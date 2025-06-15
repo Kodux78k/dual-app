@@ -436,13 +436,13 @@ if ('serviceWorker' in navigator) {
         ? 'CODEX: dual.infodose'
         : (isStudying ? 'Estudos dual.infodose' : (isEnabled ? assistantBase+' dual.infodose':''));  
       const cont=$('#logoContainer'), logo=$('#logoObj');
-      cont.classList.add('fading');
+      cont.classList.add('blend');
       setTimeout(()=>{
         if(isHistory)       logo.data='assets/icons/pill_fusion-kblx-3.png';
         else if(isStudying) logo.data='assets/icons/DualKittyKard-icon-3.png';
         else                 logo.data='assets/icons/pill_fusion-kblx-1.png';
-        cont.classList.remove('fading');
-      },369);
+        cont.classList.remove('blend');
+      },699);
     }
 
     function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
