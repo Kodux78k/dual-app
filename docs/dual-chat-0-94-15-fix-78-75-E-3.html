@@ -46,7 +46,10 @@
     @keyframes expandFooter{0%,100%{transform:scale(1)}50%{transform:scale(0.96)}}
     @keyframes moveGradient{0%{background-position:0% 50%}100%{background-position:200% 50%}}
     @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
-
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #f0f) }
+      to   { filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 35px #f0f) }
+    }
     /* Botões */
     .copy-button, .paste-button, .toggle-button, .kitty-button, .history-button {
       width:36px; height:36px; border:none; border-radius:50%;
@@ -73,6 +76,8 @@
       width:100%; height:100%; object-fit:contain;
       animation:pulse 2s infinite ease-in-out;
       transition:opacity var(--med) ease;
+      animation:glow 3s ease-in-out infinite alternate;
+      
     }
 
     /* Paginação */
