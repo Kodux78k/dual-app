@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Diário de Livros</title>
+  <!-- jsPDF para exportar PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <style>
+    /* Reset & Base */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{height:100%;scroll-behavior:smooth;font-size:100%}
+    body{position:relative;min-height:100%;font-family:Inter,sans-serif;overflow:hidden}
+    /* Partículas & Gradiente */
+    #particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;background:#000}
+    body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;
+      background:linear-gradient(45deg,rgba(0,255,255,0.15),rgba(255,0,255,0.15));z-index:1}
+
+    /* Estrutura */
+    .app{display:flex;height:100%;position:relative;z-index:2}
+    .sidebar{
+      position:fixed; top:0; left:0; height:100%;
+      width:220px; transform:translateX(-100%);
+      background:rgba(255,255,255,0.1); backdrop-filter:blur(12px);
+      box-shadow:2px 0 8px rgba(0,0,0,0.2);
+      display:flex;flex-direction:column;
+      transition:transform .3s ease;
+      z-index:5;
+    }
+    body.menu-open .sidebar { transform:translateX(0); }
+    .sidebar header{padding:1rem;text-align:center;color:#fff;font-weight:700;font-size:1.1rem}
+    .books{flex:1;overflow-y:auto;padding:0.5rem}
+    .books button{
+      width:100%;padding:0.5rem;margin-bottom:0.3rem;
+      background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:4px;
+      text-align:left;cursor:pointer;transition:background .2s;
+    }
+    .books button:hover, .books button.active{
+      background:rgba(255,255,255,0.4);
+    }
+    .new-book{padding:0.75rem;text-align:center;border-top:1px solid rgba(255,255,255,0.2)}
+    .new-book button{padding:0.5rem 1rem;background:#0ff;color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600}
+
+    .main{flex:1;display:flex;justify-content:center;align-items:center;padding:1rem}
+    .book{
+      width:100%;max-width:600px;height:85vh;
+      background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);
+      box-shadow:0 8px 32px rgba(0,0,0,0.2);border-radius:16px;
+      display:flex;flex-direction:column;position:relative;
+    }
+
+    /* Páginas */
+    .pages{flex:1;position:relative;overflow:hidden}
+    .page{
+      position:absolute;top:0;left:0;width:100%;height:100%;
+      padding:2rem;overflow-y:auto;color:#fff;
+      opacity:0;transform:translateY(30px);
+      transition:opacity .4s,transform .4s;
+    }
+    .page.active{opacity:1;transform:translateY(0)}
+
+    /* Campos editáveis */
+    .page-title{font-size:1.8rem;font-weight:700;margin-bottom:0.5rem;outline:none}
+    .page-sub{font-size:1.2rem;font-weight:500;color:rgba(255,255,255,0.8);margin-bottom:1.5rem;outline:none}
+    .page-body{font-size:1rem;line-height:1.6;min-height:200px;outline:none}
+
+    /* Controles */
+    .controls{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:0.75rem 1rem;background:rgba(255,255,255,0.1);
+      backdrop-filter:blur(8px);border-top:1px solid rgba(255,255,255,0.2);
+    }
+    .btn{
+      padding:0.5rem 0.75rem;border:none;border-radius:8px;
+      background:rgba(255,255,255,0.2);color:#fff;cursor:pointer;
+      font-size:0.9rem;display:inline-flex;align-items:center;gap:0.3rem;
+      transition:background .3s;
+      position:relative;
+    }
+    .btn:hover:not(:disabled){background:rgba(255,255,255,0.4)}
+    .btn:disabled{opacity:0.4;cursor:default}
+
+    /* Dropdown */
+    .dropdown {
+      position:absolute; top:calc(100% + 4px); right:0;
+      background:rgba(255,255,255,0.1);backdrop-filter:blur(8px);
+      border-radius:8px; box-shadow:0 4px 16px rgba(0,0,0,0.2);
+      overflow:hidden; display:none; flex-direction:column;
+    }
+    .dropdown.show { display:flex; }
+    .dropdown button {
+      width:100%; padding:0.5rem 1rem; background:transparent;
+      border:none; color:#fff; text-align:left; cursor:pointer;
+      transition:background .2s;
+    }
+    .dropdown button:hover { background:rgba(255,255,255,0.2); }
+
+    /* Feedback */
+    .feedback{
+      position:absolute;top:12px;right:12px;
+      background:rgba(0,0,0,0.6);color:#fff;
+      padding:0.3rem 0.6rem;border-radius:4px;
+      font-size:0.8rem;opacity:0;transition:opacity .3s;
+      z-index:3;
+    }
+    .feedback.show{opacity:1}
+
+    @media(min-width:600px){
+      html{font-size:112.5%}
+      .page-title{font-size:2.2rem}
+      .page-sub{font-size:1.3rem}
+      .btn{font-size:1rem}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <div class="app">
+    <nav class="sidebar">
+      <header>Meus Livros</header>
+      <div class="books" id="books"></div>
+      <div class="new-book">
+        <button id="addBook">+ Novo Livro</button>
+      </div>
+    </nav>
+
+    <section class="main">
+      <article class="book">
+        <div class="pages" id="pages"></div>
+
+        <div class="controls">
+          <button class="btn" id="menuToggle">📚</button>
+          <button class="btn" id="prev" disabled>← Anterior</button>
+          <button class="btn" id="addPage" disabled>+ Página</button>
+
+          <div style="position:relative">
+            <button class="btn" id="optionsBtn" disabled>📋 Opções</button>
+            <div class="dropdown" id="optionsMenu">
+              <button id="optCopy">Copiar</button>
+              <button id="optTxt">Exportar .TXT</button>
+              <button id="optPdf">Exportar .PDF</button>
+            </div>
+          </div>
+
+          <button class="btn" id="next" disabled>Próximo →</button>
+        </div>
+
+        <div class="feedback" id="fb">Copiado!</div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+  // === Partículas ===
+  const c=document.getElementById('particles'),ctx=c.getContext('2d');
+  let W,H,ps=[];
+  function rs(){W=c.width=innerWidth;H=c.height=innerHeight;}
+  window.addEventListener('resize',rs); rs();
+  class P{constructor(){this.reset()} reset(){
+    this.x=Math.random()*W;this.y=Math.random()*H;
+    this.vx=(Math.random()-0.5)*0.6;this.vy=(Math.random()-0.5)*0.6;
+    this.r=1+Math.random()*2;} update(){
+    this.x+=this.vx;this.y+=this.vy;
+    if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset()}
+    draw(){ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,2*Math.PI);
+      ctx.fillStyle='rgba(255,255,255,0.6)';ctx.fill()}
+  }
+  function init(n=120){ps=[];for(let i=0;i<n;i++)ps.push(new P())}
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    ps.forEach(p=>{p.update();p.draw()});
+    for(let i=0;i<ps.length;i++)for(let j=i+1;j<ps.length;j++){
+      let a=ps[i],b=ps[j],d=Math.hypot(a.x-b.x,a.y-b.y);
+      if(d<100){
+        ctx.strokeStyle=`rgba(255,255,255,${(100-d)/100*0.25})`;
+        ctx.lineWidth=0.5;ctx.beginPath();
+        ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  init();loop();
+
+  // === Armazenamento ===
+  const KEY='diario_books';
+  let books=JSON.parse(localStorage.getItem(KEY)||'{}'),
+      cur='', pagesArr=[], idx=0;
+
+  // Elementos
+  const booksEl = document.getElementById('books'),
+        pagesEl = document.getElementById('pages'),
+        prev   = document.getElementById('prev'),
+        next   = document.getElementById('next'),
+        addPg  = document.getElementById('addPage'),
+        addBk  = document.getElementById('addBook'),
+        menuT  = document.getElementById('menuToggle'),
+        optBtn = document.getElementById('optionsBtn'),
+        optMenu= document.getElementById('optionsMenu'),
+        optCopy= document.getElementById('optCopy'),
+        optTxt = document.getElementById('optTxt'),
+        optPdf = document.getElementById('optPdf'),
+        fb     = document.getElementById('fb');
+
+  function save(){localStorage.setItem(KEY,JSON.stringify(books))}
+  function updMenu(){
+    booksEl.innerHTML='';
+    for(let name in books){
+      const b=document.createElement('button');
+      b.textContent=name;
+      if(name===cur) b.classList.add('active');
+      b.onclick=()=>loadBook(name);
+      booksEl.appendChild(b);
+    }
+  }
+
+  function loadBook(name){
+    cur=name; pagesArr=books[name]; idx=0;
+    updMenu(); renderPages(); updCtrls();
+  }
+
+  function renderPages(){
+    pagesEl.innerHTML='';
+    pagesArr.forEach((pg,i)=>{
+      const d=document.createElement('div');
+      d.className='page'+(i===idx?' active':'');
+      // título
+      const t=document.createElement('div');
+      t.className='page-title'; t.contentEditable=true;
+      t.innerText=pg.title||'Título da página';
+      t.oninput=_=>{ pagesArr[i].title=t.innerText; books[cur]=pagesArr; save() };
+      // subtítulo
+      const s=document.createElement('div');
+      s.className='page-sub'; s.contentEditable=true;
+      s.innerText=pg.subtitle||'Subtítulo';
+      s.oninput=_=>{ pagesArr[i].subtitle=s.innerText; books[cur]=pagesArr; save() };
+      // corpo
+      const b=document.createElement('div');
+      b.className='page-body'; b.contentEditable=true;
+      b.innerText=pg.body||'Escreva seu texto aqui...';
+      b.oninput=_=>{ pagesArr[i].body=b.innerText; books[cur]=pagesArr; save() };
+      d.append(t,s,b); pagesEl.appendChild(d);
+    });
+  }
+
+  function updCtrls(){
+    const no = !cur;
+    prev.disabled = idx===0;
+    next.disabled = idx===pagesArr.length-1;
+    addPg.disabled = copyDisabled = txtDisabled = pdfDisabled = no;
+    optBtn.disabled = no;
+  }
+
+  function show(i){
+    if(i<0||i>=pagesArr.length) return;
+    document.querySelectorAll('.page').forEach((pg,j)=>pg.classList.toggle('active', j===i));
+    idx=i; updCtrls();
+  }
+
+  // Botões
+  addBk.onclick=()=>{
+    const name=prompt('Nome do novo livro:');
+    if(name && !books[name]){
+      books[name]=[{title:'Título da página',subtitle:'Subtítulo',body:''}];
+      save(); loadBook(name);
+    }
+  };
+  addPg.onclick=_=>{
+    pagesArr.push({title:'Título',subtitle:'Subtítulo',body:''});
+    books[cur]=pagesArr; save(); renderPages(); show(pagesArr.length-1);
+  };
+  prev.onclick=_=>show(idx-1);
+  next.onclick=_=>show(idx+1);
+
+  // Dropdown opções
+  optBtn.onclick=_=>optMenu.classList.toggle('show');
+  document.addEventListener('click', e=>{
+    if(!optBtn.contains(e.target) && !optMenu.contains(e.target)) optMenu.classList.remove('show');
+  });
+
+  function showFeedback(msg){
+    fb.textContent=msg; fb.classList.add('show');
+    setTimeout(()=>fb.classList.remove('show'),1200);
+  }
+
+  optCopy.onclick=async()=>{
+    try{
+      const pg=document.querySelector('.page.active');
+      await navigator.clipboard.writeText(
+        pg.querySelector('.page-title').innerText + '\n' +
+        pg.querySelector('.page-sub').innerText + '\n\n' +
+        pg.querySelector('.page-body').innerText
+      );
+      showFeedback('Copiado!');
+    }catch{ showFeedback('Erro ao copiar'); }
+  };
+  optTxt.onclick=_=>{
+    const pg=document.querySelector('.page.active');
+    const text = pg.querySelector('.page-title').innerText + '\n' +
+                 pg.querySelector('.page-sub').innerText + '\n\n' +
+                 pg.querySelector('.page-body').innerText;
+    const blob=new Blob([text],{type:'text/plain'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`${cur}_pg${idx+1}.txt`;
+    a.click();
+  };
+  optPdf.onclick=_=>{
+    const pg=document.querySelector('.page.active');
+    const lines = (
+      pg.querySelector('.page-title').innerText + '\n' +
+      pg.querySelector('.page-sub').innerText + '\n\n' +
+      pg.querySelector('.page-body').innerText
+    ).split('\n');
+    const { jsPDF } = window.jspdf;
+    const doc=new jsPDF();
+    let y=20; doc.setFontSize(12);
+    lines.forEach(l=>{
+      if(y>280){doc.addPage(); y=20;}
+      doc.text(l,10,y); y+=7;
+    });
+    doc.save(`${cur}_pg${idx+1}.pdf`);
+  };
+
+  // Toggle sidebar
+  menuT.onclick = ()=> document.body.classList.toggle('menu-open');
+
+  // Inicialização
+  if(!Object.keys(books).length){
+    books['Livro 1']=[{title:'Título da página',subtitle:'Subtítulo',body:''}];
+    save();
+  }
+  updMenu(); loadBook(Object.keys(books)[0]);
+  </script>
+</body>
+</html>

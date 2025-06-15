@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>☣️ GODMODE: Cyberpunk Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #000000, #1a1a1a);
+      color: #00ff99;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 20px;
+    }
+    textarea, input {
+      width: 100%;
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 8px;
+      margin: 5px 0;
+    }
+    button {
+      background: #00ff99;
+      color: black;
+      font-weight: bold;
+      padding: 10px;
+      margin: 5px 5px 5px 0;
+      border: none;
+      cursor: pointer;
+    }
+    .entry {
+      border-bottom: 1px solid #0f0;
+      margin-bottom: 10px;
+    }
+    .section {
+      margin-top: 30px;
+      padding: 15px;
+      background: #111;
+      border: 1px solid #00ff99;
+    }
+    .log {
+      white-space: pre-wrap;
+      background: #111;
+      padding: 10px;
+      border: 1px solid #0f0;
+      height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>☣️ GODMODE [Cyberpunk Console + AI]</h1>
+  <p>Status: <span id="status">Standby</span></p>
+
+  <div class="section">
+    <h2>📂 LocalStorage</h2>
+    <button onclick="loadStorage()">Carregar</button>
+    <button onclick="clearStorage()">Limpar Tudo</button>
+    <button onclick="exportJSON()">Exportar JSON</button>
+    <input type="file" id="importFile" onchange="importJSON(event)" />
+    <label for="importFile" style="color:#0ff;">Importar JSON</label>
+
+    <div id="storageView"></div>
+
+    <h3>Inserir/Editar</h3>
+    <input id="key" placeholder="Chave" />
+    <input id="value" placeholder="Valor" />
+    <button onclick="setItem()">Salvar</button>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Chat Neural (OpenRouter)</h2>
+    <textarea id="userInput" rows="3" placeholder="Fale ou digite..."></textarea>
+    <button onclick="sendMessage()">Enviar</button>
+    <button onclick="startVoice()">🎙️ Voz</button>
+    <div id="chatLog" class="log"></div>
+  </div>
+
+  <script>
+    // ===== LocalStorage =====
+    function loadStorage() {
+      const out = document.getElementById("storageView");
+      out.innerHTML = "";
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        const v = localStorage.getItem(k);
+        out.innerHTML += `<div class="entry"><strong>${k}</strong>: ${v} <button onclick="deleteItem('${k}')">❌</button></div>`;
+      }
+      document.getElementById("status").textContent = "Storage carregado.";
+    }
+
+    function setItem() {
+      const k = document.getElementById("key").value;
+      const v = document.getElementById("value").value;
+      if (k) {
+        localStorage.setItem(k, v);
+        loadStorage();
+        document.getElementById("status").textContent = `Salvo: ${k}`;
+      }
+    }
+
+    function deleteItem(key) {
+      localStorage.removeItem(key);
+      loadStorage();
+      document.getElementById("status").textContent = `Removido: ${key}`;
+    }
+
+    function clearStorage() {
+      if (confirm("Tem certeza?")) {
+        localStorage.clear();
+        loadStorage();
+        document.getElementById("status").textContent = "Tudo apagado.";
+      }
+    }
+
+    function exportJSON() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        data[k] = localStorage.getItem(k);
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "localStorage-backup.json";
+      a.click();
+    }
+
+    function importJSON(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = JSON.parse(e.target.result);
+        for (const k in data) {
+          localStorage.setItem(k, data[k]);
+        }
+        loadStorage();
+        document.getElementById("status").textContent = "Importado.";
+      };
+      reader.readAsText(file);
+    }
+
+    // ===== Chat OpenRouter =====
+    const endpoint = "https://openrouter.ai/api/v1/chat/completions";
+    const apiKey = "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";
+    const chatLog = document.getElementById("chatLog");
+
+    async function sendMessage() {
+      const input = document.getElementById("userInput").value;
+      if (!input.trim()) return;
+      document.getElementById("status").textContent = "⌛ Processando...";
+      chatLog.innerHTML += `
+🧠 Você: ${input}
+`;
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "mistralai/mistral-7b-instruct",
+          messages: [
+            { role: "system", content: "Você está em um console cyberpunk. Seja direto, técnico e útil." },
+            { role: "user", content: input }
+          ]
+        })
+      });
+
+      const data = await response.json();
+      const message = data.choices[0].message.content;
+      chatLog.innerHTML += `🤖: ${message}
+`;
+      document.getElementById("status").textContent = "✅ Pronto";
+    }
+
+    // ===== Voz por Web Speech API =====
+    function startVoice() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'pt-BR';
+      recognition.start();
+      document.getElementById("status").textContent = "🎙️ Ouvindo...";
+
+      recognition.onresult = function(event) {
+        const texto = event.results[0][0].transcript;
+        document.getElementById("userInput").value = texto;
+        sendMessage();
+      };
+
+      recognition.onerror = function() {
+        document.getElementById("status").textContent = "❌ Erro no reconhecimento de voz.";
+      };
+    }
+  </script>
+</body>
+</html>

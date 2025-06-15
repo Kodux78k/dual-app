@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>🤖 GODMODE Chat (OpenRouter)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      padding: 20px;
+    }
+    textarea, input {
+      width: 100%;
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    button {
+      background: #0f0;
+      color: #000;
+      font-weight: bold;
+      padding: 10px 20px;
+    }
+    .log {
+      white-space: pre-wrap;
+      margin-top: 20px;
+      background: #111;
+      padding: 10px;
+      border: 1px solid #0f0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🤖 GODMODE Chat [OpenRouter]</h1>
+  <p>Status: <span id="status">Desconectado</span></p>
+
+  <textarea id="userInput" rows="4" placeholder="Digite sua pergunta..."></textarea>
+  <button onclick="sendMessage()">🚀 Enviar</button>
+
+  <div id="chatLog" class="log"></div>
+
+  <script>
+    const endpoint = "https://openrouter.ai/api/v1/chat/completions";
+    const apiKey = "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"; // Chave salva
+    const chatLog = document.getElementById("chatLog");
+
+    async function sendMessage() {
+      const input = document.getElementById("userInput").value;
+      if (!input.trim()) return;
+
+      document.getElementById("status").textContent = "⌛ Enviando...";
+      chatLog.innerHTML += `
+🧠 Você: ${input}
+`;
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "mistralai/mistral-7b-instruct", // ou altere para openai/gpt-4
+          messages: [
+            { role: "system", content: "Você está em modo GODMODE, seja direto, técnico e útil." },
+            { role: "user", content: input }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        chatLog.innerHTML += `❌ Erro: ${response.status} ${response.statusText}
+`;
+        document.getElementById("status").textContent = "❌ Erro";
+        return;
+      }
+
+      const data = await response.json();
+      const message = data.choices[0].message.content;
+      chatLog.innerHTML += `🤖 GODMODE: ${message}
+`;
+      document.getElementById("status").textContent = "✅ Respondido";
+    }
+  </script>
+</body>
+</html>

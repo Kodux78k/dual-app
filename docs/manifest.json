@@ -1,0 +1,22 @@
+{
+  "name": "Infodose sistema UPA simbolico",
+  "short_name": "Dual.Infodose",
+  "description": "Sistema simbólico DUAL-UPA com arquétipos pulsantes e ativação tríade.",
+  "start_url": "splash.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

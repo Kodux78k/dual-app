@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Landing page acolhedora e confiável para regularização imobiliária em Sorocaba, com tom de guia amigável e cuidadoso." />
+  <title>Seu Imóvel Seguro – Dual.Infodose</title>
+
+  <!-- RD Station Tracking -->
+  <script type="text/javascript">
+    (function(d, s, id){
+      var js, rjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://d335luupugsy2.cloudfront.net/js/rdstation-1.0.min.js";
+      rjs.parentNode.insertBefore(js, rjs);
+    }(document, "script", "rd-js"));
+  </script>
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX', { 'anonymize_ip': true });
+  </script>
+
+  <!-- Meta Pixel (Facebook/Instagram) -->
+  <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n; n.push=n; n.loaded=!0; n.version='2.0';
+      n.queue=[]; t=b.createElement(e); t.async=!0;
+      t.src=v; s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'XXXXXXXXXXXXXXX'); 
+    fbq('track', 'PageView');
+  </script>
+  <noscript>
+    <img height="1" width="1" style="display:none"
+         src="https://www.facebook.com/tr?id=XXXXXXXXXXXXXXX&ev=PageView&noscript=1"/>
+  </noscript>
+
+  <style>
+    /* Reset e tipografia */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #e8f4fc 0%, #ffffff 100%);
+      color: #333;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Splash Overlay */
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e8f4fc 0%, #d0e8f8 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
+    }
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    #splash img#logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 20px;
+    }
+    #splash h1 {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #activateBtn {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #activateBtn:hover {
+      background-color: #217dbb;
+      transform: scale(1.03);
+    }
+    #activateBtn.active {
+      background-color: #27ae60;
+    }
+
+    /* Container central */
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header acolhedor */
+    header {
+      text-align: center;
+      padding: 60px 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    header.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    header img#assistantImg {
+      width: 199px;
+      height: auto;
+      margin-bottom: 15px;
+    }
+    header h1 {
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    header p {
+      font-size: 1.1rem;
+      color: #555;
+      opacity: 0.9;
+      margin-bottom: 6px;
+    }
+    header p.sub {
+      font-size: 1rem;
+      color: #777;
+      opacity: 0.85;
+    }
+
+    /* Benefícios – estilo confiável */
+    .benefits {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      margin: 40px 0;
+    }
+    .benefit-card {
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(100, 149, 237, 0.4);
+      border-radius: 10px;
+      width: 32%;
+      min-width: 200px;
+      margin-bottom: 20px;
+      padding: 20px;
+      cursor: pointer;
+      position: relative;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease, transform 0.3s ease;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .benefit-card.visible {
+      opacity: 0.95;
+      transform: translateY(0);
+    }
+    .benefit-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+    .benefit-card h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #34495e;
+    }
+    .benefit-card p.brief {
+      font-size: 1rem;
+      color: #333;
+      opacity: 0.85;
+      margin-bottom: 12px;
+    }
+    .benefit-card .click-note {
+      font-size: 0.9rem;
+      color: #555;
+      opacity: 0.7;
+      border-top: 1px dashed rgba(100, 149, 237, 0.4);
+      padding-top: 8px;
+      margin-top: 8px;
+    }
+    .benefit-details {
+      display: none;
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #444;
+      border-top: 1px dashed rgba(100, 149, 237, 0.4);
+      padding-top: 10px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      text-align: left;
+      line-height: 1.5;
+    }
+    .benefit-card.expanded .benefit-details {
+      display: block;
+      opacity: 1;
+    }
+
+    /* Botão CTA tranquilo */
+    .cta-button {
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      padding: 18px;
+      font-size: 1.3rem;
+      border-radius: 8px;
+      cursor: pointer;
+      opacity: 0.9;
+      margin: 30px 0;
+      transition: opacity 0.3s, background-color 0.3s, transform 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+    .cta-button:hover {
+      transform: scale(1.02);
+      opacity: 1;
+      background-color: #217dbb;
+    }
+
+    /* Formulário em três etapas suave */
+    .lead-form-container {
+      display: none;
+      background-color: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(100, 149, 237, 0.4);
+      border-radius: 10px;
+      padding: 30px;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .lead-form-container.visible {
+      display: block;
+      opacity: 0.95;
+      transform: translateY(0);
+    }
+    .lead-form h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #2c3e50;
+      opacity: 0.9;
+      text-align: center;
+    }
+    .step {
+      display: none;
+      text-align: left;
+    }
+    .step.active {
+      display: block;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 6px;
+      opacity: 0.85;
+      color: #444;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      font-size: 1.05rem;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.9);
+      transition: border-color 0.2s, background-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #3498db;
+      background-color: #fff;
+    }
+    .form-group textarea {
+      resize: vertical;
+      height: 100px;
+    }
+    .step-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+    }
+    .step-buttons button {
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      opacity: 0.9;
+      transition: opacity 0.3s, background-color 0.3s, transform 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .step-buttons button:hover {
+      transform: scale(1.02);
+      opacity: 1;
+      background-color: #217dbb;
+    }
+    .status-message {
+      margin-top: 15px;
+      font-size: 1rem;
+      display: none;
+      opacity: 0.85;
+      text-align: center;
+    }
+    .status-success {
+      color: #27ae60;
+    }
+    .status-error {
+      color: #e74c3c;
+    }
+
+    /* Botão WhatsApp suave */
+    .whatsapp-btn {
+      display: none;
+      width: 100%;
+      background-color: #2ecc71;
+      color: #fff;
+      border: none;
+      padding: 18px;
+      font-size: 1.1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      text-align: center;
+      transition: opacity 0.3s, background-color 0.3s, transform 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      opacity: 0.9;
+    }
+    .whatsapp-btn:hover {
+      transform: scale(1.02);
+      opacity: 1;
+      background-color: #28b463;
+    }
+
+    /* Footer suave */
+    footer {
+      text-align: center;
+      padding: 20px 10px;
+      font-size: 0.85rem;
+      color: #777;
+      opacity: 0.8;
+      margin-top: 40px;
+    }
+    footer a {
+      color: #3498db;
+      opacity: 0.9;
+    }
+    footer a:hover {
+      opacity: 1;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .benefits {
+        flex-direction: column;
+        align-items: center;
+      }
+      .benefit-card {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fake Splash -->
+  <div id="splash">
+    <img id="logo" src="assets/icons/pill_Dual_0.png" alt="Logo Dual.Infodose" />
+    <h1>Bem-vindo ao Seu Imóvel Seguro</h1>
+    <button id="activateBtn">Ativar Infodose</button>
+  </div>
+
+  <!-- Conteúdo Principal Oculto -->
+  <div id="mainContent" class="container" style="opacity: 0; pointer-events: none;">
+    <!-- Header -->
+    <header id="pageHeader">
+      <img id="assistantImg" src="assets/icons/dual_bot_0.png" alt="Assistente Infodose" />
+      <h1>🏠 Seu Imóvel Merece Tranquilidade</h1>
+      <p>Estamos aqui para cuidar de todo o processo de regularização, passo a passo, sem pressa.</p>
+      <p class="sub">Com carinho, transparência e atenção aos detalhes, nós guiamos você até a escritura livre de pendências.</p>
+    </header>
+
+    <!-- Benefícios -->
+    <section class="benefits">
+      <div class="benefit-card" id="benefit1">
+        <h3>🤝 Acompanhamento Pessoal</h3>
+        <p class="brief">Um especialista dedicado estará ao seu lado a cada etapa.</p>
+        <div class="benefit-details">
+          Nosso consultor verifica cada documento com calma e explica tudo de forma clara. Você recebe orientações constantes por WhatsApp, sem surpresas.
+        </div>
+        <div class="click-note">Clique para mais detalhes</div>
+      </div>
+      <div class="benefit-card" id="benefit2">
+        <h3>🔍 Transparência Total</h3>
+        <p class="brief">Você sabe exatamente cada custo envolvido, sem tarifas escondidas.</p>
+        <div class="benefit-details">
+          Listamos todos os valores de cartório e honorários antecipadamente. Todo recebimento e despesa é compartilhado em tempo real, para sua confiança.
+        </div>
+        <div class="click-note">Clique para mais detalhes</div>
+      </div>
+      <div class="benefit-card" id="benefit3">
+        <h3>⏳ Processo Suave</h3>
+        <p class="brief">Sem correria: cada etapa respeita seu ritmo e evita estresse.</p>
+        <div class="benefit-details">
+          Realizamos visitas técnicas se necessário, esclarecemos dúvidas e cuidamos da papelada para que você possa seguir sua rotina tranquilo, enquanto tudo acontece ao fundo.
+        </div>
+        <div class="click-note">Clique para mais detalhes</div>
+      </div>
+    </section>
+
+    <!-- Botão CTA -->
+    <button class="cta-button" id="showFormBtn">Quero Começar com Segurança</button>
+
+    <!-- Formulário em Três Etapas -->
+    <section class="lead-form-container" id="leadFormContainer">
+      <h2>✏️ Preencha com Confiança</h2>
+      <form id="leadForm">
+        <!-- Etapa 1: Nome e Telefone -->
+        <div class="step" id="step1">
+          <div class="form-group">
+            <label for="inputNome">Seu Nome Completo *</label>
+            <input type="text" id="inputNome" name="nome" placeholder="Ex: Ana Oliveira" required>
+            <small style="opacity:0.75;">Precisamos do seu nome para atendê-lo de forma personalizada.</small>
+          </div>
+          <div class="form-group">
+            <label for="inputTelefone">WhatsApp (DDD + Número) *</label>
+            <input type="text" id="inputTelefone" name="telefone" placeholder="55159998881234" required>
+            <small style="opacity:0.75;">É por aqui que vamos compartilhar cada atualização importante.</small>
+          </div>
+          <div class="step-buttons">
+            <button type="button" id="next1">Próxima Etapa ➔</button>
+          </div>
+        </div>
+
+        <!-- Etapa 2: Descrição da Situação -->
+        <div class="step" id="step2">
+          <div class="form-group">
+            <label for="inputDescricao">Qual a Principal Dificuldade? *</label>
+            <textarea id="inputDescricao" name="descricao" placeholder="Ex: Dificuldade na documentação do imóvel" required></textarea>
+            <small style="opacity:0.75;">Conte com detalhes para que possamos ajudar de forma certeira.</small>
+          </div>
+          <div class="step-buttons">
+            <button type="button" id="back2">◂ Voltar</button>
+            <button type="button" id="next2">Próxima Etapa ➔</button>
+          </div>
+        </div>
+
+        <!-- Etapa 3: Bairro e Tipo de Serviço -->
+        <div class="step" id="step3">
+          <div class="form-group">
+            <label for="inputBairro">Em Que Bairro Você Está? *</label>
+            <select id="inputBairro" name="bairro" required>
+              <option value="">Selecione seu bairro</option>
+              <option>Jardim Ipiranga</option>
+              <option>Vila Haro</option>
+              <option>Parque São Bento</option>
+              <option>Cajuru</option>
+              <option>Jardim Santa Bárbara</option>
+              <option>Outro</option>
+            </select>
+            <small style="opacity:0.75;">Para direcionar nosso atendimento local e agilizar tudo.</small>
+          </div>
+          <div class="form-group">
+            <label for="inputTipoProjeto">Qual Serviço Você Precisa? *</label>
+            <select id="inputTipoProjeto" name="tipo_de_projeto" required>
+              <option value="">Selecione</option>
+              <option value="escritura">Escritura</option>
+              <option value="heranca">Herança</option>
+              <option value="iptu">IPTU</option>
+              <option value="itbi">ITBI</option>
+              <option value="outros">Outro</option>
+            </select>
+            <small style="opacity:0.75;">Assim sabermos exatamente como ajudar você.</small>
+          </div>
+          <div class="step-buttons">
+            <button type="button" id="back3">◂ Voltar</button>
+            <button type="submit">Enviar e Iniciar ➔</button>
+          </div>
+        </div>
+
+        <p id="statusSuccess" class="status-message status-success">✅ Informações recebidas! Em breve entraremos em contato para orientá-lo.</p>
+        <p id="statusError" class="status-message status-error">❌ Falha ao enviar. Por favor, tente novamente mais tarde.</p>
+        <button type="button" class="whatsapp-btn" id="whatsappBtn">
+          💬 Continuar pelo WhatsApp
+        </button>
+      </form>
+    </section>
+
+    <!-- Footer suave -->
+    <footer>
+      <p>© 2025 Dual.Infodose. Todos os direitos reservados.</p>
+      <p><a href="https://dual.infodose.com.br">dual.infodose.com.br</a></p>
+      <p style="margin-top: 8px; font-size: 0.85rem; opacity: 0.8;">
+        Respeitamos sua privacidade: <a href="https://dual.infodose.com.br/privacy" target="_blank">Política de Privacidade</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Função para remover emojis, mantendo todos os textos
+    function cleanText(text) {
+      return text.replace(/[\u{1F600}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F300}-\u{1F5FF}\u{1F900}-\u{1F9FF}\u{1F1E6}-\u{1F1FF}]/gu, '');
+    }
+    function narrate(text, options = {}) {
+      if (!window.speechSynthesis) return;
+      const clean = cleanText(text);
+      if (!clean.trim()) return;
+      const utterance = new SpeechSynthesisUtterance(clean);
+      utterance.lang = 'pt-BR';
+      utterance.rate = options.rate !== undefined ? options.rate : 0.98;
+      utterance.pitch = options.pitch !== undefined ? options.pitch : 1.2;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utterance);
+    }
+
+    // Transição do fake splash e narração de todo o header de uma vez
+    const splash = document.getElementById('splash');
+    const activateBtn = document.getElementById('activateBtn');
+    const mainContent = document.getElementById('mainContent');
+
+    activateBtn.addEventListener('click', () => {
+      activateBtn.classList.add('active');
+      setTimeout(() => {
+        splash.classList.add('hidden');
+        setTimeout(() => {
+          splash.style.display = 'none';
+          mainContent.style.pointerEvents = 'auto';
+          mainContent.style.transition = 'opacity 0.8s ease';
+          mainContent.style.opacity = '1';
+
+          // Juntar todo o texto do header em uma única string para narrar sem pular
+          const title = document.querySelector('#pageHeader h1').textContent;
+          const p1 = document.querySelector('#pageHeader p').textContent;
+          const p2 = document.querySelector('#pageHeader p.sub').textContent;
+          const fullHeader = `${title}. ${p1}. ${p2}. Agora, clique nos cartões de benefício abaixo para saber mais detalhes. Eu continuo aqui para orientar você.`;
+          narrate(fullHeader, { rate: 0.98, pitch: 1.2 });
+        }, 500);
+      }, 200);
+    });
+
+    // Animações de entrada do header e cards com IntersectionObserver
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = { threshold: 0.2 };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      observer.observe(document.getElementById('pageHeader'));
+      document.querySelectorAll('.benefit-card').forEach(card => observer.observe(card));
+    });
+
+    // Expandir/Recolher detalhes nos cartões de benefício com narração completa do título e detalhes
+    document.querySelectorAll('.benefit-card').forEach((card, index) => {
+      card.addEventListener('click', () => {
+        const title = card.querySelector('h3').textContent;
+        const details = card.querySelector('.benefit-details').textContent;
+        card.classList.toggle('expanded');
+        if (card.classList.contains('expanded')) {
+          narrate(`${title}. ${details}`, { pitch: 1.2, rate: 0.98 });
+        } else {
+          narrate("Detalhes ocultados. Clique novamente para ouvir mais informações.", { pitch: 1.0, rate: 0.98 });
+        }
+      });
+    });
+
+    // Mostrar formulário ao clicar no CTA com narração de tudo de uma vez
+    const showFormBtn = document.getElementById('showFormBtn');
+    const formContainer = document.getElementById('leadFormContainer');
+    showFormBtn.addEventListener('click', () => {
+      showFormBtn.style.display = 'none';
+      formContainer.classList.add('visible');
+      document.getElementById('step1').classList.add('active');
+      const instructions = "Ótimo, vamos iniciar com cuidado e atenção. Informe seu nome e WhatsApp para começarmos.";
+      narrate(instructions, { rate: 1.0, pitch: 1.2 });
+    });
+
+    // Controle das etapas do formulário com narração completa dos textos
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const next1 = document.getElementById('next1');
+    const next2 = document.getElementById('next2');
+    const back2 = document.getElementById('back2');
+    const back3 = document.getElementById('back3');
+
+    next1.addEventListener('click', () => {
+      narrate("Agora, descreva seu principal desafio ou dúvida para que possamos ajudar melhor.", { rate: 1.0, pitch: 1.2 });
+      step1.classList.remove('active');
+      step2.classList.add('active');
+    });
+    next2.addEventListener('click', () => {
+      narrate("Perfeito. Agora escolha seu bairro e o tipo de serviço que você precisa.", { rate: 1.0, pitch: 1.2 });
+      step2.classList.remove('active');
+      step3.classList.add('active');
+    });
+    back2.addEventListener('click', () => {
+      narrate("Voltando para a etapa anterior com calma.", { rate: 0.98, pitch: 1.0 });
+      step2.classList.remove('active');
+      step1.classList.add('active');
+    });
+    back3.addEventListener('click', () => {
+      narrate("Voltando para a etapa anterior com calma.", { rate: 0.98, pitch: 1.0 });
+      step3.classList.remove('active');
+      step2.classList.add('active');
+    });
+
+    // Envio do formulário com tracking, AJAX ao N8n e narração completa de status
+    document.getElementById('leadForm').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      document.getElementById('statusSuccess').style.display = 'none';
+      document.getElementById('statusError').style.display = 'none';
+      document.getElementById('whatsappBtn').style.display = 'none';
+
+      const nome = document.getElementById('inputNome').value.trim();
+      const telefone = document.getElementById('inputTelefone').value.trim();
+      const descricao = document.getElementById('inputDescricao').value.trim();
+      const bairro = document.getElementById('inputBairro').value.trim();
+      const tipoProjeto = document.getElementById('inputTipoProjeto').value;
+
+      if (!nome || !telefone || !descricao || !bairro || !tipoProjeto) {
+        document.getElementById('statusError').textContent = 'Por favor, preencha todos os campos para continuarmos.';
+        document.getElementById('statusError').style.display = 'block';
+        narrate("Por favor, preencha todos os campos para continuarmos.", { rate: 0.95, pitch: 1.0 });
+        return;
+      }
+
+      const payload = { nome, telefone, descricao, bairro, tipo_de_projeto: tipoProjeto };
+
+      try {
+        // RD Station
+        if (typeof rd !== 'undefined') {
+          rd.track('FormSubmission', {
+            lead_name: nome,
+            lead_phone: telefone,
+            lead_bairro: bairro,
+            lead_tipo_projeto: tipoProjeto
+          });
+        }
+        // Google Analytics 4
+        gtag('event', 'lead_form_submission', {
+          'event_category': 'Leads',
+          'event_label': tipoProjeto,
+          'value': 1
+        });
+        // Meta Pixel
+        fbq('track', 'Lead', {
+          content_name: tipoProjeto,
+          content_category: 'Regularização Imobiliária'
+        });
+
+        // Enviar para N8n
+        const response = await fetch('https://informacaodosada.app.n8n.cloud/webhook/lead-regularizacao', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error('Falha no envio');
+        }
+
+        document.getElementById('statusSuccess').style.display = 'block';
+        narrate("Informações recebidas com sucesso! Em breve entraremos em contato com orientações detalhadas. Obrigado por confiar em nós.", { rate: 1.0, pitch: 1.2 });
+
+        // Mostrar botão WhatsApp para acompanhamento
+        const whatsappBtn = document.getElementById('whatsappBtn');
+        whatsappBtn.style.display = 'block';
+        whatsappBtn.addEventListener('click', () => {
+          const waNumber = '5515997319338'; 
+          const msg = encodeURIComponent(`Olá, aqui é ${nome}. Gostaria de continuar o acompanhamento pelo WhatsApp, por favor.`);
+          window.open(`https://wa.me/${waNumber}?text=${msg}`, '_blank');
+          narrate("Abrindo WhatsApp para continuarmos o atendimento com cuidado.", { rate: 0.98, pitch: 1.0 });
+        });
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById('statusError').textContent = 'Houve um problema ao enviar. Tente novamente mais tarde.';
+        document.getElementById('statusError').style.display = 'block';
+        narrate("Houve um problema ao enviar. Por favor, tente novamente mais tarde.", { rate: 0.95, pitch: 1.0 });
+      }
+    });
+  </script>
+</body>
+</html>
