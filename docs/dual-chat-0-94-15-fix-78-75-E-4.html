@@ -264,7 +264,7 @@
 <link href="manifest.json" rel="manifest"/>
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('serviceWorker.js')
+  navigator.serviceWorker.register('service-worker.js')
     .then(() => console.log("✔️ Service Worker registrado"))
     .catch(err => console.error("❌ Service Worker falhou:", err));
 }
@@ -292,7 +292,7 @@ if ('serviceWorker' in navigator) {
 <button aria-label="Alternar tema" id="themeToggle" title="Alternar tema"></button>
 <div id="particles-js"></div>
 <div class="svg-container" id="logoContainer">
-<object data="assets/icons/pill_Dual.png" id="logoObj" type="image/png"></object>
+<object data="assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png"></object>
 </div>
 <div aria-live="polite" id="assistantName"></div>
 <div class="response-container" id="response">
@@ -308,7 +308,7 @@ if ('serviceWorker' in navigator) {
 <button class="paste-button" title="Colar"><object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object></button>
 <button class="toggle-button" id="toggleBtn" title="Login"><object data="assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28"></object></button>
 <button class="kitty-button" id="kittyBtn" title="Estudos"><object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object></button>
-<button class="history-button" id="historyBtn" title="Modo Kobllux"><object data="assets/icons/KOBLLUX-infodose-icon-1.png" height="24" type="image/png" width="24"></object></button>
+<button class="history-button" id="historyBtn" title="Modo Codex"><object data="assets/icons/KOBLLUX-infodose-icon-1.png" height="33" type="image/png" width="33"></object></button>
 </div>
 <div class="pagination">
 <button aria-label="Página anterior" data-action="prev">⟵</button>
@@ -438,7 +438,7 @@ if ('serviceWorker' in navigator) {
       const cont=$('#logoContainer'), logo=$('#logoObj');
       cont.classList.add('fading');
       setTimeout(()=>{
-        if(isHistory)       logo.data='assets/icons/KOBLLUX-infodose-icon-1.png';
+        if(isHistory)       logo.data='assets/icons/pill_fusion-kblx-trinity3.png';
         else if(isStudying) logo.data='assets/icons/DualKittyKard-icon-3.png';
         else                 logo.data='assets/icons/pill_fusion-kblx-1.png';
         cont.classList.remove('fading');
