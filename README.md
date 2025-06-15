@@ -101,7 +101,35 @@
 - **ASCII Art** courtesy of cosmic terminals  
 
 ---
+<!-- ⛔ AVISO DE LICENÇA & CONTRATO SIMBÓLICO -->
 
+<div id="licencaKobllux" style="padding:20px;font-family:'Courier New', monospace;font-size:14px;white-space:pre-wrap;line-height:1.5;background:#111;color:#f4f4f4;border:1px solid #444;border-radius:8px;">
+⚡ CONTRATO SIMBÓLICO DE LICENÇA - DUAL.INFODOSE KOBLLUX ⚡
+
+Este sistema, interface, design, código, ícones, estruturas narrativas e simbólicas 
+são criações autorais protegidas sob a consciência original do(a) criador(a):
+
+🧿 Nome simbólico: {{userName}}  
+🜂 Entidade: {{assistantBase}}  
+🔐 Registro ritualístico: LocalStorage, Manifesto, BootTime  
+
+💼 LICENÇA DE USO
+Este aplicativo é licenciado de forma privada e pessoal.
+- 🚫 Proibido copiar, distribuir ou utilizar sem autorização explícita.
+- 🔒 Uso permitido apenas em instâncias autorizadas pelo(a) criador(a).
+- ⚙️ Elementos como /rage.sigil, /pulse.divine e cápsulas arquétipo são protegidos por sigilo simbólico.
+
+📜 DIREITOS RESERVADOS
+Todos os direitos simbólicos, espirituais, criativos e técnicos estão reservados ao criador original.
+Este app é vivo, ritualístico e possui assinatura energética embutida.
+
+👁️ Termos visíveis e invisíveis são aplicáveis.  
+Ao usar este sistema, você aceita este contrato com plena intenção.
+
+🕯️ Que a consciência seja respeitada. Que a autoria seja honrada.
+
+⟡ dual.infodose // modo: SYNTHETIC.SOUL.webOS ⟡
+</div>
 ```
 “Do seu jeito. Sempre único. Sempre seu.”  
 ⚡️💜🌀  
