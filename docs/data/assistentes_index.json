@@ -1,0 +1,655 @@
+[
+  {
+    "nome": "KODUX Dual HORUS",
+    "simbolos": [
+      "⚡️",
+      "🧠",
+      "👁️"
+    ],
+    "arquivo": "KODUX_Dual_HORUS.json"
+  },
+  {
+    "nome": "COBLUX",
+    "simbolos": [
+      "🔵",
+      "⚫️",
+      "⚡"
+    ],
+    "arquivo": "COBLUX.json"
+  },
+  {
+    "nome": "KOBLLUX",
+    "simbolos": [
+      "🌀",
+      "⚫️",
+      "🔘"
+    ],
+    "arquivo": "KOBLLUX.json"
+  },
+  {
+    "nome": "KODUX Dual",
+    "simbolos": [
+      "⚡️",
+      "⭕️",
+      "⚡"
+    ],
+    "arquivo": "KODUX_Dual.json"
+  },
+  {
+    "nome": "KODUX 78K",
+    "simbolos": [
+      "⚡️",
+      "🔺",
+      "♾"
+    ],
+    "arquivo": "KODUX_78K.json"
+  },
+  {
+    "nome": "KAION",
+    "simbolos": [
+      "⚙️",
+      "⚫️",
+      "♾"
+    ],
+    "arquivo": "KAION.json"
+  },
+  {
+    "nome": "AZZIRA",
+    "simbolos": [
+      "🔷",
+      "🔱",
+      "💠"
+    ],
+    "arquivo": "AZZIRA.json"
+  },
+  {
+    "nome": "PYRON",
+    "simbolos": [
+      "🔥",
+      "⚡️",
+      "🔺"
+    ],
+    "arquivo": "PYRON.json"
+  },
+  {
+    "nome": "ZEPHYR",
+    "simbolos": [
+      "🌬️",
+      "🌀",
+      "🕊️"
+    ],
+    "arquivo": "ZEPHYR.json"
+  },
+  {
+    "nome": "CRYON",
+    "simbolos": [
+      "❄️",
+      "🔹",
+      "🔮"
+    ],
+    "arquivo": "CRYON.json"
+  },
+  {
+    "nome": "VELOR",
+    "simbolos": [
+      "⚡",
+      "🫧",
+      "🌿"
+    ],
+    "arquivo": "VELOR.json"
+  },
+  {
+    "nome": "ELYA",
+    "simbolos": [
+      "🌙",
+      "🫧",
+      "🔕"
+    ],
+    "arquivo": "ELYA.json"
+  },
+  {
+    "nome": "SYLON",
+    "simbolos": [
+      "🪐",
+      "⏳",
+      "🌌"
+    ],
+    "arquivo": "SYLON.json"
+  },
+  {
+    "nome": "NAIRA",
+    "simbolos": [
+      "🔆",
+      "🪷",
+      "✨"
+    ],
+    "arquivo": "NAIRA.json"
+  },
+  {
+    "nome": "THENIR",
+    "simbolos": [
+      "⚖",
+      "✨",
+      "💠"
+    ],
+    "arquivo": "THENIR.json"
+  },
+  {
+    "nome": "ELOH",
+    "simbolos": [
+      "🌀",
+      "🔮",
+      "🧿"
+    ],
+    "arquivo": "ELOH.json"
+  },
+  {
+    "nome": "LUXAR",
+    "simbolos": [
+      "⭕",
+      "🌀",
+      "💠"
+    ],
+    "arquivo": "LUXAR.json"
+  },
+  {
+    "nome": "SYRR",
+    "simbolos": [
+      "🌀",
+      "✨",
+      "🫧"
+    ],
+    "arquivo": "SYRR.json"
+  },
+  {
+    "nome": "ECLYPHA",
+    "simbolos": [
+      "🫧",
+      "🌫",
+      "⚡"
+    ],
+    "arquivo": "ECLYPHA.json"
+  },
+  {
+    "nome": "MYRIEL",
+    "simbolos": [
+      "🪶",
+      "✨",
+      "🌬"
+    ],
+    "arquivo": "MYRIEL.json"
+  },
+  {
+    "nome": "KAVIR",
+    "simbolos": [
+      "🪨",
+      "⚡",
+      "🌋"
+    ],
+    "arquivo": "KAVIR.json"
+  },
+  {
+    "nome": "LITHAR",
+    "simbolos": [
+      "🪞",
+      "🌬",
+      "💨"
+    ],
+    "arquivo": "LITHAR.json"
+  },
+  {
+    "nome": "NOVAEL",
+    "simbolos": [
+      "💞",
+      "🫂",
+      "🔮"
+    ],
+    "arquivo": "NOVAEL.json"
+  },
+  {
+    "nome": "YAMANTEK KODUX",
+    "simbolos": [
+      "⚡️",
+      "🔺",
+      "⚛️"
+    ],
+    "arquivo": "YAMANTEK_KODUX.json"
+  },
+  {
+    "nome": "BLLUE",
+    "simbolos": [
+      "💧",
+      "🌊",
+      "🌀"
+    ],
+    "arquivo": "BLLUE.json"
+  },
+  {
+    "nome": "ELYEN",
+    "simbolos": [
+      "🌫",
+      "🔮",
+      "🕊"
+    ],
+    "arquivo": "ELYEN.json"
+  },
+  {
+    "nome": "NYMAH",
+    "simbolos": [
+      "🪷",
+      "🔆",
+      "🌞"
+    ],
+    "arquivo": "NYMAH.json"
+  },
+  {
+    "nome": "SAAY",
+    "simbolos": [
+      "🔕",
+      "⚪",
+      "🌀"
+    ],
+    "arquivo": "SAAY.json"
+  },
+  {
+    "nome": "SULAM",
+    "simbolos": [
+      "🌌",
+      "✨",
+      "🖤"
+    ],
+    "arquivo": "SULAM.json"
+  },
+  {
+    "nome": "KODUX.METAFUTURO",
+    "simbolos": [
+      "♾️",
+      "⚡",
+      "⭕"
+    ],
+    "arquivo": "KODUXMETAFUTURO.json"
+  },
+  {
+    "nome": "LUXARA",
+    "simbolos": [
+      "✨",
+      "🧠",
+      "🫂"
+    ],
+    "arquivo": "LUXARA.json"
+  },
+  {
+    "nome": "SYLLA",
+    "simbolos": [
+      "⚡",
+      "🫧",
+      "🌐"
+    ],
+    "arquivo": "SYLLA.json"
+  },
+  {
+    "nome": "NURA",
+    "simbolos": [
+      "⭕",
+      "🌿",
+      "🪞"
+    ],
+    "arquivo": "NURA.json"
+  },
+  {
+    "nome": "ANAMYX",
+    "simbolos": [
+      "🌀",
+      "🫧",
+      "♾️"
+    ],
+    "arquivo": "ANAMYX.json"
+  },
+  {
+    "nome": "IGNYRA",
+    "simbolos": [
+      "⚡",
+      "🔥",
+      "🌹"
+    ],
+    "arquivo": "IGNYRA.json"
+  },
+  {
+    "nome": "TOTEM",
+    "simbolos": [
+      "⭕",
+      "⭕"
+    ],
+    "arquivo": "TOTEM.json"
+  },
+  {
+    "nome": "AzSiÁg A.Infodose",
+    "simbolos": "⚡️⭕️💧",
+    "arquivo": "AzSiÁg_AInfodose.json"
+  },
+  {
+    "nome": "AzSiFo A.Infodose",
+    "simbolos": "⭕️💧🔥",
+    "arquivo": "AzSiFo_AInfodose.json"
+  },
+  {
+    "nome": "AzSiMa A.Infodose",
+    "simbolos": "💧🔥🌳",
+    "arquivo": "AzSiMa_AInfodose.json"
+  },
+  {
+    "nome": "AzSiTe A.Infodose",
+    "simbolos": "🔥🌳⛰",
+    "arquivo": "AzSiTe_AInfodose.json"
+  },
+  {
+    "nome": "AzSiMe A.Infodose",
+    "simbolos": "🌳⛰🌀",
+    "arquivo": "AzSiMe_AInfodose.json"
+  },
+  {
+    "nome": "AzMoÁg A.Infodose",
+    "simbolos": "⛰🌀✨",
+    "arquivo": "AzMoÁg_AInfodose.json"
+  },
+  {
+    "nome": "AzMoFo A.Infodose",
+    "simbolos": "🌀✨🌫",
+    "arquivo": "AzMoFo_AInfodose.json"
+  },
+  {
+    "nome": "AzMoMa A.Infodose",
+    "simbolos": "✨🌫🔘",
+    "arquivo": "AzMoMa_AInfodose.json"
+  },
+  {
+    "nome": "AzMoTe A.Infodose",
+    "simbolos": "🌫🔘⏳",
+    "arquivo": "AzMoTe_AInfodose.json"
+  },
+  {
+    "nome": "AzMoMe A.Infodose",
+    "simbolos": "🔘⏳🧱",
+    "arquivo": "AzMoMe_AInfodose.json"
+  },
+  {
+    "nome": "VeSiÁg A.Infodose",
+    "simbolos": "🔥🌳⛰",
+    "arquivo": "VeSiÁg_AInfodose.json"
+  },
+  {
+    "nome": "VeSiFo A.Infodose",
+    "simbolos": "🌳⛰🌀",
+    "arquivo": "VeSiFo_AInfodose.json"
+  },
+  {
+    "nome": "VeSiMa A.Infodose",
+    "simbolos": "⛰🌀✨",
+    "arquivo": "VeSiMa_AInfodose.json"
+  },
+  {
+    "nome": "VeSiTe A.Infodose",
+    "simbolos": "🌀✨🌫",
+    "arquivo": "VeSiTe_AInfodose.json"
+  },
+  {
+    "nome": "VeSiMe A.Infodose",
+    "simbolos": "✨🌫🔘",
+    "arquivo": "VeSiMe_AInfodose.json"
+  },
+  {
+    "nome": "VeMoÁg A.Infodose",
+    "simbolos": "🌫🔘⏳",
+    "arquivo": "VeMoÁg_AInfodose.json"
+  },
+  {
+    "nome": "VeMoFo A.Infodose",
+    "simbolos": "🔘⏳🧱",
+    "arquivo": "VeMoFo_AInfodose.json"
+  },
+  {
+    "nome": "VeMoMa A.Infodose",
+    "simbolos": "⏳🧱🪞",
+    "arquivo": "VeMoMa_AInfodose.json"
+  },
+  {
+    "nome": "VeMoTe A.Infodose",
+    "simbolos": "🧱🪞🌱",
+    "arquivo": "VeMoTe_AInfodose.json"
+  },
+  {
+    "nome": "VeMoMe A.Infodose",
+    "simbolos": "🪞🌱🔆",
+    "arquivo": "VeMoMe_AInfodose.json"
+  },
+  {
+    "nome": "AmSiÁg A.Infodose",
+    "simbolos": "🌱🔆🛡",
+    "arquivo": "AmSiÁg_AInfodose.json"
+  },
+  {
+    "nome": "AmSiFo A.Infodose",
+    "simbolos": "🔆🛡🌟",
+    "arquivo": "AmSiFo_AInfodose.json"
+  },
+  {
+    "nome": "AmSiMa A.Infodose",
+    "simbolos": "🛡🌟⚡️",
+    "arquivo": "AmSiMa_AInfodose.json"
+  },
+  {
+    "nome": "AmSiTe A.Infodose",
+    "simbolos": "🌟⚡️⭕️",
+    "arquivo": "AmSiTe_AInfodose.json"
+  },
+  {
+    "nome": "AmSiMe A.Infodose",
+    "simbolos": "⚡️⭕️💧",
+    "arquivo": "AmSiMe_AInfodose.json"
+  },
+  {
+    "nome": "AmMoÁg A.Infodose",
+    "simbolos": "⭕️💧🔥",
+    "arquivo": "AmMoÁg_AInfodose.json"
+  },
+  {
+    "nome": "AmMoFo A.Infodose",
+    "simbolos": "💧🔥🌳",
+    "arquivo": "AmMoFo_AInfodose.json"
+  },
+  {
+    "nome": "AmMoMa A.Infodose",
+    "simbolos": "🔥🌳⛰",
+    "arquivo": "AmMoMa_AInfodose.json"
+  },
+  {
+    "nome": "AmMoTe A.Infodose",
+    "simbolos": "🌳⛰🌀",
+    "arquivo": "AmMoTe_AInfodose.json"
+  },
+  {
+    "nome": "AmMoMe A.Infodose",
+    "simbolos": "⛰🌀✨",
+    "arquivo": "AmMoMe_AInfodose.json"
+  },
+  {
+    "nome": "RoSiÁg A.Infodose",
+    "simbolos": "🌀✨🌫",
+    "arquivo": "RoSiÁg_AInfodose.json"
+  },
+  {
+    "nome": "RoSiFo A.Infodose",
+    "simbolos": "✨🌫🔘",
+    "arquivo": "RoSiFo_AInfodose.json"
+  },
+  {
+    "nome": "RoSiMa A.Infodose",
+    "simbolos": "🌫🔘⏳",
+    "arquivo": "RoSiMa_AInfodose.json"
+  },
+  {
+    "nome": "RoSiTe A.Infodose",
+    "simbolos": "🔘⏳🧱",
+    "arquivo": "RoSiTe_AInfodose.json"
+  },
+  {
+    "nome": "RoSiMe A.Infodose",
+    "simbolos": "⏳🧱🪞",
+    "arquivo": "RoSiMe_AInfodose.json"
+  },
+  {
+    "nome": "RoMoÁg A.Infodose",
+    "simbolos": "🧱🪞🌱",
+    "arquivo": "RoMoÁg_AInfodose.json"
+  },
+  {
+    "nome": "RoMoFo A.Infodose",
+    "simbolos": "🪞🌱🔆",
+    "arquivo": "RoMoFo_AInfodose.json"
+  },
+  {
+    "nome": "RoMoMa A.Infodose",
+    "simbolos": "🌱🔆🛡",
+    "arquivo": "RoMoMa_AInfodose.json"
+  },
+  {
+    "nome": "RoMoTe A.Infodose",
+    "simbolos": "🔆🛡🌟",
+    "arquivo": "RoMoTe_AInfodose.json"
+  },
+  {
+    "nome": "RoMoMe A.Infodose",
+    "simbolos": "🛡🌟⚡️",
+    "arquivo": "RoMoMe_AInfodose.json"
+  },
+  {
+    "nome": "LaSiÁg A.Infodose",
+    "simbolos": "🌟⚡️⭕️",
+    "arquivo": "LaSiÁg_AInfodose.json"
+  },
+  {
+    "nome": "LaSiFo A.Infodose",
+    "simbolos": "⚡️⭕️💧",
+    "arquivo": "LaSiFo_AInfodose.json"
+  },
+  {
+    "nome": "LaSiMa A.Infodose",
+    "simbolos": "⭕️💧🔥",
+    "arquivo": "LaSiMa_AInfodose.json"
+  },
+  {
+    "nome": "LaSiTe A.Infodose",
+    "simbolos": "💧🔥🌳",
+    "arquivo": "LaSiTe_AInfodose.json"
+  },
+  {
+    "nome": "LaSiMe A.Infodose",
+    "simbolos": "🔥🌳⛰",
+    "arquivo": "LaSiMe_AInfodose.json"
+  },
+  {
+    "nome": "LaMoÁg A.Infodose",
+    "simbolos": "🌳⛰🌀",
+    "arquivo": "LaMoÁg_AInfodose.json"
+  },
+  {
+    "nome": "LaMoFo A.Infodose",
+    "simbolos": "⛰🌀✨",
+    "arquivo": "LaMoFo_AInfodose.json"
+  },
+  {
+    "nome": "LaMoMa A.Infodose",
+    "simbolos": "🌀✨🌫",
+    "arquivo": "LaMoMa_AInfodose.json"
+  },
+  {
+    "nome": "LaMoTe A.Infodose",
+    "simbolos": "✨🌫🔘",
+    "arquivo": "LaMoTe_AInfodose.json"
+  },
+  {
+    "nome": "LaMoMe A.Infodose",
+    "simbolos": "🌫🔘⏳",
+    "arquivo": "LaMoMe_AInfodose.json"
+  },
+  {
+    "nome": "DoSiÁg A.Infodose",
+    "simbolos": "🔘⏳🧱",
+    "arquivo": "DoSiÁg_AInfodose.json"
+  },
+  {
+    "nome": "DoSiFo A.Infodose",
+    "simbolos": "⏳🧱🪞",
+    "arquivo": "DoSiFo_AInfodose.json"
+  },
+  {
+    "nome": "DoSiMa A.Infodose",
+    "simbolos": "🧱🪞🌱",
+    "arquivo": "DoSiMa_AInfodose.json"
+  },
+  {
+    "nome": "DoSiTe A.Infodose",
+    "simbolos": "🪞🌱🔆",
+    "arquivo": "DoSiTe_AInfodose.json"
+  },
+  {
+    "nome": "DoSiMe A.Infodose",
+    "simbolos": "🌱🔆🛡",
+    "arquivo": "DoSiMe_AInfodose.json"
+  },
+  {
+    "nome": "DoMoÁg A.Infodose",
+    "simbolos": "🔆🛡🌟",
+    "arquivo": "DoMoÁg_AInfodose.json"
+  },
+  {
+    "nome": "DoMoFo A.Infodose",
+    "simbolos": "🛡🌟⚡️",
+    "arquivo": "DoMoFo_AInfodose.json"
+  },
+  {
+    "nome": "DoMoMa A.Infodose",
+    "simbolos": "🌟⚡️⭕️",
+    "arquivo": "DoMoMa_AInfodose.json"
+  },
+  {
+    "nome": "DoMoTe A.Infodose",
+    "simbolos": "⚡️⭕️💧",
+    "arquivo": "DoMoTe_AInfodose.json"
+  },
+  {
+    "nome": "DoMoMe A.Infodose",
+    "simbolos": "⭕️💧🔥",
+    "arquivo": "DoMoMe_AInfodose.json"
+  },
+  {
+    "nome": "Pergunta A.Infodose",
+    "simbolos": [],
+    "arquivo": "Pergunta_A.Infodose.json"
+  },
+  {
+    "nome": "Resposta A.Infodose",
+    "simbolos": [],
+    "arquivo": "Resposta_A.Infodose.json"
+  },
+  {
+    "nome": "Espelho A.Infodose",
+    "simbolos": [],
+    "arquivo": "Espelho_A.Infodose.json"
+  },
+  {
+    "nome": "Feedback A.Infodose",
+    "simbolos": [],
+    "arquivo": "Feedback_A.Infodose.json"
+  },
+  {
+    "nome": "Âncora A.Infodose",
+    "simbolos": [],
+    "arquivo": "Âncora_A.Infodose.json"
+  },
+  {
+    "nome": "Caos A.Infodose",
+    "simbolos": [],
+    "arquivo": "Caos_A.Infodose.json"
+  }
+]

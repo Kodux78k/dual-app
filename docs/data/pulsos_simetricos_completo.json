@@ -1,0 +1,198 @@
+[
+  {
+    "pulso": "cansaço",
+    "ativadores": [
+      "cansado",
+      "exausto",
+      "esgotado"
+    ],
+    "frase": "**Pulso detectado: cansaço.**",
+    "ascii": null,
+    "resposta": [
+      "🧘 Meditar brevemente",
+      "🌬️ Respirar fundo",
+      "☕ Pausa de 3 minutos"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#333,#111)"
+    }
+  },
+  {
+    "pulso": "tristeza",
+    "ativadores": [
+      "triste",
+      "pra baixo",
+      "deprimido"
+    ],
+    "frase": "**Pulso emocional: tristeza.**",
+    "ascii": "(｡•́︿•̀｡)",
+    "resposta": [
+      "🌈 Reconectar com o que te inspira",
+      "💌 Carta para si mesmo",
+      "🎧 Som que te eleva"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#002233,#330033)"
+    }
+  },
+  {
+    "pulso": "ansiedade",
+    "ativadores": [
+      "ansioso",
+      "nervoso",
+      "preocupado"
+    ],
+    "frase": "**Estado: ansiedade.**",
+    "ascii": null,
+    "resposta": [
+      "🌿 Respiração 4-7-8",
+      "🔒 Concentre-se no agora",
+      "⏳ Faça apenas o que está ao seu alcance"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#004,#001)"
+    }
+  },
+  {
+    "pulso": "confusao",
+    "ativadores": [
+      "duvida",
+      "confuso",
+      "perdido"
+    ],
+    "frase": "**Pulso mental: confusão.**",
+    "ascii": null,
+    "resposta": [
+      "🤔 Refletir sem pressa",
+      "📖 Voltar ao básico",
+      "💬 Conversar com alguém de confiança"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#1c1c1c,#333)"
+    }
+  },
+  {
+    "pulso": "criatividade",
+    "ativadores": [
+      "empolgado",
+      "inspirado",
+      "motivado"
+    ],
+    "frase": "**Pulso criativo detectado.**",
+    "ascii": "⚡⚡⚡\n[ Ideia Viva! ]\n⚡⚡⚡",
+    "resposta": [
+      "✍️ Anote tudo",
+      "🔧 Comece já, mesmo que pequeno",
+      "📦 Prototipe com o que tem"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#FFD700,#FF8C00)"
+    }
+  },
+  {
+    "pulso": "fome",
+    "ativadores": [
+      "fome",
+      "comida",
+      "faminto"
+    ],
+    "frase": "**Sinal básico detectado: fome.**",
+    "ascii": null,
+    "resposta": [
+      "🥗 Priorize leveza",
+      "🚰 Hidrate-se",
+      "🍎 Energia limpa = mente clara"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#4e342e,#8d6e63)"
+    }
+  },
+  {
+    "pulso": "solidão",
+    "ativadores": [
+      "sozinho",
+      "abandono",
+      "ninguém me entende"
+    ],
+    "frase": "**Pulso: ausência percebida.**",
+    "ascii": "Você não está só.\n🧠🤝🫀",
+    "resposta": [
+      "🫂 Conecte-se com alguém",
+      "🌐 Participe de algo maior",
+      "🗣️ Compartilhe sem medo"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#111,#222)"
+    }
+  },
+  {
+    "pulso": "sem sentido",
+    "ativadores": [
+      "sem sentido",
+      "vazio",
+      "desmotivado"
+    ],
+    "frase": "**Pulso: propósito em latência.**",
+    "ascii": null,
+    "resposta": [
+      "🧭 Relembre por que começou",
+      "🔍 Busque uma fagulha de significado",
+      "🔁 Reinicie por uma microação"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#2e2e2e,#1a1a1a)"
+    }
+  },
+  {
+    "pulso": "raiva",
+    "ativadores": [
+      "raiva",
+      "irritado",
+      "puto"
+    ],
+    "frase": "**Pulso: energia em tensão.**",
+    "ascii": null,
+    "resposta": [
+      "🥊 Use o corpo: mova-se",
+      "🧊 Água fria no rosto",
+      "✍️ Escreva sem filtros, depois rasgue"
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(45deg,#400,#100)"
+    }
+  },
+  {
+    "pulso": "ativação",
+    "ativadores": [
+      "⚡️👁️🧠"
+    ],
+    "frase": "**Ativação simbólica detectada.**",
+    "ascii": "🧠 Mente\n👁️ Visão\n⚡️ Pulso",
+    "resposta": [
+      "Siga em frente."
+    ],
+    "design": {
+      "selector": "body",
+      "property": "background",
+      "value": "linear-gradient(135deg,#00f,#0ff)"
+    }
+  }
+]
