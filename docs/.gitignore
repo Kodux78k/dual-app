@@ -1,0 +1,9 @@
+# Ignorar arquivo de configuração com chaves secretas
+env.js
+
+# Ignorar pastas comuns de node (se usar Node)
+node_modules/
+
+# Ignorar pastas ou arquivos que não quer subir (exemplo)
+docs/users
+docs/config
