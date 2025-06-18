@@ -1107,14 +1107,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   trackSelect.addEventListener("change", () => {
-    trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+    trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.wav`;
     trackAudio.play();
     playPauseBtn.textContent = "⏸";
   });
 
   binauralSelect.addEventListener("change", () => {
     if (binauralSelect.value) {
-      binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.mp3`;
+      binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.wav`;
       binauralAudio.loop = true;
       binauralAudio.play();
     } else {
