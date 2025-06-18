@@ -1200,11 +1200,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("togglePlayer");
   const controls = document.getElementById("playerControls");
 
-  toggleBtn.addEventListener("click", () => {
-    const isOpen = controls.style.display === "flex";
-    controls.style.display = isOpen ? "none" : "flex";
-    player.classList.toggle("open", !isOpen);
-  });
+  if (toggleBtn && controls && player) {
+    toggleBtn.addEventListener("click", () => {
+      const open = controls.style.display === "flex";
+      controls.style.display = open ? "none" : "flex";
+      if (open) {
+        player.classList.remove("open");
+      } else {
+        player.classList.add("open");
+      }
+    });
+  }
 });
 </script>
 
