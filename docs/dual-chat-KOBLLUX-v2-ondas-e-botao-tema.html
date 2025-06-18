@@ -1194,14 +1194,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   trackSelect.addEventListener("change", () => {
-    trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+    trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.m4a`;
     trackAudio.play();
     playPauseBtn.textContent = "⏸";
   });
 
   binauralSelect.addEventListener("change", () => {
     if (binauralSelect.value) {
-      binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.mp3`;
+      binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.wav`;
       binauralAudio.loop = true;
       binauralAudio.play();
     } else {
@@ -1226,11 +1226,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.getElementById("togglePlayer");
   const controls = document.getElementById("playerControls");
 
-  toggleBtn.addEventListener("click", () => {
-    const isOpen = controls.style.display === "flex";
-    controls.style.display = isOpen ? "none" : "flex";
-    player.classList.toggle("open", !isOpen);
-  });
+  if (toggleBtn && controls && player) {
+    toggleBtn.addEventListener("click", () => {
+      const open = controls.style.display === "flex";
+      controls.style.display = open ? "none" : "flex";
+      if (open) {
+        player.classList.remove("open");
+      } else {
+        player.classList.add("open");
+      }
+    });
+  }
 });
 </script>
 
