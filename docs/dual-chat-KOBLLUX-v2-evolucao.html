@@ -988,7 +988,7 @@ function enterTranscendence() {
 
   const veil = document.createElement('div');
   veil.id = 'veil';
-  veil.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;background:url(https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif) center/cover no-repeat;opacity:0.05;';
+  veil.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;background: center/cover no-repeat;opacity:0.05;';
   document.body.appendChild(veil);
 
   const chant = new Audio('https://cdn.pixabay.com/audio/2022/03/25/audio_348c0b5364.mp3');
@@ -1168,7 +1168,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   trackSelect.addEventListener("change", () => {
-    trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.wav`;
+    trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.m4a`;
     trackAudio.play();
     playPauseBtn.textContent = "⏸";
   });
