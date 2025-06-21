@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Universo Simbólico – Jogo da Vida</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .btn {
+      position: absolute;
+      z-index: 2;
+      padding: 8px 16px;
+      background: rgba(0, 255, 255, 0.2);
+      border: 1px solid #0FF;
+      color: #0FF;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 6px;
+      margin: 5px;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      background: rgba(255, 0, 255, 0.2);
+      border-color: #F0F;
+      color: #F0F;
+    }
+
+    #controls {
+      top: 20px;
+      left: 20px;
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #historia {
+      bottom: 20px;
+      left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <canvas id="game"></canvas>
+  
+  <div id="controls">
+    <button class="btn" onclick="evoluir()">🌱 Evoluir</button>
+    <button class="btn" onclick="impacto()">☄️ Impacto</button>
+    <button class="btn" onclick="mutacao()">🧬 Mutação</button>
+  </div>
+  
+  <button class="btn" id="historia" onclick="gerarHistoria()">📜 Gerar História</button>
+
+  <!-- particles.js -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 60 },
+        color: { value: ["#0FF", "#F0F"] },
+        shape: { type: "circle" },
+        opacity: { value: 0.5 },
+        size: { value: 3 },
+        line_linked: {
+          enable: true,
+          distance: 130,
+          color: "#FFF",
+          opacity: 0.2,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 1,
+          direction: "none",
+          out_mode: "out"
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "grab" },
+          onclick: { enable: true, mode: "push" },
+        },
+        modes: {
+          grab: { distance: 120, line_linked: { opacity: 0.4 } },
+          push: { particles_nb: 4 }
+        }
+      },
+      retina_detect: true
+    });
+  </script>
+
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const resolution = 10;
+    let cols, rows, grid, speed = 100;
+    let logAcoes = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols = Math.floor(canvas.width / resolution);
+      rows = Math.floor(canvas.height / resolution);
+      grid = makeGrid();
+    }
+
+    function makeGrid(random = true) {
+      return new Array(cols).fill(null).map(() =>
+        new Array(rows).fill(0).map(() =>
+          random ? Math.floor(Math.random() * 2) : 0
+        )
+      );
+    }
+
+    function drawGrid(grid) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) {
+          if (grid[x][y] === 1) {
+            ctx.fillStyle = "#0FF";
+            ctx.fillRect(x * resolution, y * resolution, resolution, resolution);
+          }
+        }
+      }
+    }
+
+    function nextGen(grid) {
+      const next = makeGrid(false);
+      for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) {
+          const cell = grid[x][y];
+          let neighbors = countNeighbors(grid, x, y);
+          if (cell === 1 && (neighbors === 2 || neighbors === 3)) {
+            next[x][y] = 1;
+          } else if (cell === 0 && neighbors === 3) {
+            next[x][y] = 1;
+          }
+        }
+      }
+      return next;
+    }
+
+    function countNeighbors(grid, x, y) {
+      let sum = 0;
+      for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
+          if (i === 0 && j === 0) continue;
+          const col = (x + i + cols) % cols;
+          const row = (y + j + rows) % rows;
+          sum += grid[col][row];
+        }
+      }
+      return sum;
+    }
+
+    function update() {
+      grid = nextGen(grid);
+      drawGrid(grid);
+      setTimeout(() => requestAnimationFrame(update), speed);
+    }
+
+    // Ações simbólicas
+    function evoluir() {
+      speed = 30;
+      logAcoes.push("evoluir");
+    }
+
+    function impacto() {
+      const cx = Math.floor(cols / 2);
+      const cy = Math.floor(rows / 2);
+      for (let x = cx - 5; x < cx + 5; x++) {
+        for (let y = cy - 5; y < cy + 5; y++) {
+          if (x >= 0 && y >= 0 && x < cols && y < rows) {
+            grid[x][y] = 1;
+          }
+        }
+      }
+      logAcoes.push("impacto");
+    }
+
+    function mutacao() {
+      for (let i = 0; i < 100; i++) {
+        const x = Math.floor(Math.random() * cols);
+        const y = Math.floor(Math.random() * rows);
+        grid[x][y] = Math.random() < 0.5 ? 1 : 0;
+      }
+      logAcoes.push("mutacao");
+    }
+
+    function gerarHistoria() {
+      const historia = logAcoes.map(a => {
+        switch (a) {
+          case "evoluir": return "O tempo acelerou e a consciência se expandiu.";
+          case "impacto": return "Um meteoro colidiu com a esperança cósmica.";
+          case "mutacao": return "As formas da vida se alteraram sem aviso.";
+          default: return "";
+        }
+      }).join(" ");
+
+      const codificada = btoa(historia); // base64
+      console.log("📜 História codificada:", codificada);
+
+      const mensagem = `🔐 Infodose://decode?historia=${codificada}`;
+      speak(historia);
+
+      alert(`História gerada e codificada! Você pode enviar no chat:\n\n${mensagem}`);
+    }
+
+    function speak(texto) {
+      const synth = window.speechSynthesis;
+      const utter = new SpeechSynthesisUtterance(texto);
+      utter.lang = 'pt-BR';
+      synth.speak(utter);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+
+    resizeCanvas();
+    update();
+  </script>
+</body>
+</html>
