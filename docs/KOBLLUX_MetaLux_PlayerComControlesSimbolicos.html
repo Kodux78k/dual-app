@@ -677,8 +677,45 @@ if ('serviceWorker' in navigator) {
       transform: translateX(-50%) !important;
     }
   }
-</style></head>
-<body><div class="circle-container">
+</style>
+<style>
+#toggleKobllux:hover {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 0 18px rgba(255,0,255,0.5);
+}
+#koblluxPlayer {
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+#koblluxPlayer.visible {
+  display: flex !important;
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+</style>
+</head>
+<body>
+  <!-- BOTÃO DE TOGGLE FIXO DO PLAYER -->
+<button id="toggleKobllux" style="
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 10000;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0ff, #f0f);
+  border: none;
+  color: #000;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(0,255,255,0.4);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+">≋</button>
+  <div class="circle-container">
 <div class="player-circle" id="playerButton">
 <!-- SVG do ícone de duas ondas -->
 <svg class="waves-icon" viewbox="0 0 64 64">
@@ -2002,4 +2039,22 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggleKobllux = document.getElementById("toggleKobllux");
+    const player = document.getElementById("koblluxPlayer");
+
+    toggleKobllux?.addEventListener("click", () => {
+      const isVisible = player?.classList.contains("visible");
+      if (isVisible) {
+        player.classList.remove("visible");
+        setTimeout(() => { player.style.display = "none"; }, 400);
+      } else {
+        player.style.display = "flex";
+        setTimeout(() => { player.classList.add("visible"); }, 10);
+      }
+    });
+  });
+</script>
+
 </body></html>
