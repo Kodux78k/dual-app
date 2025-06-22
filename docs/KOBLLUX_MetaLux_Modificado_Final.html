@@ -528,17 +528,17 @@ if ('serviceWorker' in navigator) {
 
     /* Ensure the toggle button stays circular at 33px */
     #togglePlayer {
-      width: 33px !important;
-      height: 33px !important;
-      border-radius: 50% !important;
+      width: 33px ;
+      height: 33px ;
+      border-radius: 50% ;
     }
 
     /* Refine theme selector border thickness and opacity */
     #themeSelector,
     #koblluxPlayer select {
-      border: 1px solid var(--text) !important;
-      opacity: 0.7 !important;
-      padding: 6px 10px !important;
+      border: 1px solid var(--text) ;
+      opacity: 0.7 ;
+      padding: 6px 10px ;
     }
     #themeSelector:hover,
     #koblluxPlayer select:hover {
@@ -549,8 +549,8 @@ if ('serviceWorker' in navigator) {
     /* Option colors inherit theme text color */
     #themeSelector option,
     #koblluxPlayer select option {
-      color: var(--text) !important;
-      background: rgba(0,0,0,0.6) !important;
+      color: var(--text) ;
+      background: rgba(0,0,0,0.6) ;
     }
 
     /* Example: dynamic border color per theme */
@@ -566,6 +566,19 @@ if ('serviceWorker' in navigator) {
 
 <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
 <div id="koblluxPlayer" style="position:fixed;top:20px;left:20px;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+  <!-- Botão para mostrar/ocultar player -->
+<button id="showHideFullPlayer" style="
+  position: relative; top: 50px; width: 64px; height: 64px; border-radius: 50%;
+  background: radial-gradient(circle at center, #0ff, #005); border: none;
+  box-shadow: 0 0 15px rgba(0,255,255,0.6); display: flex;
+  align-items: center; justify-content: center; cursor: pointer; z-index: 9999;">
+  <svg viewBox="0 0 64 64" width="32" height="32">
+    <path d="M8,32 C16,24 24,40 32,32 C40,24 48,40 56,32"
+          stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M8,40 C16,32 24,48 32,40 C40,32 48,48 56,40"
+          stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </svg>
+</button>
   <button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">≋</button>
   <div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
     <button id="playPause" style="font-size:22px;background:none;">►</button>
@@ -1656,5 +1669,21 @@ document.addEventListener("DOMContentLoaded", () => {
   loadPresets();
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleBtn = document.getElementById("showHideFullPlayer");
+  const playerBox = document.getElementById("koblluxPlayer");
 
+  if (playerBox && toggleBtn) {
+    playerBox.style.transition = "opacity 0.9s ease";
+    playerBox.style.opacity = "1";
+
+    toggleBtn.addEventListener("click", () => {
+      const visible = playerBox.style.opacity !== "0";
+      playerBox.style.opacity = visible ? "0" : "1";
+      playerBox.style.pointerEvents = visible ? "none" : "auto";
+    });
+  }
+});
+</script>
 </body></html>
