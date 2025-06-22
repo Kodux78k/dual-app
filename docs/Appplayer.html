@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KOBLLUX Player</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0a0f1c;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #0ff;
+    }
+
+    h1 {
+      letter-spacing: 8px;
+      font-weight: 300;
+      font-size: 1.5rem;
+      margin-bottom: 40px;
+    }
+
+    .player-circle {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #111, #0a0f1c);
+      box-shadow: 0 0 25px #0ff, 0 0 40px #f0f inset;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .player-circle.on {
+      box-shadow: 0 0 40px #0ff, 0 0 60px #f0f inset;
+    }
+
+    .waves-icon {
+      font-size: 48px;
+      color: #0ff;
+      transition: opacity 0.3s ease;
+    }
+
+    .slider {
+      width: 300px;
+      margin: 40px 0 20px;
+      appearance: none;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      outline: none;
+      position: relative;
+    }
+
+    .slider::-webkit-slider-thumb {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0ff;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff;
+      margin-top: -7px;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0ff;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff;
+    }
+
+    .menu-button {
+      margin-top: 20px;
+      width: 300px;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: #0ff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .menu-button:hover {
+      background: rgba(0, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>KOBLLUX</h1>
+
+  <div class="player-circle" id="playerButton">
+    <div class="waves-icon">≈</div>
+  </div>
+
+  <input type="range" min="0" max="100" value="50" class="slider" id="volumeSlider">
+  <input type="range" min="0" max="100" value="50" class="slider" id="binauralSlider">
+
+  <div class="menu-button">Track <span>›</span></div>
+  <div class="menu-button">Binaural <span>›</span></div>
+
+  <script>
+    const playerButton = document.getElementById('playerButton');
+    let isPlaying = false;
+
+    playerButton.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      playerButton.classList.toggle('on', isPlaying);
+    });
+  </script>
+</body>
+</html>
