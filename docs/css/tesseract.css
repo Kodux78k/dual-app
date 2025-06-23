@@ -1,0 +1,5 @@
+/* Tesseract Mode */
+.tesseract-container {
+  border-radius: var(--fet-radius);
+  filter: url(#bokeh);
+}

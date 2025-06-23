@@ -1,0 +1,7 @@
+/* Emotion AI Mode */
+.mode-panel {
+  border-radius: var(--fet-radius);
+}
+.ai-visualization {
+  border-radius: var(--fet-radius);
+}

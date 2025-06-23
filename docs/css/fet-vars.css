@@ -1,0 +1,14 @@
+:root {
+  /* cores principais */
+  --fet-primary: #00ff88;
+  --fet-secondary: #ff00ff;
+  --fet-bg: #0a0a12;
+
+  /* offsets e tempos */
+  --fet-speed: 0.5s;
+  --fet-intensity: 1;
+  --fet-radius: 6px;
+
+  /* path base */
+  --fet-assets: '/fet/assets';
+}

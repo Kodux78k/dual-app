@@ -1,0 +1,21 @@
+/* Turbo Mode */
+.turbo-btn {
+  background: var(--fet-bg);
+  color: var(--turbo-color, var(--fet-primary));
+  border: 2px solid var(--turbo-color, var(--fet-primary));
+  padding: 1rem 2rem;
+  border-radius: var(--fet-radius);
+  box-shadow: 0 0 10px var(--turbo-color);
+  transition: all var(--turbo-speed) ease;
+}
+body[data-fet~="turbo"] .turbo-btn {
+  animation: turbo-pulse var(--turbo-speed) infinite;
+}
+@keyframes turbo-pulse {
+  0%,100% { box-shadow: 0 0 10px var(--turbo-color); transform: scale(1); }
+  50%     { box-shadow: 0 0 30px var(--turbo-color); transform: scale(var(--turbo-scale,1.05)); }
+}
+/* foco acessível */
+.turbo-btn:focus-visible {
+  outline: 3px dashed var(--turbo-color);
+}

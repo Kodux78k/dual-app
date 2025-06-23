@@ -1,0 +1,12 @@
+/* Cyberpunk Mode */
+body[data-fet~="cyberpunk"] {
+  background: var(--fet-bg);
+  color: var(--cyber-text,#00FF41);
+}
+.scanlines {
+  opacity: var(--cyber-scan-opacity,0.1);
+  border-radius: var(--fet-radius);
+}
+.kodux-brand, .glitch-effect, .cyber-border {
+  border-radius: var(--fet-radius);
+}

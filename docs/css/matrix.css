@@ -1,0 +1,15 @@
+/* Matrix Mode */
+.canvas-matrix {
+  position: fixed; top:0; left:0;
+  width:100%; height:100%;
+  z-index: -1;
+  background: var(--fet-bg);
+}
+body[data-fet~="matrix"] .matrix-border {
+  border-radius: var(--fet-radius);
+  animation: matrix-glow 2s infinite alternate;
+}
+@keyframes matrix-glow {
+  from { box-shadow: 0 0 10px var(--matrix-color,#0f0); }
+  to   { box-shadow: 0 0 30px var(--matrix-color,#0f0); }
+}

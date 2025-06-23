@@ -1,0 +1,8 @@
+/* Emotion Detector Mode */
+#scanner {
+  border-radius: var(--fet-radius);
+  transition: all 0.5s;
+}
+.happy-style, .excited-style, .calm-style, .angry-style, .sad-style, .neutral-style {
+  border-radius: var(--fet-radius);
+}
