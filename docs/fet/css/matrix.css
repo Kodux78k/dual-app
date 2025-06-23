@@ -1,0 +1,10 @@
+/* matrix.css */
+body[data-fet~="matrix"] {
+  background-color: #000;
+  color: #0f0;
+}
+.matrix-border {
+  border: 3px solid #0f0;
+  padding: 20px;
+  box-shadow: 0 0 20px #0f0;
+}

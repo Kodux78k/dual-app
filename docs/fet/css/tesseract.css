@@ -1,0 +1,12 @@
+/* tesseract.css */
+body[data-fet~="tesseract"] {
+  perspective: 1000px;
+}
+.tesseract-container {
+  transform-style: preserve-3d;
+  animation: spin 30s infinite linear;
+}
+@keyframes spin {
+  0% { transform: rotateX(0.5turn) rotateY(0deg); }
+  100% { transform: rotateX(0.5turn) rotateY(360deg); }
+}
