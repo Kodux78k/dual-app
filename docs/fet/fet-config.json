@@ -1,0 +1,10 @@
+{
+  "fets": [
+    {"name":"turbo","css":"css/turbo.css","js":"js/turbo.js","assets":{}},
+    {"name":"matrix","css":"css/matrix.css","js":"js/matrix.js","assets":{}},
+    {"name":"cyberpunk","css":"css/cyberpunk.css","js":"js/cyberpunk.js","assets":{}},
+    {"name":"emotion-detector","css":"css/emotion-detector.css","js":"js/emotion-detector.js","assets":{}},
+    {"name":"emotion-ai","css":"css/emotion-ai.css","js":"js/emotion-ai.js","assets":{}},
+    {"name":"tesseract","css":"css/tesseract.css","js":"js/tesseract.js","assets":{}}
+  ]
+}
