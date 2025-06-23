@@ -1680,14 +1680,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
   <!-- Painel de Modos FET -->
-  <div id="fetModePanel" style="position:fixed;bottom:20px;right:20px;z-index:999;">
-    <button class="fet-mode-btn" data-fet-mode="turbo">⚡ Turbo</button>
-    <button class="fet-mode-btn" data-fet-mode="matrix">🟢 Matrix</button>
-    <button class="fet-mode-btn" data-fet-mode="cyberpunk">☣️ Cyberpunk</button>
-    <button class="fet-mode-btn" data-fet-mode="emotion-detector">😄 Detector</button>
-    <button class="fet-mode-btn" data-fet-mode="emotion-ai">🤖 AI</button>
-    <button class="fet-mode-btn" data-fet-mode="tesseract">📐 Tesseract</button>
-  </div>
+  
   <script>
     document.querySelectorAll('.fet-mode-btn').forEach(btn=>{
       btn.addEventListener('click',()=> window.unlockFET(btn.dataset.fetMode));
