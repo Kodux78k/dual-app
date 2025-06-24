@@ -574,16 +574,16 @@ if ('serviceWorker' in navigator) {
 }
 </style>
 <!-- FET Styles -->
-<link href="fet/css/fet-vars.css" rel="stylesheet"/>
-<link href="fet/css/fet-unlock.css" rel="stylesheet"/>
-<link href="fet/css/turbo.css" rel="stylesheet"/>
-<link href="fet/css/matrix.css" rel="stylesheet"/>
-<link href="fet/css/cyberpunk.css" rel="stylesheet"/>
-<link href="fet/css/emotion-detector.css" rel="stylesheet"/>
-<link href="fet/css/emotion-ai.css" rel="stylesheet"/>
-<link href="fet/css/tesseract.css" rel="stylesheet"/>
+<link href="css/fet-vars.css" rel="stylesheet"/>
+<link href="css/fet-unlock.css" rel="stylesheet"/>
+<link href="css/turbo.css" rel="stylesheet"/>
+<link href="css/matrix.css" rel="stylesheet"/>
+<link href="css/cyberpunk.css" rel="stylesheet"/>
+<link href="css/emotion-detector.css" rel="stylesheet"/>
+<link href="css/emotion-ai.css" rel="stylesheet"/>
+<link href="css/tesseract.css" rel="stylesheet"/>
 <!-- FET Loader -->
-<script src="fet/js/fet-loader.js" type="module"></script>
+<script src="fet-config.js" type="module"></script>
 <style>
 #theme-controls select {
   padding: 4px 8px;
@@ -791,7 +791,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
 <div class="pagination">
 <button aria-label="Página anterior" data-action="prev">⟵</button>
-<span id="pageIndicator">1 / 1</span>
+<span id="pageIndicator">1/1</span>
 <button aria-label="Próxima página" data-action="next">⟶</button>
 </div>
 </div>
@@ -820,7 +820,7 @@ document.addEventListener("DOMContentLoaded", () => {
             MODEL:            'deepseek/deepseek-chat-v3-0324:free',
             TEMP:             0.2,
             CHUNK_SIZE:       12000,
-            AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
+            AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
           };
 
     let training='', chunks=[], chunkIndex=0;
