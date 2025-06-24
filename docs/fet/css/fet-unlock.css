@@ -1,0 +1,9 @@
+body[data-fet] [data-fet-mode] { opacity: 0.2; pointer-events: none; }
+body[data-fet~="turbo"]   [data-fet-mode="turbo"],
+body[data-fet~="matrix"]  [data-fet-mode="matrix"],
+body[data-fet~="cyberpunk"][data-fet-mode="cyberpunk"],
+body[data-fet~="emotion-detector"][data-fet-mode="emotion-detector"],
+body[data-fet~="emotion-ai"][data-fet-mode="emotion-ai"],
+body[data-fet~="tesseract"][data-fet-mode="tesseract"] {
+  opacity: 1; pointer-events: all;
+}
