@@ -1600,16 +1600,28 @@ const clean = cleanPara;
       document.querySelector('.paste-button').addEventListener('click',()=>{
         navigator.clipboard.readText().then(txt=>$('#userInput').value = txt);
       });
-      $('#sendBtn').addEventListener('click', onSend);
-      $('#userInput').addEventListener('keypress', e=>{ if(e.key==='Enter') onSend(); });
-      $('#voiceBtn').addEventListener('click', ()=>{
-        const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
-        rec.lang='pt-BR'; rec.start();
-        rec.onresult = evt=>{
-          $('#userInput').value = evt.results[0][0].transcript;
-          onSend();
-        };
-      });
+    $(document).ready(function() {
+  $('#sendBtn').on('click', onSend);
+
+  $('#userInput').on('keypress', function(e) {
+    if (e.key === 'Enter') onSend();
+  });
+
+  $('#voiceBtn').on('click', function() {
+    try {
+      const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      rec.lang = 'pt-BR';
+      rec.start();
+
+      rec.onresult = function(evt) {
+        $('#userInput').val(evt.results[0][0].transcript);
+        onSend();
+      };
+    } catch (err) {
+      console.error('Erro no reconhecimento de voz:', err);
+    }
+  });
+});
       document.querySelector('.pagination').addEventListener('click', e=>{
         if(e.target.dataset.action==='prev') changePage(-1);
         if(e.target.dataset.action==='next') changePage(1);
