@@ -2777,7 +2777,7 @@ let preferClean = localStorage.getItem('preferClean') === 'false' ? false : true
 document.addEventListener("DOMContentLoaded", () => {
   const toggleModeBtn = document.createElement('button');
   toggleModeBtn.id = 'toggleCleanMode';
-  toggleModeBtn.innerText = 'Modo Dual: ' + (preferClean ? '🫧' : '🫆');
+  toggleModeBtn.innerText = '💬=' + (preferClean ? '🫧' : '🫆');
   toggleModeBtn.style.cssText = `
     position: fixed;
     top: 8px;
@@ -2788,7 +2788,7 @@ document.addEventListener("DOMContentLoaded", () => {
     border: 1px solid #0ff;
     border-radius: 5px;
     font-size: 9px;
-    opacity:0.7;
+    opacity:0.8;
     cursor: pointer;
     z-index: 3;
   `;
