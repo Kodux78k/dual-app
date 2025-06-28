@@ -1222,13 +1222,11 @@ function changeTheme(val) {
 <body data-fet="">
 <!-- CONTROLES DE TEMA -->
 
-<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;font-size:12px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;cursor:pointer;">
-🎨 Editar Tema
-</button>
+
 
 <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
 <select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Detector</option><option value="emotion-ai">🤖 AI</option><option value="tesseract">📐 Tesseract</option><option value="save-current">💾</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup>
-<option disabled>────────────</option>
+
 <option value="edit-theme" id="editThemeOption">🎨 Editar Tema</option>
 
 </select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
@@ -1255,7 +1253,7 @@ function changeTheme(val) {
 <option value="matrix">🧪 Matrix</option>
 <option value="tesseract">🧿 Tesseract</option>
 
-<option disabled>────────────</option>
+<option disabled>────</option>
 <option value="edit-theme" id="editThemeOption">🎨 Editar Tema</option>
 
 </select>
@@ -1276,7 +1274,7 @@ function changeTheme(val) {
 <option value="matrix">🧪 Matrix</option>
 <option value="tesseract">🧿 Tesseract</option>
 
-<option disabled>────────────</option>
+<option disabled>────────</option>
 <option value="edit-theme" id="editThemeOption">🎨 Editar Tema</option>
 
 </select>
