@@ -1242,7 +1242,7 @@ function changeTheme(val) {
 <body data-fet="">
 <!-- CONTROLES DE TEMA -->
 
-<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:20px;margin-right:20px;font-size:18px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;cursor:pointer;">
+<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="top:20px;right:20px;font-size:12px;padding:4px 6px;border-radius:6px;background:transparent;color:#000;border:none;cursor:pointer;">
 🎨 </button>
 
 <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
@@ -2779,14 +2779,14 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleModeBtn.innerText = 'Modo IA: ' + (preferClean ? 'Limpo ✅' : 'Original 📝');
   toggleModeBtn.style.cssText = `
     position: fixed;
-    bottom: 12px;
-    right: 12px;
+    top: 6px;
+    left: 20px;
     padding: 10px 14px;
     background: rgba(0, 0, 0, 0.6);
     color: #0ff;
     border: 1px solid #0ff;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 8px;
     cursor: pointer;
     z-index: 9999;
   `;
