@@ -15,6 +15,37 @@
     console.log('Pulso simbólico detectado:', encontrados.join(', '));
   }
 }
+
+/**
+ * Expande o suporte a Markdown no texto renderizado
+ */
+function parseMarkdownAdvanced(text) {
+  // Títulos
+  text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+  // Blockquote
+  text = text.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+
+  // Listas não ordenadas
+  text = text.replace(/^\s*[-*+] (.*$)/gim, '<li>$1</li>');
+  text = text.replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>');
+
+  // Tabelas simples
+  const tablePattern = /\|(.+)\|\n\|([\-\s|]+)\|\n((?:\|.*\|\n?)*)/g;
+  text = text.replace(tablePattern, function(_, header, separator, rows) {
+    const headers = header.trim().split('|').map(h => `<th>${h.trim()}</th>`).join('');
+    const trs = rows.trim().split('\n').map(r => {
+      const cells = r.trim().split('|').map(c => `<td>${c.trim()}</td>`).join('');
+      return `<tr>${cells}</tr>`;
+    }).join('');
+    return `<table><thead><tr>${headers}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+
+  return text;
+}
+
 </script>
 <script defer="" src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js">function detectarPulsoSimbolico(inputTexto) {
   const simbolos = ['Δ', '⚡', '🧠', '👁️'];
@@ -1117,7 +1148,7 @@ speechSynthesis.speak = function(utter) {
 
 <script>
 const themeEditor = document.createElement('div');
-themeEditor.style.cssText = 'position:fixed;top:70px;right:12px;z-index:9999;background:#111;color:#0ff;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px';
+themeEditor.id = 'themeEditor'; themeEditor.classList.add('hidden'); themeEditor.style.cssText = 'position:fixed;top:120px;right:12px;z-index:9999;background:#111;color:#0ff;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px';
 themeEditor.innerHTML = `
 <label>🎨 Cor de fundo: <input type="color" id="bgColor"></label>
 <label>🖍️ Cor do texto: <input type="color" id="textColor"></label>
@@ -1138,11 +1169,65 @@ document.getElementById('glowAmount').addEventListener('input', e => {
   });
 });
 </script>
+
+<style>
+@keyframes fadeSlideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.response-block {
+  animation: fadeSlideUp 0.6s ease both;
+}
+h1, h2, h3 {
+  font-weight: bold;
+  margin: 0.6em 0 0.4em;
+  animation: fadeSlideUp 0.4s ease both;
+}
+blockquote {
+  padding: 0.8em 1em;
+  margin: 1em 0;
+  border-left: 4px solid #0ff;
+  background: rgba(255,255,255,0.03);
+  font-style: italic;
+  animation: fadeSlideUp 0.4s ease both;
+}
+ul {
+  padding-left: 1.5em;
+  list-style-type: disc;
+}
+table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+table th, table td {
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 0.6em;
+}
+</style>
+
+
+<script>
+function changeTheme(val) {
+  const body = document.body;
+  const allThemes = ['light','dark','medium','vibe','cyberpunk','matrix','turbo','emotion-detector','emotion-ai','tesseract','anime','nebula'];
+  allThemes.forEach(t => body.classList.remove(t));
+  body.setAttribute("data-theme", val);
+  body.classList.add(val);
+  localStorage.setItem("infodoseTheme", val);
+}
+</script>
+
 </head>
 <body data-fet="">
 <!-- CONTROLES DE TEMA -->
+
+<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;font-size:12px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;cursor:pointer;">
+🎨 Editar Tema
+</button>
+
 <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
-<select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" style="display:none;"><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Detector</option><option value="emotion-ai">🤖 AI</option><option value="tesseract">📐 Tesseract</option><option value="save-current">💾</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
+<select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Detector</option><option value="emotion-ai">🤖 AI</option><option value="tesseract">📐 Tesseract</option><option value="save-current">💾</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
 </div>
 <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
 <div id="koblluxPlayer" style="position:fixed;top:20px;left:20px;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
@@ -2600,4 +2685,57 @@ document.addEventListener("DOMContentLoaded", () => {
   );
 });
 </script>
+
+<script>
+const themePresets = {
+  "Nebulosa Mística": {
+    bg: "#1b003b",
+    text: "#cfcaff",
+    glow: 0.4
+  },
+  "Céu da Manhã": {
+    bg: "#dbe9ff",
+    text: "#001f3f",
+    glow: 0.15
+  },
+  "Modo Hacker": {
+    bg: "#000000",
+    text: "#00ff00",
+    glow: 0.3
+  },
+  "Código Cósmico": {
+    bg: "#0a0a23",
+    text: "#ff99ff",
+    glow: 0.5
+  }
+};
+
+const presetSelector = document.createElement("select");
+presetSelector.style.cssText = "margin-top:10px; padding:6px; background:#111; color:#0ff; border-radius:8px;";
+presetSelector.innerHTML = "<option disabled selected>🎨 Aplicar Preset</option>" +
+  Object.keys(themePresets).map(name => `<option value='\${name}'>\${name}</option>`).join("");
+document.getElementById("themeEditor")?.appendChild(presetSelector);
+
+presetSelector.addEventListener("change", (e) => {
+  const p = themePresets[e.target.value];
+  if (!p) return;
+  document.body.style.background = p.bg;
+  document.body.style.color = p.text;
+  document.querySelectorAll(".response-block").forEach(el => {
+    el.style.boxShadow = `0 0 \${p.glow * 40}px rgba(0,255,255,\${p.glow})`;
+  });
+});
+</script>
+
+
+<script>
+(function autoDarkMode(){
+  const hour = new Date().getHours();
+  if (hour >= 20 || hour < 6) {
+    document.body.setAttribute("data-theme", "dark");
+    document.body.classList.add("theme-fade");
+  }
+})();
+</script>
+
 </body></html>
