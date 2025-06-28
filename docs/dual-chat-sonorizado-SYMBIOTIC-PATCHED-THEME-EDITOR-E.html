@@ -780,7 +780,7 @@ if ('serviceWorker' in navigator) {
     top: 0; left: 0; right: 0; bottom: 0;
     background: url('https://www.transparenttextures.com/patterns/stardust.png');
     background-size: cover;
-    opacity: 0.05;
+    opacity: 0.2;
     z-index: 0;
   }
 
@@ -865,7 +865,7 @@ if ('serviceWorker' in navigator) {
   inset: 0;
   background: repeating-conic-gradient(#00ff00 0deg 1deg, transparent 1deg 2deg);
   animation: matrixSpin 12s linear infinite;
-  opacity: 0.04;
+  opacity: 0.02;
   z-index: 0;
 }
 @keyframes matrixSpin {
@@ -898,8 +898,8 @@ if ('serviceWorker' in navigator) {
   box-shadow: 0 0 12px rgba(255, 136, 0, 0.3);
 }
 [data-theme="turbo"] #sendBtn {
-  background: linear-gradient(45deg, #ff8800, #ffcc00);
-  -webkit-text-fill-color: transparent;
+  color: linear-gradient(45deg, #ff8800, #ffcc00);
+  -webkit-text-fill-color: orange;
 }
 
 /* TESSERACT VIBRATION STYLE */
@@ -988,13 +988,13 @@ document.getElementById("loginForm").addEventListener("submit", () => {
 /* Cyberpunk: glitch */
 [data-theme="cyberpunk"] .response-block {
   position: relative;
-  animation: glitchFlash 3s infinite;
+  animation: glitchFlash 369s infinite;
 }
 @keyframes glitchFlash {
   0% { filter: hue-rotate(0deg); }
   20% { filter: hue-rotate(20deg); }
   40% { filter: contrast(1.2); }
-  60% { filter: hue-rotate(-20deg); }
+  60% { filter: hue-rotate(-2deg); }
   80% { filter: saturate(1.5); }
   100% { filter: none; }
 }
@@ -1054,7 +1054,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       try {
-        rec.start();
+        //rec.start();//
         console.log("🎤 Modo auto-adaptativo contínuo ativado.");
       } catch(e) {
         console.warn("❌ Não foi possível iniciar reconhecimento contínuo:", e);
@@ -1092,7 +1092,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
 }
 
 [data-theme="emotion-ai"] body {
-  background: linear-gradient(to right, #222831, #393e46);
+  background: linear-gradient(to right, #f5c36b, #e89cae);
   color: #eeeeee;
 }
 [data-theme="emotion-ai"] .response-block {
@@ -1107,7 +1107,7 @@ function showThemeFeedback(theme) {
   const flash = document.createElement('div');
   flash.style.position = 'fixed';
   flash.style.inset = 0;
-  flash.style.background = 'white';
+  flash.style.background = 'black';
   flash.style.opacity = 0.6;
   flash.style.zIndex = 9999;
   flash.style.pointerEvents = 'none';
@@ -1222,12 +1222,13 @@ function changeTheme(val) {
 <body data-fet="">
 <!-- CONTROLES DE TEMA -->
 
+
+
+<div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
+<select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Detector</option><option value="emotion-ai">🤖modo:MHM</option><option value="tesseract">📐Tesseract</option><option value="save-current">💾 salvar</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
 <button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;font-size:12px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;cursor:pointer;">
 🎨 Editar Tema
 </button>
-
-<div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
-<select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Detector</option><option value="emotion-ai">🤖 AI</option><option value="tesseract">📐 Tesseract</option><option value="save-current">💾</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
 </div>
 <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
 <div id="koblluxPlayer" style="position:fixed;top:20px;left:20px;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
