@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<!-- Refatorado por ChatGPT em 25/06/2025 -->
+<title>dual-Infodose Chat Cinematográfico</title>
+<!-- Fonte Montserrat otimizada -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script defer="" src="config/config.js">function detectarPulsoSimbolico(inputTexto) {
+  const simbolos = ['Δ', '⚡', '🧠', '👁️'];
+  const encontrados = simbolos.filter(s => inputTexto.includes(s));
+  if (encontrados.length) {
+    console.log('Pulso simbólico detectado:', encontrados.join(', '));
+  }
+}
+
+/**
+ * Expande o suporte a Markdown no texto renderizado
+ */
+function parseMarkdownAdvanced(text) {
+  // Títulos
+  text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+  // Blockquote
+  text = text.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+
+  // Listas não ordenadas
+  text = text.replace(/^\s*[-*+] (.*$)/gim, '<li>$1</li>');
+  text = text.replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>');
+
+  // Tabelas simples
+  const tablePattern = /\|(.+)\|\n\|([\-\s|]+)\|\n((?:\|.*\|\n?)*)/g;
+  text = text.replace(tablePattern, function(_, header, separator, rows) {
+    const headers = header.trim().split('|').map(h => `<th>${h.trim()}</th>`).join('');
+    const trs = rows.trim().split('\n').map(r => {
+      const cells = r.trim().split('|').map(c => `<td>${c.trim()}</td>`).join('');
+      return `<tr>${cells}</tr>`;
+    }).join('');
+    return `<table><thead><tr>${headers}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+
+  return text;
+}
+
+</script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js">function detectarPulsoSimbolico(inputTexto) {
+  const simbolos = ['Δ', '⚡', '🧠', '👁️'];
+  const encontrados = simbolos.filter(s => inputTexto.includes(s));
+  if (encontrados.length) {
+    console.log('Pulso simbólico detectado:', encontrados.join(', '));
+  }
+}
+</script>
+
+<link href="manifest.json" rel="manifest"/>
+
+<!-- Ultra Foda Styles Override -->
+
+<!-- v3 CSS Override: Perfect circular toggle -->
+
+<!-- v5: Final TogglePlayer Fix -->
+
+<!-- v6: Remove container border & theme select variable styling -->
+
+<!-- v7: Rounded background & refined theme selector -->
+
+
+<!-- FET Styles -->
+<link href="fet/css/fet-vars.css" rel="stylesheet"/>
+<link href="fet/css/fet-unlock.css" rel="stylesheet"/>
+<link href="fet/css/turbo.css" rel="stylesheet"/>
+<link href="fet/css/matrix.css" rel="stylesheet"/>
+<link href="fet/css/cyberpunk.css" rel="stylesheet"/>
+<link href="fet/css/emotion-detector.css" rel="stylesheet"/>
+<link href="fet/css/emotion-ai.css" rel="stylesheet"/>
+<link href="fet/css/tesseract.css" rel="stylesheet"/>
+<!-- FET Loader -->
+<script src="fet/js/fet-loader.js" type="module"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="styles/main.css" rel="stylesheet"/></head>
+<body data-fet="">
+<!-- CONTROLES DE TEMA -->
+<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="top:32px;right:20px;font-size:9px;padding:6px;border-radius:6px;background:transparent;color:#000;border:none;cursor:pointer;opacity:0;">
+🎨 </button>
+<div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
+<select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado"><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Emotion</option><option value="emotion-ai">🤖🧠:MHM</option><option value="tesseract">📐Tesseract</option><option value="save-current">💾 salvar</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
+</div>
+<!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
+<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:1;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">≈</button><div class="hidden" id="playerWrapper"></div>
+<div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
+<button id="playPause" style="font-size:22px;background:none;">►</button>
+<select id="trackSelect">
+<option value="">🎵 Escolha uma trilha</option>
+<option value="Sono_Profundo">🌙 Sono Profundo</option>
+<option value="Manifestação">✨ Manifestação</option>
+<option value="Ativação_Pineal">🧠 Ativação Pineal</option>
+<option value="Alívio_da_Ansiedade">🌿 Alívio da Ansiedade</option>
+<option value="Meditação_Theta">🌀 Meditação Theta</option>
+<option value="Viagem_Astral">🌌 Viagem Astral</option>
+<option value="Foco_Profundo">🎯 Foco Profundo</option>
+<option value="Flow_State">🌊 Flow State</option>
+<option value="Relaxamento_Rápido">💤 Relaxamento Rápido</option>
+<option value="Concentração_Sustentada">📚 Concentração Sustentada</option>
+<option value="Cura_Emocional">💖 Cura Emocional</option>
+<option value="Recuperação_Física">🏋️ Recuperação Física</option>
+<option value="matrix">🧪 Matrix</option>
+<option value="tesseract">🧿 Tesseract</option>
+</select>
+<select id="binauralSelect">
+<option value="">🎶 Binaural Desativado</option>
+<option value="Sono_Profundo">🌙 Sono Profundo</option>
+<option value="Manifestação">✨ Manifestação</option>
+<option value="Ativação_Pineal">🧠 Ativação Pineal</option>
+<option value="Alívio_da_Ansiedade">🌿 Alívio da Ansiedade</option>
+<option value="Meditação_Theta">🌀 Meditação Theta</option>
+<option value="Viagem_Astral">🌌 Viagem Astral</option>
+<option value="Foco_Profundo">🎯 Foco Profundo</option>
+<option value="Flow_State">🌊 Flow State</option>
+<option value="Relaxamento_Rápido">💤 Relaxamento Rápido</option>
+<option value="Concentração_Sustentada">📚 Concentração Sustentada</option>
+<option value="Cura_Emocional">💖 Cura Emocional</option>
+<option value="Recuperação_Física">🏋️ Recuperação Física</option>
+<option value="matrix">🧪 Matrix</option>
+<option value="tesseract">🧿 Tesseract</option>
+</select>
+<label>🎵 Volume Trilha <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1"/></label>
+<label>🧘 Volume Binaural <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/></label>
+</div>
+</div>
+
+
+<button aria-label="Alternar tema" id="themeToggle" title="Alternar tema"></button>
+<div id="particles-js"></div>
+<div class="svg-container" id="logoContainer">
+<object data="assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png"></object>
+</div>
+<div aria-live="polite" id="assistantName"></div>
+<div class="response-container" id="response">
+<div class="pages-wrapper">
+<div class="page initial active">
+<strong data-text="🧬 Iniciando... Pulso simbiótico detectado. Presença reconhecida." id="bootText"></strong>
+</div>
+</div>
+<p class="footer-text"><em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em></p>
+<div class="response-controls">
+<div class="control-buttons">
+<button class="copy-button" title="Copiar"><object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object></button>
+<button class="paste-button" title="Colar"><object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object></button>
+<button class="toggle-button" id="toggleBtn" title="Login"><object data="assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28"></object></button>
+<button class="kitty-button" id="kittyBtn" title="Estudos"><object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object></button>
+<button class="history-button" id="historyBtn" title="Modo Codex"><object data="assets/icons/pill_fusion-kblx-trinity3.png" height="33" type="image/png" width="33"></object></button>
+</div>
+<div class="pagination">
+<button aria-label="Página anterior" data-action="prev">⟵</button>
+<span id="pageIndicator">1 / 1</span>
+<button aria-label="Próxima página" data-action="next">⟶</button>
+</div>
+</div>
+</div>
+<div class="input-container">
+<input aria-label="Digite sua mensagem" id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
+<button id="sendBtn" title="Enviar">➤</button>
+<button id="voiceBtn" title="Falar"><object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36"></object></button>
+</div>
+<div class="login-container" id="loginBox">
+<form id="loginForm">
+<input id="userName" placeholder="Nome do usuário" required="" type="text"/>
+<input id="assistantInput" placeholder="Nome do assistente" required="" type="text"/>
+<button type="submit">Ativar</button>
+</form>
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Painel de Modos FET -->
+
+
+
+
+
+
+
+
+
+
+
+<script defer="True" src="scripts/main.js"></script></body></html>
