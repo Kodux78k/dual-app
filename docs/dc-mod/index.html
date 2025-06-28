@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <!-- Refatorado por ChatGPT em 25/06/2025 -->
+  <title>
+   dual-Infodose Chat Cinematográfico
+  </title>
+  <!-- Fonte Montserrat otimizada -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&amp;display=swap" rel="stylesheet"/>
+  <script defer="" src="config/config.js">
+   function detectarPulsoSimbolico(inputTexto) {
+  const simbolos = ['Δ', '⚡', '🧠', '👁️'];
+  const encontrados = simbolos.filter(s => inputTexto.includes(s));
+  if (encontrados.length) {
+    console.log('Pulso simbólico detectado:', encontrados.join(', '));
+  }
+}
+
+/**
+ * Expande o suporte a Markdown no texto renderizado
+ */
+function parseMarkdownAdvanced(text) {
+  // Títulos
+  text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+  text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+  text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+
+  // Blockquote
+  text = text.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+
+  // Listas não ordenadas
+  text = text.replace(/^\s*[-*+] (.*$)/gim, '<li>$1</li>');
+  text = text.replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>');
+
+  // Tabelas simples
+  const tablePattern = /\|(.+)\|\n\|([\-\s|]+)\|\n((?:\|.*\|\n?)*)/g;
+  text = text.replace(tablePattern, function(_, header, separator, rows) {
+    const headers = header.trim().split('|').map(h => `<th>${h.trim()}</th>`).join('');
+    const trs = rows.trim().split('\n').map(r => {
+      const cells = r.trim().split('|').map(c => `<td>${c.trim()}</td>`).join('');
+      return `<tr>${cells}</tr>`;
+    }).join('');
+    return `<table><thead><tr>${headers}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+
+  return text;
+}
+  </script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js">
+   function detectarPulsoSimbolico(inputTexto) {
+  const simbolos = ['Δ', '⚡', '🧠', '👁️'];
+  const encontrados = simbolos.filter(s => inputTexto.includes(s));
+  if (encontrados.length) {
+    console.log('Pulso simbólico detectado:', encontrados.join(', '));
+  }
+}
+  </script>
+  <link href="manifest.json" rel="manifest"/>
+  <!-- Ultra Foda Styles Override -->
+  <!-- v3 CSS Override: Perfect circular toggle -->
+  <!-- v5: Final TogglePlayer Fix -->
+  <!-- v6: Remove container border & theme select variable styling -->
+  <!-- v7: Rounded background & refined theme selector -->
+  <!-- FET Styles -->
+  <link href="fet/css/fet-vars.css" rel="stylesheet"/>
+  <link href="fet/css/fet-unlock.css" rel="stylesheet"/>
+  <link href="fet/css/turbo.css" rel="stylesheet"/>
+  <link href="fet/css/matrix.css" rel="stylesheet"/>
+  <link href="fet/css/cyberpunk.css" rel="stylesheet"/>
+  <link href="fet/css/emotion-detector.css" rel="stylesheet"/>
+  <link href="fet/css/emotion-ai.css" rel="stylesheet"/>
+  <link href="fet/css/tesseract.css" rel="stylesheet"/>
+  <!-- FET Loader -->
+  <script src="fet/js/fet-loader.js" type="module">
+  </script>
+  <link href="styles/base_0.css" rel="stylesheet"/>
+ </head>
+ <body data-fet="">
+  <!-- CONTROLES DE TEMA -->
+  <button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="top:32px;right:20px;font-size:9px;padding:6px;border-radius:6px;background:transparent;color:#000;border:none;cursor:pointer;opacity:0;">
+   🎨
+  </button>
+  <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
+   <select id="themeSelector" onchange="changeTheme(this.value)">
+    <option value="light">
+     ☀️ Light
+    </option>
+    <option value="dark">
+     🌑 Dark
+    </option>
+    <option value="medium">
+     🌓 Medium
+    </option>
+    <option value="vibe">
+     🌈 Vibe
+    </option>
+    <option value="toggle-advanced">
+     ➕ Mais...
+    </option>
+    <optgroup id="advancedThemes" label="Avançado">
+     <option value="cyberpunk">
+      ☣️ Cyberpunk
+     </option>
+     <option value="matrix">
+      🟢 Matrix
+     </option>
+     <option value="turbo">
+      ⚡ Turbo
+     </option>
+     <option value="emotion-detector">
+      😄 Emotion
+     </option>
+     <option value="emotion-ai">
+      🤖🧠:MHM
+     </option>
+     <option value="tesseract">
+      📐Tesseract
+     </option>
+     <option value="save-current">
+      💾 salvar
+     </option>
+    </optgroup>
+    <optgroup id="savedThemes" label="Salvos" style="display:none;">
+    </optgroup>
+   </select>
+   <div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
+   </div>
+  </div>
+  <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
+  <div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:1;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+   <button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
+    ≈
+   </button>
+   <div class="hidden" id="playerWrapper">
+   </div>
+   <div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
+    <button id="playPause" style="font-size:22px;background:none;">
+     ►
+    </button>
+    <select id="trackSelect">
+     <option value="">
+      🎵 Escolha uma trilha
+     </option>
+     <option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+     <option value="Manifestação">
+      ✨ Manifestação
+     </option>
+     <option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+     <option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+     <option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+     <option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+     <option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+     <option value="Flow_State">
+      🌊 Flow State
+     </option>
+     <option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+     <option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+     <option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+     <option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+     <option value="matrix">
+      🧪 Matrix
+     </option>
+     <option value="tesseract">
+      🧿 Tesseract
+     </option>
+    </select>
+    <select id="binauralSelect">
+     <option value="">
+      🎶 Binaural Desativado
+     </option>
+     <option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+     <option value="Manifestação">
+      ✨ Manifestação
+     </option>
+     <option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+     <option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+     <option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+     <option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+     <option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+     <option value="Flow_State">
+      🌊 Flow State
+     </option>
+     <option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+     <option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+     <option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+     <option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+     <option value="matrix">
+      🧪 Matrix
+     </option>
+     <option value="tesseract">
+      🧿 Tesseract
+     </option>
+    </select>
+    <label>
+     🎵 Volume Trilha
+     <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+    </label>
+    <label>
+     🧘 Volume Binaural
+     <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+    </label>
+   </div>
+  </div>
+  <button aria-label="Alternar tema" id="themeToggle" title="Alternar tema">
+  </button>
+  <div id="particles-js">
+  </div>
+  <div class="svg-container" id="logoContainer">
+   <object data="assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png">
+   </object>
+  </div>
+  <div aria-live="polite" id="assistantName">
+  </div>
+  <div class="response-container" id="response">
+   <div class="pages-wrapper">
+    <div class="page initial active">
+     <strong data-text="🧬 Iniciando... Pulso simbiótico detectado. Presença reconhecida." id="bootText">
+     </strong>
+    </div>
+   </div>
+   <p class="footer-text">
+    <em>
+     Do seu jeito.
+     <strong>
+      Sempre
+     </strong>
+     único.
+     <strong>
+      Sempre
+     </strong>
+     seu.
+    </em>
+   </p>
+   <div class="response-controls">
+    <div class="control-buttons">
+     <button class="copy-button" title="Copiar">
+      <object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27">
+      </object>
+     </button>
+     <button class="paste-button" title="Colar">
+      <object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24">
+      </object>
+     </button>
+     <button class="toggle-button" id="toggleBtn" title="Login">
+      <object data="assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28">
+      </object>
+     </button>
+     <button class="kitty-button" id="kittyBtn" title="Estudos">
+      <object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33">
+      </object>
+     </button>
+     <button class="history-button" id="historyBtn" title="Modo Codex">
+      <object data="assets/icons/pill_fusion-kblx-trinity3.png" height="33" type="image/png" width="33">
+      </object>
+     </button>
+    </div>
+    <div class="pagination">
+     <button aria-label="Página anterior" data-action="prev">
+      ⟵
+     </button>
+     <span id="pageIndicator">
+      1 / 1
+     </span>
+     <button aria-label="Próxima página" data-action="next">
+      ⟶
+     </button>
+    </div>
+   </div>
+  </div>
+  <div class="input-container">
+   <input aria-label="Digite sua mensagem" id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
+   <button id="sendBtn" title="Enviar">
+    ➤
+   </button>
+   <button id="voiceBtn" title="Falar">
+    <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36">
+    </object>
+   </button>
+  </div>
+  <div class="login-container" id="loginBox">
+   <form id="loginForm">
+    <input id="userName" placeholder="Nome do usuário" required="" type="text"/>
+    <input id="assistantInput" placeholder="Nome do assistente" required="" type="text"/>
+    <button type="submit">
+     Ativar
+    </button>
+   </form>
+  </div>
+  <!-- Painel de Modos FET -->
+  <script defer="True" src="scripts/_funes_para_comandos_dinmicos_inline_.js">
+  </script>
+  <script defer="True" src="scripts/_mapeamento_simblico_local.js">
+  </script>
+  <script defer="True" src="scripts/_novos_sons_com_base_em_ids.js">
+  </script>
+  <script defer="True" src="scripts/_preserva_html_e_injeta_s__.js">
+  </script>
+  <script defer="True" src="scripts/_remover_microfone_automtico.js">
+  </script>
+  <script defer="True" src="scripts/_role_system_3d__variaes_de_personalidade_por_tema.js">
+  </script>
+  <script defer="True" src="scripts/_sons_ao_interagir.js">
+  </script>
+  <script defer="True" src="scripts/_sons_de_interface__coblux_ui_samples.js">
+  </script>
+  <script defer="True" src="scripts/_supermaster_handle_ai_commands_dsl_.js">
+  </script>
+  <script defer="True" src="scripts/adiciona_som_a_todos_os_blocos.js">
+  </script>
+  <script defer="True" src="scripts/analyzetoneandtrigger.js">
+  </script>
+  <script defer="True" src="scripts/aplicar_o_tema_salvo_previamente.js">
+  </script>
+  <script defer="True" src="scripts/applyadvancedtheme.js">
+  </script>
+  <script defer="True" src="scripts/applybasictheme.js">
+  </script>
+  <script defer="True" src="scripts/applytheme.js">
+  </script>
+  <script defer="True" src="scripts/applythemeselector.js">
+  </script>
+  <script defer="True" src="scripts/attachblocklisteners.js">
+  </script>
+  <script defer="True" src="scripts/atualiza_a_lista_de_temas.js">
+  </script>
+  <script defer="True" src="scripts/auto_exit_after_60s.js">
+  </script>
+  <script defer="True" src="scripts/autodarkmode.js">
+  </script>
+  <script defer="True" src="scripts/autospeakpage.js">
+  </script>
+  <script defer="True" src="scripts/bindui.js">
+  </script>
+  <script defer="True" src="scripts/boto_ativar_no_login.js">
+  </script>
+  <script defer="True" src="scripts/boto_kitty.js">
+  </script>
+  <script defer="True" src="scripts/boto_toggle_login.js">
+  </script>
+  <script defer="True" src="scripts/callai.js">
+  </script>
+  <script defer="True" src="scripts/caso_no_ative_smbolos_envia_para_ia.js">
+  </script>
+  <script defer="True" src="scripts/cdnpixabaycomaudio20220325audio_348c0b5364mp3.js">
+  </script>
+  <script defer="True" src="scripts/cdnpixabaycomdownloadaudio20220315audio_ae7b82e34emp3filenameclick124467mp3.js">
+  </script>
+  <script defer="True" src="scripts/changepage.js">
+  </script>
+  <script defer="True" src="scripts/changetheme.js">
+  </script>
+  <script defer="True" src="scripts/chunk_0.js">
+  </script>
+  <script defer="True" src="scripts/chunk_10.js">
+  </script>
+  <script defer="True" src="scripts/chunk_100.js">
+  </script>
+  <script defer="True" src="scripts/chunk_101.js">
+  </script>
+  <script defer="True" src="scripts/chunk_102.js">
+  </script>
+  <script defer="True" src="scripts/chunk_103.js">
+  </script>
+  <script defer="True" src="scripts/chunk_104.js">
+  </script>
+  <script defer="True" src="scripts/chunk_106.js">
+  </script>
+  <script defer="True" src="scripts/chunk_107.js">
+  </script>
+  <script defer="True" src="scripts/chunk_108.js">
+  </script>
+  <script defer="True" src="scripts/chunk_109.js">
+  </script>
+  <script defer="True" src="scripts/chunk_11.js">
+  </script>
+  <script defer="True" src="scripts/chunk_110.js">
+  </script>
+  <script defer="True" src="scripts/chunk_111.js">
+  </script>
+  <script defer="True" src="scripts/chunk_112.js">
+  </script>
+  <script defer="True" src="scripts/chunk_113.js">
+  </script>
+  <script defer="True" src="scripts/chunk_114.js">
+  </script>
+  <script defer="True" src="scripts/chunk_115.js">
+  </script>
+  <script defer="True" src="scripts/chunk_12.js">
+  </script>
+  <script defer="True" src="scripts/chunk_13.js">
+  </script>
+  <script defer="True" src="scripts/chunk_130.js">
+  </script>
+  <script defer="True" src="scripts/chunk_131.js">
+  </script>
+  <script defer="True" src="scripts/chunk_132.js">
+  </script>
+  <script defer="True" src="scripts/chunk_138.js">
+  </script>
+  <script defer="True" src="scripts/chunk_139.js">
+  </script>
+  <script defer="True" src="scripts/chunk_14.js">
+  </script>
+  <script defer="True" src="scripts/chunk_140.js">
+  </script>
+  <script defer="True" src="scripts/chunk_141.js">
+  </script>
+  <script defer="True" src="scripts/chunk_146.js">
+  </script>
+  <script defer="True" src="scripts/chunk_149.js">
+  </script>
+  <script defer="True" src="scripts/chunk_15.js">
+  </script>
+  <script defer="True" src="scripts/chunk_150.js">
+  </script>
+  <script defer="True" src="scripts/chunk_152.js">
+  </script>
+  <script defer="True" src="scripts/chunk_153.js">
+  </script>
+  <script defer="True" src="scripts/chunk_154.js">
+  </script>
+  <script defer="True" src="scripts/chunk_159.js">
+  </script>
+  <script defer="True" src="scripts/chunk_160.js">
+  </script>
+  <script defer="True" src="scripts/chunk_166.js">
+  </script>
+  <script defer="True" src="scripts/chunk_167.js">
+  </script>
+  <script defer="True" src="scripts/chunk_168.js">
+  </script>
+  <script defer="True" src="scripts/chunk_172.js">
+  </script>
+  <script defer="True" src="scripts/chunk_173.js">
+  </script>
+  <script defer="True" src="scripts/chunk_174.js">
+  </script>
+  <script defer="True" src="scripts/chunk_176.js">
+  </script>
+  <script defer="True" src="scripts/chunk_178.js">
+  </script>
+  <script defer="True" src="scripts/chunk_179.js">
+  </script>
+  <script defer="True" src="scripts/chunk_180.js">
+  </script>
+  <script defer="True" src="scripts/chunk_181.js">
+  </script>
+  <script defer="True" src="scripts/chunk_182.js">
+  </script>
+  <script defer="True" src="scripts/chunk_183.js">
+  </script>
+  <script defer="True" src="scripts/chunk_184.js">
+  </script>
+  <script defer="True" src="scripts/chunk_186.js">
+  </script>
+  <script defer="True" src="scripts/chunk_187.js">
+  </script>
+  <script defer="True" src="scripts/chunk_188.js">
+  </script>
+  <script defer="True" src="scripts/chunk_189.js">
+  </script>
+  <script defer="True" src="scripts/chunk_190.js">
+  </script>
+  <script defer="True" src="scripts/chunk_191.js">
+  </script>
+  <script defer="True" src="scripts/chunk_192.js">
+  </script>
+  <script defer="True" src="scripts/chunk_194.js">
+  </script>
+  <script defer="True" src="scripts/chunk_195.js">
+  </script>
+  <script defer="True" src="scripts/chunk_196.js">
+  </script>
+  <script defer="True" src="scripts/chunk_197.js">
+  </script>
+  <script defer="True" src="scripts/chunk_198.js">
+  </script>
+  <script defer="True" src="scripts/chunk_199.js">
+  </script>
+  <script defer="True" src="scripts/chunk_2.js">
+  </script>
+  <script defer="True" src="scripts/chunk_202.js">
+  </script>
+  <script defer="True" src="scripts/chunk_203.js">
+  </script>
+  <script defer="True" src="scripts/chunk_204.js">
+  </script>
+  <script defer="True" src="scripts/chunk_205.js">
+  </script>
+  <script defer="True" src="scripts/chunk_206.js">
+  </script>
+  <script defer="True" src="scripts/chunk_208.js">
+  </script>
+  <script defer="True" src="scripts/chunk_209.js">
+  </script>
+  <script defer="True" src="scripts/chunk_210.js">
+  </script>
+  <script defer="True" src="scripts/chunk_211.js">
+  </script>
+  <script defer="True" src="scripts/chunk_214.js">
+  </script>
+  <script defer="True" src="scripts/chunk_215.js">
+  </script>
+  <script defer="True" src="scripts/chunk_216.js">
+  </script>
+  <script defer="True" src="scripts/chunk_217.js">
+  </script>
+  <script defer="True" src="scripts/chunk_219.js">
+  </script>
+  <script defer="True" src="scripts/chunk_22.js">
+  </script>
+  <script defer="True" src="scripts/chunk_220.js">
+  </script>
+  <script defer="True" src="scripts/chunk_221.js">
+  </script>
+  <script defer="True" src="scripts/chunk_222.js">
+  </script>
+  <script defer="True" src="scripts/chunk_226.js">
+  </script>
+  <script defer="True" src="scripts/chunk_227.js">
+  </script>
+  <script defer="True" src="scripts/chunk_228.js">
+  </script>
+  <script defer="True" src="scripts/chunk_229.js">
+  </script>
+  <script defer="True" src="scripts/chunk_23.js">
+  </script>
+  <script defer="True" src="scripts/chunk_231.js">
+  </script>
+  <script defer="True" src="scripts/chunk_232.js">
+  </script>
+  <script defer="True" src="scripts/chunk_233.js">
+  </script>
+  <script defer="True" src="scripts/chunk_236.js">
+  </script>
+  <script defer="True" src="scripts/chunk_237.js">
+  </script>
+  <script defer="True" src="scripts/chunk_239.js">
+  </script>
+  <script defer="True" src="scripts/chunk_24.js">
+  </script>
+  <script defer="True" src="scripts/chunk_240.js">
+  </script>
+  <script defer="True" src="scripts/chunk_241.js">
+  </script>
+  <script defer="True" src="scripts/chunk_242.js">
+  </script>
+  <script defer="True" src="scripts/chunk_244.js">
+  </script>
+  <script defer="True" src="scripts/chunk_245.js">
+  </script>
+  <script defer="True" src="scripts/chunk_246.js">
+  </script>
+  <script defer="True" src="scripts/chunk_248.js">
+  </script>
+  <script defer="True" src="scripts/chunk_249.js">
+  </script>
+  <script defer="True" src="scripts/chunk_25.js">
+  </script>
+  <script defer="True" src="scripts/chunk_252.js">
+  </script>
+  <script defer="True" src="scripts/chunk_253.js">
+  </script>
+  <script defer="True" src="scripts/chunk_255.js">
+  </script>
+  <script defer="True" src="scripts/chunk_256.js">
+  </script>
+  <script defer="True" src="scripts/chunk_257.js">
+  </script>
+  <script defer="True" src="scripts/chunk_258.js">
+  </script>
+  <script defer="True" src="scripts/chunk_259.js">
+  </script>
+  <script defer="True" src="scripts/chunk_26.js">
+  </script>
+  <script defer="True" src="scripts/chunk_261.js">
+  </script>
+  <script defer="True" src="scripts/chunk_262.js">
+  </script>
+  <script defer="True" src="scripts/chunk_263.js">
+  </script>
+  <script defer="True" src="scripts/chunk_264.js">
+  </script>
+  <script defer="True" src="scripts/chunk_266.js">
+  </script>
+  <script defer="True" src="scripts/chunk_267.js">
+  </script>
+  <script defer="True" src="scripts/chunk_268.js">
+  </script>
+  <script defer="True" src="scripts/chunk_269.js">
+  </script>
+  <script defer="True" src="scripts/chunk_27.js">
+  </script>
+  <script defer="True" src="scripts/chunk_271.js">
+  </script>
+  <script defer="True" src="scripts/chunk_272.js">
+  </script>
+  <script defer="True" src="scripts/chunk_273.js">
+  </script>
+  <script defer="True" src="scripts/chunk_274.js">
+  </script>
+  <script defer="True" src="scripts/chunk_276.js">
+  </script>
+  <script defer="True" src="scripts/chunk_277.js">
+  </script>
+  <script defer="True" src="scripts/chunk_278.js">
+  </script>
+  <script defer="True" src="scripts/chunk_279.js">
+  </script>
+  <script defer="True" src="scripts/chunk_28.js">
+  </script>
+  <script defer="True" src="scripts/chunk_280.js">
+  </script>
+  <script defer="True" src="scripts/chunk_282.js">
+  </script>
+  <script defer="True" src="scripts/chunk_283.js">
+  </script>
+  <script defer="True" src="scripts/chunk_284.js">
+  </script>
+  <script defer="True" src="scripts/chunk_285.js">
+  </script>
+  <script defer="True" src="scripts/chunk_286.js">
+  </script>
+  <script defer="True" src="scripts/chunk_287.js">
+  </script>
+  <script defer="True" src="scripts/chunk_289.js">
+  </script>
+  <script defer="True" src="scripts/chunk_29.js">
+  </script>
+  <script defer="True" src="scripts/chunk_290.js">
+  </script>
+  <script defer="True" src="scripts/chunk_291.js">
+  </script>
+  <script defer="True" src="scripts/chunk_292.js">
+  </script>
+  <script defer="True" src="scripts/chunk_293.js">
+  </script>
+  <script defer="True" src="scripts/chunk_294.js">
+  </script>
+  <script defer="True" src="scripts/chunk_296.js">
+  </script>
+  <script defer="True" src="scripts/chunk_297.js">
+  </script>
+  <script defer="True" src="scripts/chunk_298.js">
+  </script>
+  <script defer="True" src="scripts/chunk_299.js">
+  </script>
+  <script defer="True" src="scripts/chunk_3.js">
+  </script>
+  <script defer="True" src="scripts/chunk_30.js">
+  </script>
+  <script defer="True" src="scripts/chunk_300.js">
+  </script>
+  <script defer="True" src="scripts/chunk_301.js">
+  </script>
+  <script defer="True" src="scripts/chunk_303.js">
+  </script>
+  <script defer="True" src="scripts/chunk_304.js">
+  </script>
+  <script defer="True" src="scripts/chunk_305.js">
+  </script>
+  <script defer="True" src="scripts/chunk_307.js">
+  </script>
+  <script defer="True" src="scripts/chunk_308.js">
+  </script>
+  <script defer="True" src="scripts/chunk_31.js">
+  </script>
+  <script defer="True" src="scripts/chunk_310.js">
+  </script>
+  <script defer="True" src="scripts/chunk_311.js">
+  </script>
+  <script defer="True" src="scripts/chunk_312.js">
+  </script>
+  <script defer="True" src="scripts/chunk_314.js">
+  </script>
+  <script defer="True" src="scripts/chunk_315.js">
+  </script>
+  <script defer="True" src="scripts/chunk_316.js">
+  </script>
+  <script defer="True" src="scripts/chunk_317.js">
+  </script>
+  <script defer="True" src="scripts/chunk_319.js">
+  </script>
+  <script defer="True" src="scripts/chunk_32.js">
+  </script>
+  <script defer="True" src="scripts/chunk_320.js">
+  </script>
+  <script defer="True" src="scripts/chunk_321.js">
+  </script>
+  <script defer="True" src="scripts/chunk_322.js">
+  </script>
+  <script defer="True" src="scripts/chunk_324.js">
+  </script>
+  <script defer="True" src="scripts/chunk_325.js">
+  </script>
+  <script defer="True" src="scripts/chunk_326.js">
+  </script>
+  <script defer="True" src="scripts/chunk_327.js">
+  </script>
+  <script defer="True" src="scripts/chunk_328.js">
+  </script>
+  <script defer="True" src="scripts/chunk_329.js">
+  </script>
+  <script defer="True" src="scripts/chunk_330.js">
+  </script>
+  <script defer="True" src="scripts/chunk_46.js">
+  </script>
+  <script defer="True" src="scripts/chunk_47.js">
+  </script>
+  <script defer="True" src="scripts/chunk_48.js">
+  </script>
+  <script defer="True" src="scripts/chunk_49.js">
+  </script>
+  <script defer="True" src="scripts/chunk_50.js">
+  </script>
+  <script defer="True" src="scripts/chunk_51.js">
+  </script>
+  <script defer="True" src="scripts/chunk_53.js">
+  </script>
+  <script defer="True" src="scripts/chunk_54.js">
+  </script>
+  <script defer="True" src="scripts/chunk_55.js">
+  </script>
+  <script defer="True" src="scripts/chunk_56.js">
+  </script>
+  <script defer="True" src="scripts/chunk_57.js">
+  </script>
+  <script defer="True" src="scripts/chunk_58.js">
+  </script>
+  <script defer="True" src="scripts/chunk_59.js">
+  </script>
+  <script defer="True" src="scripts/chunk_61.js">
+  </script>
+  <script defer="True" src="scripts/chunk_62.js">
+  </script>
+  <script defer="True" src="scripts/chunk_63.js">
+  </script>
+  <script defer="True" src="scripts/chunk_64.js">
+  </script>
+  <script defer="True" src="scripts/chunk_65.js">
+  </script>
+  <script defer="True" src="scripts/chunk_66.js">
+  </script>
+  <script defer="True" src="scripts/chunk_67.js">
+  </script>
+  <script defer="True" src="scripts/chunk_69.js">
+  </script>
+  <script defer="True" src="scripts/chunk_7.js">
+  </script>
+  <script defer="True" src="scripts/chunk_70.js">
+  </script>
+  <script defer="True" src="scripts/chunk_71.js">
+  </script>
+  <script defer="True" src="scripts/chunk_72.js">
+  </script>
+  <script defer="True" src="scripts/chunk_73.js">
+  </script>
+  <script defer="True" src="scripts/chunk_74.js">
+  </script>
+  <script defer="True" src="scripts/chunk_75.js">
+  </script>
+  <script defer="True" src="scripts/chunk_76.js">
+  </script>
+  <script defer="True" src="scripts/chunk_78.js">
+  </script>
+  <script defer="True" src="scripts/chunk_79.js">
+  </script>
+  <script defer="True" src="scripts/chunk_8.js">
+  </script>
+  <script defer="True" src="scripts/chunk_80.js">
+  </script>
+  <script defer="True" src="scripts/chunk_81.js">
+  </script>
+  <script defer="True" src="scripts/chunk_82.js">
+  </script>
+  <script defer="True" src="scripts/chunk_83.js">
+  </script>
+  <script defer="True" src="scripts/chunk_9.js">
+  </script>
+  <script defer="True" src="scripts/chunk_90.js">
+  </script>
+  <script defer="True" src="scripts/chunk_91.js">
+  </script>
+  <script defer="True" src="scripts/chunk_93.js">
+  </script>
+  <script defer="True" src="scripts/chunk_94.js">
+  </script>
+  <script defer="True" src="scripts/chunk_96.js">
+  </script>
+  <script defer="True" src="scripts/chunk_97.js">
+  </script>
+  <script defer="True" src="scripts/chunk_98.js">
+  </script>
+  <script defer="True" src="scripts/chunk_99.js">
+  </script>
+  <script defer="True" src="scripts/clique_em_qualquer_boto.js">
+  </script>
+  <script defer="True" src="scripts/consolelog_modo_autoadaptativo_contnuo_ativado.js">
+  </script>
+  <script defer="True" src="scripts/contedo_limpo_para_ia_se_necessrio.js">
+  </script>
+  <script defer="True" src="scripts/contedo_original_visvel.js">
+  </script>
+  <script defer="True" src="scripts/copiar__colar.js">
+  </script>
+  <script defer="True" src="scripts/createasciibutton.js">
+  </script>
+  <script defer="True" src="scripts/detectarpulsosimbolico.js">
+  </script>
+  <script defer="True" src="scripts/detectemotion.js">
+  </script>
+  <script defer="True" src="scripts/detectemotionandapplytheme.js">
+  </script>
+  <script defer="True" src="scripts/entertranscendence.js">
+  </script>
+  <script defer="True" src="scripts/enviar_mensagem_confirmar.js">
+  </script>
+  <script defer="True" src="scripts/escapehtml.js">
+  </script>
+  <script defer="True" src="scripts/escuta_mudanas_no_seletor_de_tema.js">
+  </script>
+  <script defer="True" src="scripts/exemplo_de_uso_na_ia_substituir_renderresponse_se_quiser_integrar_nativamente.js">
+  </script>
+  <script defer="True" src="scripts/fadeaudio.js">
+  </script>
+  <script defer="True" src="scripts/fala_com_texto_limpo.js">
+  </script>
+  <script defer="True" src="scripts/fallback_para_voz_feminina_com_prioridade_nova.js">
+  </script>
+  <script defer="True" src="scripts/funo_para_aplicar_templates_inner_dinamicamente.js">
+  </script>
+  <script defer="True" src="scripts/handleaicommand.js">
+  </script>
+  <script defer="True" src="scripts/handlecommand.js">
+  </script>
+  <script defer="True" src="scripts/handledynamicaction.js">
+  </script>
+  <script defer="True" src="scripts/hook_de_resposta.js">
+  </script>
+  <script defer="True" src="scripts/init.js">
+  </script>
+  <script defer="True" src="scripts/keep_advanced_open.js">
+  </script>
+  <script defer="True" src="scripts/layer_extra_para_matrix.js">
+  </script>
+  <script defer="True" src="scripts/lista_de_vozes_possveis_por_emoo.js">
+  </script>
+  <script defer="True" src="scripts/load_saved_themes_into_savedgroup.js">
+  </script>
+  <script defer="True" src="scripts/loadbinaural.js">
+  </script>
+  <script defer="True" src="scripts/loadconfig.js">
+  </script>
+  <script defer="True" src="scripts/loaddesignstate.js">
+  </script>
+  <script defer="True" src="scripts/loadpresets.js">
+  </script>
+  <script defer="True" src="scripts/loadrolesession.js">
+  </script>
+  <script defer="True" src="scripts/loadsaved.js">
+  </script>
+  <script defer="True" src="scripts/loadtrack.js">
+  </script>
+  <script defer="True" src="scripts/logemotion.js">
+  </script>
+  <script defer="True" src="scripts/mediagiphycommediaxt9igic0lryrxvqvgmgiphygif_centercover_norepeatopacity005.js">
+  </script>
+  <script defer="True" src="scripts/modulateresponsebytheme.js">
+  </script>
+  <script defer="True" src="scripts/navegao_entre_pginas.js">
+  </script>
+  <script defer="True" src="scripts/onsend.js">
+  </script>
+  <script defer="True" src="scripts/openrouteraiapiv1audiospeech_.js">
+  </script>
+  <script defer="True" src="scripts/openrouteraiapiv1chatcompletions.js">
+  </script>
+  <script defer="True" src="scripts/outros_echo_fable_onyx_nova.js">
+  </script>
+  <script defer="True" src="scripts/primeira_vez_s_fala_e_marca_visual.js">
+  </script>
+  <script defer="True" src="scripts/processdynamiccommands.js">
+  </script>
+  <script defer="True" src="scripts/prompt_for_name.js">
+  </script>
+  <script defer="True" src="scripts/recstart.js">
+  </script>
+  <script defer="True" src="scripts/renderasciiresponse.js">
+  </script>
+  <script defer="True" src="scripts/renderresponse.js">
+  </script>
+  <script defer="True" src="scripts/saverolesession.js">
+  </script>
+  <script defer="True" src="scripts/segunda_vez_expande_e_envia_para_a_ia.js">
+  </script>
+  <script defer="True" src="scripts/show_saved_with_advanced.js">
+  </script>
+  <script defer="True" src="scripts/showloading.js">
+  </script>
+  <script defer="True" src="scripts/showthemefeedback.js">
+  </script>
+  <script defer="True" src="scripts/som_ao_clicar.js">
+  </script>
+  <script defer="True" src="scripts/speakreal.js">
+  </script>
+  <script defer="True" src="scripts/speakrealemotion.js">
+  </script>
+  <script defer="True" src="scripts/speaktext.js">
+  </script>
+  <script defer="True" src="scripts/speaktextenhanced.js">
+  </script>
+  <script defer="True" src="scripts/splittext.js">
+  </script>
+  <script defer="True" src="scripts/startconversation.js">
+  </script>
+  <script defer="True" src="scripts/substitui_a_funo_de_fala_padro.js">
+  </script>
+  <script defer="True" src="scripts/substitui_o_sistema_de_fala_automtica_com_emoo.js">
+  </script>
+  <script defer="True" src="scripts/substituir_autospeakpage_para_usar_speakreal.js">
+  </script>
+  <script defer="True" src="scripts/toggletheme.js">
+  </script>
+  <script defer="True" src="scripts/transcendenceos__mutao_simbitica_profunda.js">
+  </script>
+  <script defer="True" src="scripts/trocar_tema_manualmente_temaselector.js">
+  </script>
+  <script defer="True" src="scripts/typewriter.js">
+  </script>
+  <script defer="True" src="scripts/updateui.js">
+  </script>
+  <script defer="True" src="scripts/vibrateonresponse.js">
+  </script>
+  <script defer="True" src="scripts/volume_padro.js">
+  </script>
+  <script defer="True" src="scripts/web_speech_api_integrao_ativar_ao_clicar_no_microfone.js">
+  </script>
+ </body>
+</html>
