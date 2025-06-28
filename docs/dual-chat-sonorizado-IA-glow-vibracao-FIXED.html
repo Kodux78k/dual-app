@@ -2797,7 +2797,7 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleModeBtn.addEventListener('click', () => {
     preferClean = !preferClean;
     localStorage.setItem('preferClean', preferClean);
-    toggleModeBtn.innerText = 'Modo IA: ' + (preferClean ? 'Limpo ✅' : 'Original 📝');
+    toggleModeBtn.innerText = ':' + (preferClean ? '🫧' : '🫆');
     if (navigator.vibrate) navigator.vibrate([30]);
   });
 });
