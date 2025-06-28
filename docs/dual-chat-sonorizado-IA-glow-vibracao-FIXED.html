@@ -1242,15 +1242,15 @@ function changeTheme(val) {
 <body data-fet="">
 <!-- CONTROLES DE TEMA -->
 
-<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="top:20px;right:20px;font-size:12px;padding:4px 6px;border-radius:6px;background:transparent;color:#000;border:none;cursor:pointer;">
-🎨 </button>
+
 
 <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
 <select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Emotion</option><option value="emotion-ai">🤖🧠:MHM</option><option value="tesseract">📐Tesseract</option><option value="save-current">💾 salvar</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
-
+<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;margin-right:20px;font-size:12px;padding:4px 6px;border-radius:6px;background:transparent;color:#000;border:none;cursor:pointer;">
+🎨 </button>
 </div>
 <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
-<div id="koblluxPlayer" style="position:fixed;top:20px;left:20px;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<div id="koblluxPlayer" style="position:fixed;top:39px;left:20px;z-index:1;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
 <button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">≈</button><div class="hidden" id="playerWrapper"></div>
 <div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
 <button id="playPause" style="font-size:22px;background:none;">►</button>
@@ -2779,16 +2779,16 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleModeBtn.innerText = 'Modo IA: ' + (preferClean ? 'Limpo ✅' : 'Original 📝');
   toggleModeBtn.style.cssText = `
     position: fixed;
-    top: 6px;
+    top: 12px;
     left: 20px;
-    padding: 10px 14px;
+    padding: 6px 9px;
     background: rgba(0, 0, 0, 0.6);
     color: #0ff;
     border: 1px solid #0ff;
     border-radius: 8px;
-    font-size: 8px;
+    font-size: 9px;
     cursor: pointer;
-    z-index: 9999;
+    z-index: 3;
   `;
   document.body.appendChild(toggleModeBtn);
 
