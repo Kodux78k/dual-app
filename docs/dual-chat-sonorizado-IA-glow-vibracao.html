@@ -1247,9 +1247,8 @@ function changeTheme(val) {
 
 <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
 <select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Detector</option><option value="emotion-ai">🤖modo:MHM</option><option value="tesseract">📐Tesseract</option><option value="save-current">💾 salvar</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
-<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;font-size:12px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;cursor:pointer;">
-🎨 Editar Tema
-</button>
+<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;font-size:12px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;right:20px; cursor:pointer;">
+🎨</button>
 </div>
 <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
 <div id="koblluxPlayer" style="position:fixed;top:20px;left:20px;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
