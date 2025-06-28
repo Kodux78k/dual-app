@@ -780,7 +780,7 @@ if ('serviceWorker' in navigator) {
     top: 0; left: 0; right: 0; bottom: 0;
     background: url('https://www.transparenttextures.com/patterns/stardust.png');
     background-size: cover;
-    opacity: 0.05;
+    opacity: 0.2;
     z-index: 0;
   }
 
@@ -898,8 +898,8 @@ if ('serviceWorker' in navigator) {
   box-shadow: 0 0 12px rgba(255, 136, 0, 0.3);
 }
 [data-theme="turbo"] #sendBtn {
-  background: linear-gradient(45deg, #ff8800, #ffcc00);
-  -webkit-text-fill-color: transparent;
+  color: linear-gradient(45deg, #ff8800, #ffcc00);
+  -webkit-text-fill-color: linear-gradient(45deg, #ff8800, #ffcc00);
 }
 
 /* TESSERACT VIBRATION STYLE */
@@ -988,7 +988,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
 /* Cyberpunk: glitch */
 [data-theme="cyberpunk"] .response-block {
   position: relative;
-  animation: glitchFlash 3s infinite;
+  animation: glitchFlash 93s infinite;
 }
 @keyframes glitchFlash {
   0% { filter: hue-rotate(0deg); }
