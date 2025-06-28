@@ -1245,10 +1245,9 @@ function changeTheme(val) {
 
 
 <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
-<select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Detector</option><option value="emotion-ai">🤖modo:MHM</option><option value="tesseract">📐Tesseract</option><option value="save-current">💾 salvar</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
-<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;font-size:12px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;cursor:pointer;">
-🎨 Editar Tema
-</button>
+<select id="themeSelector" onchange="changeTheme(this.value)"><option value="light">☀️ Light</option><option value="dark">🌑 Dark</option><option value="medium">🌓 Medium</option><option value="vibe">🌈 Vibe</option><option value="toggle-advanced">➕ Mais...</option><optgroup id="advancedThemes" label="Avançado" ><option value="cyberpunk">☣️ Cyberpunk</option><option value="matrix">🟢 Matrix</option><option value="turbo">⚡ Turbo</option><option value="emotion-detector">😄 Emotion</option><option value="emotion-ai">🤖🧠:MHM</option><option value="tesseract">📐Tesseract</option><option value="save-current">💾 salvar</option></optgroup><optgroup id="savedThemes" label="Salvos" style="display:none;"></optgroup></select><div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;"></div>
+<button onclick="document.getElementById('themeEditor').classList.toggle('hidden')" style="margin-top:6px;margin-right:20px;font-size:18px;padding:4px 6px;border-radius:6px;background:#0ff;color:#000;border:none;cursor:pointer;">
+🎨 </button>
 </div>
 <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
 <div id="koblluxPlayer" style="position:fixed;top:20px;left:20px;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:10px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
@@ -2596,12 +2595,12 @@ window.modulateResponseByTheme = modulateResponseByTheme;
 <script>
   // 🎧 Sons de interface - Coblux UI Samples
   const uiSounds = {
-    click: new Audio('assets/sounds/uiSamples/click.wav'),
+    click: new Audio('assets/sounds/uiSamples/navigation.wav'),
     hover: new Audio('assets/sounds/uiSamples/hover.wav'),
     confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
     back: new Audio('assets/sounds/uiSamples/back.wav'),
-    temaUp: new Audio('assets/sounds/uiSamples/tema_up.wav'),
-    temaDown: new Audio('assets/sounds/uiSamples/tema_down.wav'),
+    temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+    temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
   };
 
   // Volume padrão
