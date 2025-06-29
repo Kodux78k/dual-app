@@ -8,7 +8,7 @@
 <title>dual-Infodose Chat Cinematográfico</title>
 <!-- Fonte Montserrat otimizada -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&amp;display=swap" rel="stylesheet"/>
-<script defer="" src="dual-app/docs/config/config.js">function detectarPulsoSimbolico(inputTexto) {
+<script defer="" src="../config/config.js">function detectarPulsoSimbolico(inputTexto) {
   const simbolos = ['Δ', '⚡', '🧠', '👁️'];
   const encontrados = simbolos.filter(s => inputTexto.includes(s));
   if (encontrados.length) {
@@ -56,7 +56,7 @@ function parseMarkdownAdvanced(text) {
 }
 </script>
 
-<link href="manifest.json" rel="manifest"/>
+<link href="../manifest.json" rel="manifest"/>
 
 <!-- Ultra Foda Styles Override -->
 
@@ -157,7 +157,7 @@ function parseMarkdownAdvanced(text) {
 <button aria-label="Alternar tema" id="themeToggle" title="Alternar tema"></button>
 <div id="particles-js"></div>
 <div class="svg-container" id="logoContainer">
-<object data="assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png"></object>
+<object data="../assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png"></object>
 </div>
 <div aria-live="polite" id="assistantName"></div>
 <div class="response-container" id="response">
@@ -169,11 +169,11 @@ function parseMarkdownAdvanced(text) {
 <p class="footer-text"><em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em></p>
 <div class="response-controls">
 <div class="control-buttons">
-<button class="copy-button" title="Copiar"><object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object></button>
-<button class="paste-button" title="Colar"><object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object></button>
-<button class="toggle-button" id="toggleBtn" title="Login"><object data="assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28"></object></button>
-<button class="kitty-button" id="kittyBtn" title="Estudos"><object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object></button>
-<button class="history-button" id="historyBtn" title="Modo Codex"><object data="assets/icons/pill_fusion-kblx-trinity3.png" height="33" type="image/png" width="33"></object></button>
+<button class="copy-button" title="Copiar"><object data="../assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object></button>
+<button class="paste-button" title="Colar"><object data="../assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object></button>
+<button class="toggle-button" id="toggleBtn" title="Login"><object data="../assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28"></object></button>
+<button class="kitty-button" id="kittyBtn" title="Estudos"><object data="../assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object></button>
+<button class="history-button" id="historyBtn" title="Modo Codex"><object data="../assets/icons/pill_fusion-kblx-trinity3.png" height="33" type="image/png" width="33"></object></button>
 </div>
 <div class="pagination">
 <button aria-label="Página anterior" data-action="prev">⟵</button>
@@ -185,7 +185,7 @@ function parseMarkdownAdvanced(text) {
 <div class="input-container">
 <input aria-label="Digite sua mensagem" id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
 <button id="sendBtn" title="Enviar">➤</button>
-<button id="voiceBtn" title="Falar"><object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36"></object></button>
+<button id="voiceBtn" title="Falar"><object data="../assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36"></object></button>
 </div>
 <div class="login-container" id="loginBox">
 <form id="loginForm">
