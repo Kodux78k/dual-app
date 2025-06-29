@@ -1,0 +1,1 @@
+// === Funções para comandos dinâmicos inline ===
