@@ -9,7 +9,7 @@
   </title>
   <!-- Fonte Montserrat otimizada -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&amp;display=swap" rel="stylesheet"/>
-  <script defer="" src="config/config.js">
+  <script defer="" src="../config/config.js">
    function detectarPulsoSimbolico(inputTexto) {
   const simbolos = ['Δ', '⚡', '🧠', '👁️'];
   const encontrados = simbolos.filter(s => inputTexto.includes(s));
@@ -57,7 +57,7 @@ function parseMarkdownAdvanced(text) {
   }
 }
   </script>
-  <link href="manifest.json" rel="manifest"/>
+  <link href="../manifest.json" rel="manifest"/>
   <!-- Ultra Foda Styles Override -->
   <!-- v3 CSS Override: Perfect circular toggle -->
   <!-- v5: Final TogglePlayer Fix -->
@@ -75,7 +75,7 @@ function parseMarkdownAdvanced(text) {
   <!-- FET Loader -->
   <script src="fet/js/fet-loader.js" type="module">
   </script>
-  <link href="styles/base_0.css" rel="stylesheet"/>
+  <link href="styles/base/base_0.css" rel="stylesheet"/>
  </head>
  <body data-fet="">
   <!-- CONTROLES DE TEMA -->
@@ -248,7 +248,7 @@ function parseMarkdownAdvanced(text) {
   <div id="particles-js">
   </div>
   <div class="svg-container" id="logoContainer">
-   <object data="assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png">
+   <object data="../assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png">
    </object>
   </div>
   <div aria-live="polite" id="assistantName">
@@ -276,23 +276,23 @@ function parseMarkdownAdvanced(text) {
    <div class="response-controls">
     <div class="control-buttons">
      <button class="copy-button" title="Copiar">
-      <object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27">
+      <object data="../assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27">
       </object>
      </button>
      <button class="paste-button" title="Colar">
-      <object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24">
+      <object data="...assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24">
       </object>
      </button>
      <button class="toggle-button" id="toggleBtn" title="Login">
-      <object data="assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28">
+      <object data="../assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28">
       </object>
      </button>
      <button class="kitty-button" id="kittyBtn" title="Estudos">
-      <object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33">
+      <object data="../assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33">
       </object>
      </button>
      <button class="history-button" id="historyBtn" title="Modo Codex">
-      <object data="assets/icons/pill_fusion-kblx-trinity3.png" height="33" type="image/png" width="33">
+      <object data="../assets/icons/pill_fusion-kblx-trinity3.png" height="33" type="image/png" width="33">
       </object>
      </button>
     </div>
@@ -315,7 +315,7 @@ function parseMarkdownAdvanced(text) {
     ➤
    </button>
    <button id="voiceBtn" title="Falar">
-    <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36">
+    <object data="../assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36">
     </object>
    </button>
   </div>
