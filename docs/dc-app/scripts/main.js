@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   trackSelect.addEventListener("change", () => {
     if (trackSelect.value) {
-      trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+      trackAudio.src = `../../assets/sounds/trilhas/${trackSelect.value}.mp3`;
       trackAudio.loop = true;
       trackAudio.volume = trackVolume.value;
       trackAudio.play();
@@ -215,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   binauralSelect.addEventListener("change", () => {
     if (binauralSelect.value) {
-      binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.wav`;
+      binauralAudio.src = `../../assets/sounds/binaural/${binauralSelect.value}.wav`;
       binauralAudio.loop = true;
       binauralAudio.volume = binauralVolume.value;
       binauralAudio.play();
@@ -246,13 +246,13 @@ document.addEventListener("DOMContentLoaded", () => {
           THEME_KEY     = 'infodoseTheme',
           HISTORY_KEY   = 'historyMode',
           CONFIG = {
-            TRAINING_MAIN:    'data/manifesto_infinity_metalux.txt',
-            TRAINING_HISTORY: 'data/codex/Protocolo_de_Equalização_KOBLLUX_A_Verdade_do_Uno.txt',
+            TRAINING_MAIN:    '../../data/manifesto_infinity_metalux.txt',
+            TRAINING_HISTORY: '../../data/codex/Protocolo_de_Equalização_KOBLLUX_A_Verdade_do_Uno.txt',
             API_URL:          'https://openrouter.ai/api/v1/chat/completions',
             MODEL:            'deepseek/deepseek-chat-v3-0324:free',
             TEMP:             0.2,
             CHUNK_SIZE:       12000,
-            AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
+            AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
           };
 
     let training='', chunks=[], chunkIndex=0;
@@ -349,9 +349,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const cont=$('#logoContainer'), logo=$('#logoObj');
       cont.classList.add('fading');
       setTimeout(()=>{
-        if(isHistory)       logo.data='assets/icons/pill_fusion-kblx-trinity3.png';
-        else if(isStudying) logo.data='assets/icons/DualKittyKard-icon-3.png';
-        else                 logo.data='assets/icons/pill_fusion-kblx-1.png';
+        if(isHistory)       logo.data='../../assets/icons/pill_fusion-kblx-trinity3.png';
+        else if(isStudying) logo.data='../../assets/icons/DualKittyKard-icon-3.png';
+        else                 logo.data='../../assets/icons/pill_fusion-kblx-1.png';
         cont.classList.remove('fading');
       },999);
     }
@@ -1003,14 +1003,14 @@ playPauseBtn.addEventListener("click", () => {
 });
 
   trackSelect.addEventListener("change", () => {
-    trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+    trackAudio.src = `../../assets/sounds/trilhas/${trackSelect.value}.mp3`;
     trackAudio.play();
     playPauseBtn.textContent = "⏸";
   });
 
   binauralSelect.addEventListener("change", () => {
     if (binauralSelect.value) {
-      binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.mp3`;
+      binauralAudio.src = `../../assets/sounds/binaural/${binauralSelect.value}.mp3`;
       binauralAudio.loop = true;
       binauralAudio.play();
     } else {
@@ -1107,7 +1107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   trackSelect.addEventListener("change", () => {
     if (trackSelect.value) {
-      loadTrack(`assets/sounds/trilhas/${trackSelect.value}.mp3`, trackVolume.value);
+      loadTrack(`../../assets/sounds/trilhas/${trackSelect.value}.mp3`, trackVolume.value);
       playPauseBtn.textContent = "⏸";
     } else {
       fadeAudio(trackAudio, 0);
@@ -1117,7 +1117,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   binauralSelect.addEventListener("change", () => {
     if (binauralSelect.value) {
-      loadBinaural(`assets/sounds/binaural/${binauralSelect.value}.wav`, binauralVolume.value);
+      loadBinaural(`../../assets/sounds/binaural/${binauralSelect.value}.wav`, binauralVolume.value);
     } else {
       fadeAudio(binauralAudio, 0);
       setTimeout(() => binauralAudio.pause(), 1000);
@@ -1157,8 +1157,8 @@ document.addEventListener("DOMContentLoaded", () => {
     binauralSelect.value = preset.binaural;
     trackVolume.value = preset.trackVol;
     binauralVolume.value = preset.binauralVol;
-    if (preset.track) loadTrack(`assets/sounds/trilhas/${preset.track}.mp3`, preset.trackVol);
-    if (preset.binaural) loadBinaural(`assets/sounds/binaural/${preset.binaural}.wav`, preset.binauralVol);
+    if (preset.track) loadTrack(`../../assets/sounds/trilhas/${preset.track}.mp3`, preset.trackVol);
+    if (preset.binaural) loadBinaural(`../../assets/sounds/binaural/${preset.binaural}.wav`, preset.binauralVol);
   });
 
   function loadPresets() {
@@ -1421,12 +1421,12 @@ window.modulateResponseByTheme = modulateResponseByTheme;
 
   // 🎧 Sons de interface - Coblux UI Samples
   const uiSounds = {
-    click: new Audio('assets/sounds/uiSamples/navigation.wav'),
-    hover: new Audio('assets/sounds/uiSamples/hover.wav'),
-    confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
-    back: new Audio('assets/sounds/uiSamples/back.wav'),
-    temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
-    temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+    click: new Audio('../../assets/sounds/uiSamples/navigation.wav'),
+    hover: new Audio('../../assets/sounds/uiSamples/hover.wav'),
+    confirm: new Audio('../../assets/sounds/uiSamples/confirm.wav'),
+    back: new Audio('../../assets/sounds/uiSamples/back.wav'),
+    temaUp: new Audio('../../assets/sounds/uiSamples/back-action.wav'),
+    temaDown: new Audio('../../assets/sounds/uiSamples/back-action.wav'),
   };
 
   // Volume padrão
@@ -1495,12 +1495,12 @@ window.modulateResponseByTheme = modulateResponseByTheme;
 
 // 🎧 Novos sons com base em IDs
 const uiBL = {
-  toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
-  kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
-  ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
-  nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+  toggle: new Audio('../../assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+  kitty: new Audio('../../assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+  ativar: new Audio('../../assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+  nav: new Audio('../../assets/sounds/uiSamples/navigation.wav'),
 
-  cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+  cancel: new Audio('../../assets/sounds/uiSamples/cancel.wav')
 };
 
 // Volume padrão
