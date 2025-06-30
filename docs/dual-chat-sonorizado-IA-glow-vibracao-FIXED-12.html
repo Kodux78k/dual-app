@@ -619,9 +619,9 @@ if ('serviceWorker' in navigator) {
       background: url('assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG') center center no-repeat;
       background-size: cover;
       opacity: 0;
-      animation: pulseDyn 12s infinite ease-in-out;
+      animation: pulseDyn 18s infinite ease-in-out;
       transition: opacity 3s ease-in-out;
-      z-index: 1;
+      z-index: 33;
     }
 
     /* Botão de fusão */
@@ -629,18 +629,18 @@ if ('serviceWorker' in navigator) {
       position: fixed;
       top: 59px;
       right: 20px;
-      width: 33px;
-      height: 33px;
+      width: 39px;
+      height: 39px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
       border: none;
       cursor: pointer;
-      z-index: 0;
+      z-index: 101;
       backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.9s;
+      transition: background 0.3s;
     }
 
     #toggleSimbioseBtn:hover {
@@ -648,14 +648,14 @@ if ('serviceWorker' in navigator) {
     }
 
     #toggleSimbioseBtn img {
-      width: 28px;
-      height: 28px;
+      width: 29px;
+      height: 29px;
       pointer-events: none;
     }
     @keyframes pulseDyn {
-  0% { filter: opacity(0.1) scale(1) brightness(0.9) saturate(1); }
+  0% { filter: opacity(0.6) scale(1) brightness(0.9) saturate(1); }
   50% { filter: opacity(0.8) scale(1.022) brightness(1.2) saturate(1.4); }
-  100% { filter: opacity(0.1) scale(1) brightness(1) saturate(1); }
+  100% { filter: opacity(0.6) scale(1) brightness(1) saturate(1); }
 }
   </style>
 <!-- FET Styles -->
