@@ -616,11 +616,11 @@ if ('serviceWorker' in navigator) {
       width: 100vw;
       height: 100vh;
       pointer-events: none;
-      background: url('assets/styles/themes/bgs/Matrix-ASCII-BG.png') center center no-repeat;
+      background: url('assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG') center center no-repeat;
       background-size: cover;
       opacity: 0;
-      animation: pulseBG 18s infinite ease-in-out;
-      transition: opacity 1s ease-in-out;
+      animation: pulseDyn 18s infinite ease-in-out;
+      transition: opacity 2s ease-in-out;
       z-index: 100;
     }
 
@@ -652,10 +652,10 @@ if ('serviceWorker' in navigator) {
       height: 20px;
       pointer-events: none;
     }
-    @keyframes pulseBG {
-  0% { filter: brightness(0.9) saturate(1); }
-  50% { filter: brightness(1.2) saturate(1.4); }
-  100% { filter: brightness(1) saturate(1); }
+    @keyframes pulseDyn {
+  0% { filter: scale(1) brightness(0.9) saturate(1); }
+  50% { filter: scale(1.022) brightness(1.2) saturate(1.4); }
+  100% { filter: scale(1) brightness(1) saturate(1); }
 }
   </style>
 <!-- FET Styles -->
@@ -854,7 +854,7 @@ if ('serviceWorker' in navigator) {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('assets/styles/themes/bgs/Universe-BG.JPG');
+  background: url('assets/styles/themes/bgs/Light2-ASCII-BG.JPG');
   background-size: cover;
   opacity: 0;
   animation: slowFade 33s infinite ease-in-out;
@@ -957,7 +957,7 @@ if ('serviceWorker' in navigator) {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url('assets/styles/themes/bgs/Matrix1-ASCII-BG.JPG');
+  background-image: url('assets/styles/themes/bgs/Matrix-Nebula-BG.JPG');
   background-size: cover;
   background-position: center;
   opacity: 0.3;
@@ -1043,7 +1043,7 @@ if ('serviceWorker' in navigator) {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('assets/styles/themes/bgs/Light-ASCII-BG.JPG');
+  background: url('assets/styles/themes/bgs/MHM-Cubes-BG.JPG');
   background-size: cover;
   background-position: center;
   opacity: 0;
@@ -1278,7 +1278,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url('assets/styles/themes/bgs/MHM-Cubes-BG.JPG');
+  background-image: url('assets/styles/themes/bgs/MHM-ASCII-PC-BG.png');
   background-size: cover;
   background-position: center;
   opacity: 0.28;
@@ -1290,7 +1290,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('assets/styles/themes/bgs/Tesseract-ASCII-BG.JPG');
+  background: url('assets/styles/themes/bgs/Turbo-ASCII-Vibe2-BG.png');
   background-size: cover;
   background-position: center;
   opacity: 0;
@@ -1449,7 +1449,7 @@ function changeTheme(val) {
 
   <!-- Botão de Simbiose -->
   <div id="toggleSimbioseBtn" title="Ativar Simbiose">
-    <img src="icon_simbiose.png" alt="Simbiose">
+    <img src="assets/icons/icon_simbiose.png" alt="Simbiose">
   </div>
 
  
