@@ -620,8 +620,8 @@ if ('serviceWorker' in navigator) {
       background-size: cover;
       opacity: 0;
       animation: pulseDyn 18s infinite ease-in-out;
-      transition: opacity 2s ease-in-out;
-      z-index: 3;
+      transition: opacity 1s ease-in-out;
+      z-index: 0;
     }
 
     /* Botão de fusão */
@@ -633,7 +633,7 @@ if ('serviceWorker' in navigator) {
       height: 36px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
-      border: 1px solid #fff;
+      border: 2px solid #fff;
       cursor: pointer;
       z-index: 101;
       backdrop-filter: blur(6px);
@@ -654,7 +654,7 @@ if ('serviceWorker' in navigator) {
     }
     @keyframes pulseDyn {
   0% { filter:  scale(1) brightness(0.9) saturate(1); }
-  50% { filter:  scale(1.022) brightness(1.2) saturate(1.4); }
+  50% { filter:  scale(1.030) brightness(1.5) saturate(1.4); }
   100% { filter:  scale(1) brightness(1) saturate(1); }
 }
   </style>
