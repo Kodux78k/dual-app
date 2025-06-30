@@ -621,7 +621,7 @@ if ('serviceWorker' in navigator) {
       opacity: 0;
       animation: pulseDyn 18s infinite ease-in-out;
       transition: opacity 2s ease-in-out;
-      z-index: 6;
+      z-index: 3;
     }
 
     /* Botão de fusão */
@@ -629,8 +629,8 @@ if ('serviceWorker' in navigator) {
       position: fixed;
       top: 59px;
       right: 20px;
-      width: 39px;
-      height: 39px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
       border: 1px solid #fff;
@@ -648,8 +648,8 @@ if ('serviceWorker' in navigator) {
     }
 
     #toggleSimbioseBtn img {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       pointer-events: none;
     }
     @keyframes pulseDyn {
@@ -960,7 +960,7 @@ if ('serviceWorker' in navigator) {
   background-image: url('assets/styles/themes/bgs/Matrix-Nebula-BG.JPG');
   background-size: cover;
   background-position: center;
-  opacity: 0.3;
+  opacity: 0.2;
   filter: brightness(1.1) saturate(1.2);
   animation: pulseBG 12s ease-in-out infinite alternate;
   pointer-events: none;
@@ -1579,12 +1579,12 @@ document.addEventListener("DOMContentLoaded", () => {
       simbioseAtiva = !simbioseAtiva;
 
       // Ativa/desativa PNG simbiótico
-      overlay.style.opacity = simbioseAtiva ? '0.18' : '0';
+      overlay.style.opacity = simbioseAtiva ? '0.14' : '0';
 
       // Troca background
       document.body.style.backgroundImage = simbioseAtiva
-        ? "url('assets/styles/themes/bgs/Matrix-ASCII-BW-BG.JPG')" // seu background alternativo
-        : "url('assets/styles/themes/bgs/Tesseract-Sym-BG.JPG')";
+        ? "url('assets/styles/themes/bgs/Matrix-ASCII-BG.png')" // seu background alternativo
+        : "url('assets/styles/themes/bgs/TesseractSym-BG.JPG')";
 
       // Altera URL sem recarregar
       const novaURL = simbioseAtiva ? '?simbiose=on' : '?simbiose=off';
