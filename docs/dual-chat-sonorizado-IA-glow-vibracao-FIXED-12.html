@@ -620,7 +620,7 @@ if ('serviceWorker' in navigator) {
       background-size: cover;
       opacity: 0;
       animation: pulseDyn 18s infinite ease-in-out;
-      transition: opacity 3s ease-in-out;
+      transition: opacity 2s ease-in-out;
       z-index: 33;
     }
 
@@ -633,7 +633,7 @@ if ('serviceWorker' in navigator) {
       height: 39px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.2);
-      border: none;
+      border: 1px solid #fff;
       cursor: pointer;
       z-index: 101;
       backdrop-filter: blur(6px);
@@ -653,9 +653,9 @@ if ('serviceWorker' in navigator) {
       pointer-events: none;
     }
     @keyframes pulseDyn {
-  0% { filter: opacity(0.6) scale(1) brightness(0.9) saturate(1); }
+  0% { filter: opacity(0.3) scale(1) brightness(0.9) saturate(1); }
   50% { filter: opacity(0.8) scale(1.022) brightness(1.2) saturate(1.4); }
-  100% { filter: opacity(0.6) scale(1) brightness(1) saturate(1); }
+  100% { filter: opacity(0.3) scale(1) brightness(1) saturate(1); }
 }
   </style>
 <!-- FET Styles -->
