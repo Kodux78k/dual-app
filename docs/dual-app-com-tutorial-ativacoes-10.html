@@ -1651,7 +1651,7 @@ table th, table td {
 </table>
 </section>
 <button id="toggleTutorialBtn" 
-  style="position: fixed; top: 99px; left: 22px; z-index:0 ; padding: 4px ; font-size: 13px; border-radius: 50%; background: rgba(0,0,0,0.2); color: #0ff; border: none; 
+  style="position: fixed; top: 99px; left: 22px; z-index:6 ; padding: 4px ; font-size: 13px; border-radius: 50%; background: rgba(0,0,0,0.3); color: #0ff; border: none; 
   
    
   cursor: pointer;">
@@ -1720,7 +1720,7 @@ table th, table td {
 </div>
 </div>
 <!-- 🎼 PLAYER KOBLLUX EXPANDIDO -->
-<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:1;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.8);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
 <button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
     ≈
    </button>
@@ -3401,7 +3401,7 @@ presetSelector.addEventListener("change", (e) => {
 document.addEventListener("DOMContentLoaded", () => {
   const toggleModeBtn = document.createElement('button');
   toggleModeBtn.id = 'toggleCleanMode';
-  toggleModeBtn.innerText = '💬=' + (preferClean ? '🫧' : '🫆');
+  toggleModeBtn.innerText = '𓆃' + (preferClean ? '𓁽' : '𓂀');
   toggleModeBtn.style.cssText = `
     position: fixed;
     top: 8px;
