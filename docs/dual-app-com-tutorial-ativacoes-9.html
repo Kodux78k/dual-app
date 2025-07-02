@@ -72,14 +72,16 @@ function parseMarkdownAdvanced(text) {
     body.vibe   { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
     * { box-sizing:border-box; margin:0; padding:0; }
     html, body {
-  font-family: var(--font-family, sans-serif); width:100%; height:100%; overflow:hidden; }
+  font-family: var(--font-family, sans-serif); 
+  width:100%; height:100%; overflow-x: hidden; overflow-y: auto; }
     body {
   font-family: var(--font-family, sans-serif);
       display:flex; flex-direction:column; align-items:center;
       padding:20px; background:var(--bg); color:var(--text);
       font-family:'Montserrat',sans-serif;
       transition:background var(--slow), color var(--slow);
-      animation:fadeIn var(--slow) ease forwards;
+      animation:fadeIn var(--slow) ease forwards; 
+      overflow-x: hidden; overflow-y: auto;
     }
     @keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
     @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.7}}
