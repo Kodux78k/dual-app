@@ -1260,9 +1260,13 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   content: "";
   position: fixed;
   inset: 0;
-  background: repeating-conic-gradient(#00ff00 0deg 1deg, transparent 1deg 2deg);
-  animation: matrixPulse 4s ease-in-out infinite;
-  opacity: 0.04;
+  background-image: url('assets/styles/themes/bgs/Matrix-ASCII-BG.png');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15;
+  filter: brightness(1.1) saturate(1.4);
+  animation: pulseBG 24s ease-in-out infinite alternate;
+  pointer-events: none;
   z-index: 0;
 }
 @keyframes matrixPulse {
@@ -1289,7 +1293,18 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   pointer-events: none;
   z-index: -1;
 }
-
+[data-theme="emotion-detector"]::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('assets/styles/themes/bgs/Whisk_d5f8cb6e9c.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  animation: slowFade 78s infinite ease-in-out;
+  z-index: 0; /* acima do ::before, mas ainda atrás do conteúdo */
+  pointer-events: none;
+}
 [data-theme="emotion-detector"] .response-block {
   background: rgba(255, 255, 200, 0.2);
   border-left: 3px solid #ffcc00;
@@ -1653,7 +1668,7 @@ table th, table td {
 </table>
 </section>
 <button id="toggleTutorialBtn" 
-  style="position: fixed; top: 89px; left: 22px; z-index:6 ; padding: 4px ; font-size: 13px; border-radius: 50%; background: rgba(0,0,0,0.3); color: #0ff; border: none; 
+  style="position: fixed; top: 99px; left: 22px; z-index:6 ; padding: 4px ; font-size: 13px; border-radius: 50%; background: rgba(0,0,0,0.3); color: #0ff; border: none; 
   
    
   cursor: pointer;">
