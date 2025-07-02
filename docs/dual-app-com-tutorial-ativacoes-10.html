@@ -3410,7 +3410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     left: 20px;
     padding: 6px 9px;
     background: rgba(0, 0, 0, 0.6);
-    color: #0ff;
+    color: var(--bg);
     border: none;
     border-radius: 5px;
     font-size: 9px;
@@ -3423,7 +3423,7 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleModeBtn.addEventListener('click', () => {
     preferClean = !preferClean;
     localStorage.setItem('preferClean', preferClean);
-    toggleModeBtn.innerText = ':' + (preferClean ? '🫧' : '🫆');
+    toggleModeBtn.innerText = ':' + (preferClean ? '𓁽' : '𓂀');
     if (navigator.vibrate) navigator.vibrate([30]);
   });
 });
