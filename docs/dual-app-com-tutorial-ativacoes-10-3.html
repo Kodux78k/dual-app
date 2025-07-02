@@ -1486,8 +1486,11 @@ table th, table td {
   content: "";
   position: fixed;
   inset: 0;
-  background: repeating-conic-gradient(#00ff00 0deg 1deg, transparent 1deg 2deg);
-  animation: matrixSpin 12s linear infinite;
+  background-image: url('assets/styles/themes/bgs/Matrix1-ASCII-BG.JPG');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.2;
+  filter: brightness(1.1) saturate(1.2);  animation: matrixSpin 12s ease-in-out infinite;
   opacity: 0.02;
   z-index: 0;
 }
@@ -1600,8 +1603,8 @@ table th, table td {
 }
 
 @keyframes matrixSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% { transform: scale(1); }
+  100% { transform: scale(1.018); }
 }
 @keyframes pulseBG {
   0% { filter: brightness(0.9) saturate(1); }
