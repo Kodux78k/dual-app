@@ -981,7 +981,7 @@ function parseMarkdownAdvanced(text) {
   background-position: center;
   opacity: 0.18;
   filter: brightness(1.1) saturate(1.2);
-  animation: pulseBG 12s ease-in-out infinite alternate;
+  animation: tesseractVibe 12s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: -1;
 }
@@ -1259,9 +1259,9 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   background-image: url('assets/styles/themes/bgs/Matrix-ASCII-BG.png');
   background-size: cover;
   background-position: center;
-  opacity: 0.15;
+  
   filter: brightness(1.1) saturate(1.4);
-  animation: pulseBG 24s ease-in-out infinite alternate;
+  animation: matrixPulse 24s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: 0;
 }
@@ -1471,7 +1471,7 @@ table th, table td {
   background-size: cover;
   background-position: center;
   opacity: 0.4;
-  filter: brightness(1.2) saturate(1.2);  animation: matrixSpin 12s ease-in-out infinite;
+  filter: brightness(1.2) saturate(1.2);  animation: matrixPulse 12s ease-in-out infinite;
   z-index: 0;
 }
 [data-theme="matrix"]::after {
@@ -1492,8 +1492,8 @@ table th, table td {
   content: "";
   position: fixed;
   inset: 0;
-  background: linear-gradient(45deg, #9b00ff 0%, #00ff85 50%, #ff6a00 100%);
-  animation: cyberGlow 33s ease-in-out infinite alternate;
+  background-image: url('assets/styles/themes/bgs/Nebula-Alef-ASCII-BG.JPG');
+  background-size: cover;  animation: cyberGlow 33s ease-in-out infinite alternate;
   opacity: 0.06;
   pointer-events: none;
   z-index: 0;
