@@ -1286,7 +1286,18 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   pointer-events: none;
   z-index: -1;
 }
-
+[data-theme="emotion-detector"]::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('assets/styles/themes/bgs/Whisk_d5f8cb6e9c.jpg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  animation: slowFade 78s infinite ease-in-out;
+  z-index: 0; /* acima do ::before, mas ainda atrás do conteúdo */
+  pointer-events: none;
+}
 [data-theme="emotion-detector"] .response-block {
   background: rgba(255, 255, 200, 0.2);
   border-left: 3px solid #ffcc00;
@@ -1310,7 +1321,8 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   animation: pulseBG 12s ease-in-out infinite alternate;
   pointer-events: none;
   z-index: -1;
-}[data-theme="emotion-ai"]::after {
+}
+[data-theme="emotion-ai"]::after {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -1319,7 +1331,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   background-position: center;
   opacity: 0;
   animation: slowFade 78s infinite ease-in-out;
-  z-index: 1; /* acima do ::before, mas ainda atrás do conteúdo */
+  z-index: 0; /* acima do ::before, mas ainda atrás do conteúdo */
   pointer-events: none;
 }
 [data-theme="emotion-ai"] .response-block {
@@ -1574,8 +1586,9 @@ table th, table td {
   content: "";
   position: fixed;
   inset: 0;
-  background: url('assets/styles/themes/bgs/Emotion-BG.png');
+  background: url('assets/styles/themes/bgs/Universe2-BG.JPG');
   background-size: cover;
+  background-position: center;
   opacity: 0;
   animation: slowFade 33s infinite ease-in-out;
   z-index: 1;
@@ -1624,7 +1637,7 @@ table th, table td {
 </div>
 <section class="response-block middle" id="tutorialAtivacoes" 
   style="display: none; 
-  z-index: 693; 
+  z-index: 5; 
   backdrop-filter: blur(10px);   
   -webkit-backdrop-filter: blur(10px);
   margin-top: 20px;">
