@@ -967,13 +967,13 @@ function parseMarkdownAdvanced(text) {
   background-image: url('assets/styles/themes/bgs/Matrix1-ASCII-BG.JPG');
   background-size: cover;
   background-position: center;
-  animation: matrixSpinx 12s linear infinite;
-  opacity: 0.18;
+  animation: matrixSpinx 12s ease-in-out infinite;
+  opacity: 0.15;
   z-index: 0;
 }
 @keyframes matrixSpinx {
   0% { transform: scale (1); }
-  100% { transform: scale (1.11); }
+  100% { transform: scale (1.018); }
 }
 [data-theme="matrix"]::after {
   content: "";
@@ -1065,7 +1065,7 @@ function parseMarkdownAdvanced(text) {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('assets/styles/themes/bgs/MHM-Cubes-BG.JPG');
+  background: url('assets/styles/themes/bgs/Nebula-Alef-ASCII-BG.JPG');
   background-size: cover;
   background-position: center;
   opacity: 0;
@@ -1177,7 +1177,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
    /* Cyberpunk: glitch */
 [data-theme="cyberpunk"] .response-block {
   position: relative;
-  animation: glitchFlash 78s infinite;
+  animation: glitchFlash 42s infinite;
 }
 @keyframes glitchFlash {
   0% { filter: hue-rotate(0deg); }
