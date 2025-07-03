@@ -1615,6 +1615,18 @@ table th, table td {
   font-style: italic;
   margin-bottom: 6px;
 }
+</style>
+<style>
+.tutorial-box {
+  padding: 1.5rem;
+  background: rgba(0, 255, 255, 0.06);
+  border-left: 3px solid #0ff;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0,255,255,0.1);
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: fadeIn 0.8s ease-in-out;
+}
   </style>
 </head>
 <body data-fet="">
@@ -1626,7 +1638,7 @@ table th, table td {
 <div id="toggleSimbioseBtn" title="Ativar Simbiose">
 <img alt="Simbiose" src="assets/icons/icon_simbiose.png"/>
 </div>
-<section class="response-block middle" id="tutorialAtivacoes" 
+<section class="tutorial-box" id="tutorialAtivacoes" 
   style="display: none; 
   z-index: 5; 
   backdrop-filter: blur(10px);   
