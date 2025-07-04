@@ -602,7 +602,7 @@ document.getElementById('glowAmount').addEventListener('input', e => {
 
       // Troca background
       document.body.style.backgroundImage = simbioseAtiva
-        ? "url('assets/styles/themes/bgs/Cyber0-ASCII-BG.png')" // seu background alternativo
+        ? "url('assets/styles/themes/bgs/Cyber-ank-ASCII-BG.png')" // seu background alternativo
         : "url('assets/styles/themes/bgs/Nebula3-ASCII-BG.png')";
 
       // Altera URL sem recarregar
@@ -2707,7 +2707,7 @@ document.addEventListener("DOMContentLoaded", insertAssistantSignature);
       pointer-events: none;
       background: url('assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG') center center no-repeat;
       background-size: cover;
-      opacity: 0;
+      opacity: 0.18;
       animation: pulseDyn 18s infinite ease-in-out;
       transition: opacity 1s ease-in-out;
       z-index: 0;
@@ -3027,37 +3027,33 @@ document.addEventListener("DOMContentLoaded", insertAssistantSignature);
 
    /* MATRIX INNER GRID DISTORCIDO */
 [data-theme="matrix"]::before {
- content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-
-  background-image: url('assets/styles/themes/bgs/Matrix1-ASCII-BG.JPG');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  opacity: 0.18;
-  animation: pulse 12s ease-in-out infinite alternate;
-
-  /* 🔲 Corte visual interno leve */
-  border-radius: 30px;
-  overflow: hidden;
-  filter: blur(0.5px);
-  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.6);}
-
+content: "";
+position: fixed;
+inset: 0;
+z-index: -2;
+background-image: url('assets/styles/themes/bgs/Matrix1-ASCII-BG.JPG');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+opacity: 0.18;
+animation: pulse 12s ease-in-out infinite alternate;
+/* 🔲 Corte visual interno leve */
+border-radius: 30px;
+overflow: hidden;
+filter: blur(0.5px);
+box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.6);}
 [data-theme="matrix"]::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url('assets/styles/themes/bgs/Matrix-Nebula-BG.JPG');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.18;
-  filter: brightness(1.1) saturate(1.2);
-  animation: tesseractVibe 12s ease-in-out infinite alternate;
-  pointer-events: none;
-  z-index: -1;
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/Matrix-Nebula-BG.JPG');
+background-size: cover;
+background-position: center;
+opacity: 0.18;
+filter: brightness(1.1) saturate(1.2);
+animation: tesseractVibe 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: -1;
 }
 
 [data-theme="matrix"] .response-block {
@@ -3136,7 +3132,7 @@ document.addEventListener("DOMContentLoaded", insertAssistantSignature);
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('assets/styles/themes/bgs/Nebula-Alef-ASCII-BG.png');
+  background: url('assets/styles/themes/bgs/Tesseract-Base1-BG.png');
   background-size: cover;
   background-position: center;
   opacity: 0;
