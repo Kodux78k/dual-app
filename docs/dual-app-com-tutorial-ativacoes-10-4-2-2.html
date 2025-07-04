@@ -1297,7 +1297,7 @@ document.getElementById("loginForm").addEventListener("submit", () => {
   background-size: cover;
   background-position: center;
   opacity: 0;
-  animation: slowFade 78s infinite ease-in-out;
+  animation: slowFade 42s infinite ease-in-out;
   z-index: 0; /* acima do ::before, mas ainda atrás do conteúdo */
   pointer-events: none;
 }
@@ -1472,7 +1472,7 @@ table th, table td {
   background-position: center;
   opacity: 0.4;
   filter: brightness(1.2) saturate(1.2);  animation: matrixPulse 12s ease-in-out infinite;
-  z-index: 0;
+  z-index: -1;
 }
 [data-theme="matrix"]::after {
   content: "";
@@ -1481,18 +1481,18 @@ table th, table td {
   background-image: url('assets/styles/themes/bgs/Matrix1-ASCII-BG.JPG');
   background-size: cover;
   background-position: center;
-  opacity: 0.2;
-  filter: brightness(1.1) saturate(1.2);
+  opacity: 0.3;
+  filter: brightness(1.2) saturate(1.2);
   animation: pulseBG 12s ease-in-out infinite alternate;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
 }
 
 [data-theme="cyberpunk"]::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image: url('assets/styles/themes/bgs/Cyber-ASCII-BG.png');
+  background-image: url('assets/styles/themes/bgs/Hyperbolic-Field-ASCII-BG.JPG');
   background-position: center;
   background-size: cover;  animation: cyberGlow 33s ease-in-out infinite alternate;
   opacity: 0.06;
@@ -1553,7 +1553,7 @@ table th, table td {
   content: "";
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: url('assets/styles/themes/bgs/MHM-Cubes-BG.JPG');
+  background: url('assets/styles/themes/bgs/Turbo-Crystal-BG.JPG');
   background-size: cover;
   background-position: center;
   opacity: 0;
@@ -1931,7 +1931,7 @@ table th, table td {
 
       // Troca background
       document.body.style.backgroundImage = simbioseAtiva
-        ? "url('assets/styles/themes/bgs/Cyber-Wall-ASCII-BG.png')" // seu background alternativo
+        ? "url('assets/styles/themes/bgs/Cyber0-ASCII-BG.png')" // seu background alternativo
         : "url('assets/styles/themes/bgs/Nebula3-ASCII-BG.png')";
 
       // Altera URL sem recarregar
