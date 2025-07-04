@@ -3027,16 +3027,24 @@ document.addEventListener("DOMContentLoaded", insertAssistantSignature);
 
    /* MATRIX INNER GRID DISTORCIDO */
 [data-theme="matrix"]::before {
-  content: "";
+ content: "";
   position: fixed;
   inset: 0;
+  z-index: -2;
+
   background-image: url('assets/styles/themes/bgs/Matrix1-ASCII-BG.JPG');
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+
+  opacity: 0.18;
   animation: pulse 12s ease-in-out infinite alternate;
-  opacity: 0.2;
-  z-index: -2;
-}
+
+  /* 🔲 Corte visual interno leve */
+  border-radius: 30px;
+  overflow: hidden;
+  filter: blur(0.5px);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.6);}
 
 [data-theme="matrix"]::after {
   content: "";
