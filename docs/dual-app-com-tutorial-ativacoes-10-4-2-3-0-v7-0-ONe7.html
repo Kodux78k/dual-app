@@ -2740,9 +2740,7 @@ const nebulaOption = document.createElement("option");
 nebulaOption.value = "nebula";
 nebulaOption.textContent = "🌌 Nebula";
 document.querySelector("#advancedThemes")?.appendChild(nebulaOption);
-// Som ao clicar
-const clickSound = new Audio("y.com/download/audio/2022/03/15/audio_ae7b82e34e.mp3?filename=click-124467.mp3");
-clickSound.volume = 0.15;
+
 // Adiciona som a todos os blocos
 document.addEventListener("click", function (e) {
 const block = e.target.closest(".response-block");
@@ -3241,8 +3239,8 @@ flash.style.transition = 'opacity 0.6s ease-out';
 document.body.appendChild(flash);
 setTimeout(() => { flash.style.opacity = 0; }, 50);
 setTimeout(() => { document.body.removeChild(flash); }, 700);
-const audio = new Audio('assets/sounds/notify.mp3');
-audio.volume = 0.3;
+const audio = new Audio('assets/sounds/nnotify.mp3');
+audio.volume = 0.0;
 audio.play().catch(()=>{});
 }
 const originalSetAttribute = document.body.setAttribute;
