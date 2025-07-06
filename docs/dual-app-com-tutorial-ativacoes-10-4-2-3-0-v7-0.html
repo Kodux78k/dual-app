@@ -402,7 +402,7 @@ const STORAGE_KEY   = 'infodoseEnabled',
 THEME_KEY     = 'infodoseTheme',
 HISTORY_KEY   = 'historyMode',
 CONFIG = {
-TRAINING_MAIN:    'data/codex/codex-dual-8e.txt',
+TRAINING_MAIN:    'data/codex/mtlx-o.txt',
 TRAINING_HISTORY: 'data/codex/Protocolo_de_Equalização_KOBLLUX_A_Verdade_do_Uno.txt',
 API_URL:          'https://openrouter.ai/api/v1/chat/completions',
 MODEL:            'microsoft/mai-ds-r1:free',
@@ -2774,11 +2774,11 @@ inset: 0;
 background-image: url('assets/styles/themes/bgs/duals/MHM-Nebula-Dual-BG.jpg');
 background-size: cover;
 background-position: center;
-opacity: 0.3;
+opacity: 0.18;
 filter: brightness(1.2) saturate(1.2);
 animation: pulseBG 12s ease-in-out infinite alternate;
 pointer-events: none;
-z-index: -1;
+z-index: 1;
 }
 [data-theme="cyberpunk"]::before {
 content: "";
@@ -2830,7 +2830,7 @@ z-index: -1;
 content: "";
 position: fixed;
 inset: 0;
-background-image: url('assets/styles/themes/bgs/duals/MHM00-Dual-BG.png');
+background-image: url('assets/styles/themes/bgs/duals/MHM0-Dual-BG.png');
 background-size: cover;
 background-position: center;
 opacity: 0.18;
