@@ -1447,7 +1447,7 @@ this.innerText = "📘";
 }
 });
   </script>
-  <button id="toggleThemeEditorBtn" style="position: fixed; top: 133px; left: 20px; z-index: 9999; padding: 6px; font-size: 20px; border-radius: 10px; background: rgba(0,255,255,0.2); color: #0ff; border: 1px solid #0ff; cursor: pointer;">
+  <button id="toggleThemeEditorBtn" style="position: fixed; top: 133px; left: 20px; z-index: 2; padding: 6px; font-size: 20px; border-radius: 6px; background: rgba(0,255,255,0.2); color: #0ff; border: 1px solid #0ff; cursor: pointer;">
  🎨
 </button>
   <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
@@ -3036,7 +3036,7 @@ document.body.appendChild(toggleModeBtn);
 toggleModeBtn.addEventListener('click', () => {
 preferClean = !preferClean;
 localStorage.setItem('preferClean', preferClean);
-toggleModeBtn.innerText = ':' + (preferClean ? '𓁽' : '𓂀');
+toggleModeBtn.innerText = '' + (preferClean ? '𓁽' : '𓂀');
 if (navigator.vibrate) navigator.vibrate([30]);
 });
 });
@@ -3255,7 +3255,7 @@ originalSetAttribute.call(this, attr, val);
   </script>
   <script>
    const themeEditor = document.createElement('div');
-themeEditor.id = 'themeEditor'; themeEditor.classList.add('hidden'); themeEditor.style.cssText = 'position:fixed;top:147px;right:12px;z-index:9999;background:#111;color:#0ff;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px';
+themeEditor.id = 'themeEditor'; themeEditor.classList.add('hidden'); themeEditor.style.cssText = 'position:fixed;top:200px;right:12px;z-index:2;background:#111;color:#0ff;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px';
 themeEditor.innerHTML = `
 <label>🎨 Cor de fundo: <input type="color" id="bgColor"></label><label>🖍️ Cor do texto: <input type="color" id="textColor"></label><label>✨ Intensidade do brilho: <input type="range" id="glowAmount" min="0" max="1" step="0.05" value="0.2"></label>
 `;
