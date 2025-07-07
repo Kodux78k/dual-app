@@ -1019,7 +1019,7 @@ opacity: 0.28;
 filter: brightness(1.1) saturate(1.4);
 animation: pulseBG 12s ease-in-out infinite alternate;
 pointer-events: none;
-z-index: 0;
+z-index: 1;
 }[data-theme="emotion-ai"]::after {
 content: "";
 position: fixed;
@@ -1029,7 +1029,7 @@ background-size: cover;
 background-position: center;
 opacity: 0;
 animation: slowFade 78s infinite ease-in-out;
-z-index: 1; /* acima do ::before, mas ainda atrás do conteúdo */
+z-index: 2; /* acima do ::before, mas ainda atrás do conteúdo */
 pointer-events: none;
 }
 [data-theme="emotion-ai"] .response-block {
@@ -1120,7 +1120,7 @@ background-position: center;
 background-size: cover;  animation: cyberGlow 33s ease-in-out infinite alternate;
 opacity: 0.06;
 pointer-events: none;
-z-index: 0;
+z-index: 1;
 }
 [data-theme="cyberpunk"]::after {
 content: "";
