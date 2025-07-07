@@ -516,7 +516,7 @@ background-size: cover;
 opacity: 0;
 animation: pulseDyn 18s infinite ease-in-out;
 transition: opacity 1s ease-in-out;
-z-index: 0;
+z-index: -1;
 }
 /* Botão de fusão */
 #toggleSimbioseBtn {
@@ -1019,7 +1019,7 @@ opacity: 0.28;
 filter: brightness(1.1) saturate(1.4);
 animation: pulseBG 12s ease-in-out infinite alternate;
 pointer-events: none;
-z-index: 0;
+z-index: 1;
 }[data-theme="emotion-ai"]::after {
 content: "";
 position: fixed;
@@ -1029,7 +1029,7 @@ background-size: cover;
 background-position: center;
 opacity: 0;
 animation: slowFade 78s infinite ease-in-out;
-z-index: 1; /* acima do ::before, mas ainda atrás do conteúdo */
+z-index: 2; /* acima do ::before, mas ainda atrás do conteúdo */
 pointer-events: none;
 }
 [data-theme="emotion-ai"] .response-block {
@@ -1120,7 +1120,7 @@ background-position: center;
 background-size: cover;  animation: cyberGlow 33s ease-in-out infinite alternate;
 opacity: 0.06;
 pointer-events: none;
-z-index: 0;
+z-index: 1;
 }
 [data-theme="cyberpunk"]::after {
 content: "";
@@ -1131,7 +1131,7 @@ background-size: cover;
 background-position: center;
 opacity: 0.18;
 pointer-events: none;
-z-index: -1;
+z-index: 0;
 }
 [data-theme="turbo"]::before {
 content: "";
@@ -1498,7 +1498,7 @@ this.innerText = "📘";
 }
 });
   </script>
-<button id="toggleThemeEditorBtn" style="position: fixed; top: 133px; left: 20px; z-index: 2; padding: 6px; font-size: 20px; border: 1px solid var(--txt); background: rgba(var(--bg-rgb), 0.35); backdrop-filter: blur(8px); color: #0ff; border: 1px solid var(--txt); cursor: pointer; border-radius: 50%">
+<button id="toggleThemeEditorBtn" style="position: fixed; top: 130px; left: 20px; z-index: 2; padding: 6px; font-size: 20px; border: 1px solid var(--txt); background: rgba(var(--bg-rgb), 0.35); backdrop-filter: blur(8px); color: #0ff; border: 1px solid var(--txt); cursor: pointer; border-radius: 50%">
  🎨
 </button>
 <div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
@@ -1726,7 +1726,7 @@ let simbioseAtiva = false;
 btn.addEventListener('click', () => {
 simbioseAtiva = !simbioseAtiva;
 // Ativa/desativa PNG simbiótico
-overlay.style.opacity = simbioseAtiva ? '0.18' : '0';
+overlay.style.opacity = simbioseAtiva ? '0.24' : '0';
 // Troca background
 document.body.style.backgroundImage = simbioseAtiva
 ? "url('assets/styles/themes/bgs/-ASCII-BG.png')" // seu background alternativo
