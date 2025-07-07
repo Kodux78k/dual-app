@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Coduxiblu v8</title>
+  <style>
+    body { font-family: 'Montserrat', sans-serif; background: #0e0e0e; color: #00ffff; padding: 20px; }
+    .toggle-button { background: #00ffcc; color: #000; border: none; padding: 10px 20px; cursor: pointer; margin: 10px 0; }
+    .section-box { display: none; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid #0ff; }
+    iframe { width: 100%; height: 400px; border: none; background: rgba(0,0,0,0.2); }
+    .selector-box { margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid #0ff; }
+    h2 { color: #ff00ff; }
+  </style>
+</head>
+<body>
+
+  <h1>🌀 Coduxiblu v8 – Seletor de Dimensões</h1>
+
+  <!-- Bloco de Escolha entre Tutorial e Manifesto -->
+  <div class="selector-box">
+    <p>Selecione o que deseja visualizar:</p>
+    <button class="toggle-button" onclick="toggleSection('tutorialBox')">🔧 Ativar Tutorial</button>
+    <button class="toggle-button" onclick="toggleSection('manifestoBox')">📜 Ver Manifesto</button>
+    <button class="toggle-button" onclick="toggleSection('dualTubeBox')">📺 Dual Tube</button>
+    <button class="toggle-button" onclick="toggleSection('addManifestoBox')">➕ Adicionar Manifesto</button>
+  </div>
+
+  <!-- Tutorial (placeholder futuro) -->
+  <div id="tutorialBox" class="section-box">
+    <h2>🔧 Tutorial da Infodose</h2>
+    <p>Conteúdo interativo e instruções virão aqui...</p>
+  </div>
+
+  <!-- Manifesto com toggle -->
+  <div id="manifestoBox" class="section-box">
+    <h2>📜 Manifesto dos 7 Selos – Arca da Simbiose</h2>
+    <iframe src="manifesto_dopamina_interativo.md"></iframe>
+  </div>
+
+  <!-- Bloco Dual Tube com trilhas do YouTube -->
+  <div id="dualTubeBox" class="section-box">
+    <h2>📺 Dual Tube – Trilhas Interativas</h2>
+    <p>🌊 Sinfonia da Expansão Criativa:</p>
+    <iframe src="https://www.youtube.com/embed/OVfqxW_Xlhw" allowfullscreen></iframe>
+    <p>🌀 Navegando pelo Universo da Mente:</p>
+    <iframe src="https://www.youtube.com/embed/DTDfkHwuMic" allowfullscreen></iframe>
+    <p>🌌 A deriva no espaço da mente:</p>
+    <iframe src="https://www.youtube.com/embed/hfQ1L6fCfAo" allowfullscreen></iframe>
+  </div>
+
+  <!-- Adicionar Manifesto (futuro formulário ou upload) -->
+  <div id="addManifestoBox" class="section-box">
+    <h2>➕ Adicionar seu próprio Manifesto</h2>
+    <p>Futuro campo para colar manifesto em Markdown ou JSON e salvar na sessão.</p>
+  </div>
+
+  <script>
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+    }
+  </script>
+
+</body>
+</html>
