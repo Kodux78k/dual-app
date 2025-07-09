@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>A.Infodose Home + Playlists + Chat (DualTube Ajustado)</title>
+
+  <!-- Fonte Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+
+  <!-- Partículas.js (Retina Detect: true) -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js" defer></script>
+
+  <!-- Configurações do Chat (API_URL, AUTH_TOKEN e caminhos de treinamento) -->
+  <script>
+    window.CONFIG = {
+      TRAINING_MAIN:    'data/Super_Treinamento_Universal_Dual_Infodose_v1-29.txt',
+      TRAINING_HISTORY: 'data/codex-azura.txt',
+      API_URL:          'https://openrouter.ai/api/v1/chat/completions',
+      MODEL:            'deepseek/deepseek-chat-v3-0324:free',
+      TEMP:             0.2,
+      CHUNK_SIZE:       12000,
+      AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
+    };
+  </script>
+
+  <style>
+    /* ----------------------------------------
+       VARIÁVEIS DE TEMA E GLASSMORFISMO
+    -----------------------------------------*/
+    :root {
+      --bg-dark: linear-gradient(to bottom, #000, #1a1a1a);
+      --text-dark: #d7d7d7;
+      --accent1: #D28B36;
+      --accent2: #1FC8DB;
+      --fast: 0.4s;
+      --med: 0.8s;
+      --slow: 1.8s;
+      --glass-bg: rgba(255,255,255,0.08);
+      --glass-blur: blur(10px);
+    }
+    body.light {
+      --bg-dark: linear-gradient(to bottom, #666, #e0e0e0);
+      --text-dark: #444;
+    }
+    body.medium {
+      --bg-dark: linear-gradient(to bottom, #555, #333);
+      --text-dark: #eee;
+    }
+    body.vibe {
+      --bg-dark: linear-gradient(135deg, #D28B36, #1FC8DB);
+      --text-dark: #fff;
+    }
+
+    /* ----------------------------------------
+       RESET E ESTILIZAÇÕES GERAIS
+    -----------------------------------------*/
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: hidden;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      font-family: 'Montserrat', sans-serif;
+      transition: background var(--slow), color var(--slow);
+      animation: fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { transform: translateX(-100%); }
+      to   { transform: translateX(0); }
+    }
+    @keyframes slideOut {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-100%); }
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(1.012); }
+    }
+
+    /* ----------------------------------------
+       PARTICLES.JS AO FUNDO
+    -----------------------------------------*/
+    #particles-js {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* ----------------------------------------
+       BOTÕES TEMA E MENU (canto sup.)
+    -----------------------------------------*/
+    #themeToggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 30px;
+      height: 30px;
+      border: 1px solid var(--text-dark);
+      border-radius: 50%;
+      background: transparent;
+      opacity: 0.6;
+      cursor: pointer;
+      transition: opacity var(--med), border-color var(--med);
+      z-index: 10;
+    }
+    #themeToggle:hover {
+      opacity: 0.9;
+    }
+    #themeToggle::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--text-dark);
+      opacity: 0.2;
+    }
+
+    #menuToggle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: var(--accent1);
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      color: #fff;
+      opacity: 0.9;
+      transition: opacity var(--fast);
+      z-index: 10;
+    }
+    #menuToggle:hover {
+      opacity: 1;
+    }
+
+    /* ----------------------------------------
+       CABEÇALHO (saudação + busca) – LARGURA 100%
+    -----------------------------------------*/
+    header {
+      position: relative;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 5;
+    }
+    #greeting {
+      font-size: 1.2em;
+      font-weight: 600;
+      margin-left: 20px;
+      opacity: 0.8;
+    }
+    #videoSearch {
+      flex: 1;
+      max-width: 400px;
+      margin-left: 20px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.1);
+      color: inherit;
+      font-size: 14px;
+      transition: background var(--fast);
+    }
+    #videoSearch:focus {
+      background: rgba(255,255,255,0.2);
+      outline: none;
+    }
+
+    /* ----------------------------------------
+       LAYOUT PRINCIPAL: SIDEBAR + CONTENT
+    -----------------------------------------*/
+    .container {
+      position: relative;
+      flex: 1;
+      display: flex;
+      margin-top: 10px;
+      overflow: hidden;
+      padding: 0;
+      width: 100%;
+    }
+
+    /* ----------------------------------------
+       SIDEBAR DE PLAYLISTS (SEM BLUR E 100% ALTURA)
+    -----------------------------------------*/
+    #sidebar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      border-right: 1px solid rgba(255,255,255,0.15);
+      transform: translateX(-100%);
+      transition: transform var(--med) ease;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    #sidebar.open {
+      transform: translateX(0);
+      animation: slideIn var(--med) ease forwards;
+    }
+    #sidebar h2 {
+      font-size: 1.3em;
+      margin-bottom: 12px;
+      color: var(--text-dark);
+      border-bottom: 1px solid var(--text-dark);
+      padding-bottom: 6px;
+    }
+    #currentPlaylistTitle {
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      color: var(--accent2);
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      padding: 8px 0;
+      border-radius: 6px;
+      user-select: none;
+    }
+    .playlist-btn {
+      margin: 8px 0;
+      width: 100%;
+      padding: 8px 10px;
+      background: rgba(255,255,255,0.02);
+      color: var(--text-dark);
+      font-size: 1em;
+      border: none;
+      border-radius: 6px;
+      text-align: left;
+      cursor: pointer;
+      transition: background var(--fast);
+    }
+    .playlist-btn.active {
+      background: rgba(255,255,255,0.15);
+    }
+    .playlist-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    #generatePlaylistBtn {
+      margin-top: auto;
+      padding: 10px;
+      background: var(--accent2);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background var(--fast);
+    }
+    #generatePlaylistBtn:hover {
+      background: var(--accent1);
+    }
+
+    /* ----------------------------------------
+       CONTEÚDO PRINCIPAL (PLAYER + RECOMENDADOS + INFODOSE)
+    -----------------------------------------*/
+    #mainContent {
+      flex: 1;
+      margin-left: 0;
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+      overflow-y: auto;
+      padding-bottom: 20px;
+      width: 100%;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent1) transparent;
+    }
+    #mainContent::-webkit-scrollbar {
+      width: 6px;
+    }
+    #mainContent::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #mainContent::-webkit-scrollbar-thumb {
+      background: var(--accent1);
+      border-radius: 3px;
+    }
+
+    /* ----------------------------------------
+       1º Container: Player de Vídeo (100% largura)
+    -----------------------------------------*/
+    #mainPlayer {
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%;
+      position: relative;
+      background: #000;
+      border-radius: 0;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    #mainPlayer iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    #fullscreenBtn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      color: #fff;
+      padding: 6px 8px;
+      font-size: 1em;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity var(--fast);
+    }
+    #fullscreenBtn:hover {
+      opacity: 1;
+    }
+    #pipBtn {
+      position: absolute;
+      top: 10px;
+      right: 50px;
+      z-index: 2;
+      background: rgba(0,0,0,0.6);
+      border: none;
+      color: #fff;
+      padding: 6px 8px;
+      font-size: 1em;
+      border-radius: 4px;
+      cursor: pointer;
+      opacity: 0.8;
+      transition: opacity var(--fast);
+    }
+    #pipBtn:hover {
+      opacity: 1;
+    }
+
+    /* Botão “Expandir Dose” e descrição */
+    #expandDoseBtn {
+      width: 42%;
+      padding: 12px 0;
+      background: var(--accent2);
+      color: #fff;
+      font-size: 1.1em;
+      border: none;
+      cursor: pointer;
+      transition: background var(--fast), transform var(--fast);
+      margin-bottom: 8px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #expandDoseBtn:hover {
+      background: var(--accent1);
+      transform: scale(1.03);
+    }
+    #videoDescriptionContainer {
+      display: none;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-dark);
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      position: relative;
+      width: 100%;
+    }
+    #videoDescription {
+      white-space: pre-wrap;
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    #speakDescriptionBtn {
+      background: none;
+      border: 1px solid var(--accent2);
+      color: var(--accent2);
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.95em;
+      transition: background var(--fast), color var(--fast);
+    }
+    #speakDescriptionBtn:hover {
+      background: var(--accent2);
+      color: #000;
+    }
+    #buyBtn, #expandFlowBtn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 8px;
+      margin-top: 6px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      cursor: pointer;
+      background: var(--accent2);
+      color: #fff;
+      transition: transform var(--fast), box-shadow var(--fast);
+    }
+    #buyBtn:hover, #expandFlowBtn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(30,200,200,0.3);
+    }
+
+    /* ----------------------------------------
+       2º Container: Vídeos Recomendados
+    -----------------------------------------*/
+    #relatedSection {
+      margin-bottom: 20px;
+      width: 100%;
+    }
+    #relatedSection h2 {
+      font-size: 1.5em;
+      margin: 0 0 4px 8px;
+      color: var(--text-dark);
+    }
+    #relatedSection h3 {
+      font-size: 1.2em;
+      margin: 0 0 12px 8px;
+      color: var(--text-dark);
+      opacity: 0.8;
+    }
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 0 8px 6px 8px;
+      touch-action: pan-x;
+    }
+    .carousel::-webkit-scrollbar {
+      height: 6px;
+    }
+    .carousel::-webkit-scrollbar-thumb {
+      background: var(--accent1);
+      border-radius: 4px;
+    }
+    .carousel .thumb-large {
+      min-width: 300px;
+      height: 168px;
+      background: #111;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: transform var(--fast), box-shadow var(--fast);
+    }
+    .carousel .thumb-large img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .carousel .thumb-large:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(0,255,255,0.3);
+    }
+
+    /* ----------------------------------------
+       3º Container: Infodose Chat (INTEGRADO E TREINAMENTOS)
+    -----------------------------------------*/
+    .chat-container {
+      width: 100%;
+      background: var(--glass-bg);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .chat-header h3 {
+      font-size: 1.1em;
+      color: var(--text-dark);
+    }
+    .assistant-buttons {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .assistant-buttons button {
+      flex: 1;
+      padding: 8px 12px;
+      background: var(--accent2);
+      border: none;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.95em;
+      cursor: pointer;
+      transition: background var(--fast), transform var(--fast);
+    }
+    .assistant-buttons button.selected {
+      background: var(--accent1);
+      transform: scale(1.03);
+    }
+    .assistant-buttons button:hover {
+      background: var(--accent1);
+    }
+
+    .input-container {
+      display: none;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .input-container.visible {
+      display: flex;
+    }
+    .input-container input {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,1);
+      color: inherit;
+      font-size: 16px;
+      transition: background var(--fast);
+      opacity: 0.7;
+    }
+    .input-container input:focus {
+      background: rgba(255,255,255,2);
+    }
+    .input-container button {
+      width: 60px;
+      height: 60px;
+      border: none;
+      background: linear-gradient(42deg, #F0F, #0FF);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 48px;
+      cursor: pointer;
+      animation: pulse 2s infinite ease-in-out;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform var(--med);
+      opacity: 0.7;
+    }
+    .input-container button:hover {
+      transform: scale(1.1);
+    }
+    #voiceBtn {
+      width: 60px;
+      height: 60px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background var(--fast), opacity var(--slow);
+      opacity: 0.7;
+    }
+    #voiceBtn:hover {
+      background: rgba(255,255,255,0.15);
+      opacity: 1;
+    }
+    .chat-footer {
+      margin-top: 12px;
+      padding: 6px 12px;
+      background: var(--bg-dark);
+      opacity: 0.5;
+      color: var(--text-dark);
+      font-size: 0.8em;
+      text-align: center;
+      font-style: italic;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: opacity var(--slow), transform var(--slow);
+      animation: moveGradient 8s linear infinite;
+      user-select: none;
+    }
+    .chat-footer:hover {
+      opacity: 0.6;
+    }
+    .chat-footer.active {
+      opacity: 0.8;
+      animation: expandFooter var(--med) ease-out;
+    }
+    @keyframes moveGradient {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    @keyframes expandFooter {
+      0%,100% { transform: scale(1); }
+      50%     { transform: scale(0.96); }
+    }
+
+    /* ----------------------------------------
+       MODAL DE LOGIN (INCLUI USUÁRIO E ASSISTENTE)
+    -----------------------------------------*/
+    .login-container {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 320px;
+      padding: 1.5rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      backdrop-filter: blur(20px);
+      z-index: 20;
+    }
+    .login-container.active {
+      display: block;
+    }
+    .login-container h3 {
+      margin-bottom: 12px;
+      font-size: 1.1em;
+      text-align: center;
+      color: var(--text-dark);
+    }
+    .login-container input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      margin: 0.8rem 0;
+      padding: 0.4rem 0;
+      font-size: 0.95em;
+      color: #fff;
+    }
+    .login-container input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .login-container button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.5rem 0;
+      border: 1px solid var(--accent2);
+      border-radius: 8px;
+      background: transparent;
+      font-size: 0.95em;
+      color: var(--accent2);
+      cursor: pointer;
+      transition: background 0.25s, color 0.25s;
+    }
+    .login-container button:hover {
+      background: var(--accent2);
+      color: #000;
+    }
+
+    /* ----------------------------------------
+       RESPONSIVIDADE
+    -----------------------------------------*/
+    @media (max-width: 900px) {
+      #mainContent {
+        margin-left: 0;
+      }
+      .carousel {
+        justify-content: center;
+      }
+      #sidebar {
+        width: 100%;
+      }
+      .chat-container {
+        width: 100%;
+      }
+      #voiceBtn {
+        display: none;
+      }
+      #fullscreenBtn {
+        display: none;
+      }
+      #expandDoseBtn {
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Partículas ao fundo -->
+  <div id="particles-js"></div>
+
+  <!-- Botão de menu para abrir/fechar sidebar -->
+  <button id="menuToggle" title="Menu">☰</button>
+
+  <!-- Botão de alternar tema (canto direito) -->
+  <button id="themeToggle" title="Alternar tema" aria-label="Alternar tema"></button>
+
+  <!-- Cabeçalho com saudação e busca -->
+  <header>
+    <div id="greeting">Olá, convidado</div>
+    <input type="text" id="videoSearch" placeholder="🔍 Buscar vídeos..." aria-label="Buscar vídeos" />
+  </header>
+
+  <!-- Container principal: sidebar + conteúdo -->
+  <div class="container">
+    <!-- Sidebar de Playlists (sem blur) -->
+    <nav id="sidebar">
+      <h2>Playlists</h2>
+      <div id="currentPlaylistTitle">Se chegou até aqui merece saber</div>
+      <button class="playlist-btn" data-playlist="Se chegou até aqui merece saber">
+        Se chegou até aqui merece saber
+      </button>
+      <button class="playlist-btn" data-playlist="Do seu jeito, sempre único, sempre seu">
+        Do seu jeito, sempre único, sempre seu
+      </button>
+      <button class="playlist-btn" data-playlist="Ativações guiadas">
+        Ativações guiadas
+      </button>
+      <button id="generatePlaylistBtn">Gerar Playlist</button>
+    </nav>
+
+    <!-- Conteúdo principal -->
+    <div id="mainContent">
+      <!-- 1º Container: Player de Vídeo -->
+      <div id="mainPlayer">
+        <button id="fullscreenBtn" title="Tela cheia">⤢</button>
+        <button id="pipBtn" title="Picture-in-Picture">☐</button>
+      </div>
+
+      <!-- Botão “Expandir Dose” (abaixo do player) -->
+      <button id="expandDoseBtn">Descrição</button>
+
+      <!-- Container para descrição do vídeo, gerada via Fetch -->
+      <div id="videoDescriptionContainer">
+        <div id="videoDescription"></div>
+        <button id="speakDescriptionBtn">🔊 Falar</button>
+        <button id="buyBtn" class="action-btn">➮ Comprar</button>
+        <button id="expandFlowBtn" class="action-btn">➮ Fluxo</button>
+      </div>
+
+      <!-- 2º Container: Vídeos Recomendados -->
+      <section id="relatedSection">
+        <h2>Vídeos Recomendados</h2>
+        <h3>Vídeos Relacionados</h3>
+        <div class="carousel" id="carouselRecomenda">
+          <!-- Miniaturas serão inseridas via JS -->
+        </div>
+      </section>
+
+      <!-- 3º Container: Infodose Chat (INTEGRADO E TREINAMENTOS) -->
+      <div class="chat-container" id="infodoseContainer">
+        <div class="chat-header">
+          <h3>dual.Infodose Chat</h3>
+        </div>
+        <div class="assistant-buttons" id="assistantButtons">
+          <button data-assistant="Dual.infodose" class="selected">Dual</button>
+          <button data-assistant="Codex.dual">Estudos</button>
+          <button data-assistant="Horus.dual">Horus.dual</button>
+        </div>
+        <div class="input-container" id="chatInputContainer">
+          <input id="userInput" type="text" placeholder="Digite sua mensagem..." aria-label="Digite sua mensagem" />
+          <button id="sendBtn" title="Enviar">➤</button>
+          <button id="voiceBtn" title="Falar">
+            <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" type="image/svg+xml" width="36" height="36"></object>
+          </button>
+        </div>
+        <p class="chat-footer" id="toggleChatInput">
+          <em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de login (inclui usuário e assistente) -->
+  <div class="login-container" id="loginBox">
+    <h3>Configure seu Chat</h3>
+    <form id="loginForm">
+      <input type="text" id="userName" placeholder="Nome do usuário" required />
+      <input type="text" id="assistantInput" placeholder="Nome do assistente" required />
+      <button type="submit">Ativar Chat</button>
+    </form>
+  </div>
+
+  <script>
+  (function() {
+    /***************************************
+     * CONSTANTES DE STORAGE E CONFIGURAÇÃO
+     ***************************************/
+    const STORAGE_KEY    = 'infodoseEnabled',
+          ASSIST_KEY     = 'assistantBase',
+          USER_KEY       = 'userName',
+          THEME_KEY      = 'koduxTheme',
+          HISTORY_KEY    = 'historyMode';
+
+    /***************************************
+     * ELEMENTOS PRINCIPAIS
+     ***************************************/
+    const themeToggle             = document.getElementById('themeToggle');
+    const menuToggle              = document.getElementById('menuToggle');
+    const sidebar                 = document.getElementById('sidebar');
+    const currentPlaylistTitle    = document.getElementById('currentPlaylistTitle');
+    const greetingEl              = document.getElementById('greeting');
+    const loginBox                = document.getElementById('loginBox');
+    const loginForm               = document.getElementById('loginForm');
+    const userNameInput           = document.getElementById('userName');
+    const assistantInput          = document.getElementById('assistantInput');
+
+    const mainPlayerDiv           = document.getElementById('mainPlayer');
+    const videoSearchInput        = document.getElementById('videoSearch');
+    const carouselRecomenda       = document.getElementById('carouselRecomenda');
+
+    const expandDoseBtn           = document.getElementById('expandDoseBtn');
+    const videoDescriptionContainer = document.getElementById('videoDescriptionContainer');
+    const videoDescription        = document.getElementById('videoDescription');
+    const speakDescriptionBtn     = document.getElementById('speakDescriptionBtn');
+    const buyBtn                  = document.getElementById('buyBtn');
+    const expandFlowBtn           = document.getElementById('expandFlowBtn');
+    const pipBtn                  = document.getElementById('pipBtn');
+
+    const playlistBtns            = document.querySelectorAll('.playlist-btn');
+    const generatePlaylistBtn     = document.getElementById('generatePlaylistBtn');
+
+    // Chat
+    const chatInputContainer      = document.getElementById('chatInputContainer');
+    const assistantButtons        = document.getElementById('assistantButtons');
+    const userInput               = document.getElementById('userInput');
+    const sendBtn                 = document.getElementById('sendBtn');
+    const voiceBtn                = document.getElementById('voiceBtn');
+    const toggleChatInput         = document.getElementById('toggleChatInput');
+
+    /***************************************
+     * ESTADO GLOBAL
+     ***************************************/
+    let currentTheme      = localStorage.getItem(THEME_KEY) || 'dark';
+    let videoUser         = localStorage.getItem('videoUser') || '';
+    let currentPlaylist   = 'Se chegou até aqui merece saber';
+    let currentVideos     = [];
+    let filteredVideos    = [];
+    let currentVideoId    = null;
+
+    // Chat e Treinamento
+    let userName         = localStorage.getItem(USER_KEY) || '';
+    let assistantBase    = localStorage.getItem(ASSIST_KEY) || 'Dual.infodose';
+    let isEnabled        = localStorage.getItem(STORAGE_KEY) === '1';
+    let isHistory        = localStorage.getItem(HISTORY_KEY) === '1';
+    let trainingChunks   = [];
+    let trainingHistory  = '';
+    let chunkIndex       = 0;
+
+    /***************************************
+     * PLAYLISTS REVISADAS
+     ***************************************/
+    const playlists = {
+      "Se chegou até aqui merece saber": [
+        "qldgs0aLdB0","Bt_rLbMjJDk","Id2NI9tv1r4"
+      ],
+      "Do seu jeito, sempre único, sempre seu": [
+        "FbutKMpd8MY","1L9_rFmIGJ8","qldgs0aLdB0"
+      ],
+      "Ativações guiadas": [
+        "hfQ1L6fCfAo","Tq99vQNQ6dQ","DTDfkHwuMic","OVfqxW_Xlhw","kCHvLOtJIwQ"
+      ]
+    };
+
+    /***************************************
+     * FUNÇÕES DE TEMA
+     ***************************************/
+    function applyTheme(theme) {
+      document.body.classList.remove('light','medium','vibe');
+      if (theme !== 'dark') document.body.classList.add(theme);
+    }
+    function toggleTheme() {
+      const order = ['dark','light','medium','vibe'];
+      let idx = order.indexOf(currentTheme);
+      idx = (idx + 1) % order.length;
+      currentTheme = order[idx];
+      applyTheme(currentTheme);
+      localStorage.setItem(THEME_KEY, currentTheme);
+    }
+    themeToggle.addEventListener('click', toggleTheme);
+
+    /***************************************
+     * INICIAR PARTICLES.JS E CONFIG INICIAL
+     ***************************************/
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Aplica tema salvo
+      applyTheme(currentTheme);
+
+      const ACC1 = getComputedStyle(document.documentElement).getPropertyValue('--accent1').trim();
+      const ACC2 = getComputedStyle(document.documentElement).getPropertyValue('--accent2').trim();
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 40 },
+          color: { value: [ACC1, ACC2] },
+          shape: { type: 'circle' },
+          opacity: { value: 0.4 },
+          size: { value: 2.4 },
+          move: { enable: true, speed: 1.5 }
+        },
+        retina_detect: true
+      });
+
+      // Carrega arquivos de treinamento principal e history
+      try {
+        const mainTxt = await fetch(CONFIG.TRAINING_MAIN).then(r => r.text());
+        for (let i = 0; i < mainTxt.length; i += CONFIG.CHUNK_SIZE) {
+          trainingChunks.push(mainTxt.slice(i, i + CONFIG.CHUNK_SIZE));
+        }
+      } catch (e) {
+        console.error('Erro ao carregar treinamento principal:', e);
+      }
+      try {
+        trainingHistory = await fetch(CONFIG.TRAINING_HISTORY).then(r => r.text());
+      } catch (e) {
+        console.error('Erro ao carregar treinamento history:', e);
+      }
+
+      // Seleciona playlist padrão e carrega o primeiro vídeo automaticamente
+      selectPlaylist("Se chegou até aqui merece saber");
+
+      // Listener para PIP
+      pipBtn.addEventListener('click', async () => {
+        const iframe = mainPlayerDiv.querySelector('iframe');
+        if (!iframe) {
+          alert('Nenhum vídeo carregado ainda.');
+          return;
+        }
+        try {
+          if (!document.pictureInPictureElement) {
+            await iframe.requestPictureInPicture();
+          } else {
+            await document.exitPictureInPicture();
+          }
+        } catch (err) {
+          console.error('Erro ao alternar PIP:', err);
+          alert('Não foi possível alternar PIP.');
+        }
+      });
+
+      // Vincular toggle do footer para exibir/ocultar input de chat
+      toggleChatInput.addEventListener('click', () => {
+        if (chatInputContainer.classList.contains('visible')) {
+          chatInputContainer.classList.remove('visible');
+          toggleChatInput.classList.remove('active');
+        } else {
+          chatInputContainer.classList.add('visible');
+          toggleChatInput.classList.add('active');
+        }
+      });
+
+      // Se o usuário já estiver logado, inicializa chat
+      if (isEnabled && userName && assistantBase) {
+        initApp();
+      } else {
+        showLogin();
+      }
+    });
+
+    /***************************************
+     * LOGIN / USUÁRIO E ASSISTENTE
+     ***************************************/
+    function showLogin() {
+      loginBox.classList.add('active');
+    }
+    function hideLogin() {
+      loginBox.classList.remove('active');
+    }
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const uName = userNameInput.value.trim();
+      const aName = assistantInput.value.trim();
+      if (!uName || !aName) return;
+      userName = uName;
+      assistantBase = aName;
+      localStorage.setItem(USER_KEY, userName);
+      localStorage.setItem(ASSIST_KEY, assistantBase);
+      localStorage.setItem(STORAGE_KEY, '1');
+      isEnabled = true;
+      hideLogin();
+      initApp();
+    });
+
+    /***************************************
+     * SIDEBAR / SELEÇÃO DE PLAYLIST
+     ***************************************/
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+    document.body.addEventListener('click', (e) => {
+      if (!e.target.closest('#sidebar') && !e.target.closest('#menuToggle')) {
+        sidebar.classList.remove('open');
+      }
+    });
+
+    playlistBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const name = btn.dataset.playlist;
+        selectPlaylist(name);
+      });
+    });
+
+    function selectPlaylist(name) {
+      currentPlaylist = name;
+      currentPlaylistTitle.textContent = name;
+      currentVideos = playlists[name] || [];
+      filteredVideos = [...currentVideos];
+
+      // Atualiza estado visual dos botões de playlist
+      playlistBtns.forEach(btn => {
+        if (btn.dataset.playlist === name) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+
+      if (currentVideos.length > 0) {
+        // Carrega e toca automaticamente o primeiro vídeo
+        loadVideoInPlayer(currentVideos[0]);
+      } else {
+        mainPlayerDiv.innerHTML = '';
+      }
+      renderCarouselRecomenda(currentVideos);
+      sidebar.classList.remove('open');
+    }
+
+    /***************************************
+     * FUNÇÃO DE GERAR PLAYLIST (1–12)
+     ***************************************/
+    generatePlaylistBtn.addEventListener('click', () => {
+      let num = prompt("Digite um número de 1 a 12 para gerar uma playlist:");
+      if (!num) return;
+      num = parseInt(num);
+      if (isNaN(num) || num < 1 || num > 12) {
+        alert("Número inválido. Use de 1 a 12.");
+        return;
+      }
+      let chosen;
+      if (num >= 1 && num <= 4) chosen = "Se chegou até aqui merece saber";
+      else if (num >= 5 && num <= 8) chosen = "Do seu jeito, sempre único, sempre seu";
+      else chosen = "Ativações guiadas";
+
+      selectPlaylist(chosen);
+      alert(`Playlist gerada: "${chosen}"`);
+    });
+
+    /***************************************
+     * FUNÇÕES DE VÍDEO (embed direto)
+     ***************************************/
+    function renderCarouselRecomenda(list) {
+      carouselRecomenda.innerHTML = '';
+      list.forEach(id => {
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = 'thumb-large';
+        thumbDiv.dataset.id = id;
+        const img = document.createElement('img');
+        img.src = `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+        img.alt = 'Vídeo YouTube';
+        thumbDiv.appendChild(img);
+        thumbDiv.addEventListener('click', () => {
+          loadVideoInPlayer(id);
+        });
+        carouselRecomenda.appendChild(thumbDiv);
+      });
+    }
+
+    function loadVideoInPlayer(id) {
+      currentVideoId = id;
+      mainPlayerDiv.innerHTML = '';
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${id}?autoplay=1&controls=1&modestbranding=1&rel=0&playsinline=1`;
+      iframe.allow = "autoplay; encrypted-media";
+      iframe.allowFullscreen = true;
+      mainPlayerDiv.appendChild(iframe);
+
+      // Sempre oculta descrições até clicar em “Descrição”
+      videoDescriptionContainer.style.display = 'none';
+      videoDescription.innerHTML = '';
+    }
+
+    const fullscreenBtnEl = document.getElementById('fullscreenBtn');
+    fullscreenBtnEl.addEventListener('click', () => {
+      if (mainPlayerDiv.requestFullscreen) {
+        mainPlayerDiv.requestFullscreen();
+      } else if (mainPlayerDiv.webkitRequestFullscreen) {
+        mainPlayerDiv.webkitRequestFullscreen();
+      } else if (mainPlayerDiv.msRequestFullscreen) {
+        mainPlayerDiv.msRequestFullscreen();
+      }
+    });
+
+    videoSearchInput.addEventListener('input', () => {
+      const term = videoSearchInput.value.toLowerCase();
+      filteredVideos = currentVideos.filter(id => id.toLowerCase().includes(term));
+      renderCarouselRecomenda(filteredVideos);
+    });
+
+    /***************************************
+     * Função utilitária: converte markdown em HTML
+     ***************************************/
+    function markdownToHtml(text) {
+      const paragraphs = text.split(/\n\s*\n/);
+      return paragraphs.map(par => {
+        let p = par
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\n/g, '<br>');
+        return `<p>${p}</p>`;
+      }).join('');
+    }
+
+    /***************************************
+     * “Descrição”: busca + gera conteúdo + mostra botões
+     ***************************************/
+    expandDoseBtn.addEventListener('click', async () => {
+      if (!currentVideoId) {
+        alert("Nenhum vídeo carregado para mostrar descrição.");
+        return;
+      }
+      if (videoDescriptionContainer.style.display === 'block') {
+        videoDescriptionContainer.style.display = 'none';
+        return;
+      }
+      videoDescription.innerHTML = "<em>Carregando descrição…</em>";
+      videoDescriptionContainer.style.display = 'block';
+
+      try {
+        const youtubeUrl = `https://www.youtube.com/watch?v=${currentVideoId}`;
+        const oembedResp = await fetch(
+          `https://www.youtube.com/oembed?url=${encodeURIComponent(youtubeUrl)}&format=json`
+        );
+        if (!oembedResp.ok) throw new Error('Falha ao obter título do vídeo');
+        const oembedData = await oembedResp.json();
+        const videoTitle = oembedData.title;
+
+        const newPrompt =
+          `Com base neste título de vídeo: "${videoTitle}", crie uma descrição curta `
+          + `que instigue curiosidade, ofereça uma sensação de recompensa para quem assistir `
+          + `e gere antecipação. Use linguagem envolvente e vibracional. Apresente no formato `
+          + `com **negrito** onde necessário e linhas em branco entre parágrafos.`;
+
+        // Envia prompt para IA
+        const aiResp = await fetch(CONFIG.API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': CONFIG.AUTH_TOKEN
+          },
+          body: JSON.stringify({
+            model: CONFIG.MODEL,
+            temperature: CONFIG.TEMP,
+            messages: [
+              { role: 'system', content: trainingChunks[0] || '' },
+              { role: 'system', content: trainingHistory || '' },
+              { role: 'user', content: newPrompt }
+            ]
+          })
+        });
+        const aiData = await aiResp.json();
+        const aiText = aiData.choices?.[0]?.message?.content || "Não foi possível gerar descrição.";
+
+        videoDescription.innerHTML = markdownToHtml(aiText);
+      } catch (err) {
+        console.error('Erro ao gerar descrição:', err);
+        videoDescription.innerHTML = "<em>Erro ao gerar descrição.</em>";
+      }
+    });
+
+    speakDescriptionBtn.addEventListener('click', () => {
+      const text = videoDescription.innerText;
+      if (!text) return;
+      const utt = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utt);
+    });
+
+    buyBtn.addEventListener('click', () => {
+      alert("Função de Compra ainda não implementada.");
+    });
+
+    expandFlowBtn.addEventListener('click', () => {
+      alert("Função de Expansão de Fluxo ainda não implementada.");
+    });
+
+    /***************************************
+     * FUNÇÕES DE CHAT E IA
+     ***************************************/
+    function initApp() {
+      // Atualiza saudação
+      greetingEl.textContent = `Olá, ${userName}`;
+      // Ajusta texto do primeiro botão de assistente para "(nome)Dual"
+      const firstBtn = assistantButtons.querySelector('button[data-assistant="Dual.infodose"]');
+      if (firstBtn) firstBtn.textContent = `${userName}Dual`;
+      // O segundo botão exibe “Estudos” (já no HTML)
+      // O terceiro permanece “Horus.dual”
+
+      // Marca assistente selecionado visualmente
+      assistantButtons.querySelectorAll('button').forEach(btn => {
+        if (btn.dataset.assistant === assistantBase) {
+          btn.classList.add('selected');
+        } else {
+          btn.classList.remove('selected');
+        }
+      });
+
+      // Garante que o input do chat inicie oculto
+      chatInputContainer.classList.remove('visible');
+    }
+
+    assistantButtons.addEventListener('click', (e) => {
+      if (!e.target.matches('button[data-assistant]')) return;
+      const sel = e.target.dataset.assistant;
+      assistantButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('selected'));
+      e.target.classList.add('selected');
+      assistantBase = sel;
+      localStorage.setItem(ASSIST_KEY, assistantBase);
+    });
+
+    let isSending = false;
+    sendBtn.addEventListener('click', async () => {
+      const msg = userInput.value.trim();
+      if (!msg || isSending) return;
+      isSending = true;
+      appendMessage('Você', msg);
+      userInput.value = '';
+      await enviarParaIA(msg);
+      isSending = false;
+    });
+
+    userInput.addEventListener('keypress', async (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+
+    voiceBtn.addEventListener('click', () => {
+      alert('Funcionalidade de voz ainda não implementada.');
+    });
+
+    async function enviarParaIA(text) {
+      const sys1 = trainingChunks[chunkIndex] || '';
+      const sys2 = trainingHistory || '';
+      const messages = [
+        { role: 'system', content: sys1 },
+        { role: 'system', content: sys2 },
+        { role: 'system', content: `Atue como ${assistantBase}.` },
+        { role: 'user', content: text }
+      ];
+      try {
+        const resp = await fetch(CONFIG.API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': CONFIG.AUTH_TOKEN
+          },
+          body: JSON.stringify({
+            model: CONFIG.MODEL,
+            temperature: CONFIG.TEMP,
+            messages: messages
+          })
+        });
+        const data = await resp.json();
+        const conteudo = data.choices?.[0]?.message?.content || "Ops, sem resposta.";
+        appendMessage(assistantBase, conteudo, true);
+        if (chunkIndex < trainingChunks.length - 1) {
+          chunkIndex++;
+        }
+      } catch (err) {
+        console.error('Erro na chamada ao Chat API:', err);
+        appendMessage(assistantBase, "Erro ao obter resposta da IA.", true);
+      }
+    }
+
+    function appendMessage(author, text, speak = false) {
+      const msgEl = document.createElement('div');
+      msgEl.style.marginTop = '6px';
+      msgEl.innerHTML = `<strong>${author}:</strong> ${text}`;
+      videoDescriptionContainer.appendChild(msgEl);
+      if (speak) {
+        const utt = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utt);
+      }
+    }
+
+  })();
+  </script>
+</body>
+</html>
