@@ -3547,7 +3547,7 @@ function toggleIframe(id, src) {
   iframe.style.height = "80vh";
   iframe.style.zIndex = "999";
   iframe.style.border = "2px solid cyan";
-  iframe.style.borderRadius = "12px";
+  iframe.style.borderRadius = "6px";
   iframe.style.boxShadow = "0 0 20px #0ff";
   iframe.style.background = "#000";
   document.body.appendChild(iframe);
@@ -3611,13 +3611,13 @@ function exportarSimbioseCompleta() {
   URL.revokeObjectURL(url);
 }
 </script>
-<div id="botaoSimbioxContainer" style="position:fixed; left:20px; top:133px; z-index:2; display:none; flex-direction:column; gap:6px;">
+<div id="botaoSimbioxContainer" style="position:fixed; left:20px; top:200px; z-index:2; display:none; flex-direction:column; gap:6px;">
   <button id="dualBookBtn" onclick="toggleIframe('dualBookBtn_iframe', 'dual-book-14.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">📚</button>
   <button id="dualTubeBtn" onclick="toggleIframe('dualTubeBtn_iframe', 'dual-tube-27-1.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">📺</button>
   <button id="playerBtn" onclick="toggleIframe('playerBtn_iframe', 'app-player-1.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">🎧</button>
   <button id="exportSimbioseBtn" onclick="document.getElementById('saveThemeBtn')?.click()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">📤</button>
   <button id="exportFullBtn" onclick="exportarSimbioseCompleta()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">🧬</button></div>
-  <button id="toggleBotaoSimbiox" onclick="const b=document.getElementById('botaoSimbioxContainer');b.style.display=(b.style.display==='none')?'flex':'none';" style="position:fixed; left:20px; top:160px; z-index:10; width:36px; height:36px; font-size:18px; border-radius:50%; background:rgba(255,255,255,0.1); color:var(--bg); border:none; cursor:pointer;">☰</button>
+  <button id="toggleBotaoSimbiox" onclick="const b=document.getElementById('botaoSimbioxContainer');b.style.display=(b.style.display==='none')?'flex':'none';" style="position:fixed; left:20px; top:163px; z-index:10; width:36px; height:36px; font-size:18px; border-radius:50%; background:rgba(255,255,255,0.1); color:var(--bg); border:none; cursor:pointer;">☰</button>
 <script>
 document.getElementById("sendBtn")?.addEventListener("click", () => {
   const input = document.getElementById("userInput");
