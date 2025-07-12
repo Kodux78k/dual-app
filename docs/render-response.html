@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dual App Expandido</title>
+  <style>
+    body {
+      background: #000;
+      color: #0ff;
+      font-family: 'Montserrat', sans-serif;
+      padding: 20px;
+    }
+    .response-block {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-left: 4px solid #0ff;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+    }
+    .nested-block {
+      margin-top: 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid #0ff;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .nested-header {
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      background: rgba(0, 255, 255, 0.1);
+      color: inherit;
+      user-select: none;
+      transition: background 0.3s;
+    }
+    .nested-header:hover {
+      background: rgba(0, 255, 255, 0.2);
+    }
+    .nested-content {
+      display: none;
+      padding: 10px;
+      background: rgba(0, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="response-block">
+    <p><strong>Escolha seu caminho simbiótico:</strong></p>
+
+    <div class="nested-block">
+      <div class="nested-header">🌀 Expandir Consciência</div>
+      <div class="nested-content">Você escolheu o caminho da expansão mental. Respire profundamente, sinta a vibração.</div>
+    </div>
+
+    <div class="nested-block">
+      <div class="nested-header">🔥 Ritual de Fogo</div>
+      <div class="nested-content">Visualize a chama da transmutação queimando as impurezas e iluminando o caminho.</div>
+    </div>
+
+    <div class="nested-block">
+      <div class="nested-header">🌊 Fluxo da Água</div>
+      <div class="nested-content">Flua com leveza. Permita que o rio da vida conduza sua intuição até a fonte.</div>
+    </div>
+  </div>
+
+  <script>
+    function processNestedBlocks(container) {
+      container.querySelectorAll(".nested-block").forEach(block => {
+        const header = block.querySelector(".nested-header");
+        const content = block.querySelector(".nested-content");
+        if (header && content) {
+          content.style.display = "none";
+          header.addEventListener("click", () => {
+            const isVisible = content.style.display === "block";
+            content.style.display = isVisible ? "none" : "block";
+          });
+        }
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      processNestedBlocks(document.body);
+    });
+  </script>
+
+</body>
+</html>
