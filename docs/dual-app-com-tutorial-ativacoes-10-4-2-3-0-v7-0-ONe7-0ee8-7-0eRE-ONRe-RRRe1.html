@@ -3554,7 +3554,26 @@ document.getElementById("saveThemeBtn")?.addEventListener("click", () => {
 <script>
 function toggleIframe(id, src) {
   let existing = document.getElementById(id);
-  if (existing) { existing.remove(); return; }
+  
+  if (existing) {
+    // Se está visível, esconde
+    if (existing.style.display !== "none") {
+      existing.style.opacity = "0";
+      existing.style.pointerEvents = "none";
+      existing.style.zIndex = "-999";
+      existing.style.display = "none";
+    } else {
+      // Se está escondido, reexibe
+      existing.style.display = "block";
+      setTimeout(() => {
+        existing.style.opacity = "1";
+        existing.style.pointerEvents = "auto";
+        existing.style.zIndex = "999";
+      }, 10);
+    }
+    return;
+  }
+
   const iframe = document.createElement("iframe");
   iframe.id = id;
   iframe.src = src;
@@ -3568,6 +3587,10 @@ function toggleIframe(id, src) {
   iframe.style.borderRadius = "12px";
   iframe.style.boxShadow = "0 0 20px #0ff";
   iframe.style.background = "#000";
+  iframe.style.opacity = "1";
+  iframe.style.pointerEvents = "auto";
+  iframe.style.transition = "opacity 0.4s ease";
+
   document.body.appendChild(iframe);
 }
 </script>
