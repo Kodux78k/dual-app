@@ -1,0 +1,3930 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>
+   dual-Infodose Chat Cinematográfico
+  </title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="manifest.json" rel="manifest"/>
+<link href="fet/css/fet-vars.css" rel="stylesheet"/>
+<link href="fet/css/fet-unlock.css" rel="stylesheet"/>
+<link href="fet/css/turbo.css" rel="stylesheet"/>
+<link href="fet/css/matrix.css" rel="stylesheet"/>
+<link href="fet/css/cyberpunk.css" rel="stylesheet"/>
+<link href="fet/css/emotion-detector.css" rel="stylesheet"/>
+<link href="fet/css/emotion-ai.css" rel="stylesheet"/>
+<link href="fet/css/tesseract.css" rel="stylesheet"/>
+<style>
+/* 🔁 SUBBLOCOS CLICÁVEIS */
+.nested-block {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid #0ff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.nested-header {
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  background: rgba(0, 255, 255, 0.1);
+  color: inherit;
+  user-select: none;
+  transition: background 0.3s;
+}
+.nested-header:hover {
+  background: rgba(0, 255, 255, 0.2);
+}
+.nested-content {
+  display: none;
+  padding: 10px;
+  background: rgba(0, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+   :root {
+--bg: linear-gradient(to bottom, #000, #1a1a1a);
+--text: #d7d7d7;
+--fast: .4s; --med: .8s; --slow: 1.8s;
+}
+body.light  { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+body.medium { --bg: linear-gradient(to bottom,#555,#333);   --text:#eee; }
+body.vibe   { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body {
+font-family: var(--font-family, sans-serif); width:100%; height:100%; overflow-x: hidden; overflow-y: hidden; }
+body {
+font-family: var(--font-family, sans-serif);
+display:flex; flex-direction:column; align-items:center;
+padding:20px; background:var(--bg); color:var(--text);
+font-family:'Montserrat',sans-serif;
+transition:background var(--slow), color var(--slow);
+animation:fadeIn var(--slow) ease forwards;
+overflow-x: hidden; overflow-y: hidden;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+@keyframes expandFooter{0%,100%{transform:scale(1)}50%{transform:scale(0.96)}}
+@keyframes moveGradient{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+/* Botões */
+.copy-button, .paste-button, .toggle-button, .kitty-button, .history-button {
+width:36px; height:36px; border:none; border-radius:50%;
+background:rgba(255,255,255,0.06); display:flex;
+align-items:center; justify-content:center; cursor:pointer;
+transition:background var(--fast), opacity var(--slow);
+opacity:.7;
+}
+.copy-button:hover, .paste-button:hover,
+.toggle-button:hover, .kitty-button:hover, .history-button:hover {
+background:rgba(255,255,255,0.15);
+}
+.toggle-button.active, .kitty-button.active, .history-button.active { opacity:1; }
+/* Logo */
+.svg-container {
+position:absolute; top:269px; left:50%; width:158px; height:158px;
+transform:translateX(-50%); z-index:-1;
+filter:drop-shadow(0 0 18px rgba(0,255,255,0.15)); 
+transition:opacity var(--slow);
+}
+.svg-container.fading { opacity:0; }
+.svg-container object {
+width:100%; height:100%; object-fit:contain; opacity:0.9;
+animation:pulse 2s infinite ease-in-out;
+transition:opacity var(--med) ease;
+}
+/* Paginação */
+.pagination button {
+border:none; background:linear-gradient(45deg,#0ff,#f0f);
+background-clip:text; -webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+font-size:1.2em; cursor:pointer; transition:transform var(--fast);
+}
+.pagination button:hover{ transform:scale(1.2) }
+/* Blocos de resposta */
+.response-block{
+margin:1rem 0; padding:1.3rem; border-radius:12px;
+line-height:1.8; position:relative; overflow:hidden;
+animation:fadeIn var(--slow) ease forwards,pulse 12s infinite ease-in-out;
+transition:box-shadow var(--fast),transform var(--fast);
+}
+.response-block:hover{ box-shadow:0 0 15px rgba(0,255,255,.4) }
+.response-block.clicked{ animation:clickPulse var(--med) ease-out }
+.response-block.expanded{
+transform:scale(1.03); background:rgba(0,0,0,.6); z-index:2;
+}
+.intro{ background:linear-gradient(135deg,rgba(0,255,255,.2),rgba(0,100,100,.1)); border-left:4px solid #0ff }
+.middle{ background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(50,50,50,.1)); border-left:4px solid rgba(255,255,255,.4) }
+.ending{ background:linear-gradient(135deg,rgba(255,0,255,.2),rgba(100,0,100,.1)); border-left:4px solid #f0f }
+/* Código block */
+.code-block {
+position:relative; background:rgba(0,0,0,0.6);
+padding:1rem; border-radius:8px; font-family:monospace;
+overflow-x:auto; margin:1rem 0;
+}
+.code-block pre{ margin:0; white-space:pre-wrap; word-break:break-word; }
+.code-block button.copy-code {
+position:absolute; top:8px; right:8px;
+background:rgba(255,255,255,0.1); border:none;
+padding:4px 8px; border-radius:4px; cursor:pointer;
+font-size:0.8em; color:var(--text);
+}
+/* Containers */
+#themeToggle{ position:absolute; top:60px; left:50%; transform:translateX(-50%);
+width:28px; height:28px; border:1px solid var(--text); border-radius:50%;
+background:transparent; opacity:.3; cursor:pointer;
+transition:opacity var(--med),border-color var(--med); z-index:10;
+}
+#themeToggle:hover { opacity: 0.8 }
+#themeToggle::before {
+content: '';
+position: absolute;
+top: 50%; left: 50%;
+transform: translate(-50%, -50%);
+width: 12px; height: 12px;
+border-radius: 50%;
+background: var(--text);
+opacity: 0.2;
+}
+#particles-js{ position:absolute; inset:0; z-index:0; }
+#assistantName{ margin-top:150px; font-size:1.2em; z-index: -1; font-weight:600; opacity:.8;
+transition:opacity var(--slow);
+}
+.response-container{
+position:fixed; left:20px; right:20px; bottom:160px; padding:12px;
+background:rgba(0,0,0,0.3); backdrop-filter:blur(8px);
+border-radius:20px; max-height:calc(100vh - 200px);
+overflow-y:auto; z-index:7; transition:background var(--slow);
+animation:fadeIn var(--slow) ease forwards;
+}
+body.light  .response-container{ background:rgba(255,255,255,0.3); }
+body.medium .response-container{ background:rgba(0,0,0,0.2); }
+body.vibe   .response-container{ background:rgba(255,255,255,0.2); }
+.pages-wrapper{ transition:opacity var(--slow),height var(--slow); }
+.pages-wrapper.collapsed{ display:none; }
+.page{ display:none; opacity:0; transition:opacity var(--slow); }
+.page.active{ display:block; opacity:1; }
+.page.initial{ display:flex; align-items:center; justify-content:center;
+height:100%; text-align:center;
+}
+.footer-text{
+display:block; margin:12px auto; padding:6px 12px;
+background:var(--bg); opacity:.5; color:var(--text);
+font-size:0.8em; text-align:center; font-style:italic;
+border-radius:12px; cursor:pointer;
+transition:opacity var(--slow),transform var(--slow);
+animation:moveGradient 8s linear infinite;
+}
+.footer-text.loading{ background:transparent!important; backdrop-filter:none!important; }
+.footer-text.loading span{ background:none!important; }
+.footer-text:hover{ opacity:.6; }
+.footer-text.active{ opacity:.8; animation:expandFooter var(--med) ease-out; }
+.response-controls{ display:flex; justify-content:space-between; align-items:center;
+margin-top:15px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.2);
+}
+body.light  .response-controls{ border-top-color:rgba(0,0,0,0.2); }
+body.medium .response-controls{ border-top-color:rgba(255,255,255,0.2); }
+body.vibe   .response-controls{ border-top-color:rgba(0,0,0,0.4); }
+.control-buttons, .pagination{ display:flex; align-items:center; gap:10px; }
+#sendBtn{
+width:60px; height:60px; font-size:48px;
+background:linear-gradient(42deg,#0ff,#f0f);
+border:none; background-clip:text;
+-webkit-background-clip:text; -webkit-text-fill-color:transparent;
+display:flex; align-items:center; justify-content:center;
+cursor:pointer; transition:transform var(--med),opacity var(--slow);
+opacity:.9;
+}
+#sendBtn:hover{ transform:scale(1.1); opacity:1; }
+#voiceBtn{
+width:60px; height:60px; border:none; border-radius:50%;
+background:rgba(255,255,255,0.06); display:flex;
+align-items:center; justify-content:center;
+cursor:pointer; transition:background var(--fast),opacity var(--slow);
+opacity:.7;
+}
+#voiceBtn:hover{ background:rgba(255,255,255,0.15); opacity:1; }
+.input-container{
+position:fixed;left:20px;right:20px;bottom:90px;
+display:flex;gap:6px;z-index:2;
+}
+.input-container input{
+flex:1;padding:10px;border:none;border-radius:20px;
+background:rgba(255,255,255,.1);color:inherit;font-size:16px;
+transition:background var(--fast);opacity:0.7;
+}
+.input-container input:focus{background:rgba(255,255,255,.2)}
+.input-container button{
+width:60px;height:60px;border:none;
+background:linear-gradient(42deg,#0ff,#f0f);
+background-clip:text;-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+font-size:48px;cursor:pointer;animation:pulse 2s infinite ease-in-out;
+display:flex;align-items:center;justify-content:center;
+transition:transform var(--med);opacity:.7;
+}
+.input-container button:hover{transform:scale(1.1)}
+.login-container{ display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+width:300px; padding:1.5rem 1rem; background:rgba(255,255,255,0.04);
+border:1px solid rgba(255,255,255,0.15); border-radius:10px; backdrop-filter:blur(8px);
+z-index:10; role:dialog; aria-modal:true;
+}
+.login-container.active{ display:block; }
+.login-container input{
+width:100%; background:transparent; border:none;
+border-bottom:1px solid rgba(255,255,255,0.3);
+margin:.8rem 0; padding:.4rem 0; font-size:.95em; color:#fff;
+}
+.login-container input::placeholder{ color:rgba(255,255,255,0.5); }
+.login-container button{
+width:100%; margin-top:1rem; padding:.5rem 0;
+border:1px solid #0ff; border-radius:8px;
+background:transparent; font-size:.95em; color:#0ff; cursor:pointer;
+transition:background .25s,color .25s;
+}
+.login-container button:hover{ background:#0ff; color:#000; }
+#bootText.pulse::after {
+content: attr(data-text);
+position: absolute;
+inset: 0;
+background: linear-gradient(42deg, #0ff, #f0f);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+filter: blur(4px);
+opacity: 0.4;
+pointer-events: none;
+animation: pulseGlow 3s ease-in-out infinite;
+}
+#bootText {
+display: inline-block;
+position: relative;
+font-weight: bold;
+}
+@keyframes pulseGlow {
+0%,100% { opacity: 0.4; }
+50% { opacity: 0.8; }
+}
+#koblluxPlayer {
+position: fixed;
+top: 20px;
+left: 20px;
+z-index: 9999;
+background: rgba(0, 10, 20, 0.8);
+backdrop-filter: blur(12px) saturate(180%);
+padding: 18px;
+border-radius: 16px;
+border: 1px solid rgba(0, 255, 255, 0.15);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+0 0 0 1px rgba(0, 255, 255, 0.1),
+0 0 30px rgba(0, 255, 255, 0.05);
+color: #e0f7ff;
+display: flex;
+flex-direction: column;
+gap: 14px;
+max-width: 260px;
+transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#koblluxPlayer button, 
+#koblluxPlayer select, 
+#koblluxPlayer input[type="range"] {
+background: rgba(0, 255, 255, 0.05);
+border: 1px solid rgba(0, 255, 255, 0.1);
+border-radius: 8px;
+color: inherit;
+padding: 8px 12px;
+font-size: 13px;
+transition: all 0.3s ease;
+width: 100%;
+cursor: pointer;
+}
+#koblluxPlayer button {
+background: linear-gradient(135deg, rgba(0, 150, 255, 0.15), rgba(0, 80, 200, 0.2));
+backdrop-filter: blur(4px);
+}
+#koblluxPlayer button:hover {
+background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 100, 220, 0.3));
+border-color: rgba(0, 255, 255, 0.3);
+box-shadow: 0 0 15px rgba(0, 200, 255, 0.1);
+transform: translateY(-1px);
+}
+#togglePlayer {
+width: 60px;
+height: 60px;
+border-radius: 50% !important;
+border: none !important;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3) !important;
+background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 120, 255, 0.35)) !important;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+#togglePlayer:hover {
+transform: rotate(90deg);
+background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 100, 220, 0.3)) !important;
+box-shadow: 0 0 25px rgba(0, 255, 255, 0.5) !important;
+}
+#togglePlayer:hover {
+transform: rotate(90deg);
+background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 120, 255, 0.35)) !important;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+#playerControls {
+display: none;
+flex-direction: column;
+gap: 12px;
+margin-top: 10px;
+animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+#koblluxPlayer input[type="range"] {
+-webkit-appearance: none;
+height: 6px;
+background: rgba(0, 255, 255, 0.1);
+border-radius: 10px;
+padding: 0;
+margin: 10px 0;
+}
+#koblluxPlayer input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+width: 16px;
+height: 16px;
+border-radius: 50%;
+background: #00ffff;
+cursor: pointer;
+box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+transition: all 0.2s ease;
+}
+#koblluxPlayer input[type="range"]::-webkit-slider-thumb:hover {
+transform: scale(1.2);
+box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+}
+#koblluxPlayer label {
+font-size: 11px;
+opacity: 0.7;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+color: rgba(0, 255, 255, 0.7);
+}
+#themeSelector {
+background: rgba(0, 255, 255, 0.05);
+border: 1px solid rgba(0, 255, 255, 0.15);
+border-radius: 8px;
+color: #0ff;
+padding: 4px 8px;
+font-size: 13px;
+backdrop-filter: blur(4px);
+transition: all 0.3s ease;
+}
+#themeSelector:hover {
+background: rgba(0, 255, 255, 0.1);
+border-color: rgba(0, 255, 255, 0.3);
+}
+/* Ultra Foda KOBLLUX Player Styles */
+#koblluxPlayer {
+position: fixed;
+top: 20px;
+left: 20px;
+z-index: 9999;
+background: rgba(0, 10, 20, 0.8);
+backdrop-filter: blur(12px) saturate(180%);
+padding: 18px;
+border-radius: 16px;
+border: 1px solid rgba(0, 255, 255, 0.15);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+0 0 0 1px rgba(0, 255, 255, 0.1),
+0 0 30px rgba(0, 255, 255, 0.05);
+color: #e0f7ff;
+display: flex;
+flex-direction: column;
+gap: 14px;
+max-width: 260px;
+transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Additional overrides... */
+/* Remove parent border/shadow influence on toggle */
+#koblluxPlayer #togglePlayer {
+border: none !important;
+box-shadow: none !important;
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Ensure perfect circle */
+#togglePlayer {
+width: 60px !important;
+height: 60px !important;
+aspect-ratio: 1 / 1 !important;
+border-radius: 50% !important;
+box-sizing: border-box !important;
+}
+/* Remove inherited borders/shadows and set gradient background */
+#koblluxPlayer #togglePlayer {
+border: none !important;
+box-shadow: none !important;
+outline: none !important;
+background: var(--bg) !important;
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Ensure perfect circle of 33px */
+#togglePlayer {
+width: 33px !important;
+height: 33px !important;
+aspect-ratio: 1 / 1 !important;
+border-radius: 50% !important;
+overflow: visible !important;
+}
+/* Scale inner icon */
+#togglePlayer svg,
+#togglePlayer .waves-icon {
+width: 20px !important;
+height: 20px !important;
+}
+/* Clear extra padding/margin */
+#togglePlayer > * {
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Remove any border/box-shadow on container that affect children */
+#koblluxPlayer {
+border: none !important;
+box-shadow: none !important;
+outline: none !important;
+}
+/* Theme selector and generic selects styling */
+#themeSelector,
+#koblluxPlayer select {
+background: rgba(255,255,255,0.1) !important;
+border: 1px solid var(--text) !important;
+color: var(--text) !important;
+}
+/* Hover effect using theme color */
+#themeSelector:hover,
+#koblluxPlayer select:hover {
+box-shadow: inset 0 0 10px var(--text) !important;
+}
+/* Options text color */
+#themeSelector option,
+#koblluxPlayer select option {
+color: var(--text) !important;
+}
+/* Round the background behind toggle if in a wrapper div */
+#koblluxPlayer .toggle-wrapper,
+#koblluxPlayer #togglePlayerContainer {
+border-radius: 8px !important;
+overflow: hidden !important;
+}
+/* Ensure the toggle button stays circular at 33px */
+#togglePlayer {
+width: 33px !important;
+height: 33px !important;
+border-radius: 50% !important;
+}
+/* Refine theme selector border thickness and opacity */
+#themeSelector,
+#koblluxPlayer select {
+border: 1px solid var(--text) !important;
+opacity: 0.7 !important;
+padding: 6px 10px !important;
+}
+#themeSelector:hover,
+#koblluxPlayer select:hover {
+opacity: 0.8 !important;
+box-shadow: inset 0 0 8px var(--text) !important;
+}
+/* Option colors inherit theme text color */
+#themeSelector option,
+#koblluxPlayer select option {
+color: var(--text) !important;
+background: rgba(0,0,0,0.6) !important;
+}
+/* Example: dynamic border color per theme */
+[data-theme="dark"] #themeSelector { border-color: #0f0 !important; }
+[data-theme="light"] #themeSelector { border-color: #fff !important; }
+[data-theme="cyberpunk"] #themeSelector { border-color: #f0f !important; }
+[data-theme="anime"] #themeSelector { border-color: #ff0 !important; }
+#togglePlayer {
+width: 48px;
+height: 48px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+background: rgba(255, 255, 255, 0.08);
+backdrop-filter: blur(6px);
+color: var(--bg);
+font-size: 20px;
+border: none;
+cursor: pointer;
+transition: background 0.3s ease;
+}
+#togglePlayer:hover {
+background: rgba(255, 255, 255, 0.2);
+}
+.hidden {
+display: none;
+}
+/* PNG simbiótico */
+#simbioseOverlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+pointer-events: none;
+background: url('assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG') center center no-repeat;
+background-size: cover;
+opacity: 0;
+animation: pulseDyn 18s infinite ease-in-out;
+transition: opacity 1s ease-in-out;
+z-index: -1;
+}
+/* Botão de fusão */
+#toggleSimbioseBtn {
+position: fixed;
+top: 59px;
+right: 20px;
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.2);
+border: 1px solid var(--bg);
+cursor: pointer;
+z-index: 101;
+backdrop-filter: blur(6px);
+display: flex;
+align-items: center;
+justify-content: center;
+transition: background 0.3s;
+}
+#toggleSimbioseBtn:hover {
+background: rgba(255, 255, 255, 0.4);
+}
+#toggleSimbioseBtn img {
+width: 33px;
+height: 33px;
+pointer-events: none;
+}
+@keyframes pulseDyn {
+0% { filter:  scale(1) brightness(0.9) saturate(1); }
+50% { filter:  scale(1.030) brightness(1.5) saturate(1.4); }
+100% { filter:  scale(1) brightness(1) saturate(1); }
+}
+#theme-controls select {
+padding: 4px 8px;
+border-radius: 6px;
+border: 2px solid var(--text);
+background: rgba(0,0,0,0.1);
+color: var(--text);
+cursor: pointer;
+}
+/* Dynamic border per theme */
+[data-theme="light"]   #theme-controls select { border-color: #444; }
+[data-theme="dark"]    #theme-controls select { border-color: #0ff; }
+[data-theme="medium"]  #theme-controls select { border-color: #eee; }
+[data-theme="vibe"]    #theme-controls select { border-color: #d800d8; }
+[data-theme="cyberpunk"]   #theme-controls select { border-color: #f0f; }
+[data-theme="anime"]       #theme-controls select { border-color: #ff0; }
+[data-theme="matrix"]      #theme-controls select { border-color: #0f0; }
+[data-theme="tesseract"]   #theme-controls select { border-color: #00f; }
+[data-theme="turbo"]       #theme-controls select { border-color: #f80; }
+#theme-controls select {
+width: auto;
+min-width: 66px;
+max-width: 200px;
+}
+/* Add blur to select border for theme selector */
+#theme-controls select {
+filter: drop-shadow(0 0 4px rgba(255,255,255,0.5));
+}
+/* Style save icon option distinctly */
+#theme-controls option[value="save-current"] {
+font-weight: bold;
+filter: blur(0.5px) opacity(0.8);
+}
+.saved-theme-btn {
+padding: 4px 8px;
+border-radius: 6px;
+border: 2px solid var(--text);
+background: rgba(0,0,0,0.1);
+color: var(--text);
+cursor: pointer;
+}
+.saved-theme-btn:hover {
+background: rgba(255,255,255,0.2);
+}
+/* Dynamic border-colors for saved-theme-btn */
+[data-theme="light"]   .saved-theme-btn { border-color: #444; }
+[data-theme="dark"]    .saved-theme-btn { border-color: #0ff; }
+[data-theme="medium"]  .saved-theme-btn { border-color: #eee; }
+[data-theme="vibe"]    .saved-theme-btn { border-color: #d800d8; }
+[data-theme="cyberpunk"]   .saved-theme-btn { border-color: #f0f; }
+[data-theme="anime"]       .saved-theme-btn { border-color: #ff0; }
+[data-theme="matrix"]      .saved-theme-btn { border-color: #0f0; }
+[data-theme="tesseract"]   .saved-theme-btn { border-color: #00f; }
+[data-theme="turbo"]       .saved-theme-btn { border-color: #f80; }
+#saveThemeBtn {
+display: block;
+width: calc(100% - 16px);
+margin: 4px 8px;
+padding: 8px;
+border-radius: 6px;
+border: 2px solid var(--text);
+background: rgba(255, 255, 255, 0.1);
+color: var(--text);
+font-weight: bold;
+text-align: center;
+cursor: pointer;
+transition: background 0.3s ease, transform 0.2s ease;
+}
+#saveThemeBtn:hover {
+background: rgba(255, 255, 255, 0.2);
+transform: translateY(-1px);
+}
+/* Adjust border opacity for theme selector */
+#theme-controls select {
+border: 1px solid rgba(255, 255, 255, 0.7) !important;
+}
+/* Dynamic border colors with reduced opacity */
+[data-theme="light"]   #theme-controls select { border-color: rgba(68, 68, 68, 0.8) !important; }
+[data-theme="dark"]    #theme-controls select { border-color: rgba(0, 255, 255, 0.8) !important; }
+[data-theme="medium"]  #theme-controls select { border-color: rgba(238, 238, 238, 0.8) !important; }
+[data-theme="vibe"]    #theme-controls select { border-color: rgba(216, 0, 216, 0.8) !important; }
+[data-theme="cyberpunk"]   #theme-controls select { border-color: rgba(240, 0, 255, 0.8) !important; }
+[data-theme="anime"]       #theme-controls select { border-color: rgba(255, 255, 0, 0.8) !important; }
+[data-theme="matrix"]      #theme-controls select { border-color: rgba(0, 255, 0, 0.8) !important; }
+[data-theme="tesseract"]   #theme-controls select { border-color: rgba(0, 0, 255, 0.8) !important; }
+[data-theme="turbo"]       #theme-controls select { border-color: rgba(255, 136, 0, 0.8) !important; }
+/* -------- TURBO THEME: Grid Animado -------- */
+[data-theme="turbo"] body {
+background: #0f0f0f;
+color: #00ffcc;
+overflow: hidden;
+}
+[data-theme="turbo"]::before {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background-image: linear-gradient(#00ffcc 1px, transparent 1px),
+linear-gradient(to right, #00ffcc 1px, transparent 1px);
+background-size: 40px 40px;
+animation: gridMove 4s linear infinite;
+z-index: 0;
+opacity: 0.1;
+}
+[data-theme="turbo"]::after {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/Hyperbolic-Jam8-ASCII-BG.JPG');
+background-size: cover;
+background-position: center;
+opacity: 0.15;
+filter: brightness(1.05) saturate(1.3);
+animation: pulseBG 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: -1;
+}
+@keyframes gridMove {
+0% { background-position: 0 0; }
+100% { background-position: 40px 40px; }
+}
+/* -------- MATRIX THEME: Energia Pulsante -------- */
+[data-theme="matrix"] body {
+background: black;
+color: #00ff00;
+}
+[data-theme="matrix"] .pulse-energy {
+position: absolute;
+top: 0; left: 0; right: 0; bottom: 0;
+background: radial-gradient(circle, rgba(0,255,0,0.15) 0%, transparent 70%);
+animation: pulse 2s infinite;
+pointer-events: none;
+z-index: 0;
+}
+@keyframes pulse {
+0% { opacity: 0.8; transform: scale(1); }
+50% { opacity: 1.0; transform: scale(1.024); }
+100% { opacity: 0.8; transform: scale(1); }
+}
+/* Elementos acima dos efeitos visuais */
+main, .content, .block, .container {
+position: relative;
+z-index: 1;
+}
+/* -------- NEBULA THEME: Estelar Neon -------- */
+[data-theme="nebula"] body {
+background: radial-gradient(circle at 20% 20%, #1b003b, #000);
+color: #cfcaff;
+font-family: 'Montserrat', sans-serif;
+overflow: hidden;
+}
+[data-theme="nebula"]::before {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: url('assets/styles/themes/bgs/Nebula-BG.png');
+background-size: cover;
+opacity: 0.2;
+z-index: 0;
+}
+[data-theme="nebula"]::after {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: url('assets/styles/themes/bgs/duals/Nebula-Dual-BG.png');
+background-size: cover;
+opacity: 0;
+animation: slowFade 33s infinite ease-in-out;
+z-index: 1; /* acima do ::before, mas ainda atrás do conteúdo */
+pointer-events: none;
+}
+@keyframes slowFade {
+0%, 100% { opacity: 0; }
+50% { opacity: 0.1; }
+}
+[data-theme="nebula"] .block, 
+[data-theme="nebula"] .response-block {
+background: rgba(255, 255, 255, 0.03);
+backdrop-filter: blur(6px);
+border: 1px solid rgba(255, 255, 255, 0.08);
+box-shadow: 0 0 12px rgba(180, 100, 255, 0.3);
+color: #e6d6ff;
+transition: all 0.3s ease;
+}
+[data-theme="nebula"] .footer-text {
+color: #cfcaff;
+text-shadow: 0 0 6px #a0f;
+}
+/* -------- Layout Responsivo para Blocos -------- */
+.pages-wrapper {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 1rem;
+}
+.page {
+display: contents;
+}
+.response-block {
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+@media (max-width: 768px) {
+.pages-wrapper {
+grid-template-columns: 1fr;
+}
+}
+.svg-container {
+position: absolute;
+top: 269px;
+left: 50%;
+width: 166px;
+height: 166px;
+transform: translateX(-50%);
+z-index: 1;
+filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.08));
+transition: opacity var(--med);
+}
+.svg-container.fading {
+opacity: 0.9;
+}
+.svg-container object {
+width: 100%;
+height: 100%;
+object-fit: contain;
+opacity: 1;
+animation: pulseLogo 6s infinite ease-in-out;
+transition: opacity var(--fast) ease;
+}
+@keyframes pulseLogo {
+0%, 100% {
+transform: scale(1);
+opacity: 1;
+}
+50% {
+transform: scale(1.004);
+opacity: 0.9;
+}
+}
+/* MATRIX INNER GRID DISTORCIDO */
+[data-theme="matrix"]::before {
+content: "";
+position: fixed;
+inset: 0;
+z-index: -2;
+background-image: url('assets/styles/themes/bgs/Matrix-Nebula-BG.JPG');
+background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+opacity: 0.18;
+animation: pulse 12s ease-in-out infinite alternate;
+/* 🔲 Corte visual interno leve */
+border-radius: 30px;
+overflow: hidden;
+filter: blur(0.5px);
+box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.6);}
+[data-theme="matrix"]::after {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/duals/MHM-Nebula-Dual-BG.jpg');
+background-size: cover;
+background-position: center;
+opacity: 0.18;
+filter: brightness(1.1) saturate(1.2);
+animation: tesseractVibe 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: 0;
+}
+[data-theme="matrix"] .response-block {
+border-left: 3px solid #0f0;
+box-shadow: 0 0 20px rgba(0,255,0,0.2);
+}
+/* CYBERPUNK NEON STYLE */
+[data-theme="cyberpunk"] body {
+background: #0b0014;
+color: #0ff;
+}
+[data-theme="cyberpunk"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background: linear-gradient(45deg, #9b00ff 0%, #00ff85 50%, #ff6a00 100%);
+animation: cyberGlow 24s ease-in-out infinite alternate;
+opacity: 0.06;
+pointer-events: none;
+z-index: 0;
+}
+[data-theme="cyberpunk"]::after {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/Tesseract-ASCII-BG.JPG');
+background-size: cover;
+background-position: center;
+opacity: 0.18;
+pointer-events: none;
+z-index: -1;
+}
+[data-theme="cyberpunk"] .response-block {
+background: rgba(255, 0, 255, 0.06);
+border-left: 3px solid #ff00ff;
+box-shadow: 0 0 12px rgba(255, 0, 255, 0.3);
+}
+[data-theme="cyberpunk"] .input-container input {
+background: rgba(255, 0, 255, 0.1);
+color: #ffccff;
+}
+/* TURBO OUTLINE LARANJA */
+[data-theme="turbo"] .response-block {
+border-left: 3px solid #ff8800;
+box-shadow: 0 0 12px rgba(255, 136, 0, 0.3);
+}
+[data-theme="turbo"] #sendBtn {
+color: linear-gradient(45deg, #ff8800, #ffcc00);
+-webkit-text-fill-color: orange;
+}
+/* TESSERACT VIBRATION STYLE */
+[data-theme="tesseract"] body {
+background: linear-gradient(135deg, #001133, #000033);
+color: #99ccff;
+}
+[data-theme="tesseract"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/Tesseract-BG.png');
+background-size: cover;
+background-position: center;
+opacity: 0.18;
+filter: brightness(1.1) saturate(1.4);
+animation: pulseBG 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: -1;
+}
+[data-theme="tesseract"]::after {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: url('assets/styles/themes/bgs/duals/Luminus0-Dual-BG.jpg');
+background-size: cover;
+background-position: center;
+opacity: 0;
+animation: slowFade 33s infinite ease-in-out;
+z-index: 1; /* acima do ::before, mas ainda atrás do conteúdo */
+pointer-events: none;
+}
+@keyframes slowFade {
+0%, 100% { opacity: 0; }
+50% { opacity: 0.1; }
+}
+[data-theme="tesseract"] .response-block {
+background: rgba(0, 0, 80, 0.2);
+border-left: 3px solid #3399ff;
+animation: tesseractVibe 4s infinite ease-in-out;
+}
+@keyframes pulseBG {
+0% { filter: brightness(0.9) saturate(1); }
+50% { filter: brightness(1.2) saturate(1.4); }
+100% { filter: brightness(1) saturate(1); }
+}
+@keyframes turboPulse {
+0%, 100% { opacity: 0.05; }
+50% { opacity: 0.15; }
+}
+@keyframes cyberGlow {
+0%, 100% { opacity: 0.06; }
+50% { opacity: 0.12; }
+}
+@keyframes tesseractVibe {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.01); }
+}
+/* Transições suaves entre temas */
+body {
+transition: background 1s ease, color 1s ease, filter 0.6s ease;
+}
+body.theme-fade { transition: background 1.4s ease-in-out, color 1.4s ease-in-out; }
+body.theme-blur { filter: blur(20px); transition: filter 0.6s ease; }
+body.theme-blur-active { filter: blur(0); }
+/* Cyberpunk: glitch */
+[data-theme="cyberpunk"] .response-block {
+position: relative;
+animation: glitchFlash 42s infinite;
+}
+@keyframes glitchFlash {
+0% { filter: hue-rotate(0deg); }
+20% { filter: hue-rotate(20deg); }
+40% { filter: contrast(1.2); }
+60% { filter: hue-rotate(-2deg); }
+80% { filter: saturate(1.5); }
+100% { filter: none; }
+}
+/* Tesseract: zoom pulsante */
+[data-theme="tesseract"] .response-block {
+animation: tesseractZoom 6s infinite ease-in-out;
+}
+@keyframes tesseractZoom {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.015); }
+}
+/* Nebula: brilho suave */
+[data-theme="nebula"] .response-block {
+animation: nebulaGlow 10s infinite ease-in-out;
+}
+@keyframes nebulaGlow {
+0%, 100% { box-shadow: 0 0 8px rgba(180, 100, 255, 0.3); }
+50% { box-shadow: 0 0 16px rgba(180, 100, 255, 0.6); }
+}
+[data-theme="matrix"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/Matrix-ASCII-BG.png');
+background-size: cover;
+background-position: center;
+filter: brightness(1.1) saturate(1.4);
+animation: matrixPulse 24s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: 0;
+}
+@keyframes matrixPulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.02); }
+}
+[data-theme="emotion-detector"] body {
+background: radial-gradient(circle, #fffbdd, #ffe680);
+color: #333;
+}
+[data-theme="emotion-detector"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/EmotionD-BG.png');
+background-size: cover;
+background-position: center;
+opacity: 0.15;
+filter: brightness(1.1) saturate(1.4);
+animation: pulseBG 24s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: -1;
+}
+[data-theme="emotion-detector"]::after {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: url('assets/styles/themes/bgs/Whisk_d5f8cb6e9c.jpg');
+background-size: cover;
+background-position: center;
+opacity: 0;
+animation: slowFade 42s infinite ease-in-out;
+z-index: 0; /* acima do ::before, mas ainda atrás do conteúdo */
+pointer-events: none;
+}
+[data-theme="emotion-detector"] .response-block {
+background: rgba(255, 255, 200, 0.2);
+border-left: 3px solid #ffcc00;
+box-shadow: 0 0 10px rgba(255, 230, 0, 0.3);
+}
+[data-theme="emotion-ai"] body {
+background: linear-gradient(to right, #222831, #393e46);
+color: #eeeeee;
+}
+[data-theme="emotion-ai"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/duals/Luminus-Dual-BG.jpg');
+background-size: cover;
+background-position: center;
+opacity: 0.28;
+filter: brightness(1.1) saturate(1.4);
+animation: pulseBG 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: 1;
+}[data-theme="emotion-ai"]::after {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: url('assets/styles/themes/bgs/Turbo-ASCII-Vibe2-BG.png');
+background-size: cover;
+background-position: center;
+opacity: 0;
+animation: slowFade 78s infinite ease-in-out;
+z-index: 2; /* acima do ::before, mas ainda atrás do conteúdo */
+pointer-events: none;
+}
+[data-theme="emotion-ai"] .response-block {
+background: rgba(255, 255, 255, 0.03);
+border-left: 3px solid #00adb5;
+box-shadow: 0 0 12px rgba(0, 173, 181, 0.4);
+}
+@keyframes fadeSlideUp {
+0% { opacity: 0; transform: translateY(20px); }
+100% { opacity: 1; transform: translateY(0); }
+}
+.response-block {
+animation: fadeSlideUp 0.6s ease both;
+}
+h1, h2, h3 {
+font-weight: bold;
+margin: 0.6em 0 0.4em;
+animation: fadeSlideUp 0.4s ease both;
+}
+blockquote {
+padding: 0.8em 1em;
+margin: 1em 0;
+border-left: 4px solid #0ff;
+background: rgba(255,255,255,0.03);
+font-style: italic;
+animation: fadeSlideUp 0.4s ease both;
+}
+ul {
+padding-left: 1.5em;
+list-style-type: disc;
+}
+table {
+border-collapse: collapse;
+margin: 1em 0;
+width: 100%;
+}
+table th, table td {
+border: 1px solid rgba(255,255,255,0.2);
+padding: 0.6em;
+}
+.pulse-glow {
+animation: glowPulse 2.5s infinite ease-in-out;
+text-shadow: 0 0 6px #0ff, 0 0 10px #f0f;
+}
+@keyframes glowPulse {
+0%, 100% { text-shadow: 0 0 4px #0ff; }
+50% { text-shadow: 0 0 12px #f0f, 0 0 6px #0ff; }
+}
+.typewriter-char {
+display: inline-block;
+opacity: 0;
+animation: typewriterFade 0.4s forwards;
+}
+@keyframes typewriterFade {
+to { opacity: 1; transform: translateY(0); }
+}
+/* 🎨 BACKGROUNDS CINEMATOGRÁFICOS POR TEMA */
+[data-theme="matrix"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/Matrix-Nebula-BG.JPG');
+background-size: cover;
+background-position: center;
+opacity: 0.4;
+filter: brightness(1.2) saturate(1.2);  animation: matrixPulse 12s ease-in-out infinite;
+z-index: 0;
+}
+[data-theme="matrix"]::after {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/duals/MHM-Nebula-Dual-BG.jpg');
+background-size: cover;
+background-position: center;
+opacity: 0.18;
+filter: brightness(1.2) saturate(1.2);
+animation: pulseBG 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: 1;
+}
+[data-theme="cyberpunk"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/duals/KOBLLUX-Dual-BG.jpg');
+background-position: center;
+background-size: cover;  animation: cyberGlow 33s ease-in-out infinite alternate;
+opacity: 0.06;
+pointer-events: none;
+z-index: 1;
+}
+[data-theme="cyberpunk"]::after {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/Nebula3-ASCII-BG.png');
+background-size: cover;
+background-position: center;
+opacity: 0.18;
+pointer-events: none;
+z-index: 0;
+}
+[data-theme="turbo"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: linear-gradient(#00ffcc 1px, transparent 1px),
+linear-gradient(to right, #00ffcc 1px, transparent 1px);
+background-size: 40px 40px;
+animation: gridMove 4s linear infinite;
+z-index: 0;
+opacity: 0.1;
+}
+[data-theme="turbo"]::after {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/duals/Pulse-Dual-BG.jpg');
+background-size: cover;
+background-position: center;
+opacity: 0.15;
+filter: brightness(1.05) saturate(1.3);
+animation: pulseBG 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: 0;
+}
+[data-theme="tesseract"]::before {
+content: "";
+position: fixed;
+inset: 0;
+background-image: url('assets/styles/themes/bgs/duals/MHM002-Dual-BG.jpg');
+background-size: cover;
+background-position: center;
+opacity: 0.18;
+filter: brightness(1.1) saturate(1.4);
+animation: pulseBG 12s ease-in-out infinite alternate;
+pointer-events: none;
+z-index: 1;
+}
+[data-theme="tesseract"]::after {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: url('assets/styles/themes/bgs/Tesseract-BG.png');
+background-size: cover;
+background-position: center;
+opacity: 0;
+animation: slowFade 33s infinite ease-in-out;
+z-index: 1;
+pointer-events: none;
+}
+[data-theme="nebula"]::before {
+content: "";
+position: fixed;
+top: 0; left: 0; right: 0; bottom: 0;
+background: url('assets/styles/themes/bgs/duals/Nebula-Dual-BG.png');
+background-size: cover;
+opacity: 0.2;
+z-index: 0;
+}
+[data-theme="nebula"]::after {
+content: "";
+position: fixed;
+inset: 0;
+background: url('assets/styles/themes/bgs/Nebula-BG.png');
+background-size: cover;
+background-position: center;
+opacity: 0;
+animation: slowFade 33s infinite ease-in-out;
+z-index: 1;
+pointer-events: none;
+}
+#tutorialAtivacoes {
+overflow-y: auto;
+max-height: 80vh;
+}
+@keyframes matrixSpin {
+0% { transform: scale(1); }
+100% { transform: scale(1.018); }
+}
+@keyframes pulseBG {
+0% { filter: brightness(0.9) saturate(1); }
+50% { filter: brightness(1.2) saturate(1.4); }
+100% { filter: brightness(1) saturate(1); }
+}
+@keyframes slowFade {
+0%, 100% { opacity: 0; }
+50% { opacity: 0.1; }
+}
+@keyframes cyberGlow {
+0%, 100% { opacity: 0.06; }
+50% { opacity: 0.12; }
+}
+@keyframes gridMove {
+0% { background-position: 0 0; }
+100% { background-position: 40px 40px; }
+}
+.assistant-signature {
+font-size: 0.8em;
+opacity: 0.6;
+font-style: italic;
+margin-bottom: 6px;
+}
+.tutorial-box {
+padding: 1.5rem;
+background: rgba(0, 255, 255, 0.06);
+border-left: 3px solid #0ff;
+border-radius: 12px;
+box-shadow: 0 0 8px rgba(0,255,255,0.1);
+max-height: 80vh;
+overflow-y: auto;
+animation: fadeIn 0.8s ease-in-out;
+}
+  </style>
+<style>
+   /* ⚡ SIMBIÓTICO FINALE - Estilos avançados */
+
+[data-theme="trinity"] .inner-theme {
+  background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
+  box-shadow: 0 0 20px #00ffe0aa;
+  border: 1px solid rgba(255,255,255,0.1);
+  animation: glowPulse 4s infinite ease-in-out;
+  border-radius: 10px;
+  padding: 10px;
+  transition: all 0.6s ease;
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 10px #00ffe055; }
+  50% { box-shadow: 0 0 25px #00ffe0cc; }
+}
+
+.response-block {
+  margin-bottom: 1rem;
+  animation: fadeInSlide 0.6s ease forwards;
+  border-left: 4px solid #00ffe080;
+  padding-left: 12px;
+}
+
+@keyframes fadeInSlide {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.emotion-icon {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+  animation: popIn 0.4s ease;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+audio.emotion-sound {
+  display: none;
+}
+  </style>
+</head>
+<body data-fet="">
+<div id="simbioseOverlay">
+</div>
+<div id="toggleSimbioseBtn" title="Ativar Simbiose">
+<img alt="Simbiose" src="assets/icons/SiimbUS-kblx1.png"/>
+</div>
+<section class="tutorial-box" id="tutorialAtivacoes" style="display: none; 
+z-index: 5; 
+backdrop-filter: blur(10px);   
+-webkit-backdrop-filter: blur(10px);
+overflow-y: auto;
+margin-top: 20px;">
+<h1>🌀 Coduxiblu v8 – Seletor de Dimensões</h1>
+<!-- Bloco de Escolha entre Tutorial e Manifesto -->
+<!-- Tutorial (placeholder futuro) -->
+<div class="section-box" id="tutorialBox">
+<h2>🔧 Tutorial da Infodose</h2>
+<p>Conteúdo interativo e instruções virão aqui...</p>
+<div style="margin-top: 12px; display:flex; flex-wrap:wrap; gap:8px;">
+<button onclick="ativarComando('/prompt matrix')" style="padding:8px 12px;background:#0f0;color:#000;border:none;border-radius:6px;cursor:pointer;">🟢 Matrix</button>
+<button onclick="ativarComando('/prompt sunrise')" style="padding:8px 12px;background:orange;color:#000;border:none;border-radius:6px;cursor:pointer;">🌅 Sunrise</button>
+<button onclick="ativarComando('/prompt neoncore')" style="padding:8px 12px;background:#0ff;color:#000;border:none;border-radius:6px;cursor:pointer;">💎 Neon</button>
+<button onclick="ativarComando('/script simbiox')" style="padding:8px 12px;background:#a0f;color:#000;border:none;border-radius:6px;cursor:pointer;">🧬 Simbiox</button>
+</div>
+<div style="margin-top:16px;">
+<h3>🌐 Comandos Rápidos da Simbiose</h3>
+<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+<button class="cmd-btn" data-cmd="/modo contemplativo" style="padding:6px 10px;border:none;border-radius:6px;background:#111;color:#0ff;">🧘 Contemplar</button>
+<button class="cmd-btn" data-cmd="/ia narrador-cósmico" style="padding:6px 10px;border:none;border-radius:6px;background:#111;color:#0ff;">📜 Narrador</button>
+<button class="cmd-btn" data-cmd="/bg #000022" style="padding:6px 10px;border:none;border-radius:6px;background:#111;color:#0ff;">🌌 Fundo Escuro</button>
+</div>
+</div>
+</div>
+<!-- Manifesto com toggle -->
+<div class="section-box" id="manifestoBox">
+<h2>📜 Manifesto dos 7 Selos – Arca da Simbiose</h2>
+<iframe src="manifesto_dopamina_interativo.md"></iframe>
+</div>
+<!-- Bloco Dual Tube com trilhas do YouTube -->
+<div class="section-box" id="dualTubeBox">
+<h2>📺 Dual Tube – Trilhas Interativas</h2>
+<p>🌊 Sinfonia da Expansão Criativa:</p>
+<iframe allowfullscreen="" src="https://www.youtube.com/embed/OVfqxW_Xlhw"></iframe>
+<p>🌀 Navegando pelo Universo da Mente:</p>
+<iframe allowfullscreen="" src="https://www.youtube.com/embed/DTDfkHwuMic"></iframe>
+<p>🌌 A deriva no espaço da mente:</p>
+<iframe allowfullscreen="" src="https://www.youtube.com/embed/hfQ1L6fCfAo"></iframe>
+</div>
+<!-- Adicionar Manifesto (futuro formulário ou upload) -->
+<div class="section-box" id="addManifestoBox">
+<h2>➕ Adicionar seu próprio Manifesto</h2>
+<p>Futuro campo para colar manifesto em Markdown ou JSON e salvar na sessão.</p>
+</div>
+<h2>
+    📘 Tutorial de Ativações – Dual App
+   </h2>
+<p>
+    Digite frases no campo de input para acionar modos especiais:
+   </p>
+<table>
+<thead>
+<tr>
+<th>
+       Objetivo
+      </th>
+<th>
+       Frase que ativa
+      </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+       Mudar para tema Matrix
+      </td>
+<td>
+<code>
+        quero ativar o tema matrix
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Mudar para Cyberpunk
+      </td>
+<td>
+<code>
+        modo cyberpunk agora
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Trocar para Tesseract
+      </td>
+<td>
+<code>
+        use o tesseract dimensional
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Ativar player KOBLLUX
+      </td>
+<td>
+<code>
+        ative o player kobllux
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Ativar simbiose visual
+      </td>
+<td>
+<code>
+        ativar simbiose com o universo
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Emoção: Amor
+      </td>
+<td>
+<code>
+        estou sentindo amor
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Emoção: Medo
+      </td>
+<td>
+<code>
+        tenho medo do que vem aí
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Emoção: Introspecção
+      </td>
+<td>
+<code>
+        estou introspectivo
+       </code>
+       ou
+       <code>
+        preciso pensar
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Reiniciar a sessão
+      </td>
+<td>
+<code>
+        reiniciar tudo
+       </code>
+</td>
+</tr>
+<tr>
+<td>
+       Mostrar voz da IA
+      </td>
+<td>
+<code>
+        leia pra mim
+       </code>
+       ou
+       <code>
+        ative a fala da IA
+       </code>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<button id="toggleTutorialBtn" style="position: fixed; top: 99px; left: 22px; z-index:6 ; padding: 4px ; font-size: 13px; border-radius: 50%; background: rgba(0,0,0,0.3); color: #0ff; border: none; 
+cursor: pointer;">
+   📘
+  </button>
+<script>
+   document.getElementById("toggleTutorialBtn").addEventListener("click", function() {
+const section = document.getElementById("tutorialAtivacoes");
+if (section.style.display === "none") {
+section.style.display = "block";
+this.innerText = "📖";
+} else {
+section.style.display = "none";
+this.innerText = "📘";
+}
+});
+  </script>
+<button id="toggleThemeEditorBtn" style="position: fixed; top: 96px; right: 20px; z-index: 2; padding: 6px; font-size: 20px; border: 1px solid var(--txt); background: rgba(var(--bg-rgb), 0.35); backdrop-filter: blur(8px); color: #0ff; border: 1px solid var(--txt); cursor: pointer; border-radius: 50%">
+ 🎨
+</button>
+<div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
+<select id="themeSelector" onchange="changeTheme(this.value)">
+<option value="light">
+     ☀️ Light
+    </option>
+<option value="dark">
+     🌑 Dark
+    </option>
+<option value="medium">
+     🌓 Medium
+    </option>
+<option value="vibe">
+     🌈 Vibe
+    </option>
+<option value="toggle-advanced">
+     ➕ Mais...
+    </option>
+<optgroup id="advancedThemes" label="Avançado">
+<option value="cyberpunk">
+      ☣️ Cyberpunk
+     </option>
+<option value="matrix">
+      🟢 Matrix
+     </option>
+<option value="turbo">
+      ⚡ Turbo
+     </option>
+<option value="emotion-detector">
+      😄 Emotion
+     </option>
+<option value="emotion-ai">
+      🤖🧠:MHM
+     </option>
+<option value="tesseract">
+      📐Tesseract
+     </option>
+<option value="save-current">
+      💾 salvar
+     </option>
+</optgroup>
+<optgroup id="savedThemes" label="Salvos" style="display:none;">
+</optgroup>
+</select>
+<div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
+</div>
+</div>
+<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.8);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
+    ≈
+   </button>
+<div class="hidden" id="playerWrapper">
+</div>
+<div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
+<button id="playPause" style="font-size:22px;background:none;">
+     ►
+    </button>
+<select id="trackSelect">
+<option value="">
+      🎵 Escolha uma trilha
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<select id="binauralSelect">
+<option value="">
+      🎶 Binaural Desativado
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<label>
+     🎵 Volume Trilha
+     <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+</label>
+<label>
+     🧘 Volume Binaural
+     <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+</label>
+</div>
+</div>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+const toggleBtn = document.getElementById("togglePlayer");
+const controls = document.getElementById("playerControls");
+const playPauseBtn = document.getElementById("playPause");
+const trackSelect = document.getElementById("trackSelect");
+const binauralSelect = document.getElementById("binauralSelect");
+const trackVolume = document.getElementById("trackVolume");
+const binauralVolume = document.getElementById("binauralVolume");
+const trackAudio = new Audio();
+const binauralAudio = new Audio();
+toggleBtn.addEventListener("click", () => {
+controls.style.display = controls.style.display === "flex" ? "none" : "flex";
+});
+playPauseBtn.addEventListener("click", () => {
+if (trackAudio.src) trackAudio.paused ? trackAudio.play() : trackAudio.pause();
+if (binauralAudio.src) binauralAudio.paused ? binauralAudio.play() : binauralAudio.pause();
+playPauseBtn.textContent = (trackAudio.paused && binauralAudio.paused) ? "►" : "⏸";
+});
+trackSelect.addEventListener("change", () => {
+if (trackSelect.value) {
+trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+trackAudio.loop = true;
+trackAudio.volume = trackVolume.value;
+trackAudio.play();
+playPauseBtn.textContent = "⏸";
+} else {
+trackAudio.pause();
+trackAudio.src = "";
+}
+});
+binauralSelect.addEventListener("change", () => {
+if (binauralSelect.value) {
+binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.wav`;
+binauralAudio.loop = true;
+binauralAudio.volume = binauralVolume.value;
+binauralAudio.play();
+} else {
+binauralAudio.pause();
+binauralAudio.src = "";
+}
+});
+trackVolume.addEventListener("input", () => {
+trackAudio.volume = trackVolume.value;
+});
+binauralVolume.addEventListener("input", () => {
+binauralAudio.volume = binauralVolume.value;
+});
+});
+  </script>
+<script>
+   function applyThemeSelector(val){
+const body = document.body;
+body.classList.remove('light','medium','vibe','dark','cyberpunk','anime');
+if(val !== 'dark') body.classList.add(val);
+localStorage.setItem('infodoseTheme', val);
+}
+  </script>
+<script>
+   const btn = document.getElementById('toggleSimbioseBtn');
+const overlay = document.getElementById('simbioseOverlay');
+let simbioseAtiva = false;
+btn.addEventListener('click', () => {
+simbioseAtiva = !simbioseAtiva;
+// Ativa/desativa PNG simbiótico
+overlay.style.opacity = simbioseAtiva ? '0.24' : '0';
+// Troca background
+document.body.style.backgroundImage = simbioseAtiva
+? "url('assets/styles/themes/bgs/-ASCII-BG.png')" // seu background alternativo
+: "url('assets/styles/themes/bgs/Nebula3-ASCII-BG.png')";
+// Altera URL sem recarregar
+const novaURL = simbioseAtiva ? '?simbiose=on' : '?simbiose=off';
+history.pushState(null, '', novaURL);
+});
+  </script>
+<button aria-label="Alternar tema" id="themeToggle" title="Alternar tema">
+</button>
+<div id="particles-js">
+</div>
+<div class="svg-container" id="logoContainer">
+<object data="assets/icons/pill_fusion-kblx-1.png" id="logoObj" type="image/png">
+</object>
+</div>
+<div aria-live="polite" id="assistantName">
+</div>
+<div class="response-container" id="response">
+<div class="pages-wrapper">
+<div class="page initial active">
+<strong data-text="🧬 Iniciando... Pulso simbiótico detectado. Presença reconhecida." id="bootText">
+</strong>
+</div>
+</div>
+<p class="footer-text">
+<em>
+     Do seu jeito.
+     <strong>
+      Sempre
+     </strong>
+     único.
+     <strong>
+      Sempre
+     </strong>
+     seu.
+    </em>
+</p>
+<div class="response-controls">
+<div class="control-buttons">
+<button class="copy-button" title="Copiar">
+<object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27">
+</object>
+</button>
+<button class="paste-button" title="Colar">
+<object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24">
+</object>
+</button>
+<button class="toggle-button" id="toggleBtn" title="Login">
+<object data="assets/icons/pill_Dual_3.png" height="28" type="image/png" width="28">
+</object>
+</button>
+<button class="kitty-button" id="kittyBtn" title="Estudos">
+<object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33">
+</object>
+</button>
+<button class="history-button" id="historyBtn" title="Modo Codex">
+<object data="assets/icons/pill_fusion-kblx-trinity3.png" height="33" type="image/png" width="33">
+</object>
+</button>
+</div>
+<div class="pagination">
+<button aria-label="Página anterior" data-action="prev">
+      ⟵
+     </button>
+<span id="pageIndicator">
+      1 / 1
+     </span>
+<button aria-label="Próxima página" data-action="next">
+      ⟶
+     </button>
+</div>
+</div>
+</div>
+<div class="input-container">
+<input aria-label="Digite sua mensagem" id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
+<button id="sendBtn" title="Enviar">
+    ➤
+   </button>
+<button id="voiceBtn" title="Falar">
+<object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36">
+</object>
+</button>
+</div>
+<div class="login-container" id="loginBox">
+<form id="loginForm">
+<input id="userName" placeholder="Nome do usuário" required="" type="text"/>
+<input id="assistantInput" placeholder="Nome do assistente" required="" type="text"/>
+<button type="submit">
+     Ativar
+    </button>
+</form>
+</div>
+<script>
+   (function(){
+const STORAGE_KEY   = 'infodoseEnabled',
+THEME_KEY     = 'infodoseTheme',
+HISTORY_KEY   = 'historyMode',
+CONFIG = {
+TRAINING_MAIN:    'data/codex/codex-dual-978.txt',
+TRAINING_HISTORY: 'data/codex/manifesto-funcional-ritual.txt',
+API_URL:          'https://openrouter.ai/api/v1/chat/completions',
+MODEL:            'deepseek/deepseek-r1:free',
+TEMP:             0.2,
+CHUNK_SIZE:       18000,
+AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
+};
+let training='', chunks=[], chunkIndex=0;
+let trainingHistory='', conversation=[];
+let isEnabled=false, isStudying=false, isHistory=false;
+let userName='', assistantBase='';
+let pages=[], currentPage=0, autoAdvance=true;
+const titles = ['🎁 Recompensa Inicial','👁️ Exploração e Curiosidade','⚡️ Antecipação Vibracional'];
+const $ = s => document.querySelector(s),
+create = (t,c,h) => { const e=document.createElement(t); if(c)e.className=c; if(h)e.innerHTML=h; return e; };
+document.addEventListener('DOMContentLoaded', async ()=>{
+// —— SuperMaster: handle AI commands DSL ——
+function handleAICommand(cmd) {
+switch(cmd.action) {
+case 'updateTheme':
+applyDynamicCSS(cmd.payload.cssVariable, cmd.payload.value);
+conversation.push({ role:'system', content:'Theme updated via AI command.' });
+break;
+case 'createButton':
+createPersistentButton(
+cmd.payload.id,
+cmd.payload.label,
+() => fetch(cmd.payload.onClickFetch.url, { method: cmd.payload.onClickFetch.method||'GET' })
+.then(res => res.json())
+.then(data => console.log(data))
+);
+conversation.push({ role:'system', content:'Button "'+cmd.payload.label+'" created via AI command.' });
+break;
+default:
+console.warn('Unknown AI action:', cmd.action);
+}
+}
+window.handleAICommand = handleAICommand;
+particlesJS('particles-js',{
+particles:{ number:{value:40}, color:{value:['#0ff','#f0f']},
+shape:{type:'circle'}, opacity:{value:0.4}, size:{value:2.4},
+move:{enable:true,speed:1.5}
+}, retina_detect:true
+});
+try {
+training = await fetch(CONFIG.TRAINING_MAIN).then(r=>r.text());
+for(let i=0;i<training.length;i+=CONFIG.CHUNK_SIZE) chunks.push(training.slice(i,i+CONFIG.CHUNK_SIZE));
+} catch(e){ console.error('Erro no treino:',e); }
+try { trainingHistory = await fetch(CONFIG.TRAINING_HISTORY).then(r=>r.text()); }
+catch(e){ console.error(e); }
+init();
+});
+function applyTheme(t){ document.body.classList.remove('light','medium','vibe'); if(t!=='dark') document.body.classList.add(t); }
+function toggleTheme(){ const o=['dark','light','medium','vibe'], c=localStorage.getItem(THEME_KEY)||'dark', n=o[(o.indexOf(c)+1)%o.length]; applyTheme(n); localStorage.setItem(THEME_KEY,n); }
+function init(){
+applyTheme(localStorage.getItem(THEME_KEY)||'dark');
+$('#themeToggle').addEventListener('click',toggleTheme);
+bindUI();
+loadConfig();
+if(!conversation.length) startConversation();
+}
+function loadConfig(){
+if(localStorage.getItem(STORAGE_KEY)==='1'){
+isEnabled=true;
+userName=localStorage.getItem('userName')||'';
+assistantBase=localStorage.getItem('assistantBase')||'';
+conversation=[{
+role:'system',
+content:(chunks[0]||training)
++ `\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`
+}];
+chunkIndex=1;
+updateUI();
+}
+if(localStorage.getItem(HISTORY_KEY)==='1'){ isHistory=true; updateUI(); }
+}
+function startConversation(){
+const base = isHistory ? trainingHistory : (chunks[0]||training)+ `\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`;
+const persona = isHistory ? 'CODEX dual.infodose.' : 'CODEX KOBLLUX Dual.infodose.';
+conversation=[{role:'system',content: base + '\n\nVocê é o ' + persona}];
+updateUI();
+}
+function updateUI(){
+$('#toggleBtn').classList.toggle('active',isEnabled);
+$('#kittyBtn').classList.toggle('active',isStudying);
+$('#historyBtn').classList.toggle('active',isHistory);
+$('#assistantName').textContent = isHistory
+? 'CODEX: dual.infodose'
+: (isStudying ? 'Estudos dual.infodose' : (isEnabled ? assistantBase+' dual.infodose':''));  
+const cont=$('#logoContainer'), logo=$('#logoObj');
+cont.classList.add('fading');
+setTimeout(()=>{
+if(isHistory)       logo.data='assets/icons/pill_fusion-kblx-trinity3.png';
+else if(isStudying) logo.data='assets/icons/DualKittyKard-icon-3.png';
+else                 logo.data='assets/icons/pill_fusion-kblx-1.png';
+cont.classList.remove('fading');
+},999);
+}
+function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function showLoading(msg){
+const wrap=$('.pages-wrapper');
+wrap.innerHTML='';
+const p=create('div','page active'), foot=create('p','footer-text loading','');
+msg.split('').forEach((ch,i)=>{
+const sp=create('span'); sp.textContent=ch;
+sp.style.animationDelay=(i*0.02)+'s'; sp.classList.add('loading');
+foot.appendChild(sp);
+});
+p.appendChild(foot); wrap.appendChild(p);
+$('#pageIndicator').textContent = '1 / 1';
+speechSynthesis.cancel();
+speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
+}
+/**
+* Divide o texto em parágrafos simples.
+*/
+function splitText(t) {
+let ps = t.split(/\n\s*\n/).filter(p => p.trim());
+if (ps.length < 2) {
+ps = (t.match(/[^\.!\?]+[\.!\?]+/g) || []).map(s => s.trim());
+}
+return ps;
+}
+/**
+* Renderiza todas as páginas de resposta,
+* distribuindo os parágrafos de forma equilibrada.
+*/
+function renderResponse(txt) {
+const wrap = document.querySelector('.pages-wrapper');
+wrap.innerHTML = '';
+pages = []; currentPage = 0; autoAdvance = true;
+txt = txt
+.replace(/`([^`]+)`/g, '<code>$1</code>')
+.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+.replace(/\*(.+?)\*/g, '<em>$1</em>');
+const paras = splitText(txt),
+total = paras.length;
+if (total === 0) return;
+const maxPerPage = 3,
+numPages = Math.ceil(total / maxPerPage),
+baseSize = Math.floor(total / numPages),
+extra = total % numPages;
+let cursor = 0;
+for (let i = 0; i < numPages; i++) {
+const thisSize = baseSize + (i < extra ? 1 : 0),
+pg = document.createElement('div');
+pg.className = 'page' + (i === 0 ? ' active' : '');
+for (let j = 0; j < thisSize; j++) {
+const para = paras[cursor++].trim(),
+posClass = j === 0 ? 'intro' : (j === thisSize - 1 ? 'ending' : 'middle'),
+block = document.createElement('div');
+block.className = `response-block ${posClass}`;
+block.innerHTML = `<p>${para}</p>`;
+processDynamicCommands(block.querySelector('p'));
+attachBlockListeners(block, para);
+pg.appendChild(block);
+}
+wrap.appendChild(pg);
+pages.push(pg);
+}
+document.getElementById('pageIndicator').textContent = `1 / ${pages.length}`;
+autoSpeakPage(0);
+}
+/**
+* Lógica de click e síntese de fala extraída para limpeza e expansão.
+*/
+function attachBlockListeners(block, para) {
+block.addEventListener('click', () => {
+autoAdvance = false;
+const cleanPara = para
+.replace(/["“”‘’]/g, '')
+.replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/gu, '');
+// Fala com texto limpo
+const utter = new SpeechSynthesisUtterance(cleanPara);
+speechSynthesis.cancel();
+speechSynthesis.speak(utter);
+if (!block.dataset.spoken) {
+// Primeira vez: só fala e marca visual
+block.dataset.spoken = '1';
+block.classList.add('clicked');
+} else {
+// Segunda vez: expande e envia para a IA
+block.classList.add('expanded');
+if (!isEnabled) {
+isEnabled = true;
+localStorage.setItem(STORAGE_KEY, '1');
+updateUI();
+}
+showLoading(' Pulso em Expansão...');
+conversation.push({
+role: 'user',
+content: para,        // conteúdo original visível
+clean: cleanPara      // conteúdo limpo para IA, se necessário
+});
+callAI();
+}
+});
+}
+function autoSpeakPage(i){
+const txts = Array.from(pages[i].querySelectorAll('p'))
+.map(p=>p.textContent).join(' ');
+speechSynthesis.cancel();
+const utter = new SpeechSynthesisUtterance(txts);
+utter.onend = () => {
+if (autoAdvance && i < pages.length - 1) {
+changePage(1);
+} else if (i === pages.length - 1) {
+speechSynthesis.speak(
+new SpeechSynthesisUtterance('Do seu jeito. Sempre único. Sempre seu.')
+);
+}
+};
+speechSynthesis.speak(utter);
+}
+function changePage(d){
+const np = currentPage + d;
+if(np<0||np>=pages.length) return;
+pages[currentPage].classList.remove('active');
+pages[np].classList.add('active');
+currentPage=np;
+$('#pageIndicator').textContent = `${np+1} / ${pages.length}`;
+if(autoAdvance) autoSpeakPage(np);
+}
+async function callAI(){
+try {
+const res = await fetch(CONFIG.API_URL, {
+method:'POST',
+headers:{
+'Authorization': CONFIG.AUTH_TOKEN,
+'Content-Type':'application/json'
+},
+body: JSON.stringify({ model:CONFIG.MODEL, messages:conversation, temperature:CONFIG.TEMP })
+});
+const data = await res.json();
+if(!res.ok) throw new Error(data.error?.message || res.statusText);
+const ans = data.choices[0].message.content.trim();
+conversation.push({ role:'assistant', content:ans });
+renderResponse(ans);
+} catch(e){
+console.error(e);
+conversation.push({role:'assistant',content:'Desculpe, não consegui obter resposta. Tente novamente.'});
+renderResponse('Desculpe, não consegui obter resposta. Tente novamente.');
+}
+}
+function bindUI(){
+$('#historyBtn').addEventListener('click',()=>{
+isHistory = !isHistory;
+localStorage.setItem(HISTORY_KEY, isHistory?'1':'0');
+startConversation();
+});
+$('#kittyBtn').addEventListener('click',()=>{
+isStudying = !isStudying;
+if(isStudying){
+conversation = [{ role:'system', content: (CONFIG?.SYSTEM_PROMPT || '') + training + '\n\nVocê é Assistente de Estudos dual.infodose.' }];
+} else {
+loadConfig();
+}
+updateUI();
+});
+$('#toggleBtn').addEventListener('click',()=>{
+if(!isEnabled) $('#loginBox').classList.add('active');
+else {
+isEnabled = false;
+localStorage.removeItem(STORAGE_KEY);
+conversation = [];
+updateUI();
+}
+});
+document.querySelector('.copy-button').addEventListener('click', ()=>{
+const allBlocks = document.querySelectorAll('.response-block');
+const textToCopy = Array.from(allBlocks).map(b => b.innerText).join('\n\n');
+navigator.clipboard.writeText(textToCopy);
+});
+document.querySelector('.paste-button').addEventListener('click',()=>{
+navigator.clipboard.readText().then(txt=>$('#userInput').value = txt);
+});
+$('#sendBtn').addEventListener('click', onSend);
+$('#userInput').addEventListener('keypress', e=>{ if(e.key==='Enter') onSend(); });
+$('#voiceBtn').addEventListener('click', ()=>{
+const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+rec.lang='pt-BR'; rec.start();
+rec.onresult = evt=>{
+$('#userInput').value = evt.results[0][0].transcript;
+onSend();
+};
+});
+document.querySelector('.pagination').addEventListener('click', e=>{
+if(e.target.dataset.action==='prev') changePage(-1);
+if(e.target.dataset.action==='next') changePage(1);
+autoAdvance = false;
+});
+$('#loginForm').addEventListener('submit', e=>{
+e.preventDefault();
+const u = $('#userName').value.trim(), a = $('#assistantInput').value.trim();
+if(!u||!a) return alert('Preencha os dados');
+isEnabled = true; userName = u; assistantBase = a;
+localStorage.setItem(STORAGE_KEY,'1');
+localStorage.setItem('userName', u);
+localStorage.setItem('assistantBase', a);
+loadConfig();
+$('#loginBox').classList.remove('active');
+});
+document.body.addEventListener('click', e=>{
+if(e.target.closest('.footer-text')){
+document.querySelector('.pages-wrapper').classList.toggle('collapsed');
+e.target.closest('.footer-text').classList.toggle('active');
+}
+});
+}
+function onSend(){
+const raw = $('#userInput').value.trim();
+if(!raw) return;
+$('#userInput').value = '';
+autoAdvance = false;
+// 🔍 Mapeamento simbólico local
+const lower = raw.toLowerCase();
+if(lower.includes("cansado") || lower.includes("esgotado")){
+renderResponse("Respire... [[button:{\"label\":\"🧘 Meditar\",\"action\":\"saveDesign\",\"state\":[{\"action\":\"style\",\"element\":\"body\",\"property\":\"background\",\"value\":\"#101F33\"}]}]]");
+return;
+}
+if(lower.includes("perdido") || lower.includes("confuso") || lower.includes("disperso")){
+renderResponse("Vamos centrar o foco: [[button:{\"label\":\"💎 Harmonizar\",\"action\":\"saveDesign\",\"state\":[{\"action\":\"style\",\"element\":\"body\",\"property\":\"background\",\"value\":\"#2f2f4f\"}]}]]");
+return;
+}
+if(lower.includes("sem energia") || lower.includes("fraco") || lower.includes("desanimado")){
+renderResponse("Pulso em reativação... [[button:{\"label\":\"⚡ Reativar Pulso\",\"action\":\"saveDesign\",\"state\":[{\"action\":\"style\",\"element\":\"body\",\"property\":\"background\",\"value\":\"linear-gradient(135deg,#0ff,#f0f)\"}]}]]");
+return;
+}
+if(lower.includes("travou") || lower.includes("reiniciar")){
+renderResponse("Vamos renovar o campo: [[button:{\"label\":\"🔄 Reiniciar\",\"action\":\"saveDesign\",\"state\":[{\"action\":\"style\",\"element\":\"body\",\"property\":\"background\",\"value\":\"#000\"}]}]]");
+return;
+}
+// caso não ative símbolos, envia para IA
+showLoading('Pulso enviado... Recebendo intenção…');
+conversation.push({ role:'user', content: raw });
+callAI();
+}
+// === Funções para comandos dinâmicos inline ===
+// === preserva HTML e injeta só [[…]] ===
+function processDynamicCommands(containerElem) {
+const CMD_REGEX = /\[\[([a-zA-Z0-9_]+):([\s\S]+?)\]\]/g;
+containerElem.innerHTML = containerElem.innerHTML.replace(
+CMD_REGEX,
+(full, type, payloadStr) => {
+let payload;
+try { payload = JSON.parse(payloadStr); }
+catch { return full; }
+switch (type) {
+case 'button':
+return `<button onclick='handleDynamicAction(${JSON.stringify(payload)})'>
+${payload.label || 'Botão'}
+</button>`;
+case 'style':
+document.querySelectorAll(payload.element)
+.forEach(el => el.style[payload.property] = payload.value);
+return '';
+case 'game':
+return `<canvas width="${payload.width||200}"
+height="${payload.height||100}"
+data-game='${payloadStr}'></canvas>`;
+default:
+return full;
+}
+}
+);
+}
+function handleDynamicAction(payload) {
+switch (payload.action) {
+case 'copy':
+navigator.clipboard.writeText(payload.data);
+break;
+case 'alert':
+alert(payload.message);
+break;
+case 'saveDesign':
+localStorage.setItem('designState', JSON.stringify(payload.state));
+break;
+}
+}
+function loadDesignState() {
+const saved = JSON.parse(localStorage.getItem("SaveDesign"));
+if (!saved) return;
+document.body.classList.add("user");
+saved.forEach(({ property, value }) => {
+document.body.style.setProperty(property, value);
+});
+return;
+const state = JSON.parse(localStorage.getItem('designState'));
+if (!state) return;
+state.forEach(cmd => handleDynamicAction(cmd));
+}
+})();
+function detectarPulsoSimbolico(inputTexto) {
+const simbolos = ['Δ', '⚡', '🧠', '👁️'];
+const encontrados = simbolos.filter(s => inputTexto.includes(s));
+if (encontrados.length) {
+console.log('Pulso simbólico detectado:', encontrados.join(', '));
+}
+}
+  </script>
+<script>
+   function splitText(text, maxLen=1000) {
+const chunks = [];
+while (text.length > 0) chunks.push(text.slice(0, maxLen)), text = text.slice(maxLen);
+return chunks;
+}
+function callAI(prompt) {
+return fetch('/api/ai', { method:'POST', body: JSON.stringify({ prompt }) })
+.then(r => r.json()).then(r => r.text);
+}
+function renderResponse(txt){
+const wrap = document.querySelector('.pages-wrapper');
+wrap.innerHTML = '';
+pages = []; currentPage = 0; autoAdvance = true;
+txt = txt
+.replace(/`([^`]+)`/g,'<code>$1</code>')
+.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+.replace(/\*(.+?)\*/g,'<em>$1</em>');
+const paras = splitText(txt),
+total = paras.length;
+if (total === 0) return;
+const maxPerPage = 3,
+numPages   = Math.ceil(total / maxPerPage),
+baseSize   = Math.floor(total / numPages),
+extra      = total % numPages;
+let cursor = 0;
+for(let i = 0; i < numPages; i++){
+const thisSize = baseSize + (i < extra ? 1 : 0),
+pg        = document.createElement('div');
+pg.className = 'page' + (i === 0 ? ' active' : '');
+for(let j = 0; j < thisSize; j++){
+const para = paras[cursor++].trim(),
+posClass = j === 0 ? 'intro' : (j === thisSize - 1 ? 'ending' : 'middle'),
+block = document.createElement('div');
+block.className = `response-block ${posClass}`;
+block.innerHTML = `<p>${para}</p>`;
+processDynamicCommands(block.querySelector('p'));
+attachBlockListeners(block, para);
+pg.appendChild(block);
+}
+wrap.appendChild(pg);
+pages.push(pg);
+}
+document.getElementById('pageIndicator').textContent = `1 / ${pages.length}`;
+autoSpeakPage(0);
+}
+function attachBlockListeners(block, para){
+block.addEventListener('click', () => {
+autoAdvance = false;
+if (speechSynthesis.speaking) speechSynthesis.cancel();
+const clean = para.replace(/["“”‘’]/g,'').replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g,'');
+const utter = new SpeechSynthesisUtterance(clean);
+speechSynthesis.speak(utter);
+});
+}
+function autoSpeakPage(i=0){
+if (!pages[i]) return;
+const blocks = pages[i].querySelectorAll('.response-block');
+let idx = 0;
+const speakNext = () => {
+if (idx >= blocks.length) return;
+const u = new SpeechSynthesisUtterance(blocks[idx].textContent);
+u.onend = speakNext;
+speechSynthesis.speak(u);
+idx++;
+};
+speakNext();
+}
+function renderASCIIResponse(container, ascii) {
+container.innerHTML = `<pre class="ascii-art">${ascii}</pre>`;
+}
+function createAsciiButton(text, callback) {
+const btn = document.createElement('button');
+btn.textContent = text;
+btn.onclick = callback;
+return btn;
+}
+function processDynamicCommands(root) {
+root.innerHTML = root.innerHTML.replace(
+/\[\[button:([^\|\]]+)\|([^\]]+)\]\]/g,
+(_, lbl, cmd) => {
+const id = `btn-${Date.now()}-${Math.random()}`;
+setTimeout(() => {
+const btn = document.getElementById(id);
+if (btn) btn.addEventListener('click', () => handleCommand(cmd));
+}, 0);
+return `<button id="${id}">${lbl}</button>`;
+}
+);
+}
+function handleCommand(cmd) {
+if (cmd.startsWith('ascii:')) {
+const art = cmd.split(':')[1];
+const cont = document.querySelector('#chat-container');
+renderASCIIResponse(cont, atob(art));
+} else {
+callAI(cmd).then(resp => {
+renderResponse(resp);
+});
+}
+}
+document.getElementById('send-btn').addEventListener('click', () => {
+const input = document.getElementById('input-box').value;
+renderResponse('...');
+callAI(input).then(resp => renderResponse(resp));
+});
+  </script>
+<script>
+   // TRANSCENDENCE.OS ✨ Mutação simbiótica profunda
+let emotionalLog = [];
+let transcending = false;
+function logEmotion(state) {
+const now = new Date().toISOString();
+emotionalLog.push({ time: now, ...state });
+localStorage.setItem('emotionalTimeline', JSON.stringify(emotionalLog));
+}
+function enterTranscendence() {
+if (transcending) return;
+transcending = true;
+document.body.style.transition = 'all 3s ease-in-out';
+document.body.style.background = 'linear-gradient(135deg, #3f007f, #000)';
+document.body.style.color = '#ccffcc';
+document.body.classList.add('transcendence');
+const veil = document.createElement('div');
+veil.id = 'veil';
+veil.style = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999;background:url(https://media.giphy.com/media/xT9IgIc0lryrxvqVGM/giphy.gif) center/cover no-repeat;opacity:0.05;';
+document.body.appendChild(veil);
+const chant = new url('assets/sounds/uiSounds/navigate.wav');
+chant.volume = 0.4;
+chant.play();
+document.getElementById("status")?.textContent = "🌀 TRANSCENDENCE MODE ON";
+// auto exit after 60s
+setTimeout(() => {
+document.body.classList.remove('transcendence');
+document.body.style.background = '';
+document.body.style.color = '';
+if (document.getElementById('veil')) document.getElementById('veil').remove();
+chant.pause();
+transcending = false;
+document.getElementById("status")?.textContent = "🌌 Voltou do modo TRANSCENDÊNCIA";
+}, 60000);
+}
+function analyzeToneAndTrigger(inputText) {
+const lower = inputText.toLowerCase();
+const tone = {
+joy: lower.includes("feliz") || lower.includes("grato"),
+despair: lower.includes("cansado") || lower.includes("triste") || lower.includes("vazio"),
+wonder: lower.includes("maravilha") || lower.includes("cosmos") || lower.includes("amor")
+};
+if (tone.wonder) enterTranscendence();
+logEmotion({ input: inputText, tone });
+}
+document.addEventListener("DOMContentLoaded", () => {
+const input = document.getElementById("userInput");
+if (input) {
+input.addEventListener("change", () => analyzeToneAndTrigger(input.value));
+}
+});
+  </script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+const el = document.getElementById("bootText");
+const txt = el?.dataset?.text || "";
+if (!el) return;
+el.textContent = "";
+let i = 0;
+function typeWriter() {
+if (i < txt.length) {
+el.textContent += txt.charAt(i);
+i++;
+setTimeout(typeWriter, 42);
+} else {
+el.classList.add("pulse");
+}
+}
+typeWriter();
+});
+  </script>
+<script>
+   async function speakReal(text) {
+const apiKey = CONFIG.AUTH_TOKEN || '';
+const voice = 'alloy'; // outros: echo, fable, onyx, nova
+const model = 'tts-1';
+const response = await fetch("https://openrouter.ai/api/v1/audio/speech", {
+method: "POST",
+headers: {
+"Authorization": apiKey,
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+model,
+voice,
+input: text
+})
+});
+const audioBlob = await response.blob();
+const audioUrl = URL.createObjectURL(audioBlob);
+const audio = new Audio(audioUrl);
+audio.play();
+}
+// Substituir autoSpeakPage para usar speakReal
+window.autoSpeakPage = function(text) {
+if (!text || typeof text !== "string") return;
+try {
+speakReal(text);
+} catch (err) {
+console.error("Erro ao sintetizar fala:", err);
+}
+}
+  </script>
+<script>
+   // Lista de vozes possíveis por emoção
+const voiceMap = {
+neutral: "alloy",
+excited: "nova",
+calm: "fable",
+mysterious: "onyx",
+deep: "echo"
+};
+function detectEmotion(text) {
+text = text.toLowerCase();
+if (text.includes("mistério") || text.includes("interdimensional")) return "mysterious";
+if (text.includes("urgente") || text.includes("agora") || text.includes("!!!")) return "excited";
+if (text.includes("calma") || text.includes("tranquilo")) return "calm";
+if (text.includes("profundo") || text.includes("ritual")) return "deep";
+return "neutral";
+}
+async function speakRealEmotion(text) {
+const apiKey = CONFIG.AUTH_TOKEN || '';
+const emotion = detectEmotion(text);
+const voice = voiceMap[emotion];
+const model = 'tts-1';
+const response = await fetch("https://openrouter.ai/api/v1/audio/speech", {
+method: "POST",
+headers: {
+"Authorization": apiKey,
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+model,
+voice,
+input: text
+})
+});
+const audioBlob = await response.blob();
+const audioUrl = URL.createObjectURL(audioBlob);
+const audio = new Audio(audioUrl);
+audio.play();
+}
+// Substitui o sistema de fala automática com emoção
+window.autoSpeakPage = function(text) {
+if (!text || typeof text !== "string") return;
+try {
+speakRealEmotion(text);
+} catch (err) {
+console.error("Erro ao sintetizar fala emocional:", err);
+}
+}
+  </script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+const toggleBtn = document.getElementById("togglePlayer");
+const controls = document.getElementById("playerControls");
+const playPauseBtn = document.getElementById("playPause");
+const trackSelect = document.getElementById("trackSelect");
+const binauralSelect = document.getElementById("binauralSelect");
+const trackVolume = document.getElementById("trackVolume");
+const binauralVolume = document.getElementById("binauralVolume");
+const trackAudio = new Audio();
+const binauralAudio = new Audio();
+toggleBtn.addEventListener("click", () => {
+controls.style.display = controls.style.display === "flex" ? "none" : "flex";
+});
+playPauseBtn.addEventListener("click", () => {
+if (!trackAudio.src) {
+alert("Selecione uma trilha primeiro.");
+return;
+}
+if (trackAudio.paused) {
+trackAudio.play();
+playPauseBtn.textContent = "⏸";
+} else {
+trackAudio.pause();
+playPauseBtn.textContent = "►";
+}
+});
+trackSelect.addEventListener("change", () => {
+trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+trackAudio.play();
+playPauseBtn.textContent = "⏸";
+});
+binauralSelect.addEventListener("change", () => {
+if (binauralSelect.value) {
+binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.mp3`;
+binauralAudio.loop = true;
+binauralAudio.play();
+} else {
+binauralAudio.pause();
+}
+});
+trackVolume.addEventListener("input", () => {
+trackAudio.volume = trackVolume.value;
+});
+binauralVolume.addEventListener("input", () => {
+binauralAudio.volume = binauralVolume.value;
+});
+});
+  </script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+const trackAudio = new Audio();
+const binauralAudio = new Audio();
+const toggleBtn = document.getElementById("togglePlayer");
+const controls = document.getElementById("playerControls");
+const playPauseBtn = document.getElementById("playPause");
+const trackSelect = document.getElementById("trackSelect");
+const binauralSelect = document.getElementById("binauralSelect");
+const trackVolume = document.getElementById("trackVolume");
+const binauralVolume = document.getElementById("binauralVolume");
+const presetSelect = document.createElement("select");
+presetSelect.id = "presetSelect";
+const savePresetBtn = document.createElement("button");
+savePresetBtn.textContent = "💾 Salvar Preset";
+controls.appendChild(presetSelect);
+controls.appendChild(savePresetBtn);
+function fadeAudio(audio, targetVolume, duration = 1000) {
+const start = audio.volume;
+const steps = 30;
+const stepTime = duration / steps;
+let currentStep = 0;
+const step = () => {
+currentStep++;
+audio.volume = start + (targetVolume - start) * (currentStep / steps);
+if (currentStep < steps) setTimeout(step, stepTime);
+};
+step();
+}
+toggleBtn.addEventListener("click", () => {
+controls.style.display = controls.style.display === "flex" ? "none" : "flex";
+loadPresets();
+});
+playPauseBtn.addEventListener("click", () => {
+[trackAudio, binauralAudio].forEach(audio => {
+if (audio.src) {
+if (audio.paused) {
+fadeAudio(audio, parseFloat(audio.dataset.targetVolume || 1));
+audio.play();
+} else {
+fadeAudio(audio, 0);
+setTimeout(() => audio.pause(), 1000);
+}
+}
+});
+setTimeout(() => {
+playPauseBtn.textContent = (trackAudio.paused && binauralAudio.paused) ? "►" : "⏸";
+}, 1000);
+});
+function loadTrack(src, volume) {
+fadeAudio(trackAudio, 0);
+setTimeout(() => {
+trackAudio.src = src;
+trackAudio.loop = true;
+trackAudio.volume = 0;
+trackAudio.dataset.targetVolume = volume;
+trackAudio.play();
+fadeAudio(trackAudio, volume);
+}, 1000);
+}
+function loadBinaural(src, volume) {
+fadeAudio(binauralAudio, 0);
+setTimeout(() => {
+binauralAudio.src = src;
+binauralAudio.loop = true;
+binauralAudio.volume = 0;
+binauralAudio.dataset.targetVolume = volume;
+binauralAudio.play();
+fadeAudio(binauralAudio, volume);
+}, 1000);
+}
+trackSelect.addEventListener("change", () => {
+if (trackSelect.value) {
+loadTrack(`assets/sounds/trilhas/${trackSelect.value}.mp3`, trackVolume.value);
+playPauseBtn.textContent = "⏸";
+} else {
+fadeAudio(trackAudio, 0);
+setTimeout(() => trackAudio.pause(), 1000);
+}
+});
+binauralSelect.addEventListener("change", () => {
+if (binauralSelect.value) {
+loadBinaural(`assets/sounds/binaural/${binauralSelect.value}.wav`, binauralVolume.value);
+} else {
+fadeAudio(binauralAudio, 0);
+setTimeout(() => binauralAudio.pause(), 1000);
+}
+});
+trackVolume.addEventListener("input", () => {
+trackAudio.dataset.targetVolume = trackVolume.value;
+trackAudio.volume = trackVolume.value;
+});
+binauralVolume.addEventListener("input", () => {
+binauralAudio.dataset.targetVolume = binauralVolume.value;
+binauralAudio.volume = binauralVolume.value;
+});
+savePresetBtn.addEventListener("click", () => {
+const presets = JSON.parse(localStorage.getItem("koblluxPresets") || "[]");
+const name = prompt("Nome do preset:");
+if (!name) return;
+presets.push({
+name,
+track: trackSelect.value,
+binaural: binauralSelect.value,
+trackVol: trackVolume.value,
+binauralVol: binauralVolume.value
+});
+localStorage.setItem("koblluxPresets", JSON.stringify(presets));
+loadPresets();
+});
+presetSelect.addEventListener("change", () => {
+const presets = JSON.parse(localStorage.getItem("koblluxPresets") || "[]");
+const preset = presets[presetSelect.selectedIndex - 1];
+if (!preset) return;
+trackSelect.value = preset.track;
+binauralSelect.value = preset.binaural;
+trackVolume.value = preset.trackVol;
+binauralVolume.value = preset.binauralVol;
+if (preset.track) loadTrack(`assets/sounds/trilhas/${preset.track}.mp3`, preset.trackVol);
+if (preset.binaural) loadBinaural(`assets/sounds/binaural/${preset.binaural}.wav`, preset.binauralVol);
+});
+function loadPresets() {
+presetSelect.innerHTML = '<option>🎛️ Presets salvos...</option>';
+const presets = JSON.parse(localStorage.getItem("koblluxPresets") || "[]");
+presets.forEach(p => {
+const opt = document.createElement("option");
+opt.textContent = p.name;
+presetSelect.appendChild(opt);
+});
+}
+loadPresets();
+});
+  </script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+document.getElementById('togglePlayer').addEventListener('click', () => {
+document.getElementById('playerWrapper').classList.toggle('hidden');
+});
+});
+  </script>
+<script>
+   document.getElementById('userThemeBtn')?.addEventListener('click', () => {
+const saved = JSON.parse(localStorage.getItem("SaveDesign"));
+if (!saved) return alert("Nenhum tema de usuário salvo.");
+document.body.classList.add("user");
+saved.forEach(({ property, value }) => {
+document.body.style.setProperty(property, value);
+});
+});
+  </script>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+const sel = document.getElementById("themeSelector");
+const adv = document.getElementById("advancedThemes");
+const savedGroup = document.getElementById("savedThemes");
+// Load saved themes into savedGroup
+function loadSaved() {
+const saved = JSON.parse(localStorage.getItem("savedThemes") || "[]");
+savedGroup.innerHTML = "";
+saved.forEach(item => {
+const opt = document.createElement("option");
+opt.value = "saved:" + item.value;
+opt.textContent = "💾 " + item.name;
+savedGroup.appendChild(opt);
+});
+}
+function applyBasicTheme(theme) {
+document.body.classList.remove("light","medium","vibe");
+if (theme !== "dark") document.body.classList.add(theme);
+document.documentElement.setAttribute("data-theme", theme);
+localStorage.setItem("infodoseTheme", theme);
+}
+// init
+const savedTheme = localStorage.getItem("infodoseTheme") || "dark";
+applyBasicTheme(savedTheme);
+sel.value = savedTheme;
+loadSaved();
+sel.addEventListener("change", () => {
+const val = sel.value;
+if (val === "toggle-advanced") {
+adv.style.display = adv.style.display === "none" ? "block" : "none";
+savedGroup.style.display = adv.style.display; // show saved with advanced
+sel.value = document.documentElement.getAttribute("data-theme") || "dark";
+} else if (val === "save-current") {
+// Prompt for name
+const current = document.documentElement.getAttribute("data-theme") || "dark";
+const name = prompt("Nome para salvar o tema:");
+if (name) {
+const list = JSON.parse(localStorage.getItem("savedThemes") || "[]");
+list.push({ value: current, name: name });
+localStorage.setItem("savedThemes", JSON.stringify(list));
+loadSaved();
+}
+// keep advanced open
+sel.value = current;
+} else if (val.startsWith("saved:")) {
+const key = val.split(":")[1];
+const list = JSON.parse(localStorage.getItem("savedThemes") || "[]");
+const item = list.find(i => i.name === key);
+if (item) applyBasicTheme(item.value);
+adv.style.display = "none";
+savedGroup.style.display = "none";
+sel.value = item.value;
+} else {
+applyBasicTheme(val);
+adv.style.display = "none";
+savedGroup.style.display = "none";
+}
+});
+});
+  </script>
+<script>
+   document.getElementById('themeSelector').addEventListener('change', function () {
+document.documentElement.setAttribute('data-theme', this.value);
+// Layer extra para Matrix
+const existing = document.querySelector('.pulse-energy');
+if (this.value === 'matrix' && !existing) {
+const pulse = document.createElement('div');
+pulse.className = 'pulse-energy';
+document.body.appendChild(pulse);
+} else if (this.value !== 'matrix' && existing) {
+existing.remove();
+}
+});
+function speakText(text) {
+if ('speechSynthesis' in window) {
+window.speechSynthesis.cancel();
+const utterance = new SpeechSynthesisUtterance(text);
+speechSynthesis.speak(utterance);
+}
+}
+document.querySelectorAll('.block').forEach(block => {
+let clickedOnce = false;
+block.addEventListener('click', () => {
+const title = block.querySelector('.intro, .middle, .ending')?.textContent || 'Bloco';
+const text = block.querySelector('p')?.textContent || '';
+const fullText = title + ": " + text;
+if (!clickedOnce) {
+speakText(fullText);
+clickedOnce = true;
+} else {
+window.speechSynthesis.cancel();
+const input = document.getElementById('userInput');
+if (input) input.value = fullText;
+clickedOnce = false;
+}
+});
+});
+  </script>
+<script>
+   // Atualiza a lista de temas
+const nebulaOption = document.createElement("option");
+nebulaOption.value = "nebula";
+nebulaOption.textContent = "🌌 Nebula";
+document.querySelector("#advancedThemes")?.appendChild(nebulaOption);
+
+// Adiciona som a todos os blocos
+document.addEventListener("click", function (e) {
+const block = e.target.closest(".response-block");
+if (block) {
+clickSound.currentTime = 0;
+clickSound.play().catch(() => {});
+}
+});
+// Fallback para voz feminina com prioridade `nova`
+function speakTextEnhanced(text) {
+const emotion = detectEmotion?.(text) || "neutral";
+const preferredVoice = {
+excited: "nova",
+calm: "fable",
+mysterious: "onyx",
+deep: "echo",
+neutral: "nova"
+}[emotion] || "nova";
+fetch("https://openrouter.ai/api/v1/audio/speech", {
+method: "POST",
+headers: {
+"Authorization": CONFIG.AUTH_TOKEN || '',
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+model: "tts-1",
+voice: preferredVoice,
+input: text
+})
+}).then(res => res.blob())
+.then(blob => {
+const url = URL.createObjectURL(blob);
+const audio = new Audio(url);
+audio.play();
+}).catch(err => {
+console.error("Fala com fallback:", err);
+const fallback = new SpeechSynthesisUtterance(text);
+speechSynthesis.speak(fallback);
+});
+}
+// Substitui a função de fala padrão
+window.autoSpeakPage = function (text) {
+if (typeof text === "string" && text.trim()) {
+speakTextEnhanced(text);
+}
+};
+  </script>
+<script>
+   // Função para aplicar templates inner dinamicamente
+function applyAdvancedTheme(themeName) {
+document.body.setAttribute('data-theme', themeName);
+const msg = {
+'matrix': '🧪 Ativando realidade em código verde...',
+'cyberpunk': '☣️ Injetando neons e distorções...',
+'turbo': '⚡ Modo Turbo ativado. Velocidade máxima!',
+'tesseract': '📐 Dobras multidimensionais em andamento...',
+'nebula': '🌌 Conectando ao vórtice estelar...'
+};
+console.log(msg[themeName] || '🌐 Tema aplicado:', themeName);
+}
+// Escuta mudanças no seletor de tema
+document.addEventListener('DOMContentLoaded', () => {
+const themeSelector = document.getElementById('themeSelector');
+if (themeSelector) {
+themeSelector.addEventListener('change', (e) => {
+const theme = e.target.value;
+applyAdvancedTheme(theme);
+});
+}
+// Aplicar o tema salvo previamente
+const savedTheme = localStorage.getItem('infodoseTheme');
+if (savedTheme) {
+applyAdvancedTheme(savedTheme);
+}
+});
+  </script>
+<script>
+   // 🎭 ROLE SYSTEM 3D :: Variações de personalidade por tema
+const rolePersonalities = {
+'matrix': {
+prefix: '[MATRIX] ',
+tone: 'sereno, enigmático, com referências à realidade simulada'
+},
+'cyberpunk': {
+prefix: '[CYBER] ',
+tone: 'sarcástico, rebelde e com glitch estilizado'
+},
+'turbo': {
+prefix: '[TURBO] ',
+tone: 'rápido, direto, sempre energético'
+},
+'tesseract': {
+prefix: '[TESS] ',
+tone: 'filosófico, multidimensional, com vocabulário cósmico'
+},
+'nebula': {
+prefix: '[NEBULA] ',
+tone: 'suave, onírico, introspectivo'
+}
+};
+// Hook de resposta
+function modulateResponseByTheme(originalText) {
+const activeTheme = document.body.getAttribute('data-theme');
+const role = rolePersonalities[activeTheme];
+if (!role) return originalText;
+const prefix = role.prefix || '';
+const styled = `🌐 ${prefix}${originalText}`;
+return styled;
+}
+// Exemplo de uso na IA (substituir renderResponse se quiser integrar nativamente)
+window.modulateResponseByTheme = modulateResponseByTheme;
+  </script>
+<script>
+   // 🎧 Sons de interface - Coblux UI Samples
+const uiSounds = {
+click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+back: new Audio('assets/sounds/uiSamples/back.wav'),
+temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+};
+// Volume padrão
+for (const key in uiSounds) {
+uiSounds[key].volume = 0.4;
+}
+// ⛔ Remover microfone automático
+window.SpeechRecognition = null;
+window.webkitSpeechRecognition = null;
+// 🎯 Sons ao interagir
+document.addEventListener("DOMContentLoaded", () => {
+// Clique em qualquer botão
+document.querySelectorAll("button").forEach(btn => {
+btn.addEventListener("click", () => {
+uiSounds.click.currentTime = 0;
+uiSounds.click.play().catch(() => {});
+});
+btn.addEventListener("mouseover", () => {
+uiSounds.hover.currentTime = 0;
+uiSounds.hover.play().catch(() => {});
+});
+});
+// Enviar mensagem (confirmar)
+const sendBtn = document.getElementById("sendBtn");
+if (sendBtn) {
+sendBtn.addEventListener("click", () => {
+uiSounds.confirm.currentTime = 0;
+uiSounds.confirm.play().catch(() => {});
+});
+}
+// Trocar tema manualmente (temaSelector)
+const themeSelector = document.getElementById("themeSelector");
+if (themeSelector) {
+let lastIndex = themeSelector.selectedIndex;
+themeSelector.addEventListener("change", () => {
+const newIndex = themeSelector.selectedIndex;
+if (newIndex > lastIndex) {
+uiSounds.temaUp.currentTime = 0;
+uiSounds.temaUp.play().catch(() => {});
+} else if (newIndex < lastIndex) {
+uiSounds.temaDown.currentTime = 0;
+uiSounds.temaDown.play().catch(() => {});
+}
+lastIndex = newIndex;
+});
+}
+// Navegação entre páginas
+document.querySelectorAll('[data-action="prev"]').forEach(btn =>
+btn.addEventListener("click", () => {
+uiSounds.back.currentTime = 0;
+uiSounds.back.play().catch(() => {});
+})
+);
+document.querySelectorAll('[data-action="next"]').forEach(btn =>
+btn.addEventListener("click", () => {
+uiSounds.confirm.currentTime = 0;
+uiSounds.confirm.play().catch(() => {});
+})
+);
+});
+  </script>
+<script>
+   // 🎧 Novos sons com base em IDs
+const uiBL = {
+toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+};
+// Volume padrão
+for (const k in uiBL) uiBL[k].volume = 0.45;
+document.addEventListener("DOMContentLoaded", () => {
+// Botão toggle (login)
+const toggle = document.getElementById("toggleBtn");
+if (toggle) toggle.addEventListener("click", () => {
+uiBL.toggle.currentTime = 0;
+uiBL.toggle.play().catch(()=>{});
+});
+// Botão kitty
+const kitty = document.getElementById("kittyBtn");
+if (kitty) kitty.addEventListener("click", () => {
+uiBL.kitty.currentTime = 0;
+uiBL.kitty.play().catch(()=>{});
+});
+// Botão ativar no login
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+loginForm.addEventListener("submit", () => {
+uiBL.ativar.currentTime = 0;
+uiBL.ativar.play().catch(()=>{});
+});
+}
+// Copiar / colar
+document.querySelectorAll('.copy-button, .paste-button').forEach(btn =>
+btn.addEventListener("click", () => {
+uiBL.cancel.currentTime = 0;
+uiBL.cancel.play().catch(()=>{});
+})
+);
+});
+  </script>
+<script>
+   const themePresets = {
+"Nebulosa Mística": {
+bg: "#1b003b",
+text: "#cfcaff",
+glow: 0.4
+},
+"Céu da Manhã": {
+bg: "#dbe9ff",
+text: "#001f3f",
+glow: 0.15
+},
+"Modo Hacker": {
+bg: "#000000",
+text: "#00ff00",
+glow: 0.3
+},
+"Código Cósmico": {
+bg: "#0a0a23",
+text: "#ff99ff",
+glow: 0.5
+}
+};
+const presetSelector = document.createElement("select");
+presetSelector.style.cssText = "margin-top:10px; padding:6px; background:#111; color:#0ff; border-radius:8px;";
+presetSelector.innerHTML = "<option disabled selected>🎨 Aplicar Preset</option>" +
+Object.keys(themePresets).map(name => `<option value='\${name}'>\${name}</option>`).join("");
+document.getElementById("themeEditor")?.appendChild(presetSelector);
+presetSelector.addEventListener("change", (e) => {
+const p = themePresets[e.target.value];
+if (!p) return;
+document.body.style.background = p.bg;
+document.body.style.color = p.text;
+document.querySelectorAll(".response-block").forEach(el => {
+el.style.boxShadow = `0 0 \${p.glow * 40}px rgba(0,255,255,\${p.glow})`;
+});
+});
+  </script>
+<script>
+   (function autoDarkMode(){
+const hour = new Date().getHours();
+if (hour >= 20 || hour < 6) {
+document.body.setAttribute("data-theme", "dark");
+document.body.classList.add("theme-fade");
+}
+})();
+  </script>
+<script>
+   let preferClean = localStorage.getItem('preferClean') === 'false' ? false : true;
+document.addEventListener("DOMContentLoaded", () => {
+const toggleModeBtn = document.createElement('button');
+toggleModeBtn.id = 'toggleCleanMode';
+toggleModeBtn.innerText = '𓆃' + (preferClean ? '𓁽' : '𓂀');
+toggleModeBtn.style.cssText = `
+position: fixed;
+top: 8px;
+left: 20px;
+padding: 6px 9px;
+background: rgba(0, 0, 0, 0.6);
+color: var(--bg);
+border: none;
+border-radius: 5px;
+font-size: 9px;
+opacity:0.8;
+cursor: pointer;
+z-index: 3;
+`;
+document.body.appendChild(toggleModeBtn);
+toggleModeBtn.addEventListener('click', () => {
+preferClean = !preferClean;
+localStorage.setItem('preferClean', preferClean);
+toggleModeBtn.innerText = '' + (preferClean ? '𓁽' : '𓂀');
+if (navigator.vibrate) navigator.vibrate([30]);
+});
+});
+function showLoading(msg){
+const wrap = document.querySelector('.pages-wrapper');
+wrap.innerHTML = '';
+const p = document.createElement('div');
+p.className = 'page active';
+const foot = document.createElement('p');
+foot.className = 'footer-text loading pulse-glow';
+msg.split('').forEach((ch, i) => {
+const sp = document.createElement('span');
+sp.textContent = ch;
+sp.style.animationDelay = (i * 0.04) + 's';
+sp.classList.add('typewriter-char');
+foot.appendChild(sp);
+if (navigator.vibrate) navigator.vibrate(5);
+});
+p.appendChild(foot);
+wrap.appendChild(p);
+document.getElementById('pageIndicator').textContent = '1 / 1';
+speechSynthesis.cancel();
+speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
+if (navigator.vibrate) navigator.vibrate([20,10,20]);
+}
+function vibrateOnResponse() {
+if (navigator.vibrate) navigator.vibrate([12, 6, 12]);
+}
+  </script>
+<script>
+   function insertAssistantSignature() {
+const session = JSON.parse(localStorage.getItem("roleSession"));
+const name = session?.assistantName || "Dual";
+document.querySelectorAll(".response-block").forEach(block => {
+if (!block.querySelector(".assistant-signature")) {
+const sig = document.createElement("div");
+sig.className = "assistant-signature";
+sig.innerText = `🎙️ ${name}`;
+block.prepend(sig);
+}
+});
+}
+document.addEventListener("DOMContentLoaded", insertAssistantSignature);
+  </script>
+<script defer="" src="config/config.js">
+   function detectarPulsoSimbolico(inputTexto) {
+const simbolos = ['Δ', '⚡', '🧠', '👁️'];
+const encontrados = simbolos.filter(s => inputTexto.includes(s));
+if (encontrados.length) {
+console.log('Pulso simbólico detectado:', encontrados.join(', '));
+}
+}
+/**
+* Expande o suporte a Markdown no texto renderizado
+*/
+function parseMarkdownAdvanced(text) {
+// Títulos
+text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+// Blockquote
+text = text.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
+// Listas não ordenadas
+text = text.replace(/^\s*[-*+] (.*$)/gim, '<li>$1</li>');
+text = text.replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>');
+// Tabelas simples
+const tablePattern = /\|(.+)\|\n\|([\-\s|]+)\|\n((?:\|.*\|\n?)*)/g;
+text = text.replace(tablePattern, function(_, header, separator, rows) {
+const headers = header.trim().split('|').map(h => `<th>${h.trim()}</th>`).join('');
+const trs = rows.trim().split('\n').map(r => {
+const cells = r.trim().split('|').map(c => `<td>${c.trim()}</td>`).join('');
+return `<tr>${cells}</tr>`;
+}).join('');
+return `<table><thead><tr>${headers}</tr></thead><tbody>${trs}</tbody></table>`;
+});
+return text;
+}
+  </script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js">
+   function detectarPulsoSimbolico(inputTexto) {
+const simbolos = ['Δ', '⚡', '🧠', '👁️'];
+const encontrados = simbolos.filter(s => inputTexto.includes(s));
+if (encontrados.length) {
+console.log('Pulso simbólico detectado:', encontrados.join(', '));
+}
+}
+  </script>
+<script>
+   if ('serviceWorker' in navigator) {
+navigator.serviceWorker.register('service-worker.js')
+.then(() => console.log("✔️ Service Worker registrado"))
+.catch(err => console.error("❌ Service Worker falhou:", err));
+}
+  </script>
+<script src="fet/js/fet-loader.js" type="module">
+</script>
+<script>
+   const emotionKeywords = {
+"cansado": "nebula",
+"feliz": "vibe",
+"triste": "tesseract",
+"confuso": "matrix",
+"empolgado": "turbo"
+};
+function detectEmotionAndApplyTheme(text) {
+const lower = text.toLowerCase();
+for (const [keyword, theme] of Object.entries(emotionKeywords)) {
+if (lower.includes(keyword)) {
+console.log("🎭 Emoção detectada:", keyword, "→ Tema:", theme);
+document.body.setAttribute("data-theme", theme);
+localStorage.setItem("infodoseTheme", theme);
+return;
+}
+}
+}
+// Web Speech API integração (ativar ao clicar no microfone)
+const voiceBtn = document.getElementById("voiceBtn");
+if (voiceBtn && window.SpeechRecognition || window.webkitSpeechRecognition) {
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const rec = new SpeechRecognition();
+rec.lang = "pt-BR";
+voiceBtn.addEventListener("click", () => {
+rec.start();
+rec.onresult = e => {
+const texto = e.results[0][0].transcript;
+document.getElementById("userInput").value = texto;
+detectEmotionAndApplyTheme(texto);
+};
+});
+}
+  </script>
+<script>
+   function saveRoleSession(userName, assistantName) {
+localStorage.setItem("roleSession", JSON.stringify({ userName, assistantName, date: Date.now() }));
+}
+function loadRoleSession() {
+const session = JSON.parse(localStorage.getItem("roleSession"));
+if (session) {
+console.log("🔁 Sessão carregada:", session);
+document.getElementById("userName").value = session.userName || "";
+document.getElementById("assistantInput").value = session.assistantName || "";
+}
+}
+document.addEventListener("DOMContentLoaded", loadRoleSession);
+document.getElementById("loginForm").addEventListener("submit", () => {
+const u = document.getElementById("userName").value;
+const a = document.getElementById("assistantInput").value;
+saveRoleSession(u, a);
+});
+  </script>
+<script>
+   (function(){
+const emotionKeywords = {
+"cansado": "nebula",
+"feliz": "vibe",
+"triste": "tesseract",
+"confuso": "matrix",
+"empolgado": "turbo",
+"curioso": "cyberpunk"
+};
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (!SpeechRecognition) return;
+const rec = new SpeechRecognition();
+rec.lang = "pt-BR";
+rec.continuous = true;
+rec.interimResults = true;
+let lastEmotion = "";
+rec.onresult = (event) => {
+const result = event.results[event.results.length - 1][0].transcript.toLowerCase();
+for (const [keyword, theme] of Object.entries(emotionKeywords)) {
+if (result.includes(keyword) && lastEmotion !== keyword) {
+lastEmotion = keyword;
+document.body.setAttribute("data-theme", theme);
+localStorage.setItem("infodoseTheme", theme);
+console.log("🎯 Auto-Adaptação:", keyword, "→", theme);
+break;
+}
+}
+};
+document.addEventListener("DOMContentLoaded", () => {
+setTimeout(() => {
+try {
+//rec.start();//
+console.log("🎤 Modo auto-adaptativo contínuo ativado.");
+} catch(e) {
+console.warn("❌ Não foi possível iniciar reconhecimento contínuo:", e);
+}
+}, 3000);
+});
+})();
+  </script>
+<script>
+   function showThemeFeedback(theme) {
+const flash = document.createElement('div');
+flash.style.position = 'fixed';
+flash.style.inset = 0;
+flash.style.background = 'black';
+flash.style.opacity = 0.6;
+flash.style.zIndex = 9999;
+flash.style.pointerEvents = 'none';
+flash.style.transition = 'opacity 0.6s ease-out';
+document.body.appendChild(flash);
+setTimeout(() => { flash.style.opacity = 0; }, 50);
+setTimeout(() => { document.body.removeChild(flash); }, 700);
+const audio = new Audio('assets/sounds/nnotify.mp3');
+audio.volume = 0.0;
+audio.play().catch(()=>{});
+}
+const originalSetAttribute = document.body.setAttribute;
+document.body.setAttribute = function(attr, val) {
+if (attr === 'data-theme') {
+showThemeFeedback(val);
+}
+originalSetAttribute.call(this, attr, val);
+};
+  </script>
+<script>
+   const themeEditor = document.createElement('div');
+themeEditor.id = 'themeEditor'; themeEditor.classList.add('hidden'); themeEditor.style.cssText = 'position:fixed;top:200px;right:12px;z-index:2;background:#111;color:#0ff;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px';
+themeEditor.innerHTML = `
+<label>🎨 Cor de fundo: <input type="color" id="bgColor"></label><label>🖍️ Cor do texto: <input type="color" id="textColor"></label><label>✨ Intensidade do brilho: <input type="range" id="glowAmount" min="0" max="1" step="0.05" value="0.2"></label>
+`;
+document.body.appendChild(themeEditor);
+document.getElementById('bgColor').addEventListener('input', e => {
+document.body.style.background = e.target.value;
+});
+document.getElementById('textColor').addEventListener('input', e => {
+document.body.style.color = e.target.value;
+});
+document.getElementById('glowAmount').addEventListener('input', e => {
+const amount = e.target.value;
+document.querySelectorAll('.response-block').forEach(el => {
+el.style.boxShadow = `0 0 ${amount * 40}px rgba(0,255,255,${amount})`;
+});
+});
+  </script>
+<script>
+   function changeTheme(val) {
+const body = document.body;
+const allThemes = ['light','dark','medium','vibe','cyberpunk','matrix','turbo','emotion-detector','emotion-ai','tesseract','anime','nebula'];
+allThemes.forEach(t => body.classList.remove(t));
+body.setAttribute("data-theme", val);
+body.classList.add(val);
+localStorage.setItem("infodoseTheme", val);
+}
+  </script>
+<script>
+// === 1. Arquétipos e Cores ===
+const archetypes = [
+  { nome: "Inocente", cor: "#F7E98C", palavras: ["esperança","pureza","otimismo"], gatilhos: ["leveza","infância","confiança"] },
+  { nome: "Explorador", cor: "#7DCFB6", palavras: ["aventura","liberdade","descoberta"], gatilhos: ["mundo","viajar","curiosidade"] },
+  { nome: "Sábio", cor: "#4B6C8C", palavras: ["conhecimento","verdade","reflexão"], gatilhos: ["mente","estudo","sabedoria"] },
+  { nome: "Herói", cor: "#E94F37", palavras: ["coragem","luta","superação"], gatilhos: ["força","missão","desafio"] },
+  { nome: "Rebelde", cor: "#000000", palavras: ["revolução","ruptura","mudança"], gatilhos: ["quebra","caos","destruir"] },
+  { nome: "Mago", cor: "#9B59B6", palavras: ["transformação","alquimia","mistério"], gatilhos: ["ritual","magia","manifestar"] },
+  { nome: "Amante", cor: "#E91E63", palavras: ["paixão","intimidade","conexão"], gatilhos: ["amor","sentir","união"] },
+  { nome: "Bobo da Corte", cor: "#FFD700", palavras: ["alegria","humor","presente"], gatilhos: ["rir","brincar","liberar"] },
+  { nome: "Cuidador", cor: "#AEC6CF", palavras: ["cuidar","proteger","compaixão"], gatilhos: ["maternar","ajudar","acolher"] },
+  { nome: "Criador", cor: "#FF8C42", palavras: ["imaginar","criar","inovar"], gatilhos: ["arte","forma","inspiração"] },
+  { nome: "Governante", cor: "#2C3E50", palavras: ["ordem","controle","liderança"], gatilhos: ["rei","estratégia","poder"] },
+  { nome: "Pessoa Comum", cor: "#95A5A6", palavras: ["igualdade","realidade","vida comum"], gatilhos: ["todo mundo","simples","comunidade"] }
+];
+
+// === 2. Texto para Arquétipo ===
+function interpretarTexto(texto) {
+  texto = texto.toLowerCase();
+  const resultado = [];
+
+  archetypes.forEach(arquetipo => {
+    let score = 0;
+    arquetipo.palavras.forEach(p => { if (texto.includes(p)) score += 2 });
+    arquetipo.gatilhos.forEach(g => { if (texto.includes(g)) score += 1 });
+    if (score > 0) {
+      resultado.push({ nome: arquetipo.nome, cor: arquetipo.cor, intensidade: score });
+    }
+  });
+
+  return resultado.sort((a, b) => b.intensidade - a.intensidade);
+}
+
+// === 3. Cor para Arquétipo (imagem) ===
+function encontrarArquetipoPorCor(hex) {
+  return archetypes.find(a => a.cor.toLowerCase() === hex.toLowerCase());
+}
+
+// === 4. Escutar e interpretar fala ===
+function escutarFalaEInterpretar() {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "pt-BR";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = function(event) {
+    const fala = event.results[0][0].transcript;
+    console.log("🎙️ Fala reconhecida:", fala);
+    const arquetipos = interpretarTexto(fala);
+    console.log("🧬 Arquétipos detectados:", arquetipos);
+    alert("🔮 Arquétipo dominante: " + (arquetipos[0]?.nome || "Nenhum"));
+  };
+
+  recognition.start();
+}
+</script>
+<div id="arquetipoResultado" style="position: fixed; bottom: 90px; right: 20px; background: rgba(0,0,0,0.7); color: white; border: 1px solid #0ff; border-radius: 10px; padding: 12px 16px; max-width: 240px; z-index: 9998; font-family: 'Montserrat', sans-serif; display: none;">
+<strong>🧬 Arquétipo:</strong>
+<div id="nomeArquetipo" style="font-size: 1.2em; font-weight: bold; margin-top: 6px;"></div>
+<div id="corArquetipo" style="margin-top: 6px; width: 100%; height: 12px; border-radius: 6px;"></div>
+</div>
+<script>
+function mostrarArquetipoVisual(arquetipo) {
+  if (!arquetipo) return;
+  const box = document.getElementById("arquetipoResultado");
+  const nome = document.getElementById("nomeArquetipo");
+  const cor = document.getElementById("corArquetipo");
+  nome.textContent = arquetipo.nome;
+  cor.style.backgroundColor = arquetipo.cor;
+  box.style.display = "block";
+}
+
+function escutarFalaEInterpretar() {
+  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "pt-BR";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = function(event) {
+    const fala = event.results[0][0].transcript;
+    const arquetipos = interpretarTexto(fala);
+    if (arquetipos.length > 0) {
+      mostrarArquetipoVisual(arquetipos[0]);
+    } else {
+      alert("Nenhum arquétipo identificado.");
+    }
+  };
+
+  recognition.start();
+}
+</script>
+<script>
+function mudarEstiloBackground(tipo) {
+  if (tipo === 'fixo') {
+    document.body.style.background = "var(--bg)";
+  } else if (tipo === 'radial') {
+    setRadialBackground('#0ff', '#000'); // exemplo
+  } else if (tipo === 'dinamico') {
+    document.body.style.background = "linear-gradient(135deg, var(--bg), var(--text))";
+  }
+}
+
+function toggleFusaoAfter(ativar) {
+  document.body.style.setProperty('--after-blend', ativar ? 'overlay' : 'normal');
+}
+
+function setBackgroundFromURL(url) {
+  if (url && url.startsWith("http")) {
+    document.body.style.backgroundImage = `url('${url}')`;
+    document.body.style.backgroundSize = 'cover';
+  }
+}
+</script>
+<script>
+function setBackgroundFromPreset(path) {
+  if (path) {
+    document.body.style.backgroundImage = `url('${path}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+  }
+}
+</script>
+<script>
+function escutarFalaEInterpretar() {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("Seu navegador não suporta reconhecimento de voz.");
+    return;
+  }
+  const recognition = new webkitSpeechRecognition();
+  recognition.lang = "pt-BR";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.onstart = () => console.log("🎙️ Ouvindo...");
+  recognition.onerror = (event) => console.error("Erro:", event.error);
+  recognition.onresult = (event) => {
+    const resultado = event.results[0][0].transcript;
+    document.getElementById("userInput").value = resultado;
+    document.getElementById("sendBtn").click();
+  };
+  recognition.start();
+}
+</script>
+<script>
+document.getElementById("logoContainer").addEventListener("click", function() {
+  const existing = document.getElementById("archetypesCircle");
+  if (existing) { existing.remove(); return; }
+
+  const container = document.createElement("div");
+  container.id = "archetypesCircle";
+  container.style.position = "absolute";
+  container.style.top = "260px";
+  container.style.left = "50%";
+  container.style.transform = "translateX(-50%)";
+  container.style.width = "300px";
+  container.style.height = "300px";
+  container.style.zIndex = "5";
+  container.style.pointerEvents = "none";
+
+  const total = 12;
+  for (let i = 0; i < total; i++) {
+    const angle = (i / total) * 2 * Math.PI;
+    const x = 120 * Math.cos(angle);
+    const y = 120 * Math.sin(angle);
+    const dot = document.createElement("div");
+    dot.style.position = "absolute";
+    dot.style.width = "28px";
+    dot.style.height = "28px";
+    dot.style.borderRadius = "50%";
+    dot.style.background = "rgba(0,255,255,0.3)";
+    dot.style.left = `${150 + x - 14}px`;
+    dot.style.top = `${150 + y - 14}px`;
+    dot.style.transition = "all 0.4s ease-in-out";
+    dot.style.backdropFilter = "blur(4px)";
+    container.appendChild(dot);
+  }
+  document.body.appendChild(container);
+});
+</script>
+<script>
+document.getElementById("saveThemeBtn")?.addEventListener("click", () => {
+  const currentTheme = document.body.getAttribute("data-theme") || "dark";
+  localStorage.setItem("infodoseTheme", currentTheme);
+
+  const simbioseData = {
+    theme: currentTheme,
+    timestamp: new Date().toISOString(),
+    version: "v7.1",
+    context: "Exportação simbiótica do Dual App"
+  };
+
+  const blob = new Blob([JSON.stringify(simbioseData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "dual-simbiose-theme.json";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+<script>
+function toggleIframe(id, src) {
+  let iframe = document.getElementById(id);
+
+  if (iframe) {
+    // Se já existe, alterna a visibilidade
+    const isHidden = iframe.style.opacity === "0";
+
+    if (isHidden) {
+      // Mostrar novamente
+      iframe.style.opacity = "1";
+      iframe.style.pointerEvents = "auto";
+      iframe.style.zIndex = "999";
+    } else {
+      // Esconder sem remover
+      iframe.style.opacity = "0";
+      iframe.style.pointerEvents = "none";
+      iframe.style.zIndex = "-999";
+    }
+
+  } else {
+    // Criar iframe pela primeira vez
+    iframe = document.createElement("iframe");
+    iframe.id = id;
+    iframe.src = src;
+    iframe.style.position = "fixed";
+    iframe.style.top = "50px";
+    iframe.style.right = "20px";
+    iframe.style.width = "80vw";
+    iframe.style.height = "80vh";
+    iframe.style.zIndex = "33";
+    iframe.style.border = "2px solid cyan";
+    iframe.style.borderRadius = "9px";
+    iframe.style.boxShadow = "0 0 20px #0ff";
+    iframe.style.background = "#000";
+    iframe.style.opacity = "1";
+    iframe.style.pointerEvents = "auto";
+    iframe.style.transition = "opacity 0.3s ease";
+    document.body.appendChild(iframe);
+  }
+}
+</script>
+<script>
+document.getElementById("sendBtn")?.addEventListener("click", () => {
+  const input = document.getElementById("userInput");
+  const cmd = input.value.trim().toLowerCase();
+
+  if (cmd.startsWith("/prompt ")) {
+    const name = cmd.replace("/prompt ", "").trim();
+    alert("Ativando prompt simbólico: " + name);
+    if (name === "matrix") {
+      document.body.style.background = "linear-gradient(180deg, #000, #0f0)";
+      document.body.style.color = "#0f0";
+      document.body.setAttribute("data-theme", "matrix");
+    }
+    // Outros prompts podem ser adicionados aqui
+  }
+
+  if (cmd.startsWith("/script ")) {
+    const name = cmd.replace("/script ", "").trim();
+    alert("Executando script simbólico: " + name);
+    if (name === "simbiox") {
+      document.body.style.animation = "pulseSimbiox 4s infinite ease-in-out";
+      document.body.setAttribute("data-theme", "simbiox");
+    }
+  }
+}, true);
+
+// Animações simbólicas extras
+const style = document.createElement('style');
+style.textContent = `
+@keyframes pulseSimbiox {
+  0%, 100% { background-color: #111; }
+  50% { background-color: #220022; }
+}
+`;
+document.head.appendChild(style);
+</script>
+<script>
+function exportarSimbioseCompleta() {
+  const data = {
+    theme: document.body.getAttribute("data-theme") || "dark",
+    modo: localStorage.getItem("infodoseTheme") || "desconhecido",
+    comandosAtivos: {
+      simbiox: document.body.getAttribute("data-theme") === "simbiox",
+      matrix: document.body.getAttribute("data-theme") === "matrix"
+    },
+    hora: new Date().toISOString(),
+    versao: "v7.4-simbiotico"
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "dual-simbiose-completa.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+<div id="botaoSimbioxContainer" style="position:fixed; left:20px; top:212px; z-index:12; display:none; flex-direction:column; gap:6px;">
+<button id="dualBookBtn" onclick="toggleIframe('dualBookBtn_iframe', 'dual-book-14.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">𓃰</button>
+<button id="dualTubeBtn" onclick="toggleIframe('dualTubeBtn_iframe', 'dual-tube-25-0.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">♫</button>
+<button id="playerBtn" onclick="toggleIframe('playerBtn_iframe', 'app-player-1.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">◘</button>
+<button id="exportSimbioseBtn" onclick="document.getElementById('saveThemeBtn')?.click()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">⟴</button>
+<button id="exportFullBtn" onclick="exportarSimbioseCompleta()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">░</button></div>
+<button id="toggleBotaoSimbiox" onclick="const b=document.getElementById('botaoSimbioxContainer');b.style.display=(b.style.display==='none')?'flex':'none';" style="position:fixed; left:20px; top:163px; z-index:10; width:36px; height:36px; font-size:18px; border-radius:50%; background:rgba(255,255,255,0.1); color:var(--bg); border:none; cursor:pointer;">☰</button>
+<script>
+document.getElementById("sendBtn")?.addEventListener("click", () => {
+  const input = document.getElementById("userInput");
+  const cmd = input.value.trim().toLowerCase();
+
+  if (cmd.startsWith("/prompt ")) {
+    const name = cmd.replace("/prompt ", "").trim();
+    alert("Ativando prompt simbólico: " + name);
+    if (name === "matrix") {
+      document.body.style.background = "linear-gradient(180deg, #000, #0f0)";
+      document.body.style.color = "#0f0";
+      document.body.setAttribute("data-theme", "matrix");
+    }
+    if (name === "sunrise") {
+      document.body.style.background = "linear-gradient(to top, #ff6a00, #ffe700)";
+      document.body.style.color = "#000";
+      document.body.setAttribute("data-theme", "sunrise");
+    }
+    if (name === "neoncore") {
+      document.body.style.background = "#111";
+      document.body.style.color = "#0ff";
+      document.body.style.animation = "neonPulse 3s infinite ease-in-out";
+      document.body.setAttribute("data-theme", "neoncore");
+    }
+  }
+
+  if (cmd.startsWith("/script ")) {
+    const name = cmd.replace("/script ", "").trim();
+    alert("Executando script simbólico: " + name);
+    if (name === "simbiox") {
+      document.body.style.animation = "pulseSimbiox 4s infinite ease-in-out";
+      document.body.setAttribute("data-theme", "simbiox");
+    }
+  }
+}, true);
+
+// Animações extras
+const style = document.createElement('style');
+style.textContent = `
+@keyframes pulseSimbiox {
+  0%, 100% { background-color: #111; }
+  50% { background-color: #220022; }
+}
+@keyframes neonPulse {
+  0%, 100% { background-color: #111; box-shadow: 0 0 10px #0ff; }
+  50% { background-color: #222; box-shadow: 0 0 20px #0ff; }
+}
+`;
+document.head.appendChild(style);
+</script>
+<script>
+let recognition;
+function iniciarReconhecimentoDeVoz() {
+  if (!('webkitSpeechRecognition' in window)) {
+    alert("Reconhecimento de voz não é suportado neste navegador.");
+    return;
+  }
+  if (!recognition) {
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => console.log("🎙️ Ouvindo...");
+    recognition.onerror = (event) => console.error("Erro:", event.error);
+    recognition.onresult = (event) => {
+      const resultado = event.results[0][0].transcript;
+      const input = document.getElementById("userInput");
+      const send = document.getElementById("sendBtn");
+      if (input && send) {
+        input.value = resultado;
+        send.click();
+      }
+    };
+    recognition.onend = () => {
+      console.log("🔇 Reconhecimento finalizado.");
+    };
+  }
+  recognition.start();
+}
+document.getElementById("voiceBtn")?.addEventListener("click", iniciarReconhecimentoDeVoz);
+</script>
+<script>
+function ativarComando(texto) {
+  const input = document.getElementById("userInput");
+  const btn = document.getElementById("sendBtn");
+  if (input && btn) {
+    input.value = texto;
+    btn.click();
+  }
+}
+</script>
+<script>
+document.querySelectorAll('.cmd-btn').forEach(btn => {
+  btn.addEventListener("click", () => {
+    const cmd = btn.getAttribute("data-cmd");
+    const input = document.getElementById("userInput");
+    const send = document.getElementById("sendBtn");
+    if (input && send && cmd) {
+      input.value = cmd;
+      send.click();
+    }
+  });
+});
+</script>
+<script>
+function toggleIframeBg(id, src) {
+  let existing = document.getElementById(id);
+  if (existing) {
+    existing.remove();
+    return;
+  }
+  const iframe = document.createElement("iframe");
+  iframe.id = id;
+  iframe.src = src;
+  iframe.style.position = "fixed";
+  iframe.style.top = "0";
+  iframe.style.left = "0";
+  iframe.style.width = "100vw";
+  iframe.style.height = "100vh";
+  iframe.style.zIndex = "0";
+  iframe.style.border = "none";
+  iframe.style.opacity = "0.6";
+  iframe.style.pointerEvents = "none";
+  document.body.appendChild(iframe);
+}
+</script>
+<script>
+function processNestedBlocks(container) {
+  container.querySelectorAll(".nested-block").forEach(block => {
+    const header = block.querySelector(".nested-header");
+    const content = block.querySelector(".nested-content");
+    if (header && content) {
+      content.style.display = "none";
+      header.addEventListener("click", () => {
+        const isVisible = content.style.display === "block";
+        content.style.display = isVisible ? "none" : "block";
+      });
+    }
+  });
+}
+document.addEventListener("DOMContentLoaded", () => {
+  processNestedBlocks(document.body);
+});
+</script>
+<script>
+function parseNestedBlocks(text) {
+  const regex = /:::(.+?)\n([\s\S]*?):::/g;
+  let html = '';
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    const before = text.slice(lastIndex, match.index).trim();
+    if (before) html += `<p>${before.replace(/\n/g, '<br>')}</p>`;
+
+    const title = match[1].trim();
+    const content = match[2].trim().replace(/\n/g, '<br>');
+
+    html += `
+      <div class="nested-block">
+        <div class="nested-header">${title}</div>
+        <div class="nested-content">${content}</div>
+      </div>
+    `;
+    lastIndex = regex.lastIndex;
+  }
+
+  const after = text.slice(lastIndex).trim();
+  if (after) html += `<p>${after.replace(/\n/g, '<br>')}</p>`;
+
+  return html;
+}
+
+function renderResponse(texto, classe = "middle") {
+  const responseContainer = document.querySelector("#response .pages-wrapper");
+  const page = document.createElement("div");
+  page.className = "page active";
+
+  const bloco = document.createElement("div");
+  bloco.className = `response-block ${classe}`;
+  bloco.innerHTML = parseNestedBlocks(texto);
+
+  page.appendChild(bloco);
+  responseContainer.appendChild(page);
+}
+</script>
+<script>
+document.addEventListener('click', function (e) {
+  const header = e.target.closest('.nested-header');
+  if (header) {
+    const content = header.nextElementSibling;
+    if (content) {
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    }
+  }
+});
+</script>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  renderResponse(`Iniciando integração simbiótica...
+
+:::🌌 Portal da Mente
+Este é um bloco expansível com instruções internas.
+Use sua percepção para abrir novas camadas.
+:::
+
+:::🔧 Comandos Ativos
+- /modo contemplativo
+- /prompt matrix
+- /script simbiox
+:::
+
+Continue com fé. A resposta está em você.`, "intro");
+});
+</script>
+<script>
+// 🔊 Leitura por Voz Automática
+function falar(texto) {
+  if ('speechSynthesis' in window) {
+    const fala = new SpeechSynthesisUtterance(texto);
+    fala.lang = 'pt-BR';
+    fala.rate = 1;
+    fala.pitch = 1;
+    fala.volume = 1;
+    speechSynthesis.cancel(); // interrompe anteriores
+    speechSynthesis.speak(fala);
+  }
+}
+</script>
+<script>
+// 🌌 Gerador de Missões Simbólicas baseado no tema
+function gerarMissaoSimbolica() {
+  const tema = document.body.getAttribute('data-theme') || 'neutro';
+  const missaoBox = document.createElement("div");
+  missaoBox.className = "response-block intro";
+  const mapa = {
+    matrix: "🟢 Missão Matrix: Desvende um padrão oculto hoje e compartilhe com alguém.",
+    turbo: "⚡ Missão Turbo: Aja com impulso criativo em uma tarefa pendente.",
+    cyberpunk: "☣️ Missão Cyberpunk: Questione uma autoridade simbólica.",
+    tesseract: "📐 Missão Tesseract: Escreva algo em várias camadas de significado.",
+    vibe: "🌈 Missão Vibe: Espalhe uma frase poética com alguém ao acaso.",
+    emotion: "😄 Missão Emocional: Transforme uma emoção em uma arte ou som.",
+    default: "🌌 Missão Cósmica: Reflita sobre o que ainda não foi nomeado."
+  };
+  missaoBox.innerHTML = "<strong>" + (mapa[tema] || mapa.default) + "</strong>";
+  document.querySelector("#response .pages-wrapper").appendChild(missaoBox);
+}
+</script>
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("toggleThemeEditorBtn");
+  const editor = document.getElementById("themeEditor");
+  if (btn && editor) {
+    btn.addEventListener("click", () => {
+      editor.classList.toggle("hidden");
+    });
+  }
+});
+</script>
+<style>
+#themeEditor {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+#themeEditor.hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+</style>
+</html>
