@@ -3553,23 +3553,44 @@ document.getElementById("saveThemeBtn")?.addEventListener("click", () => {
 </script>
 <script>
 function toggleIframe(id, src) {
-  let existing = document.getElementById(id);
-  if (existing) { existing.remove(); return; }
-  const iframe = document.createElement("iframe");
-  iframe.id = id;
-  iframe.src = src;
-  iframe.style.position = "fixed";
-  iframe.style.top = "50px";
-  iframe.style.right = "20px";
+  let iframe = document.getElementById(id);
 
-  iframe.style.width = "80vw";
-  iframe.style.height = "80vh";
-  iframe.style.zIndex = "6";
-  iframe.style.border = "2px solid cyan";
-  iframe.style.borderRadius = "6px";
-  iframe.style.boxShadow = "0 0 20px #0ff";
-  iframe.style.background = "#000";
-  document.body.appendChild(iframe);
+  if (iframe) {
+    // Se já existe, alterna a visibilidade
+    const isHidden = iframe.style.opacity === "0";
+
+    if (isHidden) {
+      // Mostrar novamente
+      iframe.style.opacity = "1";
+      iframe.style.pointerEvents = "auto";
+      iframe.style.zIndex = "999";
+    } else {
+      // Esconder sem remover
+      iframe.style.opacity = "0";
+      iframe.style.pointerEvents = "none";
+      iframe.style.zIndex = "-999";
+    }
+
+  } else {
+    // Criar iframe pela primeira vez
+    iframe = document.createElement("iframe");
+    iframe.id = id;
+    iframe.src = src;
+    iframe.style.position = "fixed";
+    iframe.style.top = "50px";
+    iframe.style.right = "20px";
+    iframe.style.width = "80vw";
+    iframe.style.height = "80vh";
+    iframe.style.zIndex = "33";
+    iframe.style.border = "2px solid cyan";
+    iframe.style.borderRadius = "9px";
+    iframe.style.boxShadow = "0 0 20px #0ff";
+    iframe.style.background = "#000";
+    iframe.style.opacity = "1";
+    iframe.style.pointerEvents = "auto";
+    iframe.style.transition = "opacity 0.3s ease";
+    document.body.appendChild(iframe);
+  }
 }
 </script>
 <script>
