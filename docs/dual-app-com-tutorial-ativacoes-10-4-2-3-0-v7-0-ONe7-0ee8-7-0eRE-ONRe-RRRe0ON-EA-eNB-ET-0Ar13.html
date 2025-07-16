@@ -4044,7 +4044,7 @@ document.getElementById("btn-modos").onclick = () => {
 <button id="btn-funcoes" style="
   position:fixed;
   bottom:10px;
-  right:40px;
+  left:160px;
   z-index:10000;
   background:#000;
   color:#0ff;
@@ -4089,8 +4089,8 @@ document.getElementById("btn-funcoes").onclick = () => {
   position: fixed;
   bottom: 60px;
   right: 10px;
-  width: 28px;
-  height: 18px;
+  width: 280px;
+  height: 180px;
   background: rgba(0,0,0,0.8);
   color: #0ff;
   border: 1px solid #0ff;
@@ -4121,7 +4121,7 @@ function logEstadoEnergetico() {
   const energia = document.createElement("div");
   energia.innerHTML = `
     <div style="margin-top: 6px; border-top:1px solid #0ff; padding-top:6px;">
-      <b>🔋 Energia Siimby.US:</b><br>
+      <b>🔋 Energia IA:</b><br>
       🧠 Foco: <span style='color:#0f0;'>87%</span><br>
       🔮 Imaginação: <span style='color:#f0f;'>Ativa</span><br>
       🌀 Simbiose: <span style='color:#0ff;'>ON</span>
@@ -4142,7 +4142,7 @@ document.getElementById("btn-funcoes").onclick = () => {
 <style>
 #circle-container {
   position: absolute;
-  top: 200px;
+  top: 260px;
   left: 50%;
   transform: translateX(-50%);
   width: 300px;
@@ -4194,8 +4194,8 @@ svgLogo.onclick = () => {
 
       const el = document.createElement("div");
       el.className = "arquetipo-circle";
-      el.style.left = (90 + x - 20) + "px";
-      el.style.top = (90 + y - 20) + "px";
+      el.style.left = (150 + x - 20) + "px";
+      el.style.top = (150 + y - 20) + "px";
       el.style.background = arq.cor;
       el.title = arq.nome;
       el.innerText = arq.emoji;
@@ -4262,7 +4262,7 @@ document.addEventListener("DOMContentLoaded", () => {
     boom.style.borderRadius = "50%";
     boom.style.background = "radial-gradient(circle, #0ff, #f0f0ff, transparent)";
     boom.style.pointerEvents = "none";
-    boom.style.animation = "pulse 0.2s ease-out";
+    boom.style.animation = "pulse 0.4s ease-out";
     document.body.appendChild(boom);
     setTimeout(() => boom.remove(), 1000);
   }
