@@ -4013,10 +4013,10 @@ const themeSounds = {
   "default": "assets/sounds/uiSounds/tech-pop.wav"
 };
 </script>
-<div id="debug-simbolico" style="display:none; position:fixed; bottom:10px; right:10px; background:black; color:#0ff; padding:8px; border:1px solid #0ff; font-size:0.75em; z-index:9999;">
+<div id="debug-simbolico" style="display:none; position:fixed; bottom:10px; right:30px; background:black; color:#0ff; padding:8px; border:1px solid #0ff; font-size:0.75em; z-index:9999;">
   🧿 Modo simbiótico ativo<br/><div id="log-interno"></div>
 </div>
-<button id="toggle-debug" style="position:fixed; bottom:10px; right:10px; z-index:10000;; display:inline-flex; width:auto; height:auto; font-size:14px;">🌀</button>
+<button id="toggle-debug" style="position:fixed; bottom:10px; right:10px; z-index:10000;; display:inline-flex; width:24px; max-width:auto; height:auto; font-size:14px;">🌀</button>
 <script>
 document.getElementById("toggle-debug").onclick = () => {
   const dbg = document.getElementById("debug-simbolico");
