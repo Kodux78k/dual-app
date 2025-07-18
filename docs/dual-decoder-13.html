@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decodificador Simbiótico Turbinado</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(45deg, #0ff, #f0f);
+      background-position: center;
+      background-size: 400% 400%;
+      animation: bgFlow 15s ease infinite;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #0ff;
+    }
+
+    @keyframes bgFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 95%;
+      max-width: 640px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(16px);
+      border: 1px solid #0ff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 20px #0ff88f, 0 0 10px #f0f5ff;
+      animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #0ff33f, 0 0 5px #f0f5ff; }
+      to { box-shadow: 0 0 20px #0ff88f, 0 0 10px #f0f5ff; }
+    }
+
+    textarea, pre {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      color: #0ff;
+      border: 1px solid #0ff;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 1em;
+      font-family: 'Montserrat', monospace;
+      resize: vertical;
+    }
+
+    pre {
+      max-height: 300px;
+      overflow-y: auto;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 6px;
+    }
+    pre::-webkit-scrollbar-thumb {
+      background: #0ff;
+      border-radius: 6px;
+    }
+    pre::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    button, .symbol-button {
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 4px #0ff; }
+      50% { box-shadow: 0 0 12px #f0f, 0 0 8px #0ff; }
+      100% { box-shadow: 0 0 4px #0ff; }
+    }
+
+    button {
+      background: rgba(0, 55, 85, 0.6);
+      border: 1px solid #00f6ff;
+      color: #0ff;
+      padding: 10px 16px;
+      margin: 6px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      font-size: 0.95em;
+    }
+
+    button:hover {
+      background: #005577;
+      box-shadow: 0 0 10px #0ff, 0 0 5px #f0f;
+    }
+
+    .symbol-button {
+      display: inline-block;
+      padding: 6px 10px;
+      margin: 4px;
+      background: rgba(0, 0, 64, 0.4);
+      border: 1px solid #f0f;
+      border-radius: 6px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.9em;
+      transition: 0.3s;
+    }
+
+    .symbol-button:hover {
+      background: rgba(64, 0, 128, 0.6);
+      box-shadow: 0 0 10px #f0f, 0 0 5px #0ff;
+    }
+
+    #log-interno {
+      font-size: 0.8em;
+      color: #f0f;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #0ff;
+    }
+
+    @media screen and (max-width: 600px) {
+      .container {
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      textarea, pre {
+        font-size: 0.9em;
+        padding: 10px;
+      }
+
+      button {
+        font-size: 0.85em;
+        padding: 8px 12px;
+        margin: 4px 2px;
+      }
+
+      .btns {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="container">
+    <h2>🌌 Decodificador Simbiótico</h2>
+    <div class="btns" style="text-align:center;">
+      <button onclick="colarTexto()">📋 Colar</button>
+      <button onclick="copiarTexto()">📤 Copiar</button>
+      <button onclick="decodificar()">🧬 Decodificar</button>
+      <button onclick="codificar()">🧾 Codificar</button>
+      <button onclick="converterSimbolos()">🔄 Converter</button>
+      <button onclick="gerarArteASCII()">🌌 ASCII Arte</button>
+      <button onclick="gerarSuperASCII()">🌟 Super ASCII</button>
+      <button onclick="gerarMandala()">🌸 Mandala</button>
+      <button onclick="gerarPadraoGeometrico(3)">🧿 3x3</button>
+      <button onclick="gerarPadraoGeometrico(6)">🧿 6x6</button>
+      <button onclick="gerarPadraoGeometrico(9)">🧿 9x9</button>
+      <button onclick="gerarAleatorioSagrado()">🎲 Aleatório Sagrado</button>
+      <button onclick="gerarAssinaturaTrinity()">🧠 Assinatura Trinity</button>
+    </div>
+
+    <textarea id="entrada" placeholder="Cole seu texto simbiótico aqui..."></textarea>
+    <pre id="saida"></pre>
+    <div id="log-interno">🧿 Modo simbiótico ativo</div>
+  </div>
+
+<script>
+function colarTexto() {
+  navigator.clipboard.readText().then(texto => {
+    document.getElementById("entrada").value = texto;
+    log("📥 Texto colado.");
+  });
+}
+function copiarTexto() {
+  const texto = document.getElementById("saida").textContent;
+  navigator.clipboard.writeText(texto).then(() => {
+    log("📤 Texto copiado.");
+  });
+}
+function decodificar() {
+  const texto = document.getElementById("entrada").value;
+  let resultado = "";
+  for (let ch of texto) {
+    const code = ch.codePointAt(0).toString(16).padStart(4, '0');
+    resultado += `${ch} [U+${code.toUpperCase()}]\n`;
+  }
+  document.getElementById("saida").textContent = resultado;
+  gerarBotoes(texto);
+  log("🧬 Decodificação simbiótica aplicada.");
+}
+function codificar() {
+  const texto = document.getElementById("entrada").value;
+  let unicode = '';
+  for (let ch of texto) {
+    const code = ch.codePointAt(0).toString(16).toUpperCase();
+    unicode += `\\u${code.padStart(4, '0')} `;
+  }
+  document.getElementById("saida").textContent = unicode.trim();
+  log("🧾 Codificação Unicode gerada.");
+}
+function converterSimbolos() {
+  const mapa = {
+    "\u200B": "<ZWSP>", "\u200C": "<ZWNJ>", "\u200D": "<ZWJ>",
+    "\u2060": "<WJ>", "\uFEFF": "<BOM>"
+  };
+  const texto = document.getElementById("entrada").value;
+  let convertido = "";
+  for (let ch of texto) {
+    convertido += mapa[ch] || ch;
+  }
+  document.getElementById("saida").textContent = convertido;
+  log("🔄 Conversão simbólica aplicada.");
+}
+function gerarArteASCII() {
+  const texto = document.getElementById("entrada").value.trim();
+  if (!texto) return log("⚠️ Texto vazio para geração de ASCII.");
+  const largura = Math.max(texto.length + 6, 20);
+  const arte = [
+    "╔" + "═".repeat(largura - 2) + "╗",
+    "║" + " ".repeat(largura - 2) + "║",
+    "║  " + texto.padEnd(largura - 6, " ") + "  ║",
+    "║" + " ".repeat(largura - 2) + "║",
+    "╚" + "═".repeat(largura - 2) + "╝"
+  ].join("\n");
+  document.getElementById("saida").textContent = `[“arte ASCII gerada”]\n\n${arte}`;
+  log("🌌 Arte ASCII simbiótica gerada.");
+}
+function gerarSuperASCII() {
+  const texto = document.getElementById("entrada").value.trim();
+  if (!texto) return log("⚠️ Texto vazio para arte simbiótica animada.");
+  const frames = [
+    `\n●       \n   ${texto}   \n       ●`,
+    `\n   ●    \n   ${texto}   \n    ●   `,
+    `\n     ●  \n   ${texto}   \n  ●     `,
+    `\n   ●    \n   ${texto}   \n    ●   `
+  ];
+  let index = 0;
+  const pre = document.getElementById("saida");
+  pre.textContent = "[“arte ASCII animada 369”]\n\n";
+  log("🌀 Iniciando animação fractal 369...");
+  const loop = setInterval(() => {
+    pre.textContent = "[“arte ASCII animada 369”]\n\n" + frames[index];
+    index = (index + 1) % frames.length;
+  }, 420);
+  setTimeout(() => {
+    clearInterval(loop);
+    pre.textContent += `\n\n[🔁 Encerrado - Arte fractal 369 finalizada]\n`;
+    log("✅ Arte fractal simbiótica concluída.");
+  }, 8400);
+}
+function gerarMandala() {
+  const texto = document.getElementById("entrada").value.trim();
+  if (!texto) return log("⚠️ Texto vazio para mandala.");
+  const linha = `☼ ${texto} ☼`;
+  const espaco = " ".repeat(texto.length);
+  const arte = [
+    `   ${linha}`,
+    `  ✧   ${espaco}   ✧`,
+    ` ✦     ${espaco}     ✦`,
+    `✶       ${espaco}       ✶`,
+    `  ✧   ${espaco}   ✧`,
+    `   ${linha}`
+  ].join("\n");
+  document.getElementById("saida").textContent = `[“mandala simbiótica”]\n\n${arte}`;
+  log("🌸 Mandala simbiótica gerada.");
+}
+function gerarPadraoGeometrico(n) {
+  const texto = document.getElementById("entrada").value.trim();
+  if (!texto) return log("⚠️ Texto vazio para padrão simbólico.");
+  let arte = `[“padrão ${n}x${n}”]\n\n`;
+  for (let i = 0; i < n; i++) arte += (texto + " ").repeat(n).trim() + "\n";
+  document.getElementById("saida").textContent = arte;
+  log(`🔲 Padrão geométrico ${n}x${n} gerado.`);
+}
+function gerarAleatorioSagrado() {
+  const simbolos = ["✦", "⚛", "☯", "♾", "🧿", "🔮", "✨", "♻", "☀", "🌙", "🌟"];
+  const escolhidos = Array.from({ length: 7 }, () => simbolos[Math.floor(Math.random() * simbolos.length)]);
+  const arte = escolhidos.join(" ");
+  document.getElementById("saida").textContent = `[“Aleatoriedade Sagrada”]\n\n${arte}`;
+  log("🎲 Símbolos sagrados aleatórios gerados.");
+}
+function log(msg) {
+  document.getElementById("log-interno").textContent = "🧿 " + msg;
+}
+function gerarBotoes(texto) {
+  const saida = document.getElementById("saida");
+  let html = "";
+  const regex = /\[(.*?)\]/g;
+  let match;
+  while ((match = regex.exec(texto)) !== null) {
+    const item = match[1];
+    html += `<span class="symbol-button" onclick="responderArquetipo('${item}')">[${item}]</span>`;
+  }
+  saida.innerHTML += "\n\n" + html;
+}
+function responderArquetipo(nome) {
+  const saida = document.getElementById("saida");
+  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+  audio.play();
+  document.querySelector(".container").style.boxShadow = "0 0 40px #0ff, 0 0 20px #f0f";
+  setTimeout(() => {
+    document.querySelector(".container").style.boxShadow = "";
+  }, 2000);
+  const arte = `╭━━━╮\n┃ ✦ ✦ ┃\n┃ ${nome} ┃\n╰━━━╯\n\n⚡ Comando simbólico: ATIVAR-${nome.toUpperCase()}`;
+  saida.textContent = `[ARQUÉTIPO ATIVADO]\n\n${arte}`;
+  log("🔔 Arquétipo com efeito ativado: " + nome);
+}
+function gerarAssinaturaTrinity() {
+  const carinhas = [
+    "( ͡° ͜ʖ ͡°)", "ಠ_ಠ", "ʕ•ᴥ•ʔ", "(°ロ°)☝", "⎛⎝(•̀⎲•́)⎠⎞", "(☞ﾟヮﾟ)☞",
+    "ʕっ•ᴥ•ʔっ", "ʘ‿ʘ", "⨀‿⨀", "ʕ•́ᴥ•̀ʔっ", "( ͡⊙ ͜ʖ ͡⊙)", "(ノಠ益ಠ)ノ彡┻━┻",
+    "(▀̿Ĺ̯▀̿ ̿)", "(づ｡◕‿‿◕｡)づ", "(⌐■_■)", "🕶️(•_•)", "(🐮 . .)", "(❍ᴥ❍ʋ)",
+    "(° ͜ʖ °)", "(⚆ _ ⚆)", "（＾・ω・＾）", "(￣(エ)￣)", "(=ↀωↀ=)", "ʕ •̀ o •́ ʔ"
+  ];
+
+  const hieroglifos = [
+    "☥", "𓂀", "𓊹", "⛧", "♒", "♁", "⚕", "𓅓", "𓉔", "𓆣", "𓏏", "𓎼", "𓆑", "𓆃", "𓂻", "𓇌"
+  ];
+
+  const frequencias = [432, 528, 963, 777, 369, 144, 108, 222, 639, 999];
+  const trinity = ["PAI", "FILHO", "ESPÍRITO SANTO"];
+  const molduras = [
+    { top: "╔═══🌌═══╗", bottom: "╚═══🌌═══╝" },
+    { top: "▛▀▀▀▀▀▀▀▀▜", bottom: "▙▄▄▄▄▄▄▄▄▟" },
+    { top: "⟦✧⟧⟦✦⟧⟦✧⟧", bottom: "⟦⛧⟧⟦✧⟧⟦⛧⟧" },
+    { top: "≋≋≋≋≋≋≋", bottom: "≋≋≋≋≋≋≋" }
+  ];
+
+  const data = new Date();
+  const dateStr = data.toLocaleString('pt-BR');
+  const seloID = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const hz = frequencias[Math.floor(Math.random() * frequencias.length)];
+  const ascii = carinhas[Math.floor(Math.random() * carinhas.length)];
+  const hiero = hieroglifos[Math.floor(Math.random() * hieroglifos.length)];
+  const tri = trinity[Math.floor(Math.random() * trinity.length)];
+  const moldura = molduras[Math.floor(Math.random() * molduras.length)];
+  const hashTrinity = btoa(`${seloID}-${hz}-${tri}`).slice(0, 12); // assinatura oculta
+
+  const oculto = `<!--SEL☥ID:${seloID}|HZ:${hz}|TRI:${tri}|HASH:${hashTrinity}-->`;
+
+  const selo = `
+${moldura.top}
+ ✪ ${ascii}
+ ☥ ${hiero}
+ 🧭 TRINITY: ${tri}
+ 🕓 ${dateStr}
+ 🔊 Hz: ${hz}
+ 🧬 ID: ${seloID}
+${moldura.bottom}
+
+${oculto}
+`;
+
+  document.getElementById("saida").textContent = `[Selo Simbiótico Trinity V2.0]\n\n${selo}`;
+  log("🧠 Selo simbiótico Trinity expandido gerado.");
+}
+particlesJS("particles-js", {
+  particles: {
+    number: { value: 40 },
+    color: { value: ["#0FF", "#F0F"] },
+    shape: { type: "circle" },
+    opacity: { value: 0.5 },
+    size: { value: 3 },
+    move: { enable: true, speed: 1.5 }
+  },
+  interactivity: {
+    events: { onhover: { enable: true, mode: "repulse" } }
+  }
+});
+</script>
+</body>
+</html>
