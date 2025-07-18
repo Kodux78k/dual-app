@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <title>Decodificador Simbiótico Dual</title>
+  <style>
+    body {
+      background: #111;
+      color: #0ff;
+      font-family: monospace;
+      padding: 20px;
+    }
+    textarea, pre {
+      width: 100%;
+      min-height: 120px;
+      background: #000;
+      color: #0ff;
+      border: 1px solid #0ff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      background: #003355;
+      border: 1px solid #00f6ff;
+      color: #0ff;
+      padding: 6px 12px;
+      margin: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005577;
+    }
+    .btns { margin-bottom: 12px; }
+    .symbol-button {
+      display: inline-block;
+      padding: 2px 6px;
+      margin: 2px;
+      background: #022;
+      border: 1px solid #0ff;
+      color: #0ff;
+      cursor: pointer;
+      font-size: 0.95em;
+    }
+    #log-interno {
+      font-size: 0.8em;
+      color: #aaa;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔍 Decodificador Simbiótico Dual</h2>
+
+  <div class="btns">
+    <button onclick="colarTexto()">📋 Colar</button>
+    <button onclick="copiarTexto()">📤 Copiar</button>
+    <button onclick="decodificar()">🧬 Decodificar Invisíveis</button>
+    <button onclick="codificar()">🧾 Codificar (Unicode)</button>
+    <button onclick="converterSimbolos()">🔄 Converter para Visível</button>
+  </div>
+
+  <textarea id="entrada" placeholder="Cole seu texto simbiótico aqui..."></textarea>
+  <pre id="saida"></pre>
+
+  <div id="log-interno">🧿 Pronto para decodificação simbiótica</div>
+
+  <script>
+    function colarTexto() {
+      navigator.clipboard.readText().then(texto => {
+        document.getElementById("entrada").value = texto;
+        log("📥 Texto colado.");
+      });
+    }
+
+    function copiarTexto() {
+      const texto = document.getElementById("saida").textContent;
+      navigator.clipboard.writeText(texto).then(() => {
+        log("📤 Texto copiado.");
+      });
+    }
+
+    function decodificar() {
+      const texto = document.getElementById("entrada").value;
+      let resultado = "";
+      for (let ch of texto) {
+        const code = ch.codePointAt(0).toString(16).padStart(4, '0');
+        resultado += `${ch} [U+${code.toUpperCase()}]\n`;
+      }
+      document.getElementById("saida").textContent = resultado;
+      gerarBotoes(texto);
+      log("🧬 Decodificação simbiótica aplicada.");
+    }
+
+    function codificar() {
+      const texto = document.getElementById("entrada").value;
+      let unicode = '';
+      for (let ch of texto) {
+        const code = ch.codePointAt(0).toString(16).toUpperCase();
+        unicode += `\\u${code.padStart(4, '0')} `;
+      }
+      document.getElementById("saida").textContent = unicode.trim();
+      log("🧾 Codificação Unicode gerada.");
+    }
+
+    function converterSimbolos() {
+      const mapa = {
+        "\u200B": "<ZWSP>",
+        "\u200C": "<ZWNJ>",
+        "\u200D": "<ZWJ>",
+        "\u2060": "<WJ>",
+        "\uFEFF": "<BOM>"
+      };
+      const texto = document.getElementById("entrada").value;
+      let convertido = "";
+      for (let ch of texto) {
+        convertido += mapa[ch] || ch;
+      }
+      document.getElementById("saida").textContent = convertido;
+      log("🔄 Conversão simbólica aplicada.");
+    }
+
+    function log(msg) {
+      document.getElementById("log-interno").textContent = "🧿 " + msg;
+    }
+
+    function gerarBotoes(texto) {
+      const saida = document.getElementById("saida");
+      let html = "";
+      const regex = /\[(.*?)\]/g;
+      let match;
+      while ((match = regex.exec(texto)) !== null) {
+        const item = match[1];
+        html += `<span class="symbol-button" onclick="renderResponse('${item}')">[${item}]</span>`;
+      }
+      saida.innerHTML += "\n\n" + html;
+    }
+
+    function renderResponse(conteudo) {
+      alert("🔘 renderResponse acionado para: " + conteudo);
+      log("📡 renderResponse() -> " + conteudo);
+    }
+  </script>
+</body>
+</html>
