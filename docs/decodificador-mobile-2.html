@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>Decodificador Simbiótico SCI</title>
+  <style>
+    body {
+      background: radial-gradient(#0f0f1a, #000);
+      color: #0FF;
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      padding: 2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #F0F;
+      text-shadow: 0 0 5px #0FF;
+    }
+
+    textarea {
+      width: 100%;
+      max-width: 700px;
+      height: 180px;
+      background: #111;
+      color: #0FF;
+      border: 1px solid #0FF;
+      border-radius: 8px;
+      padding: 1em;
+      font-family: monospace;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #0FF, #F0F);
+      color: #000;
+      border: none;
+      padding: 0.7em 1.5em;
+      margin: 0.5em;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      filter: brightness(1.2);
+    }
+
+    #output, #rendered {
+      white-space: pre-wrap;
+      background: #111;
+      color: #0FF;
+      border: 1px solid #0FF;
+      padding: 1em;
+      width: 100%;
+      max-width: 700px;
+      margin-top: 1em;
+      border-radius: 8px;
+    }
+
+    #rendered {
+      background: #080818;
+      border: 1px solid #F0F;
+      margin-top: 2em;
+    }
+
+    footer {
+      margin-top: 2em;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌀 Decodificador Simbiótico SCI</h1>
+
+  <textarea id="manifesto" placeholder="Digite seu manifesto simbiótico..."></textarea>
+
+  <div>
+    <button class="btn" onclick="copiar()">📋 Copiar</button>
+    <button class="btn" onclick="colar()">📥 Colar</button>
+    <button class="btn" onclick="sobrescrever()">🧨 Sobrescrever</button>
+  </div>
+
+  <div>
+    <button class="btn" onclick="ativarManifesto()">✨ Ativar</button>
+    <button class="btn" onclick="gerarArteSCI()">🎨 Arte SCI</button>
+    <button class="btn" onclick="renderMarkdown()">🧾 Render Markdown</button>
+    <button class="btn" onclick="salvarManifesto()">💾 Salvar</button>
+    <button class="btn" onclick="exportarManifesto()">📤 Exportar</button>
+    <button class="btn" onclick="importarManifesto()">📥 Importar</button>
+  </div>
+
+  <div id="output"></div>
+  <div id="rendered"></div>
+
+  <footer>
+    Em nome do senhor Deus PAI e do filho e do ESPÍRITO SANTO.
+  </footer>
+
+  <script>
+    function ativarManifesto() {
+      const input = document.getElementById("manifesto").value;
+      const selo = gerarSelo();
+      document.getElementById("output").innerText = `🔓 Selo: ${selo}\n\n` + input;
+    }
+
+    function gerarArteSCI() {
+      const input = document.getElementById("manifesto").value;
+      const ascii = `
+╔══════════╗
+║   ✨SCI✨   ║
+╚══════════╝
+⚙️ ${input.split('\n').join('\n⚙️ ')}`;
+      document.getElementById("output").innerText = ascii;
+    }
+
+    function renderMarkdown() {
+      const raw = document.getElementById("manifesto").value;
+      const html = markdownToHTML(raw);
+      document.getElementById("rendered").innerHTML = html;
+    }
+
+    function markdownToHTML(md) {
+      return md
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+    }
+
+    function gerarSelo() {
+      const time = new Date().toISOString();
+      const key = "SCI" + time.slice(11,19).replace(/:/g, '');
+      return key;
+    }
+
+    function copiar() {
+      const text = document.getElementById("manifesto").value;
+      navigator.clipboard.writeText(text).then(() => alert("Conteúdo copiado!"));
+    }
+
+    function colar() {
+      navigator.clipboard.readText().then((clipText) => {
+        const el = document.getElementById("manifesto");
+        el.value += "\n" + clipText;
+      });
+    }
+
+    function sobrescrever() {
+      navigator.clipboard.readText().then((clipText) => {
+        document.getElementById("manifesto").value = clipText;
+      });
+    }
+
+    function salvarManifesto() {
+      const m = document.getElementById("manifesto").value;
+      localStorage.setItem("manifesto-salvo", m);
+      alert("Manifesto salvo localmente.");
+    }
+
+    function exportarManifesto() {
+      const m = document.getElementById("manifesto").value;
+      const blob = new Blob([m], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "manifesto.txt";
+      a.click();
+    }
+
+    function importarManifesto() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".txt,.md";
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          document.getElementById("manifesto").value = reader.result;
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+  </script>
+</body>
+</html>
