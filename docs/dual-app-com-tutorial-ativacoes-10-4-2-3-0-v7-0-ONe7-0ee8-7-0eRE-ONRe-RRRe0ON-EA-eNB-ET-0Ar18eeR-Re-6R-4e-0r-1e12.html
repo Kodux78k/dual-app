@@ -1857,12 +1857,12 @@ THEME_KEY     = 'infodoseTheme',
 HISTORY_KEY   = 'historyMode',
 CONFIG = {
 TRAINING_MAIN:    'data/codex/mtlx-oo.txt',
-TRAINING_HISTORY: 'data/codex/manifesto-funcional-ritual.txt',
+TRAINING_HISTORY: 'data/codex/mtlx-oo-5.txt',
 API_URL:          'https://openrouter.ai/api/v1/chat/completions',
 MODEL:            'deepseek/deepseek-r1:free',
 TEMP:             0.2,
 CHUNK_SIZE:       18000,
-AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
+AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
 };
 let training='', chunks=[], chunkIndex=0;
 let trainingHistory='', conversation=[];
