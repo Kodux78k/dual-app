@@ -1,0 +1,156 @@
+
+<!-- Este conteúdo será o HTML completo gerado acima -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dual App Avatar Simbiótico</title>
+  <style>
+    #avatar3D-container {
+      display: none;
+      position: fixed;
+      top: 169px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      height: 360px;
+      z-index: 9999;
+      background: transparent;
+    }
+    #toggleAvatarBtn {
+      position: fixed;
+      top: 133px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid #0ff;
+      color: #0ff;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <button id="toggleAvatarBtn">🧍</button>
+  <div id="avatar3D-container"></div>
+
+<!-- 🔁 Avatar 3D Simbiótico Expandido -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<script>
+const avatarBtn = document.getElementById("toggleAvatarBtn");
+const avatarContainer = document.getElementById("avatar3D-container");
+let avatarVisible = false;
+let avatarCarregado = false;
+
+avatarBtn.addEventListener("click", () => {
+  avatarVisible = !avatarVisible;
+  avatarContainer.style.display = avatarVisible ? "block" : "none";
+  if (avatarVisible && !avatarCarregado) {
+    carregarAvatarSimbiotico();
+  }
+});
+
+function carregarAvatarSimbiotico() {
+  avatarCarregado = true;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 280/360, 0.1, 1000);
+  camera.position.set(0, 1.4, 3);
+  const renderer = new THREE.WebGLRenderer({ alpha: true });
+  renderer.setSize(280, 360);
+  avatarContainer.appendChild(renderer.domElement);
+
+  const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+  scene.add(light);
+
+  let avatar, headBone;
+  new THREE.GLTFLoader().load('https://models.readyplayer.me/64a807a83221b1f67553fba3.glb', (gltf) => {
+    avatar = gltf.scene;
+    avatar.scale.set(1.2, 1.2, 1.2);
+    scene.add(avatar);
+    avatar.traverse((obj) => {
+      if (obj.isBone && obj.name.toLowerCase().includes("head")) headBone = obj;
+    });
+
+    window.addEventListener('click', (e) => {
+      if (!headBone || !avatarVisible) return;
+      const mouse = new THREE.Vector2(
+        (e.clientX / window.innerWidth) * 2 - 1,
+        -(e.clientY / window.innerHeight) * 2 + 1
+      );
+      const raycaster = new THREE.Raycaster();
+      raycaster.setFromCamera(mouse, camera);
+      const point = raycaster.ray.origin.clone().add(raycaster.ray.direction.clone().multiplyScalar(10));
+      headBone.lookAt(point);
+    });
+
+    function renderAvatar() {
+      requestAnimationFrame(renderAvatar);
+      renderer.render(scene, camera);
+    }
+    renderAvatar();
+
+    window.falarAvatar = function(texto) {
+      const utter = new SpeechSynthesisUtterance(texto);
+      utter.lang = 'pt-BR';
+      speechSynthesis.speak(utter);
+      lipsyncFake(texto.length * 55);
+      detectarEmocao(texto);
+    }
+
+    function lipsyncFake(dur = 1500) {
+      const t0 = Date.now();
+      const interval = setInterval(() => {
+        if (!avatar) return;
+        avatar.traverse((o) => {
+          if (o.isMesh && o.morphTargetInfluences) o.morphTargetInfluences[0] = Math.random();
+        });
+        if (Date.now() - t0 > dur) clearInterval(interval);
+      }, 100);
+    }
+
+    function detectarEmocao(texto) {
+      const txt = texto.toLowerCase();
+      const emocoes = [
+        { palavra: 'amor', cor: '#ff66cc', brilho: 0.8 },
+        { palavra: 'medo', cor: '#ff0000', brilho: 0.3 },
+        { palavra: 'alegria', cor: '#ffff00', brilho: 0.9 },
+        { palavra: 'tristeza', cor: '#3399ff', brilho: 0.4 },
+        { palavra: 'raiva', cor: '#ff6600', brilho: 0.6 },
+        { palavra: 'luz', cor: '#00ffff', brilho: 1.0 },
+      ];
+      for (const emo of emocoes) {
+        if (txt.includes(emo.palavra)) {
+          aplicarExpressaoEmocional(emo.cor, emo.brilho);
+          break;
+        }
+      }
+    }
+
+    function aplicarExpressaoEmocional(cor, intensidade) {
+      if (!avatar) return;
+      avatar.traverse((obj) => {
+        if (obj.isMesh) {
+          obj.material.emissive = new THREE.Color(cor);
+          obj.material.emissiveIntensity = intensidade;
+        }
+      });
+    }
+  });
+}
+
+// Integra com renderResponse
+function renderResponse(texto) {
+  if (typeof falarAvatar === 'function') falarAvatar(texto);
+  // aqui continua sua lógica simbiótica...
+}
+</script>
+</body>
+</html>
