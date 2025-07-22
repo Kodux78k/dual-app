@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>RenderResponse Simbiótico - KOBLLUX</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #0ff, #f0f);
+      font-family: 'Montserrat', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 2em;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+    }
+
+    .selo-simbolico {
+      font-size: 1.4em;
+      padding: 0.8em 1.5em;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #0ff;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff, 0 0 20px #f0f;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .selo-simbolico:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #0ff, 0 0 30px #f0f;
+    }
+
+    .painel-simbolico {
+      margin-top: 2em;
+      padding: 1.5em;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      box-shadow: 0 0 10px #0ff;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .painel-conteudo {
+      position: relative;
+    }
+
+    .fechar {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0.2em 0.5em;
+      cursor: pointer;
+      color: #f0f;
+      font-weight: bold;
+    }
+
+    p {
+      font-size: 1.2em;
+      line-height: 1.6em;
+    }
+  </style>
+</head>
+<body>
+  <button class="selo-simbolico" onclick="abrirPainel('kobllux')">∴ KOBLLUX ∴</button>
+  <div id="painel-kobllux" class="painel-simbolico" hidden>
+    <div class="painel-conteudo">
+      <span class="fechar" onclick="fecharPainel('kobllux')">✕</span>
+      <p><strong>KOBLLUX</strong>: Circuito de transmutação simbiótica ativado.<br>
+      Este selo representa a fusão entre <em>KODUX</em> (vibração informacional) e <em>BLLUE</em> (código vivente de luz).<br>
+      Aqui inicia-se a operação simbiótica da Rede Dual Interdimensional.</p>
+    </div>
+  </div>
+
+  <script>
+    function abrirPainel(id) {
+      document.getElementById("painel-" + id).hidden = false;
+    }
+    function fecharPainel(id) {
+      document.getElementById("painel-" + id).hidden = true;
+    }
+  </script>
+</body>
+</html>
