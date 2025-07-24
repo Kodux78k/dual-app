@@ -14,7 +14,6 @@
     * { margin:0; padding:0; box-sizing:border-box; }
     html, body {
       overscroll-behavior: none;
-      
     }
     body {
       font-family:'Montserrat',sans-serif;
@@ -40,6 +39,7 @@
       width:289px; 
       animation:glow 3s ease-in-out infinite alternate;
       cursor: pointer;
+      position:relative;
     }
     .logo-container object { width:100%; display:block }
     @keyframes glow {
@@ -129,16 +129,8 @@
       background: linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5));
     }
 
-    #messageBox {
-      display:none;
-      background: rgba(0,0,0,0.5);
-      border-radius:16px; padding:0.8rem;
-      text-align:center; color:#fff;
-      font-size:0.86em; opacity:0.9;
-    }
-    #buyTokens {
-      display:none;
-    }
+    #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
+    #buyTokens { display:none; }
     #buyTokens button {
       width:100%; padding:0.8rem 0;
       background:rgba(255,255,255,0.05);
@@ -153,40 +145,76 @@
       transform:scale(1.05);
       background:rgba(255,255,255,0.15);
     }
+
+    /* Decoder styles */
+    #decoderBox {
+      display:none;
+      position:fixed;
+      bottom:33px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.6);
+      padding:1rem;
+      border-radius:20px;
+      backdrop-filter:blur(8px);
+      z-index:200;
+    }
+    #decoderBox input {
+      padding:0.6rem;
+      width:200px;
+      text-align:center;
+      border-radius:10px;
+      border:none;
+      font-size:1em;
+    }
+    #toggleDecoderBtn {
+      position:fixed;
+      bottom:33px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:199;
+      padding:0.8rem 1.2rem;
+      border:none;
+      border-radius:20px;
+      background:#0ff;
+      color:#000;
+      font-weight:bold;
+      cursor:pointer;
+    }
   </style>
 </head>
 <body>
-
-
 
   <div id="particles-js"></div>
 
   <div class="center-group">
     <div class="logo-container" id="logoDual">
-  <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
-  <object data="assets/icons/kobllux-numeros.png" type="image/png"></object>
-</div>
+      <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
+      <object data="assets/icons/kobllux-numeros.png" type="image/png"></object>
+    </div>
     <div class="infodose">dual.<strong>Infodose</strong></div>
 
     <div class="login-container" id="loginBox">
       <input type="text" id="user" placeholder="Usuário" required>
       <input type="password" id="pass" placeholder="Senha" required>
       <button class="btn-full" id="submitBtn">Entrar</button>
-
       <div id="messageBox"></div>
-       <div id="buyTokens">
+      <div id="buyTokens">
         <button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
-      
-</div>
-
+      </div>
       <div class="logout-area">
         <div id="loggedUsername" class="username"></div>
         <button id="logoutBtn" class="btn-full">Desconectar</button>
       </div>
-
-     
     </div>
   </div>
+
+  <!-- DECODIFICADOR SIMBÓLICO -->
+  <div id="decoderBox">
+    <input type="text" id="codeInput" placeholder="Digite o selo...">
+    <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+  </div>
+  <button id="toggleDecoderBtn">✦ Decodificar</button>
 
   <script type="module">
     const loginBox   = document.getElementById('loginBox');
@@ -202,25 +230,44 @@
     const logoDual   = document.getElementById('logoDual');
     const storedKey  = 'infodose_user';
 
+    const decoderBox = document.getElementById('decoderBox');
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+
     const USERS_JSON = 'users/usersid.json';
     const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
 
-    const goToIndex = () => {
-  // Cria e configura o áudio dinamicamente
-  const audio = new Audio('assets/sounds/suave_portal.mp3');
-  audio.volume = 1;
-  audio.play().catch(() => {}); // tenta tocar o som
-  
-  // Inicia animações
-  gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
-  gsap.to('.infodose', { opacity: 0, duration: 0.6 });
-  gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+    const CODE_MAP = {
+      "TRINITY": "menu.html",
+      "CLIENTE001": "page-client.html",
+      "ATIVAR-RENDER": "render-response.html",
+      "ATIVAR-DECODE": "decodificador.html"
+    };
 
-  // Espera um pouco para deixar o som tocar antes de sair
-  setTimeout(() => {
-    window.location.href = 'menu.html';
-  }, 1399);
-};
+    toggleDecoderBtn.addEventListener('click', () => {
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    });
+
+    window.decodeSymbolicCode = () => {
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const dest = CODE_MAP[code];
+      if (dest) {
+        gsap.to('body', { opacity: 0, duration: 1, onComplete: () => {
+          window.location.href = dest;
+        }});
+      } else {
+        alert('Selo desconhecido ou não registrado.');
+      }
+    };
+
+    const goToIndex = () => {
+      const audio = new Audio('assets/sounds/suave_portal.mp3');
+      audio.volume = 1;
+      audio.play().catch(() => {});
+      gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+      gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+      gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+      setTimeout(() => { window.location.href = 'menu.html'; }, 1399);
+    };
 
     const lockScroll = () => {
       document.documentElement.style.overflow = 'hidden';
@@ -253,7 +300,6 @@
 
     window.addEventListener('load', () => {
       lockScroll();
-      document.getElementById('bgSound')?.play().catch(()=>{});
       const stored = localStorage.getItem(storedKey);
       stored ? showLogoutUI(stored) : showLoginUI();
     });
@@ -274,7 +320,7 @@
         const creds = await res.json();
         if (creds[u] && creds[u] === p) {
           localStorage.setItem(storedKey, rawUser);
-          goToIndex(); // redireciona
+          goToIndex();
         } else {
           showLoginUI();
           messageBox.textContent = creds[u] ? 'Senha incorreta para usuário mestre.' : 'Usuário ainda não conectado com o pulso.';
