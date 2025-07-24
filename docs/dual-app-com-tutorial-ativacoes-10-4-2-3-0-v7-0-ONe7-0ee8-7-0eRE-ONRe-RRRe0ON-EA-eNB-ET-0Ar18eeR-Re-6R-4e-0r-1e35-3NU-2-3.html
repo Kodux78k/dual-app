@@ -2050,7 +2050,7 @@ API_URL:          'https://openrouter.ai/api/v1/chat/completions',
 MODEL:            'deepseek/deepseek-r1:free',
 TEMP:             0.2,
 CHUNK_SIZE:       18000,
-AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
+AUTH_TOKEN:       window.env?.API_KEYS || 'Bearer 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'
 };
 let training='', chunks=[], chunkIndex=0;
 let trainingHistory='', conversation=[];
@@ -6723,7 +6723,7 @@ const themeSounds = {
 <div id="debug-simbolico" style="display:none; position:fixed; bottom:10px; right:10px; background:black; color:#0ff; padding:8px; border:1px solid #0ff; font-size:0.75em; z-index:9999;">
   🧿 Modo simbiótico ativo<br/><div id="log-interno"></div>
 </div>
-<button id="toggle-debug" style="position:fixed; bottom:10px; right:10px; z-index:10000;; display:none; width:auto; height:auto; font-size:14px;">🌀</button>
+<button id="toggle-debug" style="position:fixed; bottom:10px; right:18px; z-index:10000;; display:none; width:auto; height:auto; font-size:14px;">🌀</button>
 <script>
 document.getElementById("toggle-debug").onclick = () => {
   const dbg = document.getElementById("debug-simbolico");
@@ -6968,12 +6968,12 @@ document.getElementById("btn-modos").onclick = () => {
 <button id="btn-funcoes" style="
   position:fixed;
   bottom:10px;
-  left:160px;
+  left:155px;
   z-index:10000;
   background:#000;
   color:#0ff;
   border:1px solid #0ff;
-  border-radius:4px;
+  border-radius:50%;
   padding:6px 10px;
   opacity:0.2;
   transition: opacity 0.3s ease;
@@ -7068,7 +7068,7 @@ document.getElementById("btn-funcoes").onclick = () => {
   border-radius: 6px;
   overflow-y: auto;
   font-size: 0.75em;
-  z-index: 9999;
+  z-index: 9;
   padding: 6px;
   display: none;
 }
@@ -7994,7 +7994,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mask-image: radial-gradient(white, black);
 
   overflow: hidden;
-  z-index: 9999;
+  z-index: 3;
   cursor: pointer;
   font-family: monospace;
   text-align: center;
