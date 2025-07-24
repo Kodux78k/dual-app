@@ -190,6 +190,40 @@
     #uploadHTMLBtn {
       top: 260px;
     }
+  #toggleDecoderBtn,
+    #uploadHTMLBtn {
+      position: fixed;
+      top: 200px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 199;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 20px;
+      background: #0ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    #uploadHTMLBtn {
+      top: 260px;
+    }
+    #decoderContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.85);
+      z-index: 200;
+      display: none;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
   </style>
 </head>
 <body>
@@ -226,6 +260,17 @@
   <button id="toggleDecoderBtn">✦ Decodificar</button>
   <input type="file" id="uploadHTML" accept=".html" style="display:none" />
   <button id="uploadHTMLBtn">⧉ Upload HTML</button>
+<audio id="sound-portal" src="assets/sounds/Suave_Portal.mp3" preload="auto"></audio>
+<audio id="sound-upload" src="assets/sounds/uiSounds/SmbS_KBL_vox.wav" preload="auto"></audio>
+<audio id="sound-glitch" src="assets/sounds/uiSounds/codigo-mtlx-4.wav" preload="auto"></audio>
+
+<input type="file" id="uploadHTML" accept=".html" style="display:none" />
+<button id="uploadHTMLBtn">⧉ Upload HTML</button>
+<button id="toggleDecoderBtn">⧉ Decoder</button>
+
+<div id="decoderContainer">
+  <iframe src="decodificador.html"></iframe>
+</div>
 
   <script type="module">
     const loginBox   = document.getElementById('loginBox');
@@ -293,7 +338,7 @@
     };
 
     const goToIndex = () => {
-      const audio = new Audio('assets/sounds/uiSounds/codigo-mtlx-0.wav');
+      const audio = new Audio('assets/sounds/Suave_Portal.mp3');
       audio.volume = 1;
       audio.play().catch(() => {});
       gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
@@ -394,5 +439,51 @@
       retina_detect:true
     });
   </script>
+  
+<script type="module">
+  // Som ao entrar na página
+  window.addEventListener('load', () => {
+    const portalSound = document.getElementById('sound-portal');
+    portalSound.volume = 0.7;
+    portalSound.play().catch(e => {
+      console.warn('Autoplay bloqueado:', e.message);
+    });
+  });
+
+  // Upload de HTML local
+  const uploadInput = document.getElementById('uploadHTML');
+  const uploadBtn   = document.getElementById('uploadHTMLBtn');
+  const decoderBtn  = document.getElementById('toggleDecoderBtn');
+
+  uploadBtn.addEventListener('click', () => {
+    uploadInput.click();
+  });
+
+  uploadInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.name.endsWith('.html')) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const content = event.target.result;
+        const uploadSound = document.getElementById('sound-upload');
+        uploadSound.volume = 1;
+        uploadSound.play();
+        console.log("Conteúdo do HTML:", content);
+        alert(`Arquivo "${file.name}" carregado com sucesso!`);
+      };
+      reader.readAsText(file);
+    } else {
+      alert("Por favor, selecione um arquivo .html válido.");
+    }
+  });
+
+  // Som ao ativar botão de decoder
+  decoderBtn.addEventListener('click', () => {
+    const glitchSound = document.getElementById('sound-glitch');
+    glitchSound.volume = 0.8;
+    glitchSound.play();
+    document.getElementById('decoderContainer').style.display = 'block';
+  });
+</script>
 </body>
 </html>
