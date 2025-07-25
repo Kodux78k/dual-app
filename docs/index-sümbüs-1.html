@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central - Dual Infodose</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      overscroll-behavior: none;
+    }
+    body {
+      font-family:'Montserrat',sans-serif;
+      background: linear-gradient(to bottom, #000, #1a1a1a);
+      color:#fff;
+      height:100vh; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      padding-top:50px; position:relative;
+      opacity:0; animation:fadeInBody 1.8s ease forwards;
+    }
+    @keyframes fadeInBody { to { opacity:1 } }
+
+    #particles-js {
+      position:absolute; inset:0; z-index:0;
+    }
+
+    .center-group {
+      z-index:1;
+      display:flex; flex-direction:column; align-items:center;
+      gap:1rem; padding:20px; 
+    }
+    .logo-container {
+      width:289px; 
+      animation:glow 3s ease-in-out infinite alternate;
+      cursor: pointer;
+      position:relative;
+    }
+    .logo-container object { width:100%; display:block }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #f0f) }
+      to   { filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 35px #f0f) }
+    }
+    .infodose {
+      font-size:1.4em; font-weight:300;
+      animation:fadeIn 1.5s forwards 1s; opacity:0;
+    }
+    .infodose strong { font-weight:600 }
+    @keyframes fadeIn { to { opacity:0.8 } }
+
+    .login-container {
+      width:280px; padding:1rem;
+      background:rgba(0,0,0,0.6);
+      border:4px solid transparent;
+      border-radius:24px; backdrop-filter:blur(8px);
+      display:flex; flex-direction:column; gap:1rem;
+      opacity:0; transition:opacity .3s;
+      pointer-events:none;
+    }
+    .login-container.active {
+      opacity:0.8; pointer-events:auto;
+    }
+    .login-container input {
+      width:100%; background:rgba(255,255,255,0.05);
+      border:none; border-bottom:1px solid rgba(255,255,255,0.3);
+      padding:0.6rem; font-size:1em; font-weight:300;
+      color:#fff; outline:none; text-align:center;
+      transition: background .3s;
+      border-radius:10px;
+    }
+    .login-container input:focus {
+      background:rgba(255,255,255,0.1);
+    }
+
+    .btn-full {
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      padding: 0.8rem 0;
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      border-radius: 20px;
+      font-size: 1em;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+    .btn-full::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      background: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
+      border-radius: 20px;
+      z-index: -1;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    .btn-full:hover {
+      transform:scale(1.05);
+      background:rgba(255,255,255,0.15);
+    }
+
+    .logout-area {
+      display: none;
+      margin-top: 0.3rem;
+      outline: none;
+      text-align: center;
+    }
+    .logout-area .username {
+      font-weight: 300;
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 1.1em; opacity:0.8;
+    }
+    .logout-area .btn-full {
+      background: rgba(255,50,50,0.1);
+      color: #f55;
+    }
+    .logout-area .btn-full::before {
+      background: linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5));
+    }
+
+    #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
+    #buyTokens { display:none; }
+    #buyTokens button {
+      width:100%; padding:0.8rem 0;
+      background:rgba(255,255,255,0.05);
+      border:2px solid transparent;
+      border-image: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5)) 1;
+      border-radius:20px;
+      font-size:1em; font-weight:600; color:#fff;
+      cursor:pointer;
+      transition: transform .3s, background .3s;
+    }
+    #buyTokens button:hover {
+      transform:scale(1.05);
+      background:rgba(255,255,255,0.15);
+    }
+
+    /* Decoder styles */
+    #decoderBox {
+      display:none;
+      position:fixed;
+      top:140px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.6);
+      padding:1rem;
+      border-radius:20px;
+      backdrop-filter:blur(8px);
+      z-index:200;
+    }
+    #decoderBox input {
+      padding:0.6rem;
+      width:200px;
+      text-align:center;
+      border-radius:10px;
+      border:none;
+      font-size:1em;
+    }
+
+    #toggleDecoderBtn,
+    #uploadHTMLBtn {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 199;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 20px;
+      background: #0ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #toggleDecoderBtn {
+      top: 200px;
+    }
+
+    #uploadHTMLBtn {
+      top: 260px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="particles-js"></div>
+
+  <div class="center-group">
+    <div class="logo-container" id="logoDual">
+      <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
+      <object data="assets/icons/kobllux-numeros.png" type="image/png"></object>
+    </div>
+    <div class="infodose">dual.<strong>Infodose</strong></div>
+
+    <div class="login-container" id="loginBox">
+      <input type="text" id="user" placeholder="Usuário" required>
+      <input type="password" id="pass" placeholder="Senha" required>
+      <button class="btn-full" id="submitBtn">Entrar</button>
+      <div id="messageBox"></div>
+      <div id="buyTokens">
+        <button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
+      </div>
+      <div class="logout-area">
+        <div id="loggedUsername" class="username"></div>
+        <button id="logoutBtn" class="btn-full">Desconectar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECODIFICADOR SIMBÓLICO -->
+  <div id="decoderBox">
+    <input type="text" id="codeInput" placeholder="Digite o selo...">
+    <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+  </div>
+  <button id="toggleDecoderBtn">✦ Decodificar</button>
+  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+  <button id="uploadHTMLBtn">⧉ Upload HTML</button>
+
+  <script type="module">
+    const loginBox   = document.getElementById('loginBox');
+    const userInput  = document.getElementById('user');
+    const passInput  = document.getElementById('pass');
+    const submitBtn  = document.getElementById('submitBtn');
+    const messageBox = document.getElementById('messageBox');
+    const buyArea    = document.getElementById('buyTokens');
+    const buyBtn     = document.getElementById('buyIFTBtn');
+    const logoutArea = document.querySelector('.logout-area');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const loggedUser = document.getElementById('loggedUsername');
+    const logoDual   = document.getElementById('logoDual');
+    const storedKey  = 'infodose_user';
+
+    const decoderBox = document.getElementById('decoderBox');
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+
+    const uploadInput = document.getElementById('uploadHTML');
+    const uploadBtn   = document.getElementById('uploadHTMLBtn');
+
+    const USERS_JSON = 'users/usersid.json';
+    const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
+
+    const CODE_MAP = {
+      "TRINITY": "menu.html",
+      "CLIENTE001": "page-client.html",
+      "ATIVAR-RENDER": "render-response.html",
+      "ATIVAR-DECODE": "decodificador.html"
+    };
+
+    toggleDecoderBtn.addEventListener('click', () => {
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    });
+
+    uploadBtn.addEventListener('click', () => {
+      uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const content = event.target.result;
+          alert(`Arquivo "${file.name}" carregado com sucesso!`);
+          console.log("Conteúdo do HTML:", content);
+        };
+        reader.readAsText(file);
+      } else {
+        alert("Por favor, selecione um arquivo .html válido.");
+      }
+    });
+
+    window.decodeSymbolicCode = () => {
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const dest = CODE_MAP[code];
+      if (dest) {
+        gsap.to('body', { opacity: 0, duration: 1, onComplete: () => {
+          window.location.href = dest;
+        }});
+      } else {
+        alert('Selo desconhecido ou não registrado.');
+      }
+    };
+
+    const goToIndex = () => {
+      const audio = new Audio('assets/sounds/suave_portal.mp3');
+      audio.volume = 1;
+      audio.play().catch(() => {});
+      gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+      gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+      gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+      setTimeout(() => { window.location.href = 'menu.html'; }, 1399);
+    };
+
+    const lockScroll = () => {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.height = '100vh';
+      document.body.style.height = '100vh';
+      window.scrollTo(0, 0);
+    };
+
+    function showLoginUI() {
+      loginBox.classList.add('active');
+      userInput.style.display  = '';
+      passInput.style.display  = '';
+      submitBtn.style.display  = '';
+      logoutArea.style.display = 'none';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    function showLogoutUI(user) {
+      loginBox.classList.add('active');
+      userInput.style.display  = 'none';
+      passInput.style.display  = 'none';
+      submitBtn.style.display  = 'none';
+      logoutArea.style.display = 'block';
+      loggedUser.textContent   = user ? `${user}` : '';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    window.addEventListener('load', () => {
+      lockScroll();
+      const stored = localStorage.getItem(storedKey);
+      stored ? showLogoutUI(stored) : showLoginUI();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const rawUser = userInput.value.trim();
+      const u = rawUser.toLowerCase();
+      const p = passInput.value.trim();
+      if (!u || !p) {
+        showLoginUI();
+        messageBox.textContent = 'Por favor, preencha usuário e senha.';
+        messageBox.style.display = 'block';
+        return;
+      }
+      try {
+        const res   = await fetch(USERS_JSON);
+        if (!res.ok) throw new Error('Falha ao carregar credenciais.');
+        const creds = await res.json();
+        if (creds[u] && creds[u] === p) {
+          localStorage.setItem(storedKey, rawUser);
+          goToIndex();
+        } else {
+          showLoginUI();
+          messageBox.textContent = creds[u] ? 'Senha incorreta para usuário mestre.' : 'Usuário ainda não conectado com o pulso.';
+          messageBox.style.display = 'block';
+          buyArea.style.display = 'block';
+        }
+      } catch (err) {
+        showLoginUI();
+        messageBox.textContent = err.message;
+        messageBox.style.display = 'block';
+        buyArea.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(storedKey);
+      showLoginUI();
+    });
+
+    logoDual.addEventListener('click', () => {
+      const user = localStorage.getItem(storedKey);
+      if (user) goToIndex();
+    });
+
+    buyBtn.addEventListener('click', () => {
+      window.location.href = PIX_LINK;
+    });
+
+    particlesJS('particles-js', {
+      particles: {
+        number:{value:78,density:{enable:true,value_area:600}},
+        color:{value:['#0ff','#f0f']},
+        shape:{type:'circle'},
+        opacity:{value:0.4,random:true},
+        size:{value:3,random:true},
+        move:{enable:true,speed:1.2,random:true,out_mode:'out'}
+      },
+      retina_detect:true
+    });
+  </script>
+</body>
+</html>
