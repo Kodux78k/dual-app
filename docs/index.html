@@ -150,7 +150,7 @@
     #decoderBox {
       display:none;
       position:fixed;
-      bottom:48px;
+      top:140px;
       left:50%;
       transform:translateX(-50%);
       background:rgba(0,0,0,0.6);
@@ -167,19 +167,28 @@
       border:none;
       font-size:1em;
     }
+
+    #toggleDecoderBtn,
+    #uploadHTMLBtn {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 199;
+      padding: 0.8rem 1.2rem;
+      border: none;
+      border-radius: 20px;
+      background: #0ff;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
     #toggleDecoderBtn {
-      position:fixed;
-      bottom:48px;
-      left:50%;
-      transform:translateX(-50%);
-      z-index:199;
-      padding:0.8rem 1.2rem;
-      border:none;
-      border-radius:20px;
-      background:#0ff;
-      color:#000;
-      font-weight:bold;
-      cursor:pointer;
+      top: 200px;
+    }
+
+    #uploadHTMLBtn {
+      top: 260px;
     }
   </style>
 </head>
@@ -215,6 +224,8 @@
     <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
   </div>
   <button id="toggleDecoderBtn">✦ Decodificar</button>
+  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+  <button id="uploadHTMLBtn">⧉ Upload HTML</button>
 
   <script type="module">
     const loginBox   = document.getElementById('loginBox');
@@ -233,18 +244,42 @@
     const decoderBox = document.getElementById('decoderBox');
     const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
 
+    const uploadInput = document.getElementById('uploadHTML');
+    const uploadBtn   = document.getElementById('uploadHTMLBtn');
+
     const USERS_JSON = 'users/usersid.json';
     const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
 
     const CODE_MAP = {
-      "TRINITY": "menu.html",
-      "CLIENTE001": "page-client.html",
-      "ATIVAR-RENDER": "render-response.html",
-      "ATIVAR-DECODE": "decodificador.html"
+      "DUAL": "menu.html",
+      "KBLX": "page-client.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "337": "dual-tube-25.html",
+      "qwe": "dual-book-12.html",
     };
 
     toggleDecoderBtn.addEventListener('click', () => {
       decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    });
+
+    uploadBtn.addEventListener('click', () => {
+      uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const content = event.target.result;
+          alert(`Arquivo "${file.name}" carregado com sucesso!`);
+          console.log("Conteúdo do HTML:", content);
+        };
+        reader.readAsText(file);
+      } else {
+        alert("Por favor, selecione um arquivo .html válido.");
+      }
     });
 
     window.decodeSymbolicCode = () => {
