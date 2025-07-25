@@ -1,0 +1,31 @@
+
+<!-- componentes/botao-simbolico.html -->
+<div style="position:fixed; bottom:20px; right:20px; z-index:9999;">
+  <button id="botaoMagico" style="
+    padding: 12px 20px;
+    background: linear-gradient(45deg, #0ff, #f0f);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0 12px #0ff;
+    cursor: pointer;
+    animation: glowBtn 1.5s infinite alternate;
+  ">✨ Botão Mágico</button>
+</div>
+
+<style>
+@keyframes glowBtn {
+  from { box-shadow: 0 0 6px #0ff; }
+  to   { box-shadow: 0 0 20px #f0f; }
+}
+</style>
+
+<script>
+  document.getElementById('botaoMagico')?.addEventListener('click', () => {
+    alert('✨ Você ativou um botão simbiótico!');
+    if (typeof renderResponse === 'function') {
+      renderResponse('🌀 Botão mágico manifestado via HTML externo!');
+    }
+  });
+</script>
