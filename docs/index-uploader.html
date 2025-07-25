@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Uploader de Infodose ⚗️</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #000, #111);
+      color: #0ff;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 10px;
+    }
+    input[type="file"] {
+      margin: 12px 0;
+      padding: 8px;
+      background: #0ff2;
+      border: 1px solid #0ff5;
+      color: #0ff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    iframe {
+      width: 100%;
+      max-width: 900px;
+      height: 80vh;
+      margin-top: 20px;
+      border: 2px solid #0ff4;
+      border-radius: 8px;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>📤 Carregador de Infodose Local</h1>
+  <input type="file" id="fileInput" accept=".html" />
+  <iframe id="infodoseFrame"></iframe>
+
+  <script>
+    document.getElementById('fileInput').addEventListener('change', function(evt) {
+      const file = evt.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const blob = new Blob([e.target.result], { type: 'text/html' });
+          const url = URL.createObjectURL(blob);
+          document.getElementById('infodoseFrame').src = url;
+        };
+        reader.readAsText(file);
+      } else {
+        alert("Por favor, selecione um arquivo .html válido.");
+      }
+    });
+  </script>
+</body>
+</html>
