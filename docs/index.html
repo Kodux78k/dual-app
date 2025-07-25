@@ -36,7 +36,7 @@
       gap:1rem; padding:20px; 
     }
     .logo-container {
-      width:289px; 
+      width:249px; 
       animation:glow 3s ease-in-out infinite alternate;
       cursor: pointer;
       position:relative;
@@ -146,7 +146,6 @@
       background:rgba(255,255,255,0.15);
     }
 
-    /* Decoder styles */
     #decoderBox {
       display:none;
       position:fixed;
@@ -174,22 +173,28 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 199;
-      padding: 0.8rem 1.2rem;
+      padding: 0.8rem 1.4rem;
       border: none;
       border-radius: 20px;
-      background: #0ff;
-      color: #000;
+      background: rgba(0, 255, 255, 0.1);
+      color: #fff;
       font-weight: bold;
+      font-size: 0.95em;
       cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+      border-image: linear-gradient(45deg, #0ff, #f0f) 1;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
     }
 
-    #toggleDecoderBtn {
-      top: 200px;
+    #toggleDecoderBtn:hover,
+    #uploadHTMLBtn:hover {
+      transform: translateX(-50%) scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
     }
-
-    #uploadHTMLBtn {
-      top: 260px;
-    }
+    #toggleDecoderBtn { top: 40px; }
+    #uploadHTMLBtn  { top: 100px; }
   </style>
 </head>
 <body>
@@ -218,7 +223,6 @@
     </div>
   </div>
 
-  <!-- DECODIFICADOR SIMBÓLICO -->
   <div id="decoderBox">
     <input type="text" id="codeInput" placeholder="Digite o selo...">
     <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
@@ -243,7 +247,6 @@
 
     const decoderBox = document.getElementById('decoderBox');
     const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
-
     const uploadInput = document.getElementById('uploadHTML');
     const uploadBtn   = document.getElementById('uploadHTMLBtn');
 
@@ -259,11 +262,19 @@
       "qwe": "dual-book-12.html",
     };
 
+    function playButtonSound() {
+      const sound = new Audio('assets/sounds/uiSounds/click-ui.wav');
+      sound.volume = 0.7;
+      sound.play().catch(() => {});
+    }
+
     toggleDecoderBtn.addEventListener('click', () => {
+      playButtonSound();
       decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
     });
 
     uploadBtn.addEventListener('click', () => {
+      playButtonSound();
       uploadInput.click();
     });
 
@@ -271,18 +282,26 @@
       const file = e.target.files[0];
       if (file && file.name.endsWith('.html')) {
         const reader = new FileReader();
-        reader.onload = function(event) {
-          const content = event.target.result;
-          alert(`Arquivo "${file.name}" carregado com sucesso!`);
-          console.log("Conteúdo do HTML:", content);
-        };
-        reader.readAsText(file);
+  reader.onload = function(e) {
+    const content = e.target.result;
+
+    const blob = new Blob([content], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    alert('Página carregada com sucesso! Redirecionando...');
+
+    setTimeout(() => {
+      window.location.href = blobUrl;
+    }, 1000);
+  };
+  reader.readAsText(file);
       } else {
         alert("Por favor, selecione um arquivo .html válido.");
       }
     });
 
     window.decodeSymbolicCode = () => {
+      playButtonSound();
       const code = document.getElementById('codeInput').value.trim().toUpperCase();
       const dest = CODE_MAP[code];
       if (dest) {
