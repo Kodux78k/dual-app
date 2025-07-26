@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dual App + Menu Flutuante</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: transparent;
+      color: #0ff;
+    }
+
+    #menuToggleBtn {
+      position: fixed;
+      top: 33px;
+      right: 88px;
+      z-index: 10000;
+      font-size: 16px;
+      padding: 3px 8px;
+      background: #0ff;
+      border: none;
+      color: black;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #menuContainer {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      width: 90vw;
+      max-width: 500px;
+      height: 80vh;
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+      flex-direction: row;
+      z-index: 9999;
+    }
+
+    #iframeTabs {
+      width: 120px;
+      background: #111;
+      display: flex;
+      flex-direction: column;
+      border-right: 2px solid #0ff;
+    }
+
+    .tab-button {
+      padding: 10px;
+      background: transparent;
+      color: #0ff;
+      border: none;
+      border-bottom: 1px solid #0ff;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .tab-button:hover {
+      background: #0ff;
+      color: #000;
+    }
+
+    #iframeDisplay {
+      flex: 1;
+      position: relative;
+    }
+
+    .tab-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none;
+    }
+
+    .tab-frame.active {
+      display: block;
+    }
+
+    #uploadHTML {
+      display: none;
+    }
+
+    #uploadHTMLBtn {
+      position: fixed;
+      top: 20px;
+      right: 140px;
+      z-index: 10000;
+      font-size: 24px;
+      padding: 6px 10px;
+      background: #0ff;
+      border: none;
+      color: black;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 2px 6px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 14px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Botões -->
+  <button id="uploadHTMLBtn">⧉</button>
+  <input type="file" id="uploadHTML" accept=".html" />
+  <button id="menuToggleBtn">☰</button>
+
+  <!-- Menu flutuante -->
+  <div id="menuContainer">
+    <div id="iframeTabs"></div>
+    <div id="iframeDisplay"></div>
+  </div>
+
+  <script>
+    const menuToggleBtn = document.getElementById("menuToggleBtn");
+    const uploadHTMLBtn = document.getElementById("uploadHTMLBtn");
+    const uploadHTML = document.getElementById("uploadHTML");
+    const menuContainer = document.getElementById("menuContainer");
+    const iframeTabs = document.getElementById("iframeTabs");
+    const iframeDisplay = document.getElementById("iframeDisplay");
+
+    let tabCount = 0;
+    const tabs = [];
+
+    // Toggle menu flutuante
+    menuToggleBtn.addEventListener("click", () => {
+      const visible = menuContainer.style.display === "flex";
+      menuContainer.style.display = visible ? "none" : "flex";
+    });
+
+    // Abrir arquivo HTML local e criar nova aba
+    uploadHTMLBtn.addEventListener("click", () => {
+      uploadHTML.click();
+    });
+
+    uploadHTML.addEventListener("change", async (e) => {
+      const file = e.target.files[0];
+      if (file && file.type === "text/html") {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const content = event.target.result;
+          const blob = new Blob([content], { type: "text/html" });
+          const blobURL = URL.createObjectURL(blob);
+          addNewTab(`Tab ${++tabCount}`, blobURL);
+        };
+        reader.readAsText(file);
+      }
+    });
+
+    function addNewTab(name, src) {
+      // Criar botão lateral
+      const btn = document.createElement("button");
+      btn.className = "tab-button";
+      btn.textContent = name;
+      iframeTabs.appendChild(btn);
+
+      // Criar iframe
+      const iframe = document.createElement("iframe");
+      iframe.className = "tab-frame";
+      iframe.src = src;
+      iframe.allow = "autoplay";
+      iframeDisplay.appendChild(iframe);
+
+      tabs.push({ btn, iframe });
+
+      // Tornar ativo
+      setActiveTab(tabs.length - 1);
+
+      // Troca ativa
+      btn.addEventListener("click", () => {
+        const index = tabs.findIndex(t => t.btn === btn);
+        setActiveTab(index);
+      });
+    }
+
+    function setActiveTab(index) {
+      tabs.forEach((tab, i) => {
+        tab.iframe.classList.toggle("active", i === index);
+        tab.btn.style.background = i === index ? "#0ff" : "transparent";
+        tab.btn.style.color = i === index ? "#000" : "#0ff";
+
+        if (i !== index) {
+          // Pausar mídia e animações nos iframes inativos
+          tab.iframe.contentWindow?.postMessage({ action: "pause" }, "*");
+        } else {
+          // Retomar mídia no ativo
+          tab.iframe.contentWindow?.postMessage({ action: "resume" }, "*");
+        }
+      });
+    }
+
+    // Recebe comandos do iframe (menu.html ou outro)
+    window.addEventListener("message", (event) => {
+      const msg = event.data;
+      if (msg?.action === "fechar") {
+        menuContainer.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
