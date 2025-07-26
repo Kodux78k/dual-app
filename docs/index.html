@@ -254,7 +254,7 @@
     const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
 
     const CODE_MAP = {
-      "DUAL": "menu.html",
+      "Menu": "menu.html",
       "KBLX": "page-client.html",
       "ATVR": "render-response.html",
       "ATVD": "decodificador.html",
@@ -317,13 +317,13 @@
     };
 
     const goToIndex = () => {
-      const audio = new Audio('assets/sounds/uiSounds/codigo-mtlx-0.wav');
+      const audio = new Audio('assets/sounds/portal_suave.mp3');
       audio.volume = 1;
       audio.play().catch(() => {});
       gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
       gsap.to('.infodose', { opacity: 0, duration: 0.6 });
       gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
-      setTimeout(() => { window.location.href = 'menu.html'; }, 1399);
+      setTimeout(() => { window.location.href = 'menu-x-0.html'; }, 1399);
     };
 
     const lockScroll = () => {
