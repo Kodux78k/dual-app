@@ -77,37 +77,47 @@
       background:rgba(255,255,255,0.1);
     }
 
-    .btn-full {
-      position: relative;
-      z-index: 1;
-      overflow: hidden;
-      padding: 0.8rem 0;
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: none;
-      border-radius: 20px;
-      font-size: 1em;
-      font-weight: 600;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.3s, background 0.3s;
-    }
-    .btn-full::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      padding: 2px;
-      background: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
-      border-radius: 20px;
-      z-index: -1;
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-    }
-    .btn-full:hover {
-      transform:scale(1.05);
-      background:rgba(255,255,255,0.15);
-    }
+    .btn-container {
+  display: flex;
+  gap: 10px; /* espaço entre botões */
+  flex-wrap: wrap; /* quebra linha se não couber */
+}
+
+.btn-full {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  padding: 0.8rem 1.5rem; /* aumentei o padding horizontal pra ficar bonito */
+  background: rgba(255,255,255,0.05);
+  border: none;
+  border-radius: 20px;
+  font-size: 1em;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+  /* width removido para não forçar 100% */
+  flex: 1 1 auto; /* deixa os botões flexíveis no container */
+  min-width: 100px; /* largura mínima para não ficar muito pequeno */
+}
+
+.btn-full::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
+  border-radius: 20px;
+  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.btn-full:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,0.15);
+}
 
     .logout-area {
       display: none;
@@ -227,7 +237,7 @@
     <input type="text" id="codeInput" placeholder="Digite o selo...">
     <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
   </div>
-  <button id="toggleDecoderBtn">✦</button>
+  <button id="toggleDecoderBtn">┻━┻</button>
   <input type="file" id="uploadHTML" accept=".html" style="display:none" />
   <button id="uploadHTMLBtn">⧉</button>
 
@@ -266,8 +276,8 @@
     };
 
     function playButtonSound() {
-      const sound = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
-      sound.volume = 0.7;
+      const sound = new Audio('assets/sounds/uiSounds/navigate.wav');
+      sound.volume = 0.4;
       sound.play().catch(() => {});
     }
 
@@ -323,7 +333,7 @@
       gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
       gsap.to('.infodose', { opacity: 0, duration: 0.6 });
       gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
-      setTimeout(() => { window.location.href = 'menu-x-1.html'; }, 1399);
+      setTimeout(() => { window.location.href = 'menu-x-0.html'; }, 1399);
     };
 
     const lockScroll = () => {
