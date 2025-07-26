@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dual App - Avançado</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: #111;
+      color: #fff;
+      overflow: hidden;
+    }
+    #main-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: row;
+    }
+    #dropdownMenu {
+      width: 200px;
+      background: #222;
+      border-right: 1px solid #444;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    #iframeTabs {
+      flex-grow: 1;
+      position: relative;
+    }
+    .iframe-tab {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: none;
+    }
+    .iframe-tab.active {
+      display: block;
+    }
+    #controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+    }
+    .control-btn {
+      background: #444;
+      color: white;
+      padding: 6px 10px;
+      border: none;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="main-container">
+    <div id="dropdownMenu">
+      <h3>Menu</h3>
+      <button onclick="addTab('pagina1.html')">+ Página 1</button><br/>
+      <button onclick="addTab('pagina2.html')">+ Página 2</button><br/>
+      <button onclick="pauseAnimations()">⏸ Pausar animações</button><br/>
+      <button onclick="resumeAnimations()">▶️ Retomar animações</button>
+    </div>
+    <div id="iframeTabs"></div>
+  </div>
+  <div id="controls">
+    <button class="control-btn" onclick="switchTab(-1)">◀️</button>
+    <button class="control-btn" onclick="switchTab(1)">▶️</button>
+  </div>
+
+  <script>
+    let tabs = [];
+    let currentTab = -1;
+
+    function addTab(url) {
+      const iframe = document.createElement('iframe');
+      iframe.src = url;
+      iframe.className = 'iframe-tab';
+      document.getElementById('iframeTabs').appendChild(iframe);
+      tabs.push(iframe);
+      switchToTab(tabs.length - 1);
+    }
+
+    function switchToTab(index) {
+      if (index >= 0 && index < tabs.length) {
+        if (currentTab >= 0) tabs[currentTab].classList.remove('active');
+        currentTab = index;
+        tabs[currentTab].classList.add('active');
+      }
+    }
+
+    function switchTab(direction) {
+      const nextIndex = currentTab + direction;
+      if (nextIndex >= 0 && nextIndex < tabs.length) {
+        switchToTab(nextIndex);
+      }
+    }
+
+    function pauseAnimations() {
+      document.querySelectorAll('*').forEach(el => {
+        el.style.animationPlayState = 'paused';
+      });
+    }
+
+    function resumeAnimations() {
+      document.querySelectorAll('*').forEach(el => {
+        el.style.animationPlayState = 'running';
+      });
+    }
+  </script>
+</body>
+</html>
