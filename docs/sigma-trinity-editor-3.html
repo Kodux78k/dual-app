@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Editor Completo Mobile</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: #fff;
+    }
+    header {
+      background: #222;
+      padding: 1em;
+      text-align: center;
+      font-weight: bold;
+    }
+    #editor {
+      position: relative;
+      width: 100%;
+      height: 75vh;
+      background: #333;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      user-select: none;
+      touch-action: none;
+      transform-origin: center center;
+    }
+    .layer.text {
+      font-size: 20px;
+      color: white;
+      background: transparent;
+      padding: 4px 8px;
+    }
+    .crop-shape.circle { border-radius: 50%; }
+    .crop-shape.square { border-radius: 0%; }
+
+    #controls {
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+    }
+    input[type="file"], input[type="range"], input[type="text"] {
+      width: 100%;
+      padding: 0.4em;
+      background: #444;
+      border: none;
+      color: white;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+    }
+    .buttons button {
+      flex: 1 1 auto;
+      padding: 0.5em;
+      background: #555;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>Editor Mobile Expandido</header>
+  <div id="editor"></div>
+
+  <div id="controls">
+    <input type="file" accept="image/png, image/jpeg" onchange="handleUpload(event)" multiple />
+    
+    <input type="range" min="0.1" max="1" step="0.05" value="1" onchange="setOpacity(this.value)" />
+    
+    <div class="buttons">
+      <button onclick="setCrop('none')">Livre</button>
+      <button onclick="setCrop('square')">Quadrado</button>
+      <button onclick="setCrop('circle')">Circular</button>
+    </div>
+
+    <div class="buttons">
+      <button onclick="scaleSelected(1.1, 1.1)">Ampliar</button>
+      <button onclick="scaleSelected(0.9, 0.9)">Reduzir</button>
+      <button onclick="scaleSelected(1.1, 1)">Largura+</button>
+      <button onclick="scaleSelected(1, 1.1)">Altura+</button>
+    </div>
+
+    <div class="buttons">
+      <input type="text" id="textInput" placeholder="Inserir texto..." />
+      <button onclick="addText()">+ Texto</button>
+    </div>
+
+    <div class="buttons">
+      <button onclick="addShape('square')">+ Quadrado</button>
+      <button onclick="addShape('circle')">+ Círculo</button>
+      <button onclick="exportCanvas()">Exportar PNG</button>
+    </div>
+  </div>
+
+  <canvas id="exportCanvas"></canvas>
+
+  <script>
+    const editor = document.getElementById("editor");
+    let selectedLayer = null;
+    let layers = [];
+
+    function handleUpload(event) {
+      const files = event.target.files;
+      for (let file of files) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.className = "layer crop-shape";
+        img.style.width = "200px";
+        img.style.opacity = "1";
+        img.onload = () => {
+          editor.appendChild(img);
+          layers.push(img);
+          makeInteractive(img);
+        };
+      }
+    }
+
+    function addText() {
+      const value = document.getElementById("textInput").value;
+      if (!value.trim()) return;
+      const div = document.createElement("div");
+      div.textContent = value;
+      div.className = "layer text";
+      div.style.left = "50px";
+      div.style.top = "50px";
+      div.style.opacity = "1";
+      editor.appendChild(div);
+      layers.push(div);
+      makeInteractive(div);
+    }
+
+    function addShape(shape) {
+      const div = document.createElement("div");
+      div.className = "layer crop-shape " + shape;
+      div.style.background = "#0ff5";
+      div.style.width = "100px";
+      div.style.height = "100px";
+      div.style.left = "60px";
+      div.style.top = "60px";
+      div.style.opacity = "1";
+      editor.appendChild(div);
+      layers.push(div);
+      makeInteractive(div);
+    }
+
+    function setCrop(shape) {
+      if (!selectedLayer) return;
+      selectedLayer.classList.remove("circle", "square");
+      if (shape !== "none") selectedLayer.classList.add(shape);
+    }
+
+    function scaleSelected(sx, sy) {
+      if (!selectedLayer) return;
+      const rect = selectedLayer.getBoundingClientRect();
+      selectedLayer.style.width = rect.width * sx + "px";
+      selectedLayer.style.height = rect.height * sy + "px";
+    }
+
+    function setOpacity(val) {
+      if (selectedLayer) {
+        selectedLayer.style.opacity = val;
+      }
+    }
+
+    function makeInteractive(el) {
+      let isDragging = false;
+      let lastTouchDistance = null;
+      let initialAngle = null;
+      let lastRotation = 0;
+      let offsetX = 0, offsetY = 0;
+
+      el.addEventListener("touchstart", e => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          selectedLayer = el;
+          const touch = e.touches[0];
+          const rect = el.getBoundingClientRect();
+          offsetX = touch.clientX - rect.left;
+          offsetY = touch.clientY - rect.top;
+        } else if (e.touches.length === 2) {
+          lastTouchDistance = getDistance(e.touches[0], e.touches[1]);
+          initialAngle = getAngle(e.touches[0], e.touches[1]);
+        }
+      });
+
+      el.addEventListener("touchmove", e => {
+        if (e.touches.length === 1 && isDragging) {
+          const touch = e.touches[0];
+          el.style.left = (touch.clientX - offsetX) + "px";
+          el.style.top = (touch.clientY - offsetY) + "px";
+        } else if (e.touches.length === 2) {
+          const dist = getDistance(e.touches[0], e.touches[1]);
+          const angle = getAngle(e.touches[0], e.touches[1]);
+
+          if (lastTouchDistance && initialAngle !== null) {
+            const scale = dist / lastTouchDistance;
+            const rect = el.getBoundingClientRect();
+            el.style.width = rect.width * scale + "px";
+            el.style.height = rect.height * scale + "px";
+
+            const deltaAngle = angle - initialAngle;
+            lastRotation += deltaAngle;
+            el.style.transform = `rotate(${lastRotation}deg)`;
+            initialAngle = angle;
+            lastTouchDistance = dist;
+          }
+        }
+      });
+
+      el.addEventListener("touchend", () => {
+        isDragging = false;
+        lastTouchDistance = null;
+        initialAngle = null;
+      });
+
+      el.addEventListener("click", () => selectedLayer = el);
+    }
+
+    function getDistance(t1, t2) {
+      const dx = t2.clientX - t1.clientX;
+      const dy = t2.clientY - t1.clientY;
+      return Math.hypot(dx, dy);
+    }
+
+    function getAngle(t1, t2) {
+      return Math.atan2(t2.clientY - t1.clientY, t2.clientX - t1.clientX) * (180 / Math.PI);
+    }
+
+    function exportCanvas() {
+      const canvas = document.getElementById("exportCanvas");
+      const ctx = canvas.getContext("2d");
+      const rect = editor.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      layers.forEach(layer => {
+        const style = window.getComputedStyle(layer);
+        const width = parseFloat(style.width);
+        const height = parseFloat(style.height);
+        const left = parseFloat(style.left);
+        const top = parseFloat(style.top);
+        const opacity = parseFloat(style.opacity);
+        ctx.globalAlpha = opacity || 1;
+
+        ctx.save();
+        ctx.translate(left + width / 2, top + height / 2);
+
+        const match = style.transform.match(/rotate\(([-0-9.]+)deg\)/);
+        if (match) ctx.rotate(parseFloat(match[1]) * Math.PI / 180);
+
+        if (layer.tagName === "IMG") {
+          ctx.drawImage(layer, -width / 2, -height / 2, width, height);
+        } else {
+          ctx.fillStyle = style.backgroundColor || "#fff";
+          if (layer.classList.contains("circle")) {
+            ctx.beginPath();
+            ctx.arc(0, 0, Math.min(width, height) / 2, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            ctx.fillRect(-width / 2, -height / 2, width, height);
+          }
+          if (layer.classList.contains("text")) {
+            ctx.fillStyle = style.color || "#fff";
+            ctx.font = "20px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(layer.textContent, 0, 0);
+          }
+        }
+
+        ctx.restore();
+      });
+
+      const dataURL = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataURL;
+      a.download = "composicao_final.png";
+      a.click();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGMA-TRINITY Editor</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; background: #111; color: #fff; }
+    #controls, #timeline { padding: 10px; background: #222; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    #editor { width: 100%; height: 80vh; background: #000; position: relative; overflow: hidden; }
+    .layer, .text-layer { position: absolute; cursor: move; }
+    .text-layer { color: white; font-size: 20px; }
+    .buttons input, .buttons button, .buttons select {
+      background: #333; color: #eee; border: none; padding: 6px 10px; border-radius: 6px;
+    }
+    @keyframes pulsar { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes fade { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .anim-pulsar { animation: pulsar 2s infinite; }
+    .anim-girar { animation: girar 5s linear infinite; }
+    .anim-fade { animation: fade 3s infinite; }
+  </style>
+</head>
+<body>
+
+<div id="controls" class="buttons">
+  <input type="file" id="imageInput" accept="image/*" />
+  <input type="text" id="textInput" placeholder="Adicionar texto..." />
+  <button onclick="addText()">➕ Texto</button>
+  <select id="filterSelect" onchange="applyFilter(this.value)">
+    <option value="none">Sem Filtro</option>
+    <option value="grayscale(1)">Preto & Branco</option>
+    <option value="sepia(1)">Sépia</option>
+    <option value="blur(3px)">Desfoque</option>
+    <option value="contrast(200%)">Alto Contraste</option>
+    <option value="brightness(1.5)">Brilho+</option>
+    <option value="invert(1)">Inverter Cores</option>
+  </select>
+  <button onclick="addAnimation('anim-pulsar')">+ Pulsar</button>
+  <button onclick="addAnimation('anim-girar')">+ Girar</button>
+  <button onclick="addAnimation('anim-fade')">+ Fade</button>
+  <button onclick="removeAnimations()">− Animações</button>
+  <input type="text" id="promptText" placeholder="Digite um tema..." />
+  <button onclick="generateText()">Gerar Texto 🧠</button>
+  <button onclick="saveProject()">💾 Salvar Projeto</button>
+  <button onclick="loadProject()">📂 Carregar Projeto</button>
+</div>
+
+<div id="editor"></div>
+<div id="timeline">⏱️ Linha do Tempo (em breve - MP4/GIF export)</div>
+
+<script>
+let layers = [];
+let selectedLayer = null;
+const editor = document.getElementById('editor');
+
+document.getElementById('imageInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = document.createElement('img');
+  img.src = URL.createObjectURL(file);
+  img.className = 'layer';
+  img.style.top = '50px';
+  img.style.left = '50px';
+  img.style.width = '100px';
+  makeInteractive(img);
+  editor.appendChild(img);
+  layers.push(img);
+});
+
+function makeInteractive(el) {
+  el.addEventListener('pointerdown', e => {
+    selectedLayer = el;
+    const offsetX = e.offsetX, offsetY = e.offsetY;
+    function move(ev) {
+      el.style.left = `${ev.clientX - offsetX}px`;
+      el.style.top = `${ev.clientY - offsetY}px`;
+    }
+    function stop() {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+    }
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop);
+  });
+  el.addEventListener('wheel', e => {
+    e.preventDefault();
+    const scale = parseFloat(el.style.scale || 1);
+    el.style.scale = e.deltaY < 0 ? scale + 0.1 : scale - 0.1;
+  });
+}
+
+function addText() {
+  const txt = document.getElementById('textInput').value;
+  if (!txt) return;
+  const span = document.createElement('div');
+  span.textContent = txt;
+  span.className = 'text-layer';
+  span.style.top = '100px';
+  span.style.left = '100px';
+  makeInteractive(span);
+  editor.appendChild(span);
+  layers.push(span);
+}
+
+function applyFilter(filter) {
+  if (selectedLayer) selectedLayer.style.filter = filter;
+}
+
+function addAnimation(animClass) {
+  if (!selectedLayer) return;
+  removeAnimations();
+  selectedLayer.classList.add(animClass);
+}
+function removeAnimations() {
+  if (!selectedLayer) return;
+  selectedLayer.classList.remove('anim-pulsar', 'anim-girar', 'anim-fade');
+}
+
+function generateText() {
+  const prompt = document.getElementById('promptText').value.trim().toLowerCase();
+  let output = "Luz interior revela a eternidade.";
+  if (prompt.includes("cósmica") || prompt.includes("estrela")) output = "A estrela pulsa no infinito do teu olhar.";
+  else if (prompt.includes("luz")) output = "A luz em ti é código de ascensão.";
+  else if (prompt.includes("azul")) output = "Azul vibra no coração do vórtice interdimensional.";
+  document.getElementById("textInput").value = output;
+  addText();
+}
+
+function saveProject() {
+  const data = layers.map(el => ({
+    tag: el.tagName,
+    class: el.className,
+    text: el.textContent || '',
+    style: el.style.cssText
+  }));
+  localStorage.setItem("KOBLLUX_PROJECT", JSON.stringify(data));
+  alert("Projeto salvo localmente!");
+}
+
+function loadProject() {
+  const data = JSON.parse(localStorage.getItem("KOBLLUX_PROJECT"));
+  if (!data) return alert("Nenhum projeto salvo.");
+  editor.innerHTML = "";
+  layers = [];
+  data.forEach(obj => {
+    const el = document.createElement(obj.tag);
+    el.className = obj.class;
+    el.textContent = obj.text;
+    el.style.cssText = obj.style;
+    editor.appendChild(el);
+    layers.push(el);
+    makeInteractive(el);
+  });
+}
+</script>
+</body>
+</html>

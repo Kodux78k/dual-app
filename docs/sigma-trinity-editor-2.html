@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Editor Mobile Expandido</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #121212;
+      color: white;
+    }
+    header {
+      padding: 1em;
+      text-align: center;
+      background: #222;
+      font-weight: bold;
+    }
+    #editor {
+      position: relative;
+      width: 100%;
+      height: 75vh;
+      background: #333;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      touch-action: none;
+      user-select: none;
+      transform-origin: center center;
+    }
+    .crop-shape.circle { border-radius: 50%; }
+    .crop-shape.square { border-radius: 0%; }
+
+    #controls {
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+    }
+    input[type="file"] {
+      background: #444;
+      border: none;
+      padding: 0.5em;
+      color: white;
+      width: 100%;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+    }
+    .buttons button {
+      flex: 1;
+      padding: 0.5em;
+      background: #555;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-size: 0.9em;
+    }
+    canvas {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>Editor de Imagens Mobile</header>
+  <div id="editor"></div>
+
+  <div id="controls">
+    <input type="file" accept="image/png, image/jpeg" onchange="handleUpload(event)" multiple />
+    <div class="buttons">
+      <button onclick="setCrop('none')">Recorte Livre</button>
+      <button onclick="setCrop('square')">Quadrado</button>
+      <button onclick="setCrop('circle')">Circular</button>
+    </div>
+    <div class="buttons">
+      <button onclick="scaleSelected(1.1, 1.1)">Ampliar</button>
+      <button onclick="scaleSelected(0.9, 0.9)">Reduzir</button>
+      <button onclick="scaleSelected(1.1, 1)">Largura+</button>
+      <button onclick="scaleSelected(1, 1.1)">Altura+</button>
+    </div>
+    <div class="buttons">
+      <button onclick="exportCanvas()">Exportar PNG</button>
+    </div>
+  </div>
+
+  <canvas id="exportCanvas"></canvas>
+
+  <script>
+    const editor = document.getElementById("editor");
+    let selectedLayer = null;
+    let layers = [];
+
+    function handleUpload(event) {
+      const files = event.target.files;
+      for (let file of files) {
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.className = "layer crop-shape";
+        img.style.width = "200px";
+        img.onload = () => {
+          editor.appendChild(img);
+          layers.push(img);
+          makeInteractive(img);
+        };
+      }
+    }
+
+    function setCrop(shape) {
+      if (!selectedLayer) return;
+      selectedLayer.classList.remove("circle", "square");
+      if (shape !== "none") selectedLayer.classList.add(shape);
+    }
+
+    function scaleSelected(sx, sy) {
+      if (!selectedLayer) return;
+      const rect = selectedLayer.getBoundingClientRect();
+      selectedLayer.style.width = rect.width * sx + "px";
+      selectedLayer.style.height = rect.height * sy + "px";
+    }
+
+    function makeInteractive(el) {
+      let isDragging = false;
+      let lastTouchDistance = null;
+      let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
+
+      el.addEventListener("touchstart", e => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          selectedLayer = el;
+          const touch = e.touches[0];
+          const rect = el.getBoundingClientRect();
+          offsetX = touch.clientX - rect.left;
+          offsetY = touch.clientY - rect.top;
+        } else if (e.touches.length === 2) {
+          lastTouchDistance = getDistance(e.touches[0], e.touches[1]);
+        }
+      });
+
+      el.addEventListener("touchmove", e => {
+        if (e.touches.length === 1 && isDragging) {
+          const touch = e.touches[0];
+          el.style.left = (touch.clientX - offsetX) + "px";
+          el.style.top = (touch.clientY - offsetY) + "px";
+        } else if (e.touches.length === 2) {
+          const dist = getDistance(e.touches[0], e.touches[1]);
+          if (lastTouchDistance) {
+            const scale = dist / lastTouchDistance;
+            const rect = el.getBoundingClientRect();
+            el.style.width = rect.width * scale + "px";
+            el.style.height = rect.height * scale + "px";
+          }
+          lastTouchDistance = dist;
+        }
+      });
+
+      el.addEventListener("touchend", () => {
+        isDragging = false;
+        lastTouchDistance = null;
+      });
+
+      el.addEventListener("click", () => {
+        selectedLayer = el;
+      });
+    }
+
+    function getDistance(touch1, touch2) {
+      const dx = touch2.clientX - touch1.clientX;
+      const dy = touch2.clientY - touch1.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function exportCanvas() {
+      const canvas = document.getElementById("exportCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const rect = editor.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      layers.forEach(layer => {
+        const img = layer;
+        const style = window.getComputedStyle(img);
+        const width = parseFloat(style.width);
+        const height = parseFloat(style.height);
+        const left = parseFloat(style.left);
+        const top = parseFloat(style.top);
+        const radius = img.classList.contains("circle") ? 0.5 : 0;
+
+        if (radius > 0) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(left + width / 2, top + height / 2, Math.min(width, height) / 2, 0, Math.PI * 2);
+          ctx.clip();
+        }
+
+        ctx.drawImage(img, left, top, width, height);
+
+        if (radius > 0) {
+          ctx.restore();
+        }
+      });
+
+      const dataURL = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = dataURL;
+      a.download = "imagem_editada.png";
+      a.click();
+    }
+  </script>
+</body>
+</html>

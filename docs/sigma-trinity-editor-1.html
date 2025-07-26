@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor de Imagens Mobile</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    header {
+      background: #222;
+      padding: 1em;
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    #editor {
+      position: relative;
+      width: 100%;
+      height: 80vh;
+      background: #333;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      user-select: none;
+      touch-action: none;
+      transform-origin: center center;
+    }
+    #controls {
+      padding: 1em;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5em;
+    }
+    input[type="file"] {
+      background: #444;
+      padding: 0.5em;
+      border: none;
+      color: white;
+      width: 100%;
+    }
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      justify-content: center;
+    }
+    .buttons button {
+      flex: 1 1 auto;
+      padding: 0.5em;
+      background: #555;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9em;
+    }
+    .crop-shape {
+      border-radius: 0%;
+    }
+    .crop-shape.circle {
+      border-radius: 50%;
+    }
+    .crop-shape.square {
+      border-radius: 0%;
+    }
+  </style>
+</head>
+<body>
+  <header>Editor de Imagens Mobile</header>
+  <div id="editor"></div>
+
+  <div id="controls">
+    <input type="file" accept="image/png, image/jpeg" onchange="handleUpload(event)">
+    <div class="buttons">
+      <button onclick="setCrop('none')">Recorte Livre</button>
+      <button onclick="setCrop('square')">Quadrado</button>
+      <button onclick="setCrop('circle')">Circular</button>
+    </div>
+    <div class="buttons">
+      <button onclick="scaleSelected(1.1, 1.1)">Ampliar</button>
+      <button onclick="scaleSelected(0.9, 0.9)">Reduzir</button>
+      <button onclick="scaleSelected(1.1, 1)">Largura+</button>
+      <button onclick="scaleSelected(1, 1.1)">Altura+</button>
+    </div>
+  </div>
+
+  <script>
+    const editor = document.getElementById("editor");
+    let selectedLayer = null;
+    let layers = [];
+
+    function handleUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const img = document.createElement("img");
+      img.src = URL.createObjectURL(file);
+      img.className = "layer crop-shape";
+      img.style.width = "200px";
+      img.style.height = "auto";
+      img.onload = () => {
+        editor.appendChild(img);
+        layers.push(img);
+        makeDraggable(img);
+        selectedLayer = img;
+      };
+    }
+
+    function setCrop(shape) {
+      if (!selectedLayer) return;
+      selectedLayer.classList.remove("circle", "square");
+      if (shape !== "none") selectedLayer.classList.add(shape);
+    }
+
+    function scaleSelected(sx, sy) {
+      if (!selectedLayer) return;
+      const rect = selectedLayer.getBoundingClientRect();
+      selectedLayer.style.width = rect.width * sx + "px";
+      selectedLayer.style.height = rect.height * sy + "px";
+    }
+
+    function makeDraggable(el) {
+      let isDragging = false;
+      let offsetX = 0, offsetY = 0;
+
+      el.addEventListener("touchstart", e => {
+        isDragging = true;
+        selectedLayer = el;
+        const touch = e.touches[0];
+        const rect = el.getBoundingClientRect();
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
+      });
+
+      window.addEventListener("touchmove", e => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        el.style.left = (touch.clientX - offsetX) + "px";
+        el.style.top = (touch.clientY - offsetY) + "px";
+      });
+
+      window.addEventListener("touchend", () => {
+        isDragging = false;
+      });
+
+      // To support tap to select on mobile
+      el.addEventListener("click", () => {
+        selectedLayer = el;
+      });
+    }
+  </script>
+</body>
+</html>
