@@ -264,19 +264,19 @@
     const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
 
     const CODE_MAP = {
-      "Menu": "menu.html",
-      "KBL": "index-x-3.html",
+      "DUAL": "menu.html",
+      "KBLX": "menu-x-1.html",
       "ATVR": "render-response.html",
       "ATVD": "decodificador.html",
-      "337": "dual-tube-25.html",
-      "qwe": "dual-book-12.html",
-      "mn1": "index-manifestado.html",
-      "mn2": "index-manifestado-tangle.html",
-      "bts": "botao-simbolico.html",
+      "337": "KOBLLUX_MetaLux_CLEANED.html",
+      "DBK": "dual-book-12.html",
+      "IMN": "index-manifestado.html",
+      "IMNN": "index-manifestado-tangle.html",
+      "BTS": "botao-simbolico.html",
     };
 
     function playButtonSound() {
-      const sound = new Audio('assets/sounds/uiSounds/navigate.wav');
+      const sound = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
       sound.volume = 0.4;
       sound.play().catch(() => {});
     }
@@ -333,7 +333,7 @@
       gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
       gsap.to('.infodose', { opacity: 0, duration: 0.6 });
       gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
-      setTimeout(() => { window.location.href = 'menu-x-0.html'; }, 1399);
+      setTimeout(() => { window.location.href = 'menu.html'; }, 1399);
     };
 
     const lockScroll = () => {
