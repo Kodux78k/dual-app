@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGMA PERITO – IA Integrada</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f3f3f3; margin: 0; padding: 0; }
+    header { background: #333; color: white; padding: 20px; text-align: center; }
+    main { padding: 20px; max-width: 800px; margin: auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    section { margin-bottom: 30px; }
+    textarea, input, select { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; background: #0066cc; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0052a3; }
+    .output { background: #e8f4ff; padding: 15px; white-space: pre-wrap; border-left: 5px solid #007acc; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛠️ SIGMA PERITO – LAUDO + IA + NR + COTAÇÃO</h1>
+  </header>
+  <main>
+    <section>
+      <h2>🔐 Chave da IA (SK)</h2>
+      <input type="text" id="apiKey" placeholder="Cole aqui sua chave SK..." />
+    </section>
+
+    <section>
+      <h2>🤖 Assistente de Laudo com IA</h2>
+      <textarea id="userPrompt" rows="5" placeholder="Descreva o caso da perícia, evento, problema, NR, acidente..."></textarea>
+      <button onclick="chamarIA()">Ativar IA</button>
+      <div id="iaOutput" class="output"></div>
+    </section>
+
+    <section>
+      <h2>📋 Checklists de Segurança (NR)</h2>
+      <ul>
+        <li>✅ NR-6 – Equipamentos de Proteção Individual</li>
+        <li>✅ NR-10 – Segurança em Instalações Elétricas</li>
+        <li>✅ NR-18 – Condições e Meio Ambiente na Construção</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>💰 Tabela de Cotação</h2>
+      <textarea rows="4" placeholder="Adicione materiais, EPIs, custos, valores estimados..."></textarea>
+    </section>
+
+    <section>
+      <h2>✍️ Assinatura Digital</h2>
+      <canvas id="signatureCanvas" width="300" height="150" style="border:1px solid #000;"></canvas><br />
+      <button onclick="limparAssinatura()">Limpar</button>
+    </section>
+
+    <section>
+      <button onclick="window.print()">📄 Exportar como PDF</button>
+    </section>
+  </main>
+
+  <script>
+    function chamarIA() {
+      const apiKey = document.getElementById("apiKey").value;
+      const prompt = document.getElementById("userPrompt").value;
+      const outputDiv = document.getElementById("iaOutput");
+      outputDiv.innerHTML = "⌛ Processando...";
+
+      fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        outputDiv.innerHTML = data.choices?.[0]?.message?.content || "❌ Nenhuma resposta.";
+      })
+      .catch(err => {
+        console.error(err);
+        outputDiv.innerHTML = "❌ Erro ao conectar com IA.";
+      });
+    }
+
+    const canvas = document.getElementById("signatureCanvas");
+    const ctx = canvas.getContext("2d");
+    let desenhando = false;
+
+    canvas.addEventListener("mousedown", () => { desenhando = true; });
+    canvas.addEventListener("mouseup", () => { desenhando = false; ctx.beginPath(); });
+    canvas.addEventListener("mousemove", desenhar);
+
+    function desenhar(event) {
+      if (!desenhando) return;
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#000";
+      ctx.lineTo(event.offsetX, event.offsetY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(event.offsetX, event.offsetY);
+    }
+
+    function limparAssinatura() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  </script>
+</body>
+</html>

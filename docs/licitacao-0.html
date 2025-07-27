@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cotação Clara | Licitações</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .form-box {
+      background: #fff;
+      padding: 28px;
+      border-radius: 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      background: #1976d2;
+      color: white;
+      border: none;
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 8px;
+      width: 100%;
+      font-size: 15px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Cotação Clara</h2>
+    <input type="text" id="nome" placeholder="Seu nome">
+    <input type="text" id="orgao" placeholder="Órgão público ou empresa">
+    <textarea id="descricao" rows="4" placeholder="Descreva os itens da cotação"></textarea>
+    <button onclick="enviar()">Enviar Cotação</button>
+  </div>
+  <script>
+    function enviar() {
+      const nome = document.getElementById("nome").value;
+      const orgao = document.getElementById("orgao").value;
+      const descricao = document.getElementById("descricao").value;
+      const mailto = `mailto:cotacao@empresa.com?subject=Cotação%20de%20Peças&body=Nome:%20${nome}%0AÓrgão:%20${orgao}%0AItens:%20${descricao}`;
+      window.location.href = mailto;
+    }
+  </script>
+</body>
+</html>

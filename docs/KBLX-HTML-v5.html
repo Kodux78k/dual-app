@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KOBLLUX Codex vFinal</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Courier New', monospace;
+      background: linear-gradient(135deg, #0a0a0a, #0f0f2e);
+      color: #fff; display: flex; flex-direction: column; height: 100vh;
+    }
+    header { padding: 10px; background: #111; text-align: center; font-size: 18px; }
+    #editorContainer { display: flex; flex: 1; overflow: hidden; }
+    #editor, #preview {
+      flex: 1; padding: 10px; resize: none; outline: none;
+      background: #1a1a1a; border: none; color: #0ff; font-size: 14px;
+    }
+    #preview { background: #0d0d0d; border-left: 1px solid #444; overflow: auto; }
+    #sidebar {
+      width: 300px; background: #0f0f1f; border-left: 1px solid #444;
+      display: flex; flex-direction: column;
+      transition: transform 0.3s ease-in-out;
+    }
+    #sidebar.hidden { transform: translateX(100%); }
+    #sidebarToggle {
+      position: absolute; right: 300px; top: 10px;
+      z-index: 10; background: #222; color: #fff; border: none; padding: 5px 10px;
+    }
+    #chat, #input, #controls {
+      padding: 10px; font-size: 13px;
+    }
+    #input { margin-top: auto; border-top: 1px solid #333; }
+    textarea, input[type="file"] {
+      width: 100%; background: #000; color: #0f0; border: 1px solid #333; padding: 6px;
+    }
+    #controls button {
+      background: #222; color: #0ff; border: 1px solid #555; padding: 5px 8px; margin: 2px;
+    }
+    iframe { width: 100%; height: 100%; border: none; }
+    #tabs { display: flex; flex-wrap: wrap; background: #111; }
+    .tab {
+      background: #222; color: #fff; padding: 5px 10px; margin: 2px;
+      cursor: pointer; border: 1px solid #555;
+    }
+    .tab.active { background: #0ff; color: #000; }
+    .energy {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none; z-index: 0;
+      background: radial-gradient(circle at center, rgba(0,255,255,0.1) 0%, transparent 80%);
+      animation: pulse 3s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.2; }
+      50% { opacity: 0.5; }
+      100% { opacity: 0.2; }
+    }
+  </style>
+</head>
+<body>
+  <header>KOBLLUX CODEX ∞</header>
+
+  <div id="tabs"></div>
+
+  <div id="editorContainer">
+    <div style="position: relative; flex: 1; display: flex; flex-direction: column;">
+      <textarea id="editor" placeholder="Escreva seu código HTML aqui..."></textarea>
+      <iframe id="preview"></iframe>
+      <div class="energy"></div>
+    </div>
+
+    <div id="sidebar">
+      <div id="chat"><strong>💬 Conversa com o Código:</strong><br/><em>(IA offline por enquanto)</em></div>
+      <div id="controls">
+        <button onclick="analisarCodigo()">Analisar</button>
+        <button onclick="salvarArquivo()">Salvar</button>
+        <input type="file" onchange="carregarArquivo(event)" />
+        <button onclick="enviarInfodoses()">📤 Infodoses</button>
+      </div>
+      <div id="input">
+        <textarea id="manualContext" placeholder="Enviar contexto manual para IA..."></textarea>
+        <button onclick="enviarManual()">Enviar Contexto</button>
+      </div>
+    </div>
+  </div>
+
+  <button id="sidebarToggle" onclick="toggleSidebar()">⮕</button>
+
+  <script>
+    let tabs = [];
+    let currentTab = null;
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+
+    function novaAba(nome = `Aba ${tabs.length + 1}`, conteudo = '') {
+      tabs.push({ nome, conteudo });
+      currentTab = tabs.length - 1;
+      renderTabs();
+      editor.value = conteudo;
+      atualizarPreview();
+    }
+
+    function renderTabs() {
+      const el = document.getElementById('tabs');
+      el.innerHTML = '';
+      tabs.forEach((tab, i) => {
+        const t = document.createElement('div');
+        t.className = 'tab' + (i === currentTab ? ' active' : '');
+        t.textContent = tab.nome;
+        t.onclick = () => {
+          currentTab = i;
+          editor.value = tabs[i].conteudo;
+          atualizarPreview();
+          renderTabs();
+        };
+        el.appendChild(t);
+      });
+    }
+
+    function atualizarPreview() {
+      if (currentTab !== null) {
+        tabs[currentTab].conteudo = editor.value;
+        const blob = new Blob([editor.value], { type: 'text/html' });
+        preview.src = URL.createObjectURL(blob);
+      }
+    }
+
+    editor.addEventListener('input', atualizarPreview);
+
+    function analisarCodigo() {
+      const chat = document.getElementById('chat');
+      const code = editor.value;
+      chat.innerHTML = `🔍 Analisando...<br/>Linhas: ${code.split('\n').length}<br/>Caracteres: ${code.length}`;
+    }
+
+    function salvarArquivo() {
+      const blob = new Blob([editor.value], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.download = (tabs[currentTab]?.nome || 'codigo') + '.html';
+      link.href = URL.createObjectURL(blob);
+      link.click();
+    }
+
+    function carregarArquivo(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = e => {
+        novaAba(file.name, e.target.result);
+      };
+      if (file) reader.readAsText(file);
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('hidden');
+    }
+
+    function enviarManual() {
+      const ctx = document.getElementById('manualContext').value;
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<br/>📤 Enviado manualmente:<br/><pre>${ctx}</pre>`;
+    }
+
+    function enviarInfodoses() {
+      const infodose = localStorage.getItem('infodose-kobllux');
+      const chat = document.getElementById('chat');
+      if (infodose) {
+        chat.innerHTML += `<br/>📥 Infodose carregada:<br/><pre>${infodose}</pre>`;
+      } else {
+        chat.innerHTML += `<br/>⚠️ Nenhuma infodose encontrada.`;
+      }
+    }
+
+    // Inicial
+    novaAba("Index.html", "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Nova Página</title>\n  </head>\n  <body>\n    <h1>Olá, KOBLLUX!</h1>\n  </body>\n</html>");
+  </script>
+</body>
+</html>

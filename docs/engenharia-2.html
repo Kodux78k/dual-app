@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel SIGMA | Perito e Eng. de Segurança</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0; padding: 0;
+      background: #f5f5f5; color: #222;
+    }
+    header {
+      background: linear-gradient(45deg, #243949, #517fa4);
+      color: white; padding: 20px; text-align: center;
+    }
+    nav {
+      background: #fff; padding: 10px;
+      display: flex; justify-content: space-around; flex-wrap: wrap;
+      border-bottom: 2px solid #ccc;
+    }
+    nav button {
+      background: #243949; color: white;
+      border: none; padding: 10px 20px; margin: 5px;
+      border-radius: 6px; cursor: pointer;
+    }
+    section {
+      padding: 20px;
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+    textarea, input, select {
+      width: 100%; margin: 10px 0; padding: 10px;
+      border: 1px solid #ccc; border-radius: 6px;
+    }
+    canvas { border: 1px solid #ccc; margin-top: 10px; }
+    .btn {
+      background: #517fa4; color: white; border: none;
+      padding: 10px 20px; border-radius: 6px; cursor: pointer;
+    }
+    .cotacao-table td, .cotacao-table th {
+      padding: 8px; border: 1px solid #ccc;
+    }
+    .cotacao-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SIGMA | Perito & Segurança do Trabalho</h1>
+    <p>🛡️ Laudos • Treinamentos • NR • Cotação • Assinatura</p>
+  </header>
+
+  <nav>
+    <button onclick="toggle('laudo')">📄 Laudo Automático</button>
+    <button onclick="toggle('cotacao')">💰 Cotação</button>
+    <button onclick="toggle('treinamento')">🎓 Treinamentos / NR</button>
+    <button onclick="toggle('assinatura')">✍️ Assinatura Digital</button>
+    <button onclick="window.print()">📤 Exportar PDF</button>
+  </nav>
+
+  <section id="laudo" class="active">
+    <h2>📄 Geração de Laudo com IA (simulado)</h2>
+    <textarea id="descricaoProblema" placeholder="Descreva o problema ou situação da obra..."></textarea>
+    <button class="btn" onclick="gerarLaudo()">Gerar Laudo</button>
+    <textarea id="laudoGerado" placeholder="Laudo gerado aparecerá aqui..." rows="10"></textarea>
+  </section>
+
+  <section id="cotacao">
+    <h2>💰 Tabela de Cotação</h2>
+    <table class="cotacao-table" id="tabelaCotacao">
+      <tr><th>Item</th><th>Quantidade</th><th>Valor Unitário</th></tr>
+    </table>
+    <input type="text" id="item" placeholder="Item"/>
+    <input type="number" id="quantidade" placeholder="Quantidade"/>
+    <input type="number" id="valor" placeholder="Valor Unitário"/>
+    <button class="btn" onclick="adicionarCotacao()">Adicionar Item</button>
+  </section>
+
+  <section id="treinamento">
+    <h2>🎓 Treinamentos e NRs</h2>
+    <ul>
+      <li>NR-6: Equipamentos de Proteção Individual</li>
+      <li>NR-10: Segurança em Instalações Elétricas</li>
+      <li>NR-18: Condições e Meio Ambiente na Indústria da Construção</li>
+    </ul>
+    <p>✅ Treinamentos disponíveis sob demanda. Enviar e-mail ou mensagem para agendar.</p>
+  </section>
+
+  <section id="assinatura">
+    <h2>✍️ Assinatura Digital</h2>
+    <canvas id="canvas" width="300" height="150"></canvas><br/>
+    <button class="btn" onclick="limparAssinatura()">Limpar</button>
+  </section>
+
+  <section>
+    <h3>📎 Upload de Documentos e Fotos</h3>
+    <input type="file" multiple />
+  </section>
+
+  <section>
+    <h3>📞 Contato Rápido</h3>
+    <p>WhatsApp: <a href="https://wa.me/5500000000000" target="_blank">Chamar no WhatsApp</a></p>
+    <p>Email: <a href="mailto:contato@empresa.com">contato@empresa.com</a></p>
+  </section>
+
+  <script>
+    function toggle(id) {
+      document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function gerarLaudo() {
+      const input = document.getElementById("descricaoProblema").value;
+      document.getElementById("laudoGerado").value = 
+        "Laudo Técnico:\n\n" +
+        "Após análise da situação informada — \"" + input + "\" — constatamos a necessidade de vistoria técnica, conforme padrões da NR aplicável. Recomenda-se uso de EPI, isolamento da área e relatório fotográfico. Assinado digitalmente.";
+    }
+
+    function adicionarCotacao() {
+      const item = document.getElementById("item").value;
+      const qtd = document.getElementById("quantidade").value;
+      const valor = document.getElementById("valor").value;
+      const tabela = document.getElementById("tabelaCotacao");
+      const linha = tabela.insertRow();
+      linha.innerHTML = `<td>${item}</td><td>${qtd}</td><td>R$ ${parseFloat(valor).toFixed(2)}</td>`;
+    }
+
+    // Assinatura digital
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    let desenhando = false;
+
+    canvas.addEventListener("mousedown", () => desenhando = true);
+    canvas.addEventListener("mouseup", () => desenhando = false);
+    canvas.addEventListener("mousemove", desenhar);
+    function desenhar(event) {
+      if (!desenhando) return;
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineWidth = 2;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#000";
+      ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(event.clientX - rect.left, event.clientY - rect.top);
+    }
+    function limparAssinatura() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  </script>
+</body>
+</html>

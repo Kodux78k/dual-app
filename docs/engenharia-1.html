@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Segurança & Perícia | Eng. Segurança do Trabalho</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      margin:0; padding:0;
+      font-family: 'Arial', sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+    header, footer {
+      background: #004d40;
+      color: #fff;
+      text-align: center;
+      padding: 16px;
+    }
+    main {
+      padding: 24px;
+      max-width: 900px;
+      margin: auto;
+    }
+    section {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    h2 {
+      margin-top: 0;
+      color: #004d40;
+    }
+    label { display:block; margin:12px 0 4px; font-weight: bold; }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border:1px solid #ccc;
+      font-size: 14px;
+    }
+    button {
+      background: #00796b;
+      color: #fff;
+      border:none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #004d40;
+    }
+    table {
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      border:1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .flex { display: flex; gap: 12px; flex-wrap: wrap; }
+    .flex > * { flex:1; min-width: 200px; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Eng. Segurança & Perícia em Obras</h1>
+  <p>Perícia técnica · Cotação de EPIs · Treinamentos · NR Compliance</p>
+</header>
+
+<main>
+
+  <!-- 1. DADOS BÁSICOS & AGENDAMENTO -->
+  <section id="sec-pericia">
+    <h2>1. Agendar Perícia / Inspeção</h2>
+    <div class="flex">
+      <div>
+        <label for="nome">Nome Completo</label>
+        <input id="nome" type="text" placeholder="Seu nome"/>
+      </div>
+      <div>
+        <label for="empresa">Empresa / Obra</label>
+        <input id="empresa" type="text" placeholder="Nome da obra ou empresa"/>
+      </div>
+    </div>
+    <label for="data">Data da Inspeção</label>
+    <input id="data" type="date"/>
+    <label for="docs">Anexar Fotos / Documentos</label>
+    <input id="docs" type="file" multiple accept="image/*,application/pdf"/>
+    <button onclick="submitPericia()">Enviar Agendamento</button>
+  </section>
+
+  <!-- 2. COTAÇÃO DE EPIs & SERVIÇOS -->
+  <section id="sec-cotacao">
+    <h2>2. Cotação de EPIs & Serviços</h2>
+    <table id="table-cotacao">
+      <thead>
+        <tr>
+          <th>Item / EPI</th>
+          <th>Quantidade</th>
+          <th>Preço Unit.</th>
+          <th> Ação </th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="addRow()">+ Adicionar Item</button>
+    <button onclick="sendCotacao()">Enviar Cotação</button>
+  </section>
+
+  <!-- 3. TREINAMENTOS & CHECKLIST NR -->
+  <section id="sec-treinamentos">
+    <h2>3. Inscrição em Treinamentos & NR-Checklists</h2>
+    <label for="treinamento">Selecione o Treinamento</label>
+    <select id="treinamento">
+      <option value="nr6">NR-6: EPI</option>
+      <option value="nr18">NR-18: Condições de Obra</option>
+      <option value="nr10">NR-10: Segurança em Eletricidade</option>
+      <option value="custom">Outro</option>
+    </select>
+    <textarea id="obs-trein" rows="3" placeholder="Observações ou outra NR…"></textarea>
+    <h3>Checklist de Conformidade</h3>
+    <div id="checklist">
+      <label><input type="checkbox" value="epi"> Fornecimento de EPIs</label>
+      <label><input type="checkbox" value="sinal"> Placas e Sinalizações</label>
+      <label><input type="checkbox" value="andaime"> Andaimes e Escoramentos</label>
+      <label><input type="checkbox" value="eletrica"> Instalações Elétricas Seguras</label>
+    </div>
+    <button onclick="sendTrein()">Confirmar Inscrição & Checklist</button>
+  </section>
+
+  <!-- 4. COMUNICAÇÃO RÁPIDA -->
+  <section id="sec-comunicacao">
+    <h2>4. Contato Imediato</h2>
+    <button onclick="openEmail()">✉️ Enviar e-mail</button>
+    <button onclick="openWhats()">💬 WhatsApp</button>
+  </section>
+
+</main>
+
+<footer>
+  <p>© 2025 – Eng. Segurança do Trabalho & Perícias</p>
+</footer>
+
+<script>
+  // --- Seção 1: Agendamento ---
+  function submitPericia(){
+    const nome = document.getElementById('nome').value;
+    const obra = document.getElementById('empresa').value;
+    const data = document.getElementById('data').value;
+    // O upload de arquivos geralmente vai para um endpoint; aqui abrimos o WhatsApp como exemplo:
+    const msg = `Agendamento de perícia:\nNome: ${nome}\nObra: ${obra}\nData: ${data}`;
+    window.open(`https://wa.me/55SEUDDDSEUNUMERO?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  // --- Seção 2: Cotação Dinâmica ---
+  function addRow(){
+    const tbody = document.querySelector('#table-cotacao tbody');
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" placeholder="Ex: Luva, Capacete"/></td>
+      <td><input type="number" value="1" min="1"/></td>
+      <td><input type="number" step="0.01" placeholder="Preço unit."/></td>
+      <td><button onclick="this.closest('tr').remove()">✖️</button></td>`;
+    tbody.appendChild(tr);
+  }
+  function sendCotacao(){
+    const rows = [...document.querySelectorAll('#table-cotacao tbody tr')];
+    if(rows.length===0){ alert('Adicione pelo menos um item.'); return; }
+    let lista = '';
+    rows.forEach(r=>{
+      const cols = r.querySelectorAll('input');
+      lista += `• ${cols[0].value} – Qt:${cols[1].value} – R$${cols[2].value}\n`;
+    });
+    const subject = encodeURIComponent('Cotação EPIs & Serviços');
+    const body = encodeURIComponent(`Olá,\n\nSegue minha solicitação de cotação:\n${lista}`);
+    window.location.href = `mailto:cotacao@empresa.com?subject=${subject}&body=${body}`;
+  }
+
+  // --- Seção 3: Treinamento & Checklist ---
+  function sendTrein(){
+    const trein = document.getElementById('treinamento').value;
+    const obs = document.getElementById('obs-trein').value;
+    const checks = [...document.querySelectorAll('#checklist input:checked')].map(i=>i.value).join(', ');
+    const body = encodeURIComponent(
+      `Inscrição Treinamento: ${trein}\nObservações: ${obs}\nChecklist OK: ${checks}`
+    );
+    window.open(`mailto:treinamentos@empresa.com?subject=Inscrição%20Treinamento&body=${body}`, '_blank');
+  }
+
+  // --- Seção 4: Comunicação ---
+  function openEmail(){
+    window.location.href = 'mailto:contato@empresa.com?subject=Contato%20Rápido';
+  }
+  function openWhats(){
+    window.open('https://wa.me/55SEUDDDSEUNUMERO', '_blank');
+  }
+</script>

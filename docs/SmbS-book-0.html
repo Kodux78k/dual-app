@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOBLLUX 📘 Leitor de Livros</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      background: #0a0a0a;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      height: 100%;
+      overflow: hidden;
+    }
+    body.glow {
+      background: radial-gradient(ellipse at center, #1a1a1a 0%, #0a0a0a 100%);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      backdrop-filter: blur(8px);
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    header h1 {
+      font-size: 1.4rem;
+      color: #00f7ff;
+      text-shadow: 0 0 8px #00f7ff88;
+    }
+    .menu {
+      display: flex;
+      gap: 8px;
+    }
+    button {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 8px 14px;
+      border-radius: 10px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    #viewer {
+      height: calc(100% - 60px);
+      overflow-x: scroll;
+      display: flex;
+      scroll-snap-type: x mandatory;
+      padding: 1rem;
+      gap: 1rem;
+    }
+    .page {
+      flex: none;
+      width: 90vw;
+      max-width: 600px;
+      scroll-snap-align: center;
+      background: #111;
+      border-radius: 12px;
+      padding: 1rem;
+      position: relative;
+      overflow-y: auto;
+      height: calc(100vh - 100px);
+    }
+    .highlight {
+      background: rgba(0,255,255,0.2);
+      border-radius: 4px;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    #audioFrame {
+      width: 100%;
+      height: 80px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      border: none;
+    }
+    select {
+      background: rgba(255,255,255,0.05);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body class="glow">
+  <header>
+    <h1>KOBLLUX 📘 Trinity Leitor</h1>
+    <div class="menu">
+      <select id="bookSelect">
+        <option value="dopamina-sexy.pdf">📕 Dopamina Sexy</option>
+        <option value="espaco-da-mente.pdf">📘 Espaço da Mente</option>
+        <option value="codex-azura.pdf">📙 Codex Azura</option>
+        <option value="nos.pdf">📗 Nós</option>
+        <option value="hidrocortex-codex.pdf">📒 Hidrocórtex Codex</option>
+      </select>
+      <button onclick="loadBook()">📖 Carregar</button>
+      <button onclick="startNarration()">▶️ Narrar</button>
+      <button onclick="stopNarration()">⏸️ Parar</button>
+      <button onclick="toggleStoryMode()">🌌 Modo História</button>
+      <button onclick="loadExternal()">🌐 Externo</button>
+    </div>
+  </header>
+
+  <div id="viewer">
+    <div class="page" id="bookPage">
+      <p>Bem-vindo ao Leitor KOBLLUX. Selecione um livro acima para começar.</p>
+    </div>
+  </div>
+
+  <script>
+    let synth = window.speechSynthesis;
+    let utterance = null;
+    let storyMode = false;
+
+    const viewer = document.getElementById('bookPage');
+    const bookSelect = document.getElementById('bookSelect');
+
+    function loadBook() {
+      const file = bookSelect.value;
+      const url = `/assets/barras/historias/${file}`;
+      viewer.innerHTML = `<iframe src="https://docs.google.com/gview?url=${location.origin}${url}&embedded=true"></iframe>`;
+    }
+
+    function startNarration() {
+      stopNarration();
+      const text = viewer.innerText || viewer.textContent;
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 1;
+      synth.speak(utterance);
+    }
+
+    function stopNarration() {
+      if (synth.speaking) synth.cancel();
+    }
+
+    function toggleStoryMode() {
+      storyMode = !storyMode;
+      document.body.classList.toggle('story', storyMode);
+      if (storyMode) {
+        startNarration();
+        alert("🌌 Modo História ativado. Narração iniciada.");
+      } else {
+        stopNarration();
+        alert("🌙 Modo História desativado.");
+      }
+    }
+
+    function loadExternal() {
+      const url = prompt("Digite a URL do HTML externo para carregar:");
+      if (url) {
+        viewer.innerHTML = `<iframe src="${url}"></iframe>`;
+      }
+    }
+
+    // Carregamento automático via parâmetro URL
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      const livro = params.get("livro");
+      const externo = params.get("externo");
+      const modo = params.get("modo");
+
+      if (livro) {
+        bookSelect.value = livro;
+        loadBook();
+      }
+      if (externo) {
+        viewer.innerHTML = `<iframe src="${externo}"></iframe>`;
+      }
+      if (modo === "historia") {
+        setTimeout(() => toggleStoryMode(), 1000);
+      }
+    };
+  </script>
+</body>
+</html>

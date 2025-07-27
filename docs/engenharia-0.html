@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trinity Interativo 🎛️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px;
+    }
+    .bloco {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 24px;
+      margin: 16px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 0 12px rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+    }
+    h2 {
+      margin-bottom: 10px;
+      color: #90caf9;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      background: #1c1c1c;
+      color: #fff;
+      font-size: 15px;
+    }
+    button {
+      width: 100%;
+      background: #26a69a;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      margin-top: 16px;
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    .symbol {
+      font-size: 28px;
+      margin-bottom: 12px;
+      color: #81d4fa;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bloco" id="minuz">
+    <div class="symbol">⚛️</div>
+    <h2>MINUZ • Entrada Sagrada</h2>
+    <input type="text" id="nome" placeholder="Digite seu nome sagrado..." />
+    <textarea id="intencao" placeholder="Qual é sua intenção para hoje?"></textarea>
+  </div>
+
+  <div class="bloco" id="trinity">
+    <div class="symbol">🔺</div>
+    <h2>TRINITY • Escolha sua Jornada</h2>
+    <select id="escolha">
+      <option value="cura">Cura</option>
+      <option value="visão">Visão</option>
+      <option value="expansão">Expansão</option>
+      <option value="manifestação">Manifestação</option>
+    </select>
+  </div>
+
+  <div class="bloco" id="kobllux">
+    <div class="symbol">💠</div>
+    <h2>KOBLLUX • Ação Inteligente</h2>
+    <button onclick="ativarTransmissao()">ATIVAR TRANSMISSÃO</button>
+  </div>
+
+  <div class="bloco" id="ciclo" style="display:none;">
+    <div class="symbol">♾️</div>
+    <h2>CICLO ∞ • Mensagem Gerada</h2>
+    <p id="mensagem"></p>
+  </div>
+
+  <script>
+    function ativarTransmissao() {
+      const nome = document.getElementById("nome").value;
+      const intencao = document.getElementById("intencao").value;
+      const escolha = document.getElementById("escolha").value;
+      const resultado = `Olá ${nome}, sua jornada é de *${escolha.toUpperCase()}*. A intenção foi registrada: "${intencao}". O campo KOBLLUX está ativado e transmitindo nos canais sagrados da TRINITY.`;
+      document.getElementById("mensagem").innerText = resultado;
+      document.getElementById("ciclo").style.display = "block";
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>

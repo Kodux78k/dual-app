@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KOBLLUX | Base Utilitária Profissional</title>
+  <style>
+    body { font-family: sans-serif; background: #0f0f0f; color: #fff; margin: 0; padding: 2rem; }
+    h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .card {
+      background: #1a1a1a; border-radius: 8px; padding: 1rem;
+      border: 1px solid #333; transition: 0.3s; box-shadow: 0 0 12px rgba(0, 255, 255, 0.05);
+    }
+    .card:hover { border-color: #00ffff; box-shadow: 0 0 16px rgba(0, 255, 255, 0.2); }
+    a { color: #00ffff; text-decoration: none; }
+    .btn {
+      margin-top: 2rem; padding: 1rem 2rem; font-size: 1rem;
+      background: #00ffff; color: #000; border: none; border-radius: 6px;
+      cursor: pointer; font-weight: bold;
+    }
+    .btn:hover { background: #00dddd; }
+    .footer { margin-top: 4rem; font-size: 0.85rem; color: #888; }
+  </style>
+</head>
+<body>
+  <h1>KOBLLUX 📘 | Base Utilitária Profissional</h1>
+  <p>Selecione uma base para expandir com IA ou adaptar à sua realidade profissional.</p>
+  <div class="grid">
+    <div class="card">
+      <h2>Eng. Segurança e Perícia</h2>
+      <p>Ferramentas para EPIs, NRs, treinamentos e laudos técnicos.</p>
+      <a href="sigma_perito_final.html" target="_blank">Abrir Base</a>
+    </div>
+    <div class="card">
+      <h2>Fisioterapia</h2>
+      <p>Prontuários, evolução de paciente, IA clínica e relatórios.</p>
+      <a href="#">Em construção</a>
+    </div>
+    <div class="card">
+      <h2>Advocacia</h2>
+      <p>Geração de contratos, petições, controle de processos e IA jurídica.</p>
+      <a href="#">Em construção</a>
+    </div>
+    <div class="card">
+      <h2>Licitação e Cotações</h2>
+      <p>Organização de documentos, cronogramas, tabelas e IA de comparação.</p>
+      <a href="#">Em construção</a>
+    </div>
+    <div class="card">
+      <h2>Clínica Médica</h2>
+      <p>Ficha, agendamento, recibos, IA assistente e prontuários integrados.</p>
+      <a href="#">Em construção</a>
+    </div>
+  </div>
+
+  <button class="btn" onclick="modificarIA()">🧠 Modificar com IA</button>
+
+  <script>
+    async function modificarIA() {
+      const chave = prompt("Insira sua chave SK do OpenRouter:");
+      const modelo = "openai/gpt-3.5-turbo";  // ou outro gratuito
+      const conteudo = document.documentElement.outerHTML;
+
+      const resposta = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + chave,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: modelo,
+          messages: [{ role: "user", content: "Melhore esta página com base no uso profissional:" + conteudo }]
+        })
+      });
+
+      const data = await resposta.json();
+      alert("Resposta da IA:
+" + data.choices?.[0]?.message?.content || "Erro.");
+    }
+  </script>
+
+  <div class="footer">
+    🌐 Arquitetura KOBLLUX com autoaprendizado em tempo real. Expanda, personalize e reintegre.
+  </div>
+</body>
+</html>

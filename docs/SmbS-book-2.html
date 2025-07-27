@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>KOBLLUX 📘 Leitor Expandido V2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --fg: #ffffff;
+      --accent: #00f7ff;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'Segoe UI', sans-serif;
+      height: 100%;
+      overflow: hidden;
+    }
+    body.glow {
+      background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    header h1 {
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-shadow: 0 0 8px #00f7ff88;
+    }
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    button, select, input[type=range] {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--fg);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    input[type=range] {
+      width: 100px;
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 160px);
+    }
+    #bookViewer {
+      flex: 1;
+      overflow: auto;
+      padding: 1rem;
+    }
+    .page {
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      padding: 1rem;
+      backdrop-filter: blur(6px);
+      height: 100%;
+    }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 8px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      background: rgba(255,255,255,0.05);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      font-size: 1rem;
+    }
+    #controls {
+      display: none;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 1rem;
+    }
+    #controls.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body class="glow">
+  <header>
+    <h1>KOBLLUX 📘 Leitor Expandido</h1>
+    <div class="menu">
+      <select id="bookSelect">
+        <option value="dopamina-sexy.pdf">📕 Dopamina Sexy</option>
+        <option value="espaco-da-mente.pdf">📘 Espaço da Mente</option>
+        <option value="codex-azura.pdf">📙 Codex Azura</option>
+        <option value="nos.pdf">📗 Nós</option>
+        <option value="hidrocortex-codex.pdf">📒 Hidrocortex Codex</option>
+      </select>
+      <button onclick="loadBook()">📘 Carregar PDF</button>
+      <button onclick="toggleStoryMode()">🌌 Modo História</button>
+      <button onclick="loadExternal()">🔗 Externo</button>
+      <button onclick="toggleControls()">🎚️ Opções de Narração</button>
+    </div>
+    <div id="controls">
+      <button onclick="startNarration()">▶️ Play</button>
+      <button onclick="stopNarration()">⏸️ Pause</button>
+      <label>Velocidade <input type="range" min="0.5" max="2" step="0.1" value="1" id="rate"></label>
+      <label>Pitch <input type="range" min="0.5" max="2" step="0.1" value="1" id="pitch"></label>
+      <label>Volume Voz <input type="range" min="0" max="1" step="0.1" value="1" id="voiceVolume"></label>
+      <label>Volume Binaural <input type="range" min="0" max="1" step="0.1" value="0.5" id="binauralVolume"></label>
+    </div>
+  </header>
+
+  <main>
+    <div id="bookViewer">
+      <div class="page" id="bookContent">
+        <p>Selecione um livro PDF acima ou cole um texto abaixo para narração:</p>
+        <textarea id="textInput" placeholder="Cole seu texto aqui..."></textarea>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const viewer = document.getElementById('bookContent');
+    const select = document.getElementById('bookSelect');
+    const textInput = document.getElementById('textInput');
+    const rateSlider = document.getElementById('rate');
+    const pitchSlider = document.getElementById('pitch');
+    const volumeSlider = document.getElementById('voiceVolume');
+    const binauralSlider = document.getElementById('binauralVolume');
+    const controlsDiv = document.getElementById('controls');
+
+    let synth = window.speechSynthesis;
+    let utterance;
+    let audioCtx, leftOsc, rightOsc, merger;
+    let storyMode = false;
+
+    function loadBook() {
+      const file = select.value;
+      const url = `/assets/barras/historias/${file}`;
+      viewer.innerHTML = `<iframe src="${url}"></iframe><textarea id="textInput" placeholder="Cole seu texto aqui..."></textarea>`;
+    }
+
+    function startNarration() {
+      stopNarration();
+      const text = document.getElementById("textInput").value;
+      if (!text) return;
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "pt-BR";
+      utterance.rate = parseFloat(rateSlider.value);
+      utterance.pitch = parseFloat(pitchSlider.value);
+      utterance.volume = parseFloat(volumeSlider.value);
+      synth.speak(utterance);
+    }
+
+    function stopNarration() {
+      if (synth.speaking) synth.cancel();
+    }
+
+    function toggleStoryMode() {
+      storyMode = !storyMode;
+      if (storyMode) {
+        document.body.style.background = "linear-gradient(135deg, #000014, #001f1f)";
+        startNarration();
+        generateBinaural();
+      } else {
+        stopNarration();
+        if (audioCtx) audioCtx.close();
+        document.body.style.background = "";
+      }
+    }
+
+    function loadExternal() {
+      const url = prompt("URL do conteúdo externo:");
+      if (url) {
+        viewer.innerHTML = `<iframe src="${url}" allow="autoplay"></iframe><textarea id="textInput" placeholder="Cole seu texto aqui..."></textarea>`;
+      }
+    }
+
+    function toggleControls() {
+      controlsDiv.classList.toggle('active');
+    }
+
+    function generateBinaural(freq = 440, diff = 6) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const gain = audioCtx.createGain();
+      gain.gain.value = parseFloat(binauralSlider.value);
+
+      leftOsc = audioCtx.createOscillator();
+      rightOsc = audioCtx.createOscillator();
+      const leftGain = audioCtx.createGain();
+      const rightGain = audioCtx.createGain();
+      merger = audioCtx.createChannelMerger(2);
+
+      leftOsc.frequency.value = freq - diff / 2;
+      rightOsc.frequency.value = freq + diff / 2;
+      leftGain.gain.value = gain.gain.value;
+      rightGain.gain.value = gain.gain.value;
+
+      leftOsc.connect(leftGain).connect(merger, 0, 0);
+      rightOsc.connect(rightGain).connect(merger, 0, 1);
+      merger.connect(audioCtx.destination);
+      leftOsc.start();
+      rightOsc.start();
+    }
+  </script>
+</body>
+</html>
