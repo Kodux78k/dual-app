@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dual.Infodose</title>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#000000" name="theme-color"/>
+<link href="assets/icons/icon-192.png" rel="icon" type="image/png"/>
+<style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0a0a0a, #000000);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .content {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: absolute;
+      z-index: 1;
+    }
+
+    iframe.active {
+      opacity: 1;
+    }
+
+    .symbol-bar {
+      position: fixed;
+      top: 39%;
+      right: 15px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 40;
+    }
+
+    .symbol-button {
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      color: white;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      opacity: 0.7;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .symbol-button:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+
+    .lock-button {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      z-index: 50;
+    }
+
+    /* Botões de ação */
+    #uploadComponentBtn,
+    #remoteComponentBtn,
+    #toggleDecoderBtn {
+      position: fixed;
+      left: 12px;
+      z-index: 90000;
+      padding: 4px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(0, 255, 255, 0.1);
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+
+      box-shadow: 0 0 4px rgba(0,255,255,0.2), 0 0 8px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+   
+    #uploadComponentBtn { top: 330px; }
+    #remoteComponentBtn { top: 370px; }
+    #toggleDecoderBtn { top: 420px; }
+
+    #uploadComponentBtn:hover,
+    #remoteComponentBtn:hover,
+    #toggleDecoderBtn:hover {
+      transform: scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+
+    #decoderBox {
+      display: none;
+      position: fixed;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      z-index: 70;
+    }
+
+    #decoderBox input {
+      padding: 0.6rem;
+      width: 200px;
+      text-align: center;
+      border-radius: 10px;
+      border: none;
+      font-size: 1em;
+    }
+
+    #decoderBox button {
+      margin-top: 10px;
+      padding: 0.5rem 1rem;
+      background: rgba(0,255,255,0.2);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+    }
+
+    my-frame-loader::part(container) {
+      width: 90%;
+      height: 85%;
+      z-index: 8;
+    }
+  </style>
+</head>
+<body>
+<div class="content">
+<iframe class="active" id="frame" src="index.html"></iframe>
+</div>
+<div class="symbol-bar">
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0A.html')">Φ</button>
+<button class="symbol-button" onclick="loadPage('dual-decoder-13.html')">꩜</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-4.html')">◌</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-1.html')">☼</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3re.html')">⅞</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-3.html')">◉</button>
+<button class="symbol-button" onclick="loadPage('dual-chat-0-94-15-fix-78-75-REC-3.html')">◑</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-0.html')">◘</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3.html')">❖</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-3.html')">◍</button>
+</div>
+<button class="lock-button" onclick="loadPage('index.html')"></button>
+<!-- Botões -->
+<input accept=".html" id="uploadHTML" style="display:none" type="file"/>
+<button id="uploadComponentBtn">⧉</button>
+<button id="remoteComponentBtn">☍</button>
+<button id="toggleDecoderBtn">✦</button>
+<!-- Caixa do decodificador -->
+<div id="decoderBox">
+<input id="codeInput" placeholder="Digite o selo..." type="text"/>
+<button onclick="decodeSymbolicCode()">✦ Desbloquear</button>
+</div>
+<!-- COMPONENTE WEB -->
+<script type="module">
+    class MyFrameLoader extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.innerHTML = `
+          <style>
+            .overlay {
+              position: fixed;
+              inset: 0;
+              background: rgba(0,0,0,0.6);
+              backdrop-filter: blur(8px);
+              z-index: 999;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .container {
+              width: 92%;
+              height: 86%;
+              background: #111;
+              border-radius: 20px;
+              box-shadow: 0 0 20px #0ff;
+              overflow: hidden;
+              position: relative;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+            .close-btn {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background: #f0f;
+              border: none;
+              color: #000;
+              font-weight: bold;
+              border-radius: 12px;
+              padding: 4px 10px;
+              cursor: pointer;
+              z-index: 10;
+            }
+          </style>
+          <div class="overlay">
+            <div class="container">
+              <button class="close-btn">✖</button>
+              <iframe></iframe>
+            </div>
+          </div>
+        `;
+        this.iframe = shadow.querySelector('iframe');
+        shadow.querySelector('.close-btn').onclick = () => this.remove();
+      }
+      set src(val) {
+        this.iframe.src = val;
+      }
+    }
+    customElements.define('my-frame-loader', MyFrameLoader);
+  </script>
+<!-- Funções JS -->
+<script>
+    const frame = document.getElementById('frame');
+    const activationSound = new Audio('assets/sounds/acts/wounds/codigo-MT-OLX-0.wav');
+
+    function playSound() {
+      activationSound.volume = 1;
+      activationSound.play().catch(()=>{});
+    }
+
+    function loadPage(url) {
+      frame.classList.remove('active');
+      setTimeout(() => {
+        frame.src = url;
+        frame.onload = () => frame.classList.add('active');
+      }, 300);
+    }
+
+    const uploadInput = document.getElementById('uploadHTML');
+    document.getElementById('uploadComponentBtn').onclick = () => {
+      playSound();
+      uploadInput.click();
+    };
+
+    uploadInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const blob = new Blob([ev.target.result], { type: 'text/html' });
+          const blobUrl = URL.createObjectURL(blob);
+          const frame = document.createElement('my-frame-loader');
+          frame.src = blobUrl;
+          document.body.appendChild(frame);
+        };
+        reader.readAsText(file);
+      } else {
+        alert('Selecione um arquivo .html válido.');
+      }
+    };
+
+    document.getElementById('remoteComponentBtn').onclick = () => {
+      playSound();
+      const url = prompt("URL do componente remoto:");
+      if (url) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = url;
+        document.body.appendChild(frame);
+      }
+    };
+
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const decoderBox = document.getElementById('decoderBox');
+    toggleDecoderBtn.onclick = () => {
+      playSound();
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    };
+
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBLX": "page-client.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "337": "dual-tube-25.html",
+      "qwe": "dual-book-12.html",
+      "mn1": "index-manifestado.html",
+      "mn2": "index-manifestado-tangle.html",
+      "bts": "botao-simbolico.html"
+    };
+
+    function decodeSymbolicCode() {
+      playSound();
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const dest = CODE_MAP[code];
+      if (dest) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = dest;
+        document.body.appendChild(frame);
+        decoderBox.style.display = 'none';
+      } else {
+        alert('Selo desconhecido ou não registrado.');
+      }
+    }
+  </script>
+<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.8);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
+    ≈
+   </button>
+<div class="hidden" id="playerWrapper">
+</div>
+<div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
+<button id="playPause" style="font-size:22px;background:none;">
+     ►
+    </button>
+<select id="trackSelect">
+<option value="">
+      🎵 Escolha uma trilha
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<select id="binauralSelect">
+<option value="">
+      🎶 Binaural Desativado
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<label>
+     🎵 Volume Trilha
+     <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+</label>
+<label>
+     🧘 Volume Binaural
+     <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+</label>
+</div>
+</div><div id="theme-controls" style="position:fixed; top:20px; right:20px; z-index:1000;">
+<select id="themeSelector" onchange="changeTheme(this.value)">
+<option value="light">
+     ☀️ Light
+    </option>
+<option value="dark">
+     🌑 Dark
+    </option>
+<option value="medium">
+     🌓 Medium
+    </option>
+<option value="vibe">
+     🌈 Vibe
+    </option>
+<option value="toggle-advanced">
+     ➕ Mais...
+    </option>
+<optgroup id="advancedThemes" label="Avançado">
+<option value="cyberpunk">
+      ☣️ Cyberpunk
+     </option>
+<option value="matrix">
+      🟢 Matrix
+     </option>
+<option value="turbo">
+      ⚡ Turbo
+     </option>
+<option value="emotion-detector">
+      😄 Emotion
+     </option>
+<option value="emotion-ai">
+      🤖🧠:MHM
+     </option>
+<option value="tesseract">
+      📐Tesseract
+     </option>
+<option value="save-current">
+      💾 salvar
+     </option>
+</optgroup>
+<optgroup id="savedThemes" label="Salvos" style="display:none;">
+</optgroup>
+</select>
+<div id="savedThemesContainer" style="margin-top:8px; display:flex; flex-wrap:wrap; gap:4px;">
+</div>
+</div><div id="pulsos-container">
+<div id="pulsos"></div>
+</div>
+<button id="toggleBotaoSimbiox" onclick="const b=document.getElementById('botaoSimbioxContainer');
+                 b.style.display=(b.style.display==='none')?'flex':'none';" style="position:fixed; left:20px; top:163px; z-index:10;
+               width:36px; height:36px; font-size:18px; border-radius:50%;
+               background:rgba(255,255,255,0.1); color:var(--bg);
+               border:none; cursor:pointer;">
+  ☰
+</button>
+<div id="botaoSimbioxContainer" style="display:none;position:fixed;top:210px;left:20px;
+    background:rgba(255,255,255,0.05);padding:10px;border-radius:10px;z-index:100;">
+<p style="margin:0;color:#0ff;font-family:monospace;">Menu Simbiox</p>
+</div>
+</body>
+</html>
