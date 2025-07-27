@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dual.Infodose</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" />
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0a0a0a, #000000);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .content {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: absolute;
+      z-index: 1;
+    }
+
+    iframe.active {
+      opacity: 1;
+    }
+
+    .symbol-bar {
+      position: fixed;
+      top: 39%;
+      right: 15px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 40;
+    }
+
+    .symbol-button {
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      color: white;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      opacity: 0.7;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .symbol-button:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+
+    .lock-button {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      z-index: 50;
+    }
+
+    /* Botões de ação */
+    #uploadComponentBtn,
+    #remoteComponentBtn,
+    #toggleDecoderBtn {
+      position: fixed;
+      left: 12px;
+      z-index: 90000;
+      padding: 4px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(0, 255, 255, 0.1);
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+
+      box-shadow: 0 0 4px rgba(0,255,255,0.2), 0 0 8px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+   
+    #uploadComponentBtn { top: 330px; }
+    #remoteComponentBtn { top: 370px; }
+    #toggleDecoderBtn { top: 420px; }
+
+    #uploadComponentBtn:hover,
+    #remoteComponentBtn:hover,
+    #toggleDecoderBtn:hover {
+      transform: scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+
+    #decoderBox {
+      display: none;
+      position: fixed;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      z-index: 70;
+    }
+
+    #decoderBox input {
+      padding: 0.6rem;
+      width: 200px;
+      text-align: center;
+      border-radius: 10px;
+      border: none;
+      font-size: 1em;
+    }
+
+    #decoderBox button {
+      margin-top: 10px;
+      padding: 0.5rem 1rem;
+      background: rgba(0,255,255,0.2);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+    }
+
+    my-frame-loader::part(container) {
+      width: 90%;
+      height: 85%;
+      z-index: 8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="content">
+    <iframe id="frame" src="index.html" class="active"></iframe>
+  </div>
+
+ 
+<div class="symbol-bar">
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0A.html')">Φ</button>
+    <button class="symbol-button" onclick="loadPage('dual-decoder-13.html')">꩜</button>
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-4.html')">◌</button>
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-1.html')">☼</button>
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3re.html')">⅞</button>
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-3.html')">◉</button>
+    <button class="symbol-button" onclick="loadPage('dual-chat-0-94-15-fix-78-75-REC-3.html')">◑</button>
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-0.html')">◘</button>
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3.html')">❖</button>
+    <button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-3.html')">◍</button>
+  </div>
+  <button class="lock-button" onclick="loadPage('index.html')"></button>
+
+  <!-- Botões -->
+  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+  <button id="uploadComponentBtn">⧉</button>
+  <button id="remoteComponentBtn">☍</button>
+  <button id="toggleDecoderBtn">✦</button>
+  <div id="botaoSimbioxContainer" style="position:fixed; left:20px; top:212px; z-index:12; display:none; flex-direction:column; gap:6px;">
+<button id="dualBookBtn" onclick="toggleIframe('dualBookBtn_iframe', 'dual-book-14.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">𓃰</button>
+<button id="dualTubeBtn" onclick="toggleIframe('dualTubeBtn_iframe', 'dual-tube-25-0.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">♫</button>
+<button id="playerBtn" onclick="toggleIframe('playerBtn_iframe', 'app-player-1.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">◘</button>
+<button id="exportSimbioseBtn" onclick="document.getElementById('saveThemeBtn')?.click()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">⟴</button>
+<button id="exportFullBtn" onclick="exportarSimbioseCompleta()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">░</button></div>
+<button id="toggleBotaoSimbiox" onclick="const b=document.getElementById('botaoSimbioxContainer');b.style.display=(b.style.display==='none')?'flex':'none';" style="position:fixed; left:20px; top:163px; z-index:10; width:36px; height:36px; font-size:18px; border-radius:50%; background:rgba(255,255,255,0.1); color:var(--bg); border:none; cursor:pointer;">☰</button>
+
+  <!-- Caixa do decodificador -->
+  <div id="decoderBox">
+    <input type="text" id="codeInput" placeholder="Digite o selo...">
+    <button onclick="decodeSymbolicCode()">✦ Desbloquear</button>
+  </div>
+
+  <!-- COMPONENTE WEB -->
+  <script type="module">
+    class MyFrameLoader extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.innerHTML = `
+          <style>
+            .overlay {
+              position: fixed;
+              inset: 0;
+              background: rgba(0,0,0,0.6);
+              backdrop-filter: blur(8px);
+              z-index: 999;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .container {
+              width: 92%;
+              height: 86%;
+              background: #111;
+              border-radius: 20px;
+              box-shadow: 0 0 20px #0ff;
+              overflow: hidden;
+              position: relative;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+            .close-btn {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background: #f0f;
+              border: none;
+              color: #000;
+              font-weight: bold;
+              border-radius: 12px;
+              padding: 4px 10px;
+              cursor: pointer;
+              z-index: 10;
+            }
+          </style>
+          <div class="overlay">
+            <div class="container">
+              <button class="close-btn">✖</button>
+              <iframe></iframe>
+            </div>
+          </div>
+        `;
+        this.iframe = shadow.querySelector('iframe');
+        shadow.querySelector('.close-btn').onclick = () => this.remove();
+      }
+      set src(val) {
+        this.iframe.src = val;
+      }
+    }
+    customElements.define('my-frame-loader', MyFrameLoader);
+  </script>
+
+  <!-- Funções JS -->
+  <script>
+    const frame = document.getElementById('frame');
+    const activationSound = new Audio('assets/sounds/acts/wounds/codigo-MT-OLX-0.wav');
+
+    function playSound() {
+      activationSound.volume = 1;
+      activationSound.play().catch(()=>{});
+    }
+
+    function loadPage(url) {
+      frame.classList.remove('active');
+      setTimeout(() => {
+        frame.src = url;
+        frame.onload = () => frame.classList.add('active');
+      }, 300);
+    }
+
+    const uploadInput = document.getElementById('uploadHTML');
+    document.getElementById('uploadComponentBtn').onclick = () => {
+      playSound();
+      uploadInput.click();
+    };
+
+    uploadInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const blob = new Blob([ev.target.result], { type: 'text/html' });
+          const blobUrl = URL.createObjectURL(blob);
+          const frame = document.createElement('my-frame-loader');
+          frame.src = blobUrl;
+          document.body.appendChild(frame);
+        };
+        reader.readAsText(file);
+      } else {
+        alert('Selecione um arquivo .html válido.');
+      }
+    };
+
+    document.getElementById('remoteComponentBtn').onclick = () => {
+      playSound();
+      const url = prompt("URL do componente remoto:");
+      if (url) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = url;
+        document.body.appendChild(frame);
+      }
+    };
+
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const decoderBox = document.getElementById('decoderBox');
+    toggleDecoderBtn.onclick = () => {
+      playSound();
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    };
+
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBLX": "page-client.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "337": "dual-tube-25.html",
+      "qwe": "dual-book-12.html",
+      "mn1": "index-manifestado.html",
+      "mn2": "index-manifestado-tangle.html",
+      "bts": "botao-simbolico.html"
+    };
+
+    function decodeSymbolicCode() {
+      playSound();
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const dest = CODE_MAP[code];
+      if (dest) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = dest;
+        document.body.appendChild(frame);
+        decoderBox.style.display = 'none';
+      } else {
+        alert('Selo desconhecido ou não registrado.');
+      }
+    }
+  </script>
+  <script>
+document.getElementById("btn-expandir-ritual").onclick = () => {
+  const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
+  if (alvo) {
+    alvo.style.display = alvo.style.display === "none" ? "block" : "none";
+    logMistico("⧉ Expandiu o plano ritual oculto.");
+  }
+};
+</script>
+<!-- 🌌 Botões simbióticos -->
+<style>
+#btn-expandir-ritual, {
+  position: fixed;
+  bottom: 10px;
+  z-index: 10000;
+  background: #000;
+  color: #0ff;
+  border: 1px solid #0ff;
+  border-radius: 4px;
+  padding: 6px 10px;
+  opacity: 0.2;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+#btn-expandir-ritual:hover,
+ {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+#btn-expandir-ritual { left: 10px; }
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.021); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.4; }
+}
+</style>
+<button id="btn-expandir-ritual">⧉</button>
+<button id="toggle-debug" style="; display:inline-flex; width:auto; height:auto; font-size:14px;">🌀</button>
+<button id="btn-modos">✦</button>
+<script>
+document.getElementById("btn-expandir-ritual").onclick = () => {
+  const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
+  if (alvo) {
+    alvo.style.display = alvo.style.display === "none" ? "block" : "none";
+    logMistico("⧉ Expandiu o plano ritual oculto.");
+  }
+};
+</script>
+  <style>
+#pulsos-container {
+  position: fixed;
+  top: 208px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  opacity: var(--slow);
+  border: 1px solid transparent;
+  border-image: linear-gradient(45deg, #F0F, #0FF);
+  border-image-slice: 1;
+
+  -webkit-mask-image: radial-gradient(white, black); /* força máscara arredondada no Safari */
+  mask-image: radial-gradient(white, black);
+
+  overflow: hidden;
+  z-index: 9999;
+  cursor: pointer;
+  font-family: monospace;
+  text-align: center;
+}
+
+  #pulsos {
+    max-height: calc(2.5 * 1.2em);
+    overflow-y: auto;
+    padding: 0.4em;
+    font-size: 0.93em;
+    color: #0ff;
+    position: relative;
+  }
+
+  #pulsos.expanded {
+    max-height: calc(12 * 1.2em);
+    overflow-y: auto;
+  }
+
+  .debug-mistico {
+    line-height: 1.2em;
+    margin-bottom: 0em; 
+    word-break: break-word;
+  }
+
+  /* FADE VISUAL no final */
+  #pulsos:not(.expanded)::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: 1.2em;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    pointer-events: none;
+  }
+</style>
+<!-- 🌌 Camada Simbiótica Oculta -->
+<div id="pulsos-container">
+<div id="pulsos"></div>
+</div>
+<script>
+  const pulsos = document.getElementById("pulsos");
+
+  function logMistico(msg) {
+    const el = document.createElement("div");
+    el.className = "debug-mistico";
+    el.innerText = "🌀 " + msg;
+    pulsos.appendChild(el);
+
+    // Se não estiver expandido, mantém rolagem automática para o final
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  }
+
+  // Duplo clique para expandir/recolher
+  pulsos.addEventListener("click", () => {
+    pulsos.classList.toggle("expanded");
+  });
+
+  // Clique simples → rola até o final se não estiver expandido
+  pulsos.addEventListener("click", () => {
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  });
+
+  function spawnCosmicExplosion(x, y) {
+    const boom = document.createElement("div");
+    boom.style.position = "absolute";
+    boom.style.left = x + "px";
+    boom.style.top = y + "px";
+    boom.style.width = boom.style.height = "12px";
+    boom.style.borderRadius = "50%";
+    boom.style.background = "radial-gradient(circle, #0ff, #f0f0ff, transparent)";
+    boom.style.pointerEvents = "none";
+    boom.style.animation = "pulse 0.4s ease-out";
+    document.body.appendChild(boom);
+    setTimeout(() => boom.remove(), 1000);
+  }
+
+  document.addEventListener("click", e => {
+    spawnCosmicExplosion(e.clientX, e.clientY);
+    navigator.vibrate?.([5, 15, 5]);
+    logMistico("Pulso simbiótico em " + e.clientX + ", " + e.clientY);
+  });
+</script>
+</body>
+</html>
