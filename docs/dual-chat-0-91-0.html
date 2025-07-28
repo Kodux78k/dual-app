@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dual-Infodose Chat Cinematográfico</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
+      --text: #d7d7d7;
+      --fast: .4s; --med: .8s; --slow: 1.8s;
+    }
+    body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+    body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+    body.vibe  { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden}
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      padding:20px;background:var(--bg);color:var(--text);
+      font-family:'Montserrat',sans-serif;
+      transition:background var(--slow),color var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes expandFooter{0%,100%{transform:scale(1)}50%{transform:scale(0.96)}}
+    .copy-button, .paste-button, .toggle-button, .kitty-button, .history-button {
+      width:36px;height:36px;border:none;border-radius:50%;
+      background:rgba(255,255,255,0.06);display:flex;
+      align-items:center;justify-content:center;cursor:pointer;
+      transition:background var(--fast),opacity var(--slow);opacity:.7;
+    }
+    .copy-button:hover, .paste-button:hover,
+    .toggle-button:hover, .kitty-button:hover, .history-button:hover {
+      background:rgba(255,255,255,0.15);
+    }
+    .toggle-button.active, .kitty-button.active, .history-button.active { opacity:1; }
+    .svg-container{width:200px;height:200px;overflow:hidden;pointer-events:none;transition:opacity var(--fast)}
+    .svg-container.fading{opacity:0}
+    #assistantName{margin:20px 0;font-size:1.2rem;text-align:center;min-height:1.5em}
+    .response-container{position:relative;flex:1;width:100%;max-width:600px;display:flex;flex-direction:column;justify-content:flex-end}
+    .pages-wrapper{flex:1;overflow:hidden;position:relative}
+    .page{position:absolute;top:0;left:100%;width:100%;padding:20px;line-height:1.6;opacity:0;transition:transform var(--med),opacity var(--med)}
+    .page.active{transform:translateX(-100%);opacity:1}
+    .page.initial{left:0;transform:translateX(0);opacity:1}
+    .footer-text{margin-top:auto;text-align:center;font-size:.9rem;animation:expandFooter var(--slow) ease infinite}
+    .response-controls{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+    .pagination button{border:none;background:none;color:var(--text);font-size:1.2rem;cursor:pointer;opacity:.6}
+    .pagination button:hover{opacity:1}
+    #pageIndicator{font-size:.9rem}
+    .input-container{display:flex;align-items:center;width:100%;max-width:600px;margin-top:20px}
+    #userInput{flex:1;padding:12px;border:none;border-radius:24px;font-size:1rem;margin-right:10px;box-shadow:0 2px 10px rgba(0,0,0,0.3)}
+    #sendBtn,#voiceBtn{width:48px;height:48px;border:none;border-radius:50%;margin-left:5px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background var(--fast)}
+    #sendBtn:hover,#voiceBtn:hover{background:rgba(255,255,255,0.2)}
+    #sendBtn{font-size:1.4rem}
+    .login-container{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);padding:20px;border-radius:8px;display:none;flex-direction:column;width:90%;max-width:320px}
+    .login-container.active{display:flex}
+    .login-container input{margin-bottom:10px;padding:10px;border:none;border-radius:4px;font-size:1rem}
+    .login-container button{padding:10px;border:none;border-radius:4px;background:var(--text);color:var(--bg);font-weight:700;cursor:pointer}
+  </style>
+</head>
+<body>
+  <button id="themeToggle" title="Alternar tema">🎨</button>
+  <div id="particles-js"></div>
+  <div class="svg-container" id="logoContainer">
+    <object id="logoObj" data="assets/icons/3D_logo_Dual_Infodose_10.png" type="image/png"></object>
+  </div>
+  <div id="assistantName"></div>
+  <div class="response-container">
+    <div class="pages-wrapper">
+      <div class="page initial active"><strong>Clique no ◉ e diga “Oi, Dual”.</strong></div>
+    </div>
+    <p class="footer-text"><em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em></p>
+    <div class="response-controls">
+      <div class="control-buttons">
+        <button class="copy-button" title="Copiar"><object data="assets/icons/BW_quad_Dual_Infodose.svg" type="image/svg+xml" width="27" height="27"></object></button>
+        <button class="paste-button" title="Colar"><object data="assets/icons/BW_Dual_Infodose.svg" type="image/svg+xml" width="24" height="24"></object></button>
+        <button id="toggleBtn" class="toggle-button" title="Login Infodose"><object data="assets/icons/circle_icon_fade_rente.png" type="image/png" width="33" height="33"></object></button>
+        <button id="kittyBtn" class="kitty-button" title="Estudos"><object data="assets/icons/DualKittyKard-icon-3.png" type="image/png" width="33" height="33"></object></button>
+        <button id="historyBtn" class="history-button" title="Modo História"><object data="assets/icons/Ancora_Dual_Infodose.svg" type="image/svg+xml" width="24" height="24"></object></button>
+      </div>
+      <div class="pagination">
+        <button data-action="prev">⟵</button>
+        <span id="pageIndicator">1 / 1</span>
+        <button data-action="next">⟶</button>
+      </div>
+    </div>
+  </div>
+  <div class="input-container">
+    <input id="userInput" type="text" placeholder="Diga: 'oi, Dual'...">
+    <button id="sendBtn" title="Enviar">➤</button>
+    <button id="voiceBtn" title="Falar"><object data="assets/icons/Reset_buttom_Dual-Infodose.svg" type="image/svg+xml" width="36" height="36"></object></button>
+  </div>
+  <div class="login-container" id="loginBox">
+    <form id="loginForm">
+      <input type="text" id="userName" placeholder="Nome do usuário" required>
+      <input type="text" id="assistantInput" placeholder="Nome dual.infodose" required>
+      <button type="submit">Ativar</button>
+    </form>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+  (function(){
+    const STORAGE_KEY='infodoseEnabled', THEME_KEY='infodoseTheme', HISTORY_KEY='historyMode',
+          CONFIG={TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-29.txt',
+                  TRAINING_HISTORY:'data/codex-azura.txt',
+                  API_URL:'https://openrouter.ai/api/v1/chat/completions',
+                  MODEL:'deepseek/deepseek-chat-v3-0324:free',
+                  TEMP:0.2, CHUNK_SIZE:12000,
+                  AUTH_TOKEN:'Bearer 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'};
+    let training='', trainingHistory='', chunks=[], chunkIndex=0;
+    let isEnabled=false, isStudying=false, isHistory=false;
+    let userName='', assistantBase='';
+    let conversation=[], pages=[], currentPage=0, autoAdvance=true;
+    let originalLogo='';
+
+    const $=s=>document.querySelector(s);
+    const splitInChunks=(text,n)=>{let a=[];for(let i=0;i<text.length;i+=n)a.push(text.slice(i,i+n));return a;};
+    const createEl=(t,c,h)=>{let e=document.createElement(t);if(c)e.className=c;if(h)e.innerHTML=h;return e;};
+
+    function applyTheme(th){ document.body.classList.remove('light','medium','vibe'); if(th!=='dark') document.body.classList.add(th); }
+    function toggleTheme(){ let o=['dark','light','medium','vibe'],c=localStorage.getItem(THEME_KEY)||'dark',n=o[(o.indexOf(c)+1)%4];applyTheme(n);localStorage.setItem(THEME_KEY,n); }
+    function loadConfig(){
+      if(localStorage.getItem(STORAGE_KEY)==='1'){
+        isEnabled=true; userName=localStorage.getItem('userName'); assistantBase=localStorage.getItem('assistantBase');
+        conversation=[{role:'system',content:(chunks[0]||training)+`\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`}];
+        chunkIndex=1; updateUI();
+      }
+    }
+    function updateUI(){
+      $('#toggleBtn').classList.toggle('active',isEnabled);
+      $('#kittyBtn').classList.toggle('active',isStudying);
+      $('#historyBtn').classList.toggle('active',isHistory);
+      $('#assistantName').textContent = isHistory?'Modo História Dual':
+        isStudying?'Estudos dual.infodose':isEnabled?`${assistantBase} dual.infodose`:'';
+      let cont=$('.svg-container'),obj=$('#logoObj');
+      cont.classList.add('fading');cont.addEventListener('transitionend',function t(){cont.removeEventListener('transitionend',t);
+        obj.data=isHistory?'assets/icons/Ancora_Dual_Infodose.png':isStudying?'assets/icons/DualKittyKard-icon-3.png':originalLogo;
+        cont.classList.remove('fading');
+      });
+    }
+
+    function splitText(txt){
+      let p=txt.split(/\n\s*\n/).filter(x=>x.trim());
+      if(p.length%3!==0)p=(txt.match(/[^\.!\?]+[\.!\?]+/g)||[]).map(s=>s.trim());
+      let out=[];for(let i=0;i<p.length;i+=3)out.push(p.slice(i,i+3));return out;
+    }
+    function renderResponse(txt){
+      let wrap=$('.pages-wrapper');wrap.innerHTML='';pages=[];currentPage=0;autoAdvance=true;
+      txt=txt.replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+      let groups=splitText(txt),titles=['🎁 Recompensa Inicial','👁️ Exploração','⚡️ Antecipação'];
+      groups.forEach((grp,gi)=>{
+        let pg=createEl('div','page'+(gi===0?' active':''),'');
+        grp.forEach((para,j)=>{
+          let cls=j===0?'intro':j===1?'middle':'ending',
+              block=createEl('div',`response-block ${cls}`,`<p>${para}</p>`);
+          block.addEventListener('click',()=>{
+            autoAdvance=false;
+            let clean=para.replace(/["“”‘’]/g,'').replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g,''),
+                utt=new SpeechSynthesisUtterance(clean);
+            speechSynthesis.cancel();speechSynthesis.speak(utt);
+            if(block.dataset.spoken){conversation.push({role:'user',content:`${titles[j]}\n\n${para}`});showLoading('Pulso em Expansão...');callAI();}
+            else{block.dataset.spoken='1';block.classList.add('clicked');}
+          });
+          pg.appendChild(block);
+        });
+        wrap.appendChild(pg);pages.push(pg);
+      });
+      $('#pageIndicator').textContent=`1 / ${pages.length}`;autoSpeakPage(0);
+    }
+    function autoSpeakPage(i){
+      let txts=Array.from(pages[i].querySelectorAll('p')).map(p=>p.textContent).join(' ');
+      speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(txts);
+      u.onend=()=>{if(autoAdvance&&i<pages.length-1)changePage(1);
+                  else if(i===pages.length-1)speechSynthesis.speak(new SpeechSynthesisUtterance('Do seu jeito. Sempre único. Sempre seu.'));};
+      speechSynthesis.speak(u);
+    }
+    function changePage(d){
+      let n=currentPage+d; if(n<0||n>=pages.length)return;
+      pages[currentPage].classList.remove('active');pages[n].classList.add('active');currentPage=n;
+      $('#pageIndicator').textContent=`${n+1} / ${pages.length}`;if(autoAdvance)autoSpeakPage(n);
+    }
+    function showLoading(msg='Carregando resposta...'){renderResponse(msg);}
+    async function callAI(){
+      showLoading('Carregando resposta...');
+      conversation.push({role:'user',content:conversation.slice(-1)[0].content});
+      let res=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':CONFIG.AUTH_TOKEN},body:JSON.stringify({model:CONFIG.MODEL,temperature:CONFIG.TEMP,messages:conversation})});
+      let j=await res.json(),txt=j.choices&&j.choices[0].message.content.trim()||'Erro na API';
+      conversation.push({role:'assistant',content:txt}); if(!isHistory&&chunkIndex<chunks.length)conversation[0].content+=chunks[chunkIndex++];renderResponse(txt);
+    }
+
+    function onSend(){
+      let raw=$('#userInput').value.trim(); if(!raw)return;
+      $('#userInput').value='';autoAdvance=false;conversation.push({role:'user',content:raw});callAI();
+    }
+    function doTTS(){let msg=$('#userInput').value.trim();if(!msg)return;speechSynthesis.speak(new SpeechSynthesisUtterance(msg));$('#userInput').value='';}
+    function toggleLogin(){
+      isEnabled=!isEnabled;localStorage.setItem(STORAGE_KEY,isEnabled?'1':'0');
+      if(isEnabled)$('#loginBox').classList.add('active');else{ $('#loginBox').classList.remove('active');conversation=[];updateUI();}
+    }
+    function submitLogin(e){e.preventDefault();userName=$('#userName').value.trim();assistantBase=$('#assistantInput').value.trim();
+      localStorage.setItem(STORAGE_KEY,'1');localStorage.setItem('userName',userName);localStorage.setItem('assistantBase',assistantBase);
+      isEnabled=true;loadConfig();$('#loginBox').classList.remove('active');
+    }
+    function toggleStudying(){
+      isStudying=!isStudying;localStorage.setItem('studyingMode',isStudying?'1':'0');
+      conversation=[{role:'system',content:(chunks[0]||training)+`\n\nVocê é ${isStudying?'Assistente de Estudos':'assistente'} dual.infodose.`}];
+      updateUI();
+    }
+    function toggleHistory(){
+      isHistory=!isHistory;localStorage.setItem(HISTORY_KEY,isHistory?'1':'0');
+      conversation=[{role:'system',content:(isHistory?trainingHistory:chunks[0]||training)+`\n\nVocê é o ${isHistory?'Modo História Dual.':'assistente Dual.infodose.'}`}];
+      chunkIndex=isHistory?0:1;updateUI();
+      document.querySelector('.pages-wrapper').innerHTML=`<div class="page initial active"><strong>Clique no ◉ e diga “Oi, Dual”.</strong></div>`;
+      $('#pageIndicator').textContent='1 / 1';
+    }
+    function bindUI(){
+      $('#sendBtn').onclick=onSend;
+      $('#userInput').addEventListener('keypress',e=>e.key==='Enter'&&onSend());
+      $('#voiceBtn').onclick=doTTS;
+      $('#toggleBtn').onclick=toggleLogin;
+      $('#loginForm').addEventListener('submit',submitLogin);
+      $('#kittyBtn').onclick=toggleStudying;
+      $('#historyBtn').onclick=toggleHistory;
+      $('[data-action="prev"]'.replace(/\$/g,'')).onclick=()=>changePage(-1);
+      $('[data-action="next"]'.replace(/\$/g,'')).onclick=()=>changePage(1);
+      document.querySelector('.control-buttons').addEventListener('click',e=>{
+        if(e.target.closest('.copy-button')){
+          let txt=pages.map(p=>p.innerText.trim()).join('\n\n');
+          navigator.clipboard.writeText(txt);
+        }
+        if(e.target.closest('.paste-button')){
+          navigator.clipboard.readText().then(t=>$('#userInput').value=t);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded',async()=>{
+      applyTheme(localStorage.getItem(THEME_KEY)||'dark');
+      originalLogo=$('#logoObj').data;
+      training=await fetch(CONFIG.TRAINING_FILE).then(r=>r.text());
+      chunks=splitInChunks(training,CONFIG.CHUNK_SIZE);
+      trainingHistory=await fetch(CONFIG.TRAINING_HISTORY).then(r=>r.text());
+      isHistory=localStorage.getItem(HISTORY_KEY)==='1';
+      loadConfig();
+      bindUI();
+      conversation.push({role:'system',content:(isHistory?trainingHistory:chunks[0]||training)+`\n\nVocê é o ${isHistory?'Modo História Dual.':'assistente Dual.infodose.'}`});
+      chunkIndex=isHistory?0:1;
+    });
+  })();
+  </script>
+</body>
+</html>

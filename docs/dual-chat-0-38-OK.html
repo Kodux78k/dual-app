@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dual-Infodose Chat Cinematográfico</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <meta name="theme-color" id="themeColorMeta" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <style>
+    /* ===========================
+       VARIÁVEIS & GERAL
+    ============================ */
+    :root {
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
+      --text: #d7d7d7;
+      --fast: 0.4s;
+      --med: 0.8s;
+      --slow: 2s;
+      --theme-color: #000000;
+    }
+    body.light {
+      --bg: linear-gradient(to bottom, #666, #e0e0e0);
+      --text: #444;
+      --theme-color: #ffffff;
+    }
+    body.medium {
+      --bg: linear-gradient(to bottom, #555, #333);
+      --text: #eee;
+      --theme-color: #333333;
+    }
+    body.vibe {
+      --bg: linear-gradient(135deg, #00d8d8, #d800d8);
+      --text: #fff;
+      --theme-color: #00d8d8;
+    }
+    * { box-sizing:border-box; margin:0; padding:0 }
+    html, body { width:100%; height:100%; overflow:hidden }
+    body {
+      display:flex; flex-direction:column; align-items:center;
+      padding:20px; background:var(--bg); color:var(--text);
+      font-family:'Montserrat',sans-serif;
+      transition: background var(--slow), color var(--slow);
+      animation: fadeIn var(--slow) ease forwards;
+    }
+
+    /* =====================
+       ANIMAÇÕES
+    ====================== */
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes clickPulse {
+      0%,100% { opacity:1; }
+      50%     { opacity:0.7; }
+    }
+    @keyframes expandFooter {
+      0%,100% { transform:scale(1); }
+      50%     { transform:scale(0.96); }
+    }
+    @keyframes moveGradient {
+      0% { background-position:0% 50%; }
+      100% { background-position:200% 50%; }
+    }
+    @keyframes pulseSlow {
+      0%,100% { transform:scale(1); }
+      50%     { transform:scale(1.01); }
+    }
+
+    /* =====================
+       BOTÃO TEMA
+    ====================== */
+    #themeToggle {
+      position:absolute; top:60px; left:50%; transform:translateX(-50%);
+      width:30px; height:30px; border:1px solid var(--text);
+      border-radius:50%; background:transparent; opacity:.3;
+      cursor:pointer; transition: opacity var(--med), border-color var(--med);
+      z-index:10;
+    }
+    #themeToggle:hover { opacity:.8 }
+    #themeToggle::before {
+      content:''; position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%); width:12px; height:12px;
+      border-radius:50%; background:var(--text); opacity:.2;
+      transition: transform var(--slow) ease;
+    }
+    #themeToggle:active::before {
+      transform: translate(-50%,-50%) scale(0.8);
+    }
+
+    /* =====================
+       PARTICLES & LOGO
+    ====================== */
+    #particles-js { position:absolute; inset:0; z-index:0 }
+    .svg-container { position:absolute; top:269px; left:50%; width:180px; height:180px; opacity:1; transform:translateX(-50%); z-index:1; filter: drop-shadow(0 0 10px rgba(0,255,255,0.15)); transition:opacity var(--slow) }
+    .svg-container.fading { opacity:0 }
+    .svg-container object { width:100%; height:100%; object-fit:contain; display:block; animation:pulse 2s infinite ease-in-out }
+    
+
+    /* =====================
+       ASSISTANT NAME
+    ====================== */
+    #assistantName {
+      margin-top:199px; font-size:1.1em; font-weight:600;
+      opacity:.8; transition: opacity var(--slow);
+    }
+
+    /* =====================
+       CONTAINER DE RESPOSTA
+    ====================== */
+    .response-container {
+      position:fixed; left:20px; right:20px; bottom:160px;
+      padding:12px; background:rgba(0,0,0,0.3);
+      backdrop-filter:blur(8px); border-radius:20px;
+      max-height:calc(100vh - 200px); overflow-y:auto; z-index:1;
+      transition:background var(--slow);
+      animation:fadeIn var(--slow) ease;
+    }
+    .response-container.collapsed .pages-wrapper { display:none }
+    body.light  .response-container { background:rgba(255,255,255,0.3) }
+    body.medium .response-container { background:rgba(0,0,0,0.2) }
+    body.vibe   .response-container { background:rgba(255,255,255,0.2) }
+
+    /* =====================
+       PAGINATED CONTENT
+    ====================== */
+    .pages-wrapper {}
+    .page { display:none; opacity:0; transition:opacity var(--slow) }
+    .page.active { display:block; opacity:1 }
+    .page.initial {
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; height:100%; text-align:center;
+    }
+
+    /* =====================
+       BOTÃO-RODAPÉ (footer-text)
+    ====================== */
+    .footer-text {
+      display:block;
+      margin:12px auto;
+      padding:6px 12px;
+      background:var(--bg); 
+      opacity:.5;
+      color:var(--text);
+      font-size:0.8em; text-align:center; font-style:italic;
+      border-radius:12px; cursor:pointer;
+      transition: opacity var(--slow), transform var(--slow);
+      animation:moveGradient 8s linear infinite;
+    }
+    /* Sobrescreve o background do loading para transparente */
+.footer-text.loading {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+/* Garante que cada span não herde nenhum background */
+.footer-text.loading span {
+  background: none !important;
+}
+    .footer-text:hover {
+      opacity:.6;
+    }
+    .footer-text.active {
+      opacity:.8;
+      animation:expandFooter var(--med) ease-out;
+    }
+
+    /* =====================
+       CONTROLES & BOTÕES
+    ====================== */
+    .response-controls {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:15px; padding-top:10px;
+      border-top:1px solid rgba(255,255,255,0.2);
+      transition:border-color var(--fast);
+      animation:fadeIn var(--slow) ease;
+    }
+    body.light  .response-controls { border-top-color:rgba(0,0,0,0.2) }
+    body.medium .response-controls { border-top-color:rgba(255,255,255,0.2) }
+    body.vibe   .response-controls { border-top-color:rgba(0,0,0,0.4) }
+
+    .control-buttons, .pagination {
+      display:flex; align-items:center; gap:10px;
+      transition:transform var(--slow);
+    }
+    .control-buttons:hover, .pagination:hover {
+      transform:scale(1.02);
+    }
+
+    .copy-button, .paste-button {
+      background:rgba(255,255,255,0.06);
+      width:36px; height:36px; border:none; border-radius:12px;
+      display:flex; justify-content:center; align-items:center;
+      cursor:pointer; transition:background var(--fast), opacity var(--slow);
+      opacity:.7; animation:fadeIn var(--slow) ease;
+    }
+    .copy-button:hover, .paste-button:hover {
+      background:rgba(255,255,255,0.15);
+    }
+
+    .toggle-button, .kitty-button {
+      background:rgba(255,255,255,0.06);
+      width:36px; height:36px; border:none; border-radius:50%;
+      display:flex; justify-content:center; align-items:center;
+      cursor:pointer; transition:background var(--fast), opacity var(--slow);
+      opacity:.7; animation:fadeIn var(--slow) ease;
+    }
+    .toggle-button:hover, .kitty-button:hover {
+      background:rgba(255,255,255,0.15);
+    }
+    .toggle-button.active, .kitty-button.active { opacity:1 }
+
+    /* =====================
+       PAGINAÇÃO
+    ====================== */
+    .pagination button {
+      border:none;
+      background:linear-gradient(45deg,#0ff,#f0f);
+      background-clip:text; -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      font-size:1.2em; cursor:pointer;
+      transition:transform var(--fast);
+      animation:fadeIn var(--slow) ease;
+    }
+    .pagination button:hover { transform:scale(1.2) }
+
+    /* =====================
+       RESPONSE BLOCKS
+    ====================== */
+    .response-block {
+      margin:1rem 0; padding:1.3rem; border-radius:12px;
+      background:rgba(0,0,0,0.4); cursor:pointer; overflow:hidden;
+      animation:fadeIn var(--slow) ease, pulseSlow 12s infinite ease-in-out;
+      transition:box-shadow var(--fast), transform var(--slow);
+    }
+    .response-block p {
+      line-height:1.8; color:inherit;
+      transition:color var(--slow);
+    }
+    .response-block:hover {
+      box-shadow:0 0 15px rgba(0,255,255,0.4);
+      transform:scale(1.005);
+    }
+    .response-block.clicked {
+      animation:clickPulse var(--slow) ease-out;
+    }
+    .response-block.expanded {
+      transform:scale(1.03); background:rgba(0,0,0,0.6); z-index:2;
+    }
+
+    .intro   { background:linear-gradient(135deg,rgba(0,255,255,0.2),rgba(0,100,100,0.1)); border-left:4px solid #0ff }
+    .middle  { background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(50,50,50,0.1)); border-left:4px solid rgba(255,255,255,0.4) }
+    .ending  { background:linear-gradient(135deg,rgba(255,0,255,0.2),rgba(100,0,100,0.1)); border-left:4px solid #f0f }
+
+    /* =====================
+       INPUT & ENVIAR
+    ====================== */
+    .input-container {
+      position:fixed; left:20px; right:20px; bottom:90px;
+      display:flex; gap:6px; z-index:2; max-width:calc(100% - 40px);
+      animation:fadeIn var(--slow) ease;
+    }
+    .input-container input {
+      flex:1; padding:10px; border:none; border-radius:20px;
+      background:rgba(255,255,255,0.1); color:inherit; font-size:16px;
+      opacity:.7; transition:background var(--fast), transform var(--slow);
+    }
+    .input-container input:focus {
+      background:rgba(255,255,255,0.2);
+      transform:scale(1.005);
+    }
+    .input-container button {
+      width:60px; height:60px; border:none;
+      background:linear-gradient(42deg,#0ff,#f0f);
+      background-clip:text; -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      font-size:48px; cursor:pointer;
+      animation:pulseSlow 6s infinite ease-in-out, fadeIn var(--slow) ease;
+      display:flex; align-items:center; justify-content:center;
+      transition:transform var(--med), opacity var(--slow);
+      opacity:.7;
+    }
+    .input-container button:hover {
+      transform:scale(1.1);
+      opacity:1;
+    }
+
+    /* =====================
+       LOGIN MODAL
+    ====================== */
+    .login-container {
+      position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:300px; padding:1.5rem 1rem;
+      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.15);
+      border-radius:10px; backdrop-filter:blur(8px); z-index:10;
+      display:none; animation:fadeIn var(--slow) ease;
+    }
+    .login-container.active { display:block }
+    .login-container input {
+      width:100%; background:transparent; border:none;
+      border-bottom:1px solid rgba(255,255,255,0.3);
+      margin:0.8rem 0; padding:0.4rem 0; font-size:0.95em; color:#fff;
+      transition: border-color var(--slow);
+    }
+    .login-container input:focus { border-color: var(--text); }
+    .login-container input::placeholder { color:rgba(255,255,255,0.5) }
+    .login-container button {
+      width:100%; margin-top:1rem; padding:0.5rem 0;
+      border:1px solid #0ff; border-radius:8px;
+      background:transparent; font-size:0.95em; color:#0ff; cursor:pointer;
+      transition: background var(--slow), color var(--slow);
+    }
+    .login-container button:hover { background:#0ff; color:#000 }
+  </style>
+</head>
+<body>
+
+  <!-- BOTÃO TEMA -->
+  <button id="themeToggle" title="Alternar tema"></button>
+
+  <!-- PARTICLES -->
+  <div id="particles-js"></div>
+
+  <!-- LOGO -->
+  <div class="svg-container" id="logoContainer">
+    <object id="logoObj" data="assets/icons/3D_logo_Dual_Infodose_10.png" type="image/png"></object>
+  </div>
+
+  <!-- NOME DO ASSISTENTE -->
+  <div id="assistantName"></div>
+
+  <!-- CONTAINER DE RESPOSTA -->
+  <div class="response-container" id="response">
+
+    <div class="pages-wrapper">
+      <div class="page initial active">
+        <strong>Clique no ◉ e diga “Oi, Dual”.</strong>
+      </div>
+    </div>
+
+    <!-- RODAPÉ COMO BOTÃO -->
+    <p class="footer-text"><em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em></p>
+
+    <!-- CONTROLES -->
+    <div class="response-controls">
+      <div class="control-buttons">
+        <button class="copy-button" title="Copiar">
+          <object data="assets/icons/BW_quad_Dual_Infodose.svg" type="image/svg+xml" width="27" height="27"></object>
+        </button>
+        <button class="paste-button" title="Colar">
+          <object data="assets/icons/BW_Dual_Infodose.svg" type="image/svg+xml" width="24" height="24"></object>
+        </button>
+        <button id="toggleBtn" class="toggle-button" title="Login Infodose">
+          <object data="assets/icons/circle_icon_fade_rente.png" type="image/png" width="33" height="33"></object>
+        </button>
+        <button id="kittyBtn" class="kitty-button" title="Ativar Assistente de Estudos">
+          <object data="assets/icons/DualKittyKard-icon-3.png" type="image/png" width="33" height="33"></object>
+        </button>
+      </div>
+      <div class="pagination">
+        <button data-action="prev">⟵</button>
+        <span id="pageIndicator">1 / 1</span>
+        <button data-action="next">⟶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-container">
+    <input id="userInput" type="text" placeholder="Diga: 'oi, Dual'...">
+    <button id="sendBtn" title="Enviar">➤</button>
+    <button id="voiceBtn" title="Falar">
+      <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" type="image/svg+xml" width="36" height="36"></object>
+    </button>
+  </div>
+
+  <!-- LOGIN MODAL -->
+  <div class="login-container" id="loginBox">
+    <form id="loginForm">
+      <input type="text" id="userName" placeholder="Nome do usuário" required>
+      <input type="text" id="assistantInput" placeholder="Nome dual.infodose" required>
+      <button type="submit">Ativar</button>
+    </form>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+  (function(){
+    const STORAGE_KEY='infodoseEnabled',
+          CONFIG={
+            TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-28.txt',
+            API_URL:'https://openrouter.ai/api/v1/chat/completions',
+            MODEL:'deepseek/deepseek-chat-v3-0324:free',
+            TEMP:0.2, CHUNK_SIZE:78000,
+            AUTH_TOKEN:'Bearer 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'
+          },
+          CURRENT_THEME='infodoseTheme';
+    let training='', chunks=[], chunkIndex=0,
+        isEnabled=false, isStudying=false,
+        userName='', assistantBase='',
+        conversation=[], pages=[], currentPage=0, autoAdvance=true,
+        originalLogo='';
+
+    const $=s=>document.querySelector(s),
+          create=(t,c,h)=>{let e=document.createElement(t);if(c)e.className=c;if(h)e.innerHTML=h;return e;};
+
+    function applyTheme(t){ document.body.classList.remove('light','medium','vibe'); if(t!=='dark') document.body.classList.add(t); }
+    function updateMeta(){ document.getElementById('themeColorMeta').content = getComputedStyle(document.body).getPropertyValue('--theme-color').trim(); }
+    function toggleTheme(){
+      const order=['dark','light','medium','vibe'], cur=localStorage.getItem(CURRENT_THEME)||'dark',
+            nxt=order[(order.indexOf(cur)+1)%order.length];
+      applyTheme(nxt); localStorage.setItem(CURRENT_THEME,nxt); updateMeta();
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+      applyTheme(localStorage.getItem(CURRENT_THEME)||'dark');
+      updateMeta();
+      $('#themeToggle').onclick = toggleTheme;
+      init();
+      document.body.addEventListener('click', e=>{
+        if(e.target.closest('.footer-text')){
+          const btn = e.target.closest('.footer-text');
+          btn.classList.toggle('active');
+          $('.response-container').classList.toggle('collapsed');
+        }
+      });
+    });
+
+    async function init(){
+      originalLogo = $('#logoObj').data;
+      try {
+        training = await fetch(CONFIG.TRAINING_FILE).then(r=>r.text());
+        for(let i=0;i<training.length;i+=CONFIG.CHUNK_SIZE) chunks.push(training.slice(i,i+CONFIG.CHUNK_SIZE));
+      } catch{}
+      loadConfig();
+      particlesJS('particles-js',{
+        particles:{ number:{value:40}, color:{value:['#0ff','#f0f']}, shape:{type:'circle'},
+                   opacity:{value:0.4}, size:{value:2.4}, move:{enable:true,speed:1.5} },
+        retina_detect:true
+      });
+      bindUI();
+    }
+
+    function loadConfig(){
+      if(localStorage.getItem(STORAGE_KEY)==='1'){
+        isEnabled=true;
+        userName=localStorage.getItem('userName')||'';
+        assistantBase=localStorage.getItem('assistantBase')||'';
+        conversation=[{role:'system',content:`${chunks[0]||training}\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`}];
+        chunkIndex=1;
+      }
+      updateUI();
+    }
+
+    function updateUI(){
+      $('#toggleBtn').classList.toggle('active',isEnabled);
+      $('#kittyBtn').classList.toggle('active',isStudying);
+      $('#assistantName').textContent = isEnabled
+        ? `${assistantBase} dual.infodose`
+        : isStudying
+          ? 'Estudos dual.infodose'
+          : '';
+    }
+
+    function showLoading(msg){
+      const wrap=$('.pages-wrapper'); wrap.innerHTML='';
+      const p=create('div','page active'),
+            foot=create('p','footer-text loading','');
+      msg.split('').forEach((ch,i)=>{
+        const sp=document.createElement('span');
+        sp.textContent=ch; sp.style.animationDelay=(i*0.2)+'s';
+        sp.classList.add('loading'); foot.appendChild(sp);
+      });
+      p.appendChild(foot);
+      wrap.appendChild(p);
+      pages=[p]; currentPage=0;
+    }
+
+    function splitText(t){
+      let ps=t.split(/\n\s*\n/).filter(p=>p.trim());
+      if(ps.length%3!==0) ps=t.match(/[^\.!\?]+[\.!\?]+/g).map(s=>s.trim());
+      const out=[]; for(let i=0;i<ps.length;i+=3) out.push(ps.slice(i,i+3));
+      return out;
+    }
+
+    function renderResponse(txt){
+      speechSynthesis.cancel(); autoAdvance=true;
+      const wrap=$('.pages-wrapper'); wrap.innerHTML=''; pages=[];
+      // 1) Substituições de Markdown básicas
+  txt = txt
+    // código inline
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // negrito **texto**
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // itálico *texto*
+    .replace(/(^|[^*])\*([^*]+)\*([^*]|$)/g, '$1<em>$2</em>$3')
+    // headings ###, ##, #
+    .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+    .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
+    .replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
+
+ 
+      // 2) Agora divide em grupos, monta as páginas e injeta como innerHTML
+  const groups = splitText(txt),
+        titles = ['🎁 Recompensa Inicial','👁️ Exploração','⚡️ Antecipação'];
+
+  groups.forEach((grp, gi) => {
+    const pg = document.createElement('div');
+    pg.className = 'page' + (gi===0 ? ' active' : '');
+
+    grp.forEach((para, j) => {
+      const cls = j===0 ? 'intro' : j===1 ? 'middle' : 'ending';
+      // aqui o innerHTML já vai interpretar <h1>, <code>, <em>, <strong>, etc.
+      const block = document.createElement('div');
+      block.className = `response-block ${cls}`;
+      block.innerHTML = `<p>${para}</p>`;
+          block.addEventListener('click',()=>{
+            autoAdvance=false;
+            if(!block.dataset.spoken){
+              block.dataset.spoken='1'; block.classList.add('clicked'); speak(para);
+            } else {
+              block.classList.add('expanded');
+              if(!isEnabled){ isEnabled=true; localStorage.setItem(STORAGE_KEY,'1'); updateUI(); }
+              showLoading('⚡️ Pulso em Expansão...');
+              conversation.push({role:'user',content:`${titles[j]}\n\n${para}`});
+              callAI();
+            }
+          });
+          pg.appendChild(block);
+        });
+        wrap.appendChild(pg);
+        pages.push(pg);
+      });
+      currentPage = 0;
+  document.getElementById('pageIndicator').textContent = `1 / ${pages.length}`;
+  autoSpeakPage(0);
+    }
+
+    function autoSpeakPage(i){
+      const txts = Array.from(pages[i].querySelectorAll('p')).map(p=>p.innerText).join(' ');
+      speak(txts,()=>{
+        if(!autoAdvance) return;
+        if(i<pages.length-1){ changePage(1); autoSpeakPage(i+1); }
+        else speak('Do seu jeito. Sempre único. Sempre seu.');
+      });
+    }
+
+    function changePage(d){
+      const np=currentPage+d;
+      if(np<0||np>=pages.length) return;
+      pages[currentPage].classList.remove('active');
+      pages[np].classList.add('active');
+      currentPage=np;
+      $('#pageIndicator').textContent=`${np+1} / ${pages.length}`;
+    }
+
+    async function callAI(){
+      try {
+        const res=await fetch(CONFIG.API_URL,{
+          method:'POST',
+          headers:{'Authorization':CONFIG.AUTH_TOKEN,'Content-Type':'application/json'},
+          body:JSON.stringify({model:CONFIG.MODEL,messages:conversation,temperature:CONFIG.TEMP})
+        });
+        const data=await res.json();
+        const ans=data.choices?.[0]?.message?.content.trim()||'Sem resposta.';
+        conversation.push({role:'assistant',content:ans});
+        renderResponse(ans);
+      } catch {
+        conversation.push({role:'assistant',content:'O pulso oscilou, o fluxo continua.'});
+        renderResponse('O pulso oscilou, o fluxo continua.');
+      }
+    }
+
+    function bindUI(){
+      $('#sendBtn').onclick=onSend;
+      $('#userInput').addEventListener('keypress',e=>e.key==='Enter'&&onSend());
+      $('#voiceBtn').onclick=()=>{
+        const rec=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+        rec.lang='pt-BR'; rec.start();
+        rec.onresult=evt=>{ $('#userInput').value=evt.results[0][0].transcript; onSend(); };
+      };
+      document.body.addEventListener('click', e=>{
+        if(e.target.matches('.copy-code'))
+          navigator.clipboard.writeText(e.target.nextElementSibling.innerText);
+      });
+      document.querySelector('.control-buttons').addEventListener('click', e=>{
+        if(e.target.closest('.copy-button')){
+          autoAdvance=false;
+          const txt = Array.from(document.querySelectorAll('.pages-wrapper .page'))
+            .map(p=>p.innerText.trim()).join('\n\n');
+          navigator.clipboard.writeText(txt);
+        }
+        if(e.target.closest('.paste-button')){
+          autoAdvance=false;
+          navigator.clipboard.readText().then(txt=>$('#userInput').value=txt);
+        }
+        if(e.target.closest('#toggleBtn')){
+          autoAdvance=false;
+          if(!isEnabled) $('#loginBox').classList.add('active');
+          else { isEnabled=false; localStorage.removeItem(STORAGE_KEY); conversation=[]; updateUI(); }
+        }
+        if(e.target.closest('#kittyBtn')){
+          autoAdvance=false; isStudying=!isStudying;
+          if(isStudying){
+            isEnabled=false; chunkIndex=1;
+            conversation=[{role:'system',content:`${chunks[0]||training}\n\nAssistente de Estudos dual.infodose.`}];
+          } else changeLogo(originalLogo);
+          updateUI();
+        }
+      });
+      document.querySelector('.pagination').addEventListener('click', e=>{
+        autoAdvance=false;
+        if(e.target.dataset.action==='prev') changePage(-1);
+        if(e.target.dataset.action==='next') changePage(1);
+      });
+      $('#loginForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const u=$('#userName').value.trim(), a=$('#assistantInput').value.trim();
+        if(!u||!a) return alert('Preencha os dados');
+        isEnabled=true; userName=u; assistantBase=a;
+        localStorage.setItem(STORAGE_KEY,'1');
+        localStorage.setItem('userName',u);
+        localStorage.setItem('assistantBase',a);
+        conversation=[{role:'system',content:`${chunks[0]||training}\n\nUsuário: ${u}.\nAssistente: ${a} dual.infodose.`}];
+        chunkIndex=1; updateUI(); $('#loginBox').classList.remove('active');
+      });
+    }
+
+    function onSend(){
+      const raw=$('#userInput').value.trim();
+      if(!raw) return;
+      $('#userInput').value='';
+      if(raw.toLowerCase()==='estado 78k') return;
+      autoAdvance=false; showLoading('⚡️Pulso enviado...Recebendo Intenção…');
+      conversation.push({role:'user',content:isEnabled?`Usuário ${userName}: ${raw}`:raw});
+      callAI();
+    }
+
+    function changeLogo(srcs){
+      const [p,f] = Array.isArray(srcs)?srcs:[srcs,null];
+      const cont=$('#logoContainer'), obj=$('#logoObj');
+      cont.classList.add('fading');
+      cont.addEventListener('transitionend',function once(){
+        cont.removeEventListener('transitionend',once);
+        obj.data=p; if(f) obj.addEventListener('error',fn=>{obj.removeEventListener('error',fn);obj.data=f;});
+        cont.classList.remove('fading');
+      });
+    }
+
+    function speak(txt,cb){
+      let clean = txt.replace(/<[^>]+>/g,'').replace(/(\*\*|\*|__|_|`)/g,'');
+      const u=new SpeechSynthesisUtterance(clean);
+      u.lang='pt-BR'; u.rate=.99; u.pitch=1.1;
+      speechSynthesis.speak(u);
+      if(cb) u.onend=cb;
+    }
+
+    bindUI();
+  })();
+  </script>
+</body>
+</html>

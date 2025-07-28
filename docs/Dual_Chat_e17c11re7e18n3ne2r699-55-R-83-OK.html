@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>dual-Infodose Chat Cinematográfico</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="voice-btn" href="assets/icons/Reset_buttom_Dual-Infodose.svg" type="image/svg" />
+  <link rel="copy-button" href="assets/icons/Botao_cor_Type_Dual_Infodose.svg" type="image/svg+xml" />
+  <link rel="paste-button" href="assets/icons/botao_Movimento_Calice_Dual_Infodose.svg" type="image/svg" />
+  <link rel="toggle-button" href="assets/icons/dual_Dual_Infodose.svg" type="image/svg+xml" />
+  <style>
+    :root {
+      --bg-dark: linear-gradient(to bottom, #000, #1a1a1a);
+      --text-dark: #fff;
+      --primary: #111;
+      --secondary: #5e5c5e;
+      --fast: 0.4s;
+      --med: 0.8s;
+      --slow: 1.8s;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    html, body { overflow:hidden; }
+    body {
+      position: relative;
+      padding:20px;
+      background:var(--bg-dark);
+      color:var(--text-dark);
+      font-family:'Montserrat',sans-serif;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+    }
+
+    /* Partículas e SVG central */
+    #particles-js { position:absolute; inset:0; z-index:0; }
+    .svg-container {
+      position:absolute; top:260px; left:50%;
+      transform:translateX(-50%);
+      width:180px; height:180px;
+      
+      border-radius:50%;
+      backdrop-filter:blur(8px);
+      z-index:1;
+    }
+    .svg-container object { width:100%; height:100%; animation:pulse 2s infinite ease-in-out; }
+
+    /* Nome do Assistente */
+    #assistantName {
+      margin-top:59%;
+      font-size:0.8em;
+      font-weight:600;
+      z-index:1;
+      opacity:0.6;
+    }
+
+    /* Container de respostas */
+    .response-container {
+      position:fixed;
+      left:20px; right:20px; bottom:160px;
+      padding:12px;
+      background:rgba(0,0,0,0.4);
+      backdrop-filter:blur(10px);
+      border-radius:20px;
+      max-height:calc(100vh - 200px);
+      overflow-y:auto;
+      z-index:1;
+    }
+    .page { display:none; opacity:0; transition:opacity var(--med) ease-in-out; }
+    .page.active { display:block; opacity:1; }
+    .page.initial { text-align:center; font-size:1.1em; }
+
+    .response-controls {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-top:15px; padding-top:10px;
+      border-top:1px solid rgba(255,255,255,0.2);
+    }
+    .control-buttons { display:flex; gap:10px; }
+
+    /* Botões copiar/colar */
+    .copy-button,
+    .paste-button {
+      background:rgba(255,255,255,0.03);
+      padding:6px;
+      border: none;
+      border-radius:9px;
+      cursor:pointer;
+      transition:background var(--fast);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:36px;
+      height:36px;
+    }
+    .copy-button:hover,
+    .paste-button:hover {
+      background:rgba(255,255,255,0.15);
+    }
+
+    /* Toggle Infodose */
+    .toggle-button {
+      background:rgba(255,255,255,0.06);
+      padding:6px;
+      border-radius:50%;
+      border: none;
+      cursor:pointer;
+      transition:filter var(--mid), opacity var(--fast);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:36px;
+      height:36px;
+      opacity:0.3;
+    }
+    .toggle-button:hover {
+      background:rgba(255,255,255,0.15);
+    }
+    .toggle-button.active {
+      opacity:1;
+      filter:drop-shadow(0 0 8px #000);
+    }
+
+    .pagination { display:flex; align-items:center; gap:10px; }
+    .pagination button {
+      border:none; font-size:1.2em;
+      color:#6fe4fb; cursor:pointer; transition:transform var(--mid); 
+      background: linear-gradient(45deg, #0ff, #f0f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      transition: background var(--fast), transform var(--fast);
+    }
+    .pagination button:hover { transform:scale(1.2); }
+
+    /* Blocos de resposta */
+    .response-block {
+      margin:1rem 0;
+      padding:1.2rem;
+      border-radius:12px;
+      animation:fadeIn var(--slow) ease forwards;
+      transition:box-shadow var(--fast),transform var(--fast);
+      line-height:1.5;
+      position:relative;
+      cursor:pointer;
+      overflow:hidden;
+      animation:pulse 12s infinite ease-in-out;
+    }
+    .response-block:hover { box-shadow:0 0 15px rgba(0,255,255,0.4); }
+    .response-block.clicked { animation:clickPulse var(--med) ease-out; }
+    .response-block.expanded {
+      transform:scale(1.03);
+      background:rgba(0,0,0,0.6);
+      z-index:2;
+    }
+    .intro { background:linear-gradient(135deg,rgba(0,255,255,0.2),rgba(0,100,100,0.1)); border-left:4px solid #0ff; }
+    .middle { background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(50,50,50,0.1)); border-left:4px solid rgba(255,255,255,0.4); }
+    .ending { background:linear-gradient(135deg,rgba(255,0,255,0.2),rgba(100,0,100,0.1)); border-left:4px solid #f0f; }
+    .footer-text { margin-top:12px; font-size:0.8em; text-align:center; font-style:italic; }
+
+    /* Input + botões */
+    .input-container {
+      position:fixed; left:20px; right:20px; bottom:90px;
+      display:flex; gap:10px; z-index:2; max-width:calc(100% - 40px);
+    }
+    .input-container input {
+      flex:1; padding:10px; border:none; border-radius:20px;
+      background:rgba(255,255,255,0.1); color:inherit; outline:none;
+      font-size:16px; transition:background var(--fast);
+    }
+    .input-container input:focus { background:rgba(255,255,255,0.2); }
+    .input-container button {
+      width:60px; height:60px; border:none; border-radius:50%;
+      background:linear-gradient(45deg,var(--primary),var(--secondary));
+      color:#fff; font-size:1.5em; cursor:pointer;
+      display:flex; justify-content:center; align-items:center;
+      animation:pulse 2s infinite ease-in-out;
+      transition:transform var(--mid);
+    }
+    .input-container button:hover { transform:scale(1.1); }
+
+    /* Login Modal */
+    .login-container {
+      position:fixed; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:300px; padding:1.5rem 1rem;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.15);
+      border-radius:10px;
+      backdrop-filter:blur(8px);
+      z-index:10; display:none;
+    }
+    .login-container.active { display:block; }
+    .login-container input {
+      width:100%; background:transparent;
+      border:none; border-bottom:1px solid rgba(255,255,255,0.3);
+      margin:0.8rem 0; padding:0.4rem 0;
+      font-size:0.95em; color:#fff; outline:none;
+    }
+    .login-container input::placeholder { color:rgba(255,255,255,0.5); }
+    .login-container button {
+      width:100%; margin-top:1rem;
+      background:transparent; border:1px solid #0ff;
+      border-radius:8px; padding:0.5rem 0;
+      font-size:0.95em; color:#0ff; cursor:pointer;
+      transition:background .25s, color .25s;
+    }
+    .login-container button:hover { background:#0ff; color:#000; }
+
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+    @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.8}}
+  </style>
+</head>
+<body>
+
+  <div id="particles-js"></div>
+  <div class="svg-container">
+    <object data="assets/icons/3D_logo_Dual_Infodose_9.svg" type="image/svg+xml"></object>
+  </div>
+
+  <div id="assistantName"></div>
+
+  <div class="response-container" id="response">
+    <div class="page initial active">
+      <strong>Clique no ◉ e diga “Oi, Dual”.</strong><br>
+      <em>Sempre único. Sempre seu.</em>
+    </div>
+    <div class="response-controls">
+      <div class="control-buttons">
+
+        <!-- BOTÃO COPIAR -->
+        <button class="copy-button" title="Copiar">
+          <object
+            data="assets/icons/BW_quad_Dual_Infodose.svg"
+            type="image/svg+xml"
+            width="27"
+            height="27">
+          </object>
+        </button>
+
+        <!-- BOTÃO COLAR -->
+        <button class="paste-button" title="Colar">
+          <object
+            data="assets/icons/BW_Dual_Infodose.svg"
+            type="image/svg+xml"
+            width="24"
+            height="24">
+          </object>
+        </button>
+
+        <!-- BOTÃO TOGGLE / LOGIN -->
+        <button id="toggleBtn" class="toggle-button" title="Login para Infodose">
+          <object
+            data="assets/icons/circle_icon_fade_rente.png"
+            type="image/png"
+            width="33"
+            height="33">
+          </object>
+        </button>
+
+      </div>
+      <div class="pagination">
+        <button data-action="prev">⟵</button>
+        <span id="pageIndicator">1 / 1</span>
+        <button data-action="next">⟶</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-container">
+    <input id="userInput" type="text" placeholder="Diga: 'oi, Dual'...">
+    <button id="sendBtn" title="Enviar">➤</button>
+    <button id="voiceBtn" title="Falar">
+      <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" type="image/svg+xml" width="36" height="36"></object>
+    </button>
+  </div>
+
+  <div class="login-container" id="loginBox">
+    <form id="loginForm">
+      <input type="text" id="userName" placeholder="Nome do usuário" required>
+      <input type="text" id="assistantInput" placeholder="Nome dual.infodose" required>
+      <button type="submit">Ativar</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    const TRAINING_FILE = 'data/Super_Treinamento_Universal_Dual_Infodose_v1-28.txt';
+    const API_ENDPOINT   = 'https://openrouter.ai/api/v1/chat/completions';
+    const MODEL_NAME     = 'meta-llama/llama-4-maverick:free';
+    const TEMPERATURE    = 0.2;
+
+    let training = '';
+    let assistantEnabled = false;
+    let conversation = [];
+    let pages = [], currentPage = 0, autoAdvance = true;
+    let userName = '';
+    let assistantBase = '';
+
+    const assistantNameEl = document.getElementById('assistantName');
+    const loginBox = document.getElementById('loginBox');
+    const toggleBtn = document.getElementById('toggleBtn');
+
+    const createEl = (tag, cls, html) => {
+      const e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (html) e.innerHTML = html;
+      return e;
+    };
+    const splitBlocks = text => {
+      let paras = text.split(/\n\s*\n/).filter(p=>p.trim());
+      if (paras.length % 3 !== 0) {
+        paras = paras.join(' ').match(/[^\.!\?]+[\.!\?]+/g).map(s=>s.trim());
+      }
+      const groups = [];
+      for (let i=0; i<paras.length; i+=3) groups.push(paras.slice(i,i+3));
+      return groups;
+    };
+    const speakText = (txt, onend) => {
+      const u = new SpeechSynthesisUtterance(txt);
+      u.lang = 'pt-BR'; u.rate = 0.99; u.pitch = 1.1; u.volume = 1;
+      speechSynthesis.speak(u);
+      if (onend) u.onend = onend;
+    };
+    const updateToggleUI = () => {
+      toggleBtn.classList.toggle('active', assistantEnabled);
+      toggleBtn.title = assistantEnabled ? 'Desativar Infodose' : 'Login para Infodose';
+    };
+
+    function loadCfg() {
+      if (localStorage.getItem('infodoseEnabled') === '1') {
+        assistantEnabled = true;
+        userName = localStorage.getItem('userName') || '';
+        assistantBase = localStorage.getItem('assistantBase') || '';
+        assistantNameEl.textContent = assistantBase + ' dual.infodose';
+        conversation.unshift({
+          role:'system',
+          content: `Usuário: ${userName}. Assistente: ${assistantBase} dual.infodose. A partir de agora, o assistente chamará-se ${assistantBase} dual.infodose e referenciará sempre o nome do usuário ${userName}.`
+        });
+      }
+      updateToggleUI();
+    }
+
+    const showLoading = msg => {
+      const respEl = document.getElementById('response');
+      const ctrls = respEl.querySelector('.response-controls');
+      respEl.querySelectorAll('.page:not(.initial)').forEach(p=>p.remove());
+      const page = createEl('div','page active');
+      page.appendChild(createEl('p','footer-text',msg));
+      respEl.insertBefore(page, ctrls);
+      pages=[page]; currentPage=0;
+      document.getElementById('pageIndicator').textContent='…';
+    };
+
+    const renderPaginatedResponse = text => {
+      speechSynthesis.cancel(); autoAdvance=true;
+      const respEl = document.getElementById('response');
+      respEl.querySelectorAll('.page:not(.initial)').forEach(p=>p.remove());
+      pages=[]; const groups=splitBlocks(text);
+      const ctrl = respEl.querySelector('.response-controls');
+      const titles=['🎁 Recompensa Inicial','👁️ Exploração e Curiosidade','⚡️ Antecipação Vibracional'];
+      groups.forEach((tris,gi)=>{
+        const page=createEl('div',gi===0?'page active':'page');
+        tris.forEach((body,j)=>{
+          const cls=j===0?'intro':j===1?'middle':'ending';
+          const b=createEl('div','response-block '+cls,
+            `<h3>${titles[j]}</h3><p>${body}</p>`
+          );
+          b.dataset.state=''; b.addEventListener('click',()=>{
+            if(!b.dataset.state){
+              speechSynthesis.cancel(); speakText(body);
+              b.classList.add('clicked'); b.dataset.state='spoken';
+            } else {
+              b.classList.add('expanded'); b.dataset.state='';
+              if(!assistantEnabled){
+                assistantEnabled=true;
+                localStorage.setItem('infodoseEnabled','1');
+                updateToggleUI();
+              }
+              const blockText=`${titles[j]}\n\n${body}`;
+              showLoading('Pulso em Expansão...');
+              speechSynthesis.cancel(); speakText('Pulso em Expansão...');
+              conversation.push({role:'user',content:blockText});
+              callAI();
+            }
+          });
+          b.addEventListener('animationend',e=>{ if(e.animationName==='clickPulse') b.classList.remove('clicked'); });
+          page.appendChild(b);
+        });
+        page.appendChild(createEl('p','footer-text',
+          `<em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em>`
+        ));
+        respEl.insertBefore(page,ctrl); pages.push(page);
+      });
+      currentPage=0;
+      document.getElementById('pageIndicator').textContent=`1 / ${pages.length}`;
+      speakPage(0);
+    };
+    const speakPage = i=>{ const page=pages[i]; const body=Array.from(page.querySelectorAll('.response-block p')).map(p=>p.innerText).join(' '); speakText(body,()=>{
+        if(!autoAdvance) return;
+        if(i<pages.length-1){ changePage(1); speakPage(i+1); }
+        else speakText(`Do seu jeito, sempre único, sempre seu, ${userName}.`);
+    }); };
+    const changePage=offset=>{ const np=currentPage+offset; if(np<0||np>=pages.length) return; pages[currentPage].classList.remove('active'); pages[np].classList.add('active'); currentPage=np; document.getElementById('pageIndicator').textContent=`${currentPage+1} / ${pages.length}`; };
+
+    async function callAI(){
+      const body={model:MODEL_NAME,messages:conversation,temperature:TEMPERATURE};
+      try {
+        const resp=await fetch(API_ENDPOINT,{method:'POST',headers:{'Authorization':'Bearer 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','Content-Type':'application/json'},body:JSON.stringify(body)});
+        const data=await resp.json();
+        const answer=data.choices[0].message.content.trim();
+        conversation.push({role:'assistant',content:answer});
+        renderPaginatedResponse(answer);
+      } catch {
+        const errorMsg='O pulso oscilou, o fluxo continua.';
+        conversation.push({role:'assistant',content:errorMsg});
+        renderPaginatedResponse(errorMsg);
+      }
+    }
+
+    async function sendMessage(){
+      const respEl=document.getElementById('response');
+      const initPage=respEl.querySelector('.page.initial');
+      if(initPage) initPage.remove();
+      const input=document.getElementById('userInput');
+      const raw=input.value.trim(); if(!raw) return; input.value='';
+      speechSynthesis.cancel(); speakText('');
+      showLoading('⚡️Pulso enviado...Recebendo Intenção…');
+      conversation.push({role:'user',content:raw});
+      callAI();
+    }
+
+    document.addEventListener('DOMContentLoaded',async()=>{
+      try{ training=await fetch(TRAINING_FILE).then(r=>r.text()); }catch{}
+      loadCfg();
+      particlesJS('particles-js',{particles:{number:{value:40},color:{value:['#0ff','#f0f']},shape:{type:'circle'},opacity:{value:0.4},size:{value:2.4},move:{enable:true,speed:1.5}},retina_detect:true});
+
+      document.getElementById('sendBtn').addEventListener('click',sendMessage);
+      document.getElementById('userInput').addEventListener('keypress',e=>{ if(e.key==='Enter') sendMessage(); });
+      document.querySelector('[data-action="prev"]').addEventListener('click',()=>changePage(-1));
+      document.querySelector('[data-action="next"]').addEventListener('click',()=>changePage(1));
+      document.querySelector('.copy-button').addEventListener('click',()=>{ const all=Array.from(document.querySelectorAll('.response-container .page')).map(p=>p.innerText.trim()).join('\n\n'); navigator.clipboard.writeText(all); });
+      document.querySelector('.paste-button').addEventListener('click',async()=>{ document.getElementById('userInput').value=await navigator.clipboard.readText(); });
+
+      toggleBtn.addEventListener('click',()=>{
+        if(assistantEnabled){
+          assistantEnabled=false;
+          localStorage.removeItem('infodoseEnabled');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('assistantBase');
+          assistantNameEl.textContent='';
+          conversation = conversation.filter(m=>m.role!=='system');
+          updateToggleUI();
+        } else {
+          loginBox.classList.add('active');
+        }
+      });
+
+      document.getElementById('loginForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const u=document.getElementById('userName').value.trim();
+        const a=document.getElementById('assistantInput').value.trim();
+        if(!u||!a) return alert('Preencha os dados');
+        assistantEnabled=true;
+        userName=u;
+        assistantBase=a;
+        localStorage.setItem('infodoseEnabled','1');
+        localStorage.setItem('userName',u);
+        localStorage.setItem('assistantBase',a);
+        assistantNameEl.textContent=a+' dual.infodose';
+        conversation.unshift({
+          role:'system',
+          content:`Usuário: ${u}. Assistente: ${a} dual.infodose. A partir de agora, o assistente chamará-se ${a} dual.infodose e referenciará sempre o nome do usuário ${u}.`
+        });
+        updateToggleUI();
+        loginBox.classList.remove('active');
+      });
+
+      document.getElementById('voiceBtn').addEventListener('click',()=>{
+        const R=new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+        R.lang='pt-BR'; R.start();
+        R.onresult=e=>{
+          document.getElementById('userInput').value=e.results[0][0].transcript;
+          sendMessage();
+        };
+      });
+    });
+  </script>
+</body>
+</html>
