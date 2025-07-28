@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dual.Infodose</title>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#000000" name="theme-color"/>
+<link href="assets/icons/icon-192.png" rel="icon" type="image/png"/>
+<style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0a0a0a, #000000);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .content {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: absolute;
+      z-index: 1;
+    }
+
+    iframe.active {
+      opacity: 1;
+    }
+
+    .symbol-bar {
+      position: fixed;
+      top: 39%;
+      right: 15px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 40;
+    }
+
+    .symbol-button {
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      color: white;
+      background: rgba(255,255,255,0.05);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      opacity: 0.7;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .symbol-button:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+
+    .lock-button {
+      position: fixed;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      z-index: 183000;
+    }
+
+    /* Botões de ação */
+    #uploadComponentBtn,
+    #remoteComponentBtn,
+    #toggleDecoderBtn {
+      position: fixed;
+      left: 12px;
+      z-index: 90000;
+      padding: 4px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(0, 255, 255, 0.1);
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+
+      box-shadow: 0 0 4px rgba(0,255,255,0.2), 0 0 8px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+   
+    #uploadComponentBtn { top: 330px; }
+    #remoteComponentBtn { top: 370px; }
+    #toggleDecoderBtn { top: 420px; }
+
+    #uploadComponentBtn:hover,
+    #remoteComponentBtn:hover,
+    #toggleDecoderBtn:hover {
+      transform: scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+
+    #decoderBox {
+      display: none;
+      position: fixed;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      z-index: 70;
+    }
+
+    #decoderBox input {
+      padding: 0.6rem;
+      width: 200px;
+      text-align: center;
+      border-radius: 10px;
+      border: none;
+      font-size: 1em;
+    }
+
+    #decoderBox button {
+      margin-top: 10px;
+      padding: 0.5rem 1rem;
+      background: rgba(0,255,255,0.2);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+    }
+
+    my-frame-loader::part(container) {
+      width: 90%;
+      height: 85%;
+      z-index: 8;
+    }
+  
+
+#btn-expandir-ritual {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 99999;
+  padding: 6px 8px;
+  font-size: 14px;
+  background: #0ff;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div class="content">
+<iframe class="active" id="frame" src="index.html"></iframe>
+</div>
+<div class="symbol-bar">
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0A.html')">Φ</button>
+<button class="symbol-button" onclick="loadPage('dual-decoder-13.html')">꩜</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-4.html')">◌</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-1.html')">☼</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3re.html')">⅞</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-3.html')">◉</button>
+<button class="symbol-button" onclick="loadPage('dual-chat-0-94-15-fix-78-75-REC-3.html')">◑</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-2-0.html')">◘</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3.html')">❖</button>
+<button class="symbol-button" onclick="loadPage('dual-app-com-tutorial-ativacoes-10-4-2-3-0-v7-0-ONe7-0ee8-7-0eRE-ONRe-RRRe0ON-EA-eNB-ET-0Ar18eeR-Re-6R-4e-0r-1e35-3NU-3.html')">◍</button>
+</div>
+<button class="lock-button" onclick="loadPage('index.html')"></button>
+<!-- Botões -->
+<input accept=".html" id="uploadHTML" style="display:none" type="file"/>
+<button id="uploadComponentBtn">⧉</button>
+<button id="remoteComponentBtn">☍</button>
+<button id="toggleDecoderBtn">✦</button>
+<button id="btn-expandir-ritual">🌀</button>
+<!-- Caixa do decodificador -->
+<div id="decoderBox">
+<input id="codeInput" placeholder="Digite o selo..." type="text"/>
+<button onclick="decodeSymbolicCode()">✦ Desbloquear</button>
+</div>
+<!-- COMPONENTE WEB -->
+<script type="module">
+    class MyFrameLoader extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.innerHTML = `
+          <style>
+            .overlay {
+              position: fixed;
+              inset: 0;
+              background: rgba(0,0,0,0.6);
+              backdrop-filter: blur(8px);
+              z-index: 999;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .container {
+              width: 92%;
+              height: 86%;
+              background: #111;
+              border-radius: 20px;
+              box-shadow: 0 0 20px #0ff;
+              overflow: hidden;
+              position: relative;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+            .close-btn {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background: #f0f;
+              border: none;
+              color: #000;
+              font-weight: bold;
+              border-radius: 12px;
+              padding: 4px 10px;
+              cursor: pointer;
+              z-index: 10;
+            }
+          </style>
+          <div class="overlay">
+            <div class="container">
+              <button class="close-btn">✖</button>
+              <iframe></iframe>
+            </div>
+          </div>
+        `;
+        this.iframe = shadow.querySelector('iframe');
+        shadow.querySelector('.close-btn').onclick = () => this.remove();
+      }
+      set src(val) {
+        this.iframe.src = val;
+      }
+    }
+    customElements.define('my-frame-loader', MyFrameLoader);
+  </script>
+<!-- Funções JS -->
+<script>
+    const frame = document.getElementById('frame');
+    const activationSound = new Audio('assets/sounds/acts/wounds/codigo-MT-OLX-0.wav');
+
+    function playSound() {
+      activationSound.volume = 1;
+      activationSound.play().catch(()=>{});
+    }
+
+    function loadPage(url) {
+      frame.classList.remove('active');
+      setTimeout(() => {
+        frame.src = url;
+        frame.onload = () => frame.classList.add('active');
+      }, 300);
+    }
+
+    const uploadInput = document.getElementById('uploadHTML');
+    document.getElementById('uploadComponentBtn').onclick = () => {
+      playSound();
+      uploadInput.click();
+    };
+
+    uploadInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const blob = new Blob([ev.target.result], { type: 'text/html' });
+          const blobUrl = URL.createObjectURL(blob);
+          const frame = document.createElement('my-frame-loader');
+          frame.src = blobUrl;
+          document.body.appendChild(frame);
+        };
+        reader.readAsText(file);
+      } else {
+        alert('Selecione um arquivo .html válido.');
+      }
+    };
+
+    document.getElementById('remoteComponentBtn').onclick = () => {
+      playSound();
+      const url = prompt("URL do componente remoto:");
+      if (url) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = url;
+        document.body.appendChild(frame);
+      }
+    };
+
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const decoderBox = document.getElementById('decoderBox');
+    toggleDecoderBtn.onclick = () => {
+      playSound();
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    };
+
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBLX": "page-client.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "337": "dual-tube-25.html",
+      "qwe": "dual-book-12.html",
+      "mn1": "index-manifestado.html",
+      "mn2": "index-manifestado-tangle.html",
+      "bts": "botao-simbolico.html"
+    };
+
+    function decodeSymbolicCode() {
+      playSound();
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const dest = CODE_MAP[code];
+      if (dest) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = dest;
+        document.body.appendChild(frame);
+        decoderBox.style.display = 'none';
+      } else {
+        alert('Selo desconhecido ou não registrado.');
+      }
+    }
+  </script>
+<script>
+document.getElementById("btn-expandir-ritual").onclick = () => {
+  const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
+  if (alvo) {
+    alvo.style.display = alvo.style.display === "none" ? "block" : "none";
+    logMistico("⧉ Expandiu o plano ritual oculto.");
+  }
+};
+</script>
+<!-- 🌌 Botões simbióticos -->
+<style>
+#btn-expandir-ritual, {
+  position: fixed;
+  bottom: 30px;
+  z-index: 10000;
+  background: #000;
+  color: #0ff;
+  border: 1px solid #0ff;
+  border-radius: 4px;
+  padding: 6px 10px;
+  opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+#btn-expandir-ritual:hover,
+ {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+#btn-expandir-ritual { left: 20px; }
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.021); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.4; }
+}
+</style>
+<script>
+document.getElementById("btn-expandir-ritual").onclick = () => {
+  const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
+  if (alvo) {
+    alvo.style.display = alvo.style.display === "none" ? "block" : "none";
+    logMistico("⧉ Expandiu o plano ritual oculto.");
+  }
+};
+</script>
+<style>
+#pulsos-container {
+  position: fixed;
+  top: 208px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  opacity: var(--slow);
+  border: 1px solid transparent;
+  border-image: linear-gradient(45deg, #F0F, #0FF);
+  border-image-slice: 1;
+
+  -webkit-mask-image: radial-gradient(white, black); /* força máscara arredondada no Safari */
+  mask-image: radial-gradient(white, black);
+
+  overflow: hidden;
+  z-index: 9999;
+  cursor: pointer;
+  font-family: monospace;
+  text-align: center;
+}
+
+  #pulsos {
+    max-height: calc(2.5 * 1.2em);
+    overflow-y: auto;
+    padding: 0.4em;
+    font-size: 0.88em;
+    color: #0ff;
+    position: relative;
+  }
+
+  #pulsos.expanded {
+    max-height: calc(12 * 1.2em);
+    overflow-y: auto;
+  }
+
+  .debug-mistico {
+    line-height: 1.2em;
+    margin-bottom: 0em; 
+    word-break: break-word;
+  }
+
+  /* FADE VISUAL no final */
+  #pulsos:not(.expanded)::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: 1.2em;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    pointer-events: none;
+  }
+    #koblluxPlayer {
+position: fixed;
+top: 20px;
+left: 20px;
+z-index: 9999;
+background: rgba(0, 10, 20, 0.8);
+backdrop-filter: blur(12px) saturate(180%);
+padding: 18px;
+border-radius: 16px;
+border: 1px solid rgba(0, 255, 255, 0.15);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+0 0 0 1px rgba(0, 255, 255, 0.1),
+0 0 30px rgba(0, 255, 255, 0.05);
+color: #e0f7ff;
+display: flex;
+flex-direction: column;
+gap: 14px;
+max-width: 260px;
+transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#koblluxPlayer button, 
+#koblluxPlayer select, 
+#koblluxPlayer input[type="range"] {
+background: rgba(0, 255, 255, 0.05);
+border: 1px solid rgba(0, 255, 255, 0.1);
+border-radius: 8px;
+color: inherit;
+padding: 8px 12px;
+font-size: 13px;
+transition: all 0.3s ease;
+width: 100%;
+cursor: pointer;
+}
+#koblluxPlayer button {
+background: linear-gradient(135deg, rgba(0, 150, 255, 0.15), rgba(0, 80, 200, 0.2));
+backdrop-filter: blur(4px);
+}
+#koblluxPlayer button:hover {
+background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 100, 220, 0.3));
+border-color: rgba(0, 255, 255, 0.3);
+box-shadow: 0 0 15px rgba(0, 200, 255, 0.1);
+transform: translateY(-1px);
+}
+#togglePlayer {
+width: 60px;
+height: 60px;
+border-radius: 50% !important;
+border: none !important;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3) !important;
+background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 120, 255, 0.35)) !important;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+#togglePlayer:hover {
+transform: rotate(90deg);
+background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 100, 220, 0.3)) !important;
+box-shadow: 0 0 25px rgba(0, 255, 255, 0.5) !important;
+}
+#togglePlayer:hover {
+transform: rotate(90deg);
+background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 120, 255, 0.35)) !important;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+#playerControls {
+display: none;
+flex-direction: column;
+gap: 12px;
+margin-top: 10px;
+animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+#koblluxPlayer input[type="range"] {
+-webkit-appearance: none;
+height: 6px;
+background: rgba(0, 255, 255, 0.1);
+border-radius: 10px;
+padding: 0;
+margin: 10px 0;
+}
+#koblluxPlayer input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+width: 16px;
+height: 16px;
+border-radius: 50%;
+background: #00ffff;
+cursor: pointer;
+box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+transition: all 0.2s ease;
+}
+#koblluxPlayer input[type="range"]::-webkit-slider-thumb:hover {
+transform: scale(1.2);
+box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+}
+#koblluxPlayer label {
+font-size: 11px;
+opacity: 0.7;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+color: rgba(0, 255, 255, 0.7);
+}
+#themeSelector {
+background: rgba(0, 255, 255, 0.05);
+border: 1px solid rgba(0, 255, 255, 0.15);
+border-radius: 8px;
+color: #0ff;
+padding: 4px 8px;
+font-size: 13px;
+backdrop-filter: blur(4px);
+transition: all 0.3s ease;
+}
+#themeSelector:hover {
+background: rgba(0, 255, 255, 0.1);
+border-color: rgba(0, 255, 255, 0.3);
+}
+/* Ultra Foda KOBLLUX Player Styles */
+#koblluxPlayer {
+position: fixed;
+top: 20px;
+left: 20px;
+z-index: 99999;
+background: rgba(0, 10, 20, 0.8);
+backdrop-filter: blur(12px) saturate(180%);
+padding: 18px;
+border-radius: 16px;
+border: 1px solid rgba(0, 255, 255, 0.15);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+0 0 0 1px rgba(0, 255, 255, 0.1),
+0 0 30px rgba(0, 255, 255, 0.05);
+color: #e0f7ff;
+display: flex;
+flex-direction: column;
+gap: 14px;
+max-width: 260px;
+transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Additional overrides... */
+/* Remove parent border/shadow influence on toggle */
+#koblluxPlayer #togglePlayer {
+border: none !important;
+box-shadow: none !important;
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Ensure perfect circle */
+#togglePlayer {
+width: 60px !important;
+height: 60px !important;
+aspect-ratio: 1 / 1 !important;
+border-radius: 50% !important;
+box-sizing: border-box !important;
+}
+/* Remove inherited borders/shadows and set gradient background */
+#koblluxPlayer #togglePlayer {
+border: none !important;
+box-shadow: none !important;
+outline: none !important;
+background: var(--bg) !important;
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Ensure perfect circle of 33px */
+#togglePlayer {
+width: 33px !important;
+height: 33px !important;
+aspect-ratio: 1 / 1 !important;
+border-radius: 50% !important;
+overflow: visible !important;
+}
+/* Scale inner icon */
+#togglePlayer svg,
+#togglePlayer .waves-icon {
+width: 20px !important;
+height: 20px !important;
+}
+/* Clear extra padding/margin */
+#togglePlayer > * {
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Remove any border/box-shadow on container that affect children */
+#koblluxPlayer {
+border: none !important;
+box-shadow: none !important;
+outline: none !important;
+}
+</style>
+<!-- 🌌 Camada Simbiótica Oculta -->
+<div id="pulsos-container">
+<div id="pulsos"></div>
+</div>
+<script>
+  const pulsos = document.getElementById("pulsos");
+
+  function logMistico(msg) {
+    const el = document.createElement("div");
+    el.className = "debug-mistico";
+    el.innerText = "🌀 " + msg;
+    pulsos.appendChild(el);
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  }
+
+  pulsos.addEventListener("click", () => {
+    pulsos.classList.toggle("expanded");
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  });
+
+  function spawnCosmicExplosion(x, y) {
+    const boom = document.createElement("div");
+    boom.style.position = "absolute";
+    boom.style.left = x + "px";
+    boom.style.top = y + "px";
+    boom.style.width = boom.style.height = "12px";
+    boom.style.borderRadius = "50%";
+    boom.style.background = "radial-gradient(circle, #0ff, #f0f0ff, transparent)";
+    boom.style.pointerEvents = "none";
+    boom.style.animation = "pulse 0.4s ease-out";
+    document.body.appendChild(boom);
+    setTimeout(() => boom.remove(), 1000);
+  }
+
+  // Pulso na página principal
+  document.addEventListener("click", e => {
+    spawnCosmicExplosion(e.clientX, e.clientY);
+    navigator.vibrate?.([5, 15, 5]);
+    logMistico("Pulso simbiótico em " + e.clientX + ", " + e.clientY);
+  });
+
+  // Recebe cliques do iframe
+  window.addEventListener("message", function(event) {
+    if (event.data?.type === "iframeClick") {
+      const iframe = document.getElementById("seuIframeID"); // Troque para o ID real do seu iframe
+      if (!iframe) return;
+
+      const rect = iframe.getBoundingClientRect();
+      const xGlobal = rect.left + event.data.x;
+      const yGlobal = rect.top + event.data.y;
+
+      spawnCosmicExplosion(xGlobal, yGlobal);
+      navigator.vibrate?.([5, 15, 5]);
+      logMistico("⚡ Pulso no iFrame em " + event.data.x + ", " + event.data.y);
+    }
+  });
+</script>
+<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.8);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
+    ≈
+   </button>
+<div class="hidden" id="playerWrapper">
+</div>
+<div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
+<button id="playPause" style="font-size:22px;background:none;">
+     ►
+    </button>
+<select id="trackSelect">
+<option value="">
+      🎵 Escolha uma trilha
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<select id="binauralSelect">
+<option value="">
+      🎶 Binaural Desativado
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      🌀 Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<label>
+     🎵 Volume Trilha
+     <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1">
+</input></label>
+<label>
+     🧘 Volume Binaural
+     <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+</label>
+</div>
+</div>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+const toggleBtn = document.getElementById("togglePlayer");
+const controls = document.getElementById("playerControls");
+const playPauseBtn = document.getElementById("playPause");
+const trackSelect = document.getElementById("trackSelect");
+const binauralSelect = document.getElementById("binauralSelect");
+const trackVolume = document.getElementById("trackVolume");
+const binauralVolume = document.getElementById("binauralVolume");
+const trackAudio = new Audio();
+const binauralAudio = new Audio();
+toggleBtn.addEventListener("click", () => {
+controls.style.display = controls.style.display === "flex" ? "none" : "flex";
+});
+playPauseBtn.addEventListener("click", () => {
+if (trackAudio.src) trackAudio.paused ? trackAudio.play() : trackAudio.pause();
+if (binauralAudio.src) binauralAudio.paused ? binauralAudio.play() : binauralAudio.pause();
+playPauseBtn.textContent = (trackAudio.paused && binauralAudio.paused) ? "►" : "⏸";
+});
+trackSelect.addEventListener("change", () => {
+if (trackSelect.value) {
+trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+trackAudio.loop = true;
+trackAudio.volume = trackVolume.value;
+trackAudio.play();
+playPauseBtn.textContent = "⏸";
+} else {
+trackAudio.pause();
+trackAudio.src = "";
+}
+});
+binauralSelect.addEventListener("change", () => {
+if (binauralSelect.value) {
+binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.wav`;
+binauralAudio.loop = true;
+binauralAudio.volume = binauralVolume.value;
+binauralAudio.play();
+} else {
+binauralAudio.pause();
+binauralAudio.src = "";
+}
+});
+trackVolume.addEventListener("input", () => {
+trackAudio.volume = trackVolume.value;
+});
+binauralVolume.addEventListener("input", () => {
+binauralAudio.volume = binauralVolume.value;
+});
+});
+  </script>
+<script>
+  document.addEventListener("click", function(e) {
+    window.parent.postMessage({
+      type: "iframeClick",
+      x: e.clientX,
+      y: e.clientY
+    }, "*");
+  });
+  document.addEventListener("touchstart", function(e) {
+    const t = e.touches[0];
+    if (t) {
+      window.parent.postMessage({
+        type: "iframeClick",
+        x: t.clientX,
+        y: t.clientY
+      }, "*");
+    }
+  });
+</script>
+    <script>
+  document.getElementById("btn-expandir-ritual")?.addEventListener("click", () => {
+    const pulsos = document.getElementById("pulsos");
+    if (pulsos) {
+      pulsos.classList.toggle("expanded");
+      if (!pulsos.classList.contains("expanded")) {
+        pulsos.scrollTop = pulsos.scrollHeight;
+      }
+    }
+  });
+</script>
+</body>
+</html>
