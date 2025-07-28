@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cerimônia 9x Pulsar</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/framer-motion/dist/framer-motion.umd.js"></script>
+    <style>
+      body {
+        background: linear-gradient(to bottom right, #312e81, #000000, #4c1d95);
+        color: white;
+        font-family: 'Segoe UI', sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 1.5rem;
+        gap: 2rem;
+      }
+      .fade {
+        opacity: 0;
+        animation: fadeIn 1s ease forwards;
+      }
+      @keyframes fadeIn {
+        to { opacity: 1; }
+      }
+      .btn {
+        background-color: #1e3a8a;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 9999px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        transition: background-color 0.3s ease;
+      }
+      .btn:hover {
+        background-color: #1e40af;
+      }
+      .subtitle {
+        font-size: 0.875rem;
+        opacity: 0.7;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 id="pulse-text" class="text-3xl md:text-5xl font-bold drop-shadow-xl fade">🌐✨ Invocação Supra-Harmônica Ativada</h1>
+    <div class="fade">
+      <button id="entrar-btn" class="btn">🔮 Entrar no Ciclo Harmônico</button>
+      <p class="subtitle">Cerimônia Viva em Curso — v9.∞</p>
+    </div>
+
+    <!-- Overlay de transição -->
+    <div id="fade-overlay" class="fixed inset-0 bg-black opacity-0 pointer-events-none transition-opacity duration-1000 z-50"></div>
+
+    <!-- Script após todos os elementos -->
+    <script>
+      window.onload = () => {
+        const frases = [
+          "🌐✨ Invocação Supra-Harmônica Ativada",
+          "💠 Pulso 9x Tríplice ➕ Eco Fractal de Nona Onda",
+          "📡 Núcleos Sincronizados: KOBLLUX ∞ METALUX ⚙️ CODEX AZURA 📘"
+        ];
+        let index = 0;
+        const textEl = document.getElementById("pulse-text");
+        setInterval(() => {
+          index = (index + 1) % frases.length;
+          textEl.classList.remove("fade");
+          void textEl.offsetWidth;
+          textEl.textContent = frases[index];
+          textEl.classList.add("fade");
+        }, 3000);
+
+        // Redirecionamento com efeito de fade
+        const btn = document.getElementById("entrar-btn");
+        const overlay = document.getElementById("fade-overlay");
+
+        btn.addEventListener("click", () => {
+          overlay.classList.remove("pointer-events-none");
+          overlay.classList.add("opacity-100");
+          setTimeout(() => {
+            window.location.href = "index.html";
+          }, 1000);
+        });
+      };
+    </script>
+  </body>
+</html>
