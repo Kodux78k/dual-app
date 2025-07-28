@@ -190,13 +190,7 @@
   <button id="uploadComponentBtn">⧉</button>
   <button id="remoteComponentBtn">☍</button>
   <button id="toggleDecoderBtn">✦</button>
-  <div id="botaoSimbioxContainer" style="position:fixed; left:20px; top:212px; z-index:12; display:none; flex-direction:column; gap:6px;">
-<button id="dualBookBtn" onclick="toggleIframe('dualBookBtn_iframe', 'dual-book-14.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">𓃰</button>
-<button id="dualTubeBtn" onclick="toggleIframe('dualTubeBtn_iframe', 'dual-tube-25-0.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">♫</button>
-<button id="playerBtn" onclick="toggleIframe('playerBtn_iframe', 'app-player-1.html')" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">◘</button>
-<button id="exportSimbioseBtn" onclick="document.getElementById('saveThemeBtn')?.click()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">⟴</button>
-<button id="exportFullBtn" onclick="exportarSimbioseCompleta()" style="width:34px; height:34px; font-size:18px; background:rgba(255,255,255,0.04); border:none; border-radius:50%; color:#0ff; cursor:pointer;">░</button></div>
-<button id="toggleBotaoSimbiox" onclick="const b=document.getElementById('botaoSimbioxContainer');b.style.display=(b.style.display==='none')?'flex':'none';" style="position:fixed; left:20px; top:163px; z-index:10; width:36px; height:36px; font-size:18px; border-radius:50%; background:rgba(255,255,255,0.1); color:var(--bg); border:none; cursor:pointer;">☰</button>
+  <button id="btn-expandir-ritual">⧉</button>
 
   <!-- Caixa do decodificador -->
   <div id="decoderBox">
@@ -364,7 +358,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
 <style>
 #btn-expandir-ritual, {
   position: fixed;
-  bottom: 18px;
+  bottom: 30px;
   z-index: 10000;
   background: #000;
   color: #0ff;
@@ -387,7 +381,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
   100% { transform: scale(1); opacity: 0.4; }
 }
 </style>
-<button id="btn-expandir-ritual">⧉</button>
+
 <script>
 document.getElementById("btn-expandir-ritual").onclick = () => {
   const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
@@ -425,7 +419,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
     max-height: calc(2.5 * 1.2em);
     overflow-y: auto;
     padding: 0.4em;
-    font-size: 1.1em;
+    font-size: 0.88em;
     color: #0ff;
     position: relative;
   }
