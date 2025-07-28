@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Símbolo SVG Infodose Puro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: radial-gradient(circle, #eee, #ccc);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .pulse-wrapper {
+      position: relative;
+      width: 200px;
+      height: 200px;
+    }
+    .pulse-shadow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 180px;
+      height: 180px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: pulse 3s ease-in-out infinite;
+      z-index: 0;
+    }
+    .circle-spin {
+      width: 160px;
+      height: 160px;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-top: 3px solid rgba(0,0,0,0.6);
+      border-radius: 50%;
+      animation: spin 6s linear infinite;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+    .svg-symbol {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.08; }
+      50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.15; }
+    }
+  </style>
+</head>
+<body>
+  <div class="pulse-wrapper">
+    <div class="pulse-shadow"></div>
+    <div class="circle-spin"></div>
+    <div class="svg-symbol">
+      
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="100" r="90" stroke="black" fill="none" stroke-width="2"/>
+  <circle cx="100" cy="100" r="35" stroke="black" fill="none" stroke-width="2"/>
+  <circle cx="100" cy="100" r="30" stroke="black" fill="none" stroke-width="2"/>
+  <line x1="100" y1="70" x2="100" y2="130" stroke="black" stroke-width="2"/>
+  <line x1="80" y1="100" x2="120" y2="100" stroke="black" stroke-width="2"/>
+  <path d="M100,85 Q85,100 100,115 Q90,100 100,85" fill="none" stroke="black" stroke-width="2"/>
+  <path d="M100,85 Q115,100 100,115 Q110,100 100,85" fill="none" stroke="black" stroke-width="2"/>
+  <path d="M100,72 L93,82 L107,82 Z" fill="none" stroke="black" stroke-width="2"/>
+  <path d="M100,128 L93,118 L107,118 Z" fill="none" stroke="black" stroke-width="2"/>
+</svg>
+
+    </div>
+  </div>
+</body>
+</html>

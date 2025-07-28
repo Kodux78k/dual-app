@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dual.Infodose - Gerar Tríade</title>
+  <link rel="manifest" href="manifest.json" />
+  <script src="scripts/triad.js" defer></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 2rem;
+      height: 100vh;
+      background: radial-gradient(circle, #0f0f0f, #000000);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .symbol-button {
+      font-size: 2rem;
+      margin: 1rem;
+      cursor: pointer;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid #555;
+      border-radius: 50%;
+      transition: 0.3s;
+    }
+    .symbol-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .triad-display {
+      margin-top: 2rem;
+      font-size: 1.5rem;
+      letter-spacing: 1rem;
+    }
+    .activate-button {
+      margin-top: 2rem;
+      padding: 1rem 2rem;
+      background: linear-gradient(45deg, #00ffff, #ff00ff);
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      border-radius: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Gere sua Tríade</h1>
+  <div class="symbol-button" onclick="generateTriad()">◉</div>
+  <div class="triad-display" id="triadDisplay">[ Tríade ]</div>
+  <button class="activate-button" onclick="activateTriad()">Ativar Tríade</button>
+
+</body>
+</html>

@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KODUX 3x9x7 Archetype System</title>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #0a0a0a, #000000);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: sans-serif;
+      transition: background 0.8s ease-in-out;
+    }
+
+    body.light-mode {
+      background: radial-gradient(circle at center, #f0f0f0, #dcdcdc);
+    }
+
+    .theme-switch {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    .theme-switch.active {
+      transform: translateX(-50%) scale(1.2);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .halo {
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+      border-radius: 50%;
+      animation: haloGlow 4s infinite ease-in-out;
+    }
+
+    @keyframes haloGlow {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.15); opacity: 0.7; }
+    }
+
+    .symbol {
+      width: 280px;
+      height: 280px;
+      z-index: 2;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: pulse 3s infinite;
+      position: relative;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    .archetype {
+      position: absolute;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s ease;
+    }
+
+    .archetype.active {
+      opacity: 1;
+      pointer-events: auto;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(4px);
+    }
+
+    .archetype svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+      opacity: 0.7;
+    }
+
+    .archetype.selected {
+      border-color: white;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .line {
+      position: absolute;
+      width: 2px;
+      height: 160px;
+      background: white;
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+    }
+
+    .activation {
+      position: absolute;
+      bottom: 12%;
+      text-align: center;
+      color: white;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .activation button {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .activation.active {
+      display: flex;
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-switch" id="themeSwitch" onclick="toggleTheme(event)"></div>
+  <div class="halo"></div>
+
+  <div class="symbol" id="symbol">
+    <svg width="240" height="240" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="90" stroke="white" stroke-width="2" fill="none"/>
+      <path id="center-line" d="M100 10 L100 190" stroke="white" stroke-width="3" opacity="0.0"/>
+    </svg>
+  </div>
+
+  <div class="line" id="lineEffect"></div>
+
+  <div class="activation" id="activationBox">
+    <div id="activationText">Assistente Ativado: <b></b></div>
+    <button id="copyPromptBtn">Copiar Prompt</button>
+  </div>
+
+  <script>
+    const icons = [
+      '<path d="M10 2 L2 18 H18 Z"/>',  // ⚡️
+      '<circle cx="10" cy="10" r="8"/>', // ⚫️
+      '<rect x="4" y="4" width="12" height="12"/>', // 🔘
+      '<path d="M10 0 A10 10 0 0 1 10 20 A10 10 0 0 1 10 0"/>', // 🧠
+      '<path d="M2 10 H18 M10 2 V18"/>', // 👁️
+      '<path d="M5 5 L15 15 M15 5 L5 15"/>', // ❌
+      '<path d="M10 0 L12 6 L18 6 L13 10 L15 16 L10 12 L5 16 L7 10 L2 6 L8 6 Z"/>', // ✴️
+      '<path d="M6 10 A4 4 0 1 0 14 10 A4 4 0 1 0 6 10"/>', // 🌊
+      '<path d="M2 12 Q6 4 10 12 T18 12"/>', // ⛰️
+      '<path d="M3 10 L10 3 L17 10 L10 17 Z"/>', // 🔷
+      '<path d="M6 2 L14 2 L14 18 L6 18 Z"/>', // 🕋
+      '<path d="M10 2 L12 8 L18 8 L13 12 L15 18 L10 14 L5 18 L7 12 L2 8 L8 8 Z"/>', // 🔥
+      '<circle cx="10" cy="10" r="4"/>', // ⭕
+    ];
+    const emojiMap = ["⚡️","⚫️","🔘","🧠","👁️","❌","✴️","🌊","⛰️","🔷","🕋","🔥","⭕"];
+    const activeArchetypes = [];
+    const text = document.getElementById("activationText");
+    const line = document.getElementById("center-line");
+    const activation = document.getElementById("activationBox");
+    const copyBtn = document.getElementById("copyPromptBtn");
+
+    icons.forEach((svgPath, i) => {
+      const btn = document.createElement("div");
+      btn.classList.add("archetype");
+      const angle = (i / icons.length) * 2 * Math.PI;
+      const radius = 170;
+      btn.style.left = `calc(50% + ${Math.cos(angle) * radius}px - 19px)`;
+      btn.style.top = `calc(50% + ${Math.sin(angle) * radius}px - 19px)`;
+      btn.innerHTML = `<svg viewBox="0 0 20 20">${svgPath}</svg>`;
+      btn.addEventListener("click", () => toggleArchetype(btn, i));
+      document.body.appendChild(btn);
+    });
+
+    document.getElementById("symbol").addEventListener("click", () => {
+      document.querySelectorAll(".archetype").forEach(b => b.classList.toggle("active"));
+    });
+
+    function toggleArchetype(btn, index) {
+      btn.classList.toggle("selected");
+      const i = activeArchetypes.indexOf(index);
+      if (i === -1) activeArchetypes.push(index);
+      else activeArchetypes.splice(i, 1);
+
+      if (activeArchetypes.length === 3) activateFusion();
+      else {
+        line.setAttribute("opacity", "0.0");
+        activation.classList.remove("active");
+      }
+    }
+
+    let assistentes = [];
+    fetch('assistentes_ativacao.json')
+      .then(res => res.json())
+      .then(data => assistentes = data);
+
+    function activateFusion() {
+      const selected = activeArchetypes.map(i => emojiMap[i]).sort();
+      const match = assistentes.find(a => JSON.stringify([...a.simbolos].sort()) === JSON.stringify(selected));
+
+      if (match) {
+        line.setAttribute("opacity", "0.5");
+        activation.classList.add("active");
+        text.innerHTML = `Assistente Ativado: <b>${match.nome} A.Infodose</b><br><small>${match.frase}</small>`;
+        copyBtn.onclick = () => navigator.clipboard.writeText(match.prompt).then(() => alert("Prompt copiado!"));
+      } else {
+        activation.classList.add("active");
+        text.innerHTML = "Combinação não encontrada.";
+        copyBtn.onclick = () => {};
+      }
+    }
+
+    function toggleTheme(event) {
+      event.stopPropagation();
+      document.body.classList.toggle("light-mode");
+      const themeBtn = document.getElementById("themeSwitch");
+      themeBtn.classList.add("active");
+      setTimeout(() => themeBtn.classList.remove("active"), 500);
+    }
+  </script>
+</body>
+</html>
