@@ -59,7 +59,7 @@
       position:fixed;left:20px;right:20px;bottom:156px;padding:12px;
       background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);
       border-radius:20px;max-height:calc(100vh - 200px);
-      overflow-y:auto;z-index:999;transition:background var(--slow);
+      overflow-y:auto;z-index:99999;transition:background var(--slow);
       animation:fadeIn var(--slow) ease forwards;
     }
     body.light  .response-container{background:rgba(255,255,255,0.3)}
@@ -130,7 +130,7 @@
     .ending{background:linear-gradient(135deg,rgba(255,0,255,.2),rgba(100,0,100,.1));border-left:4px solid #f0f}
     .input-container{
       position:fixed;left:20px;right:20px;bottom:90px;
-      display:flex;gap:6px;z-index:2;
+      display:flex;gap:6px;z-index:999992;
     }
     .input-container input{
       flex:1;padding:10px;border:none;border-radius:20px;
@@ -152,7 +152,7 @@
       position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
       width:300px;padding:1.5rem 1rem;background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.15);border-radius:10px;
-      backdrop-filter:blur(8px);z-index:10;display:none;
+      backdrop-filter:blur(8px);z-index:99999;display:none;
     }
     .login-container.active{display:block}
     .login-container input{
@@ -211,7 +211,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      z-index: 40;
+      z-index: 99999;
     }
 
     .symbol-button {
@@ -298,7 +298,7 @@
       padding: 1rem;
       border-radius: 20px;
       backdrop-filter: blur(8px);
-      z-index: 70;
+      z-index: 999970;
     }
 
     #decoderBox input {
@@ -656,7 +656,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
 position: fixed;
 top: 20px;
 left: 20px;
-z-index: 9999;
+z-index: 99999;
 background: rgba(0, 10, 20, 0.8);
 backdrop-filter: blur(12px) saturate(180%);
 padding: 18px;
@@ -904,7 +904,7 @@ outline: none !important;
     }
   });
 </script>
-<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.8);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:99997;background:rgba(0,0,0,0.8);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
 <button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
     ≈
    </button>
