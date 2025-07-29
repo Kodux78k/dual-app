@@ -1217,7 +1217,7 @@ binauralAudio.volume = binauralVolume.value;
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
             CHUNK_SIZE   :12000,
-            AUTH_TOKEN   :'Bearer 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'
+            AUTH_TOKEN   :'Bearer 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'
           };
 
     let training = '', chunks = [], chunkIndex = 0;
@@ -1266,42 +1266,49 @@ binauralAudio.volume = binauralVolume.value;
     }
 
     async function init(){
-      applyTheme(localStorage.getItem(THEME_KEY)||'dark');
-      $('#themeToggle').addEventListener('click',toggleTheme);
-      originalLogo = $('#logoObj').data;
+  await carregarCodex(); // Carrega o Codex antes de continuar
 
-      try {
-        training = await fetch(CONFIG.TRAINING_FILE).then(r=>r.text());
-        for(let i=0;i<training.length;i+=CONFIG.CHUNK_SIZE){
-          chunks.push(training.slice(i,i+CONFIG.CHUNK_SIZE));
-        }
-      } catch(e){ console.error('Falha no treino:',e); }
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  $('#themeToggle').addEventListener('click', toggleTheme);
+  originalLogo = $('#logoObj').data;
 
-      loadConfig();
-      if(!conversation.length){
-        conversation.push({
-          role:'system',
-          content:(chunks[0]||training)+'\n\nVocê é o assistente Dual.infodose.'
-        });
-        chunkIndex=1;
-      }
-      bindUI();
+  try {
+    training = await fetch(CONFIG.TRAINING_FILE).then(r => r.text());
+    for(let i = 0; i < training.length; i += CONFIG.CHUNK_SIZE){
+      chunks.push(training.slice(i, i + CONFIG.CHUNK_SIZE));
     }
+  } catch(e){
+    console.error('Falha no treino:', e);
+  }
 
-    function loadConfig(){
-      if(localStorage.getItem(STORAGE_KEY)==='1'){
-        isEnabled=true;
-        userName=localStorage.getItem('userName')||'';
-        assistantBase=localStorage.getItem('assistantBase')||'';
-        conversation=[{
-          role:'system',
-          content:(chunks[0]||training)
-            +`\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`
-        }];
-        chunkIndex=1;
-        updateUI();
-      }
-    }
+  loadConfig();
+
+  if(!conversation.length){
+    conversation.push({
+      role: 'system',
+      content: (chunks[0] || training) + '\n\nVocê é o assistente Dual.infodose.'
+    });
+    chunkIndex = 1;
+  }
+
+  bindUI();
+  updateUI();
+}
+
+function loadConfig(){
+  if(localStorage.getItem(STORAGE_KEY) === '1'){
+    isEnabled = true;
+    userName = localStorage.getItem('userName') || '';
+    assistantBase = localStorage.getItem('assistantBase') || '';
+    conversation = [{
+      role: 'system',
+      content: (chunks[0] || training)
+        + `\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`
+    }];
+    chunkIndex = 1;
+    updateUI();
+  }
+}
 
     function updateUI(){
       $('#toggleBtn').classList.toggle('active',isEnabled);
@@ -1418,35 +1425,55 @@ binauralAudio.volume = binauralVolume.value;
       if(autoAdvance) autoSpeakPage(np)
     }
 
-    async function callAI(){
-      try {
-        const res = await fetch(CONFIG.API_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': CONFIG.AUTH_TOKEN,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            model: CONFIG.MODEL,
-            messages: conversation,
-            temperature: CONFIG.TEMP
-          })
-        });
+    async function callAI() {
+  try {
+    // Pega a última mensagem do usuário
+    const lastUserMessage = conversation.filter(m => m.role === 'user').slice(-1)[0]?.content || '';
 
-        const payload = await res.json();
-        if (!res.ok) throw new Error(payload.error?.message || res.statusText);
-        if (!payload.choices?.length) throw new Error('Resposta vazia da API');
-        const ans = payload.choices[0].message.content.trim();
-        conversation.push({ role: 'assistant', content: ans });
-        renderResponse(ans);
+    // Filtra rituais relevantes no codex
+    const rituaisRelevantes = filtrarRituais(lastUserMessage);
+    const textoRituais = gerarTextoRituais(rituaisRelevantes);
 
-      } catch (err) {
-        console.error('callAI erro:', err);
-        const fallback = 'Desculpe, não consegui obter resposta. Tente novamente.';
-        conversation.push({ role: 'assistant', content: fallback });
-        renderResponse(fallback);
-      }
-    }
+    // Junta a mensagem do usuário com os rituais relevantes
+    const novaMensagem = lastUserMessage + textoRituais;
+
+    // Substitui a última mensagem do usuário na conversa
+    conversation.pop();
+    conversation.push({ role: 'user', content: novaMensagem });
+
+    // Faz a requisição para a API com a conversa atualizada
+    const res = await fetch(CONFIG.API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': CONFIG.AUTH_TOKEN,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: CONFIG.MODEL,
+        messages: conversation,
+        temperature: CONFIG.TEMP
+      })
+    });
+
+    const payload = await res.json();
+
+    if (!res.ok) throw new Error(payload.error?.message || res.statusText);
+    if (!payload.choices?.length) throw new Error('Resposta vazia da API');
+
+    // Pega a resposta e adiciona na conversa
+    const ans = payload.choices[0].message.content.trim();
+    conversation.push({ role: 'assistant', content: ans });
+
+    // Renderiza resposta
+    renderResponse(ans);
+
+  } catch (err) {
+    console.error('callAI erro:', err);
+    const fallback = 'Desculpe, não consegui obter resposta. Tente novamente.';
+    conversation.push({ role: 'assistant', content: fallback });
+    renderResponse(fallback);
+  }
+}
 
     function bindUI(){
       $('#sendBtn').addEventListener('click',onSend);
@@ -1527,8 +1554,50 @@ binauralAudio.volume = binauralVolume.value;
   })();
   </script>
 
+<script>
+// Variável global para guardar o Codex
+window.rituaisCodex = [];
 
+// Função para carregar o XML do Codex
+async function carregarCodex() {
+  try {
+    const res = await fetch('data/codex/codex_ritual_manifesto-001-999.xml');
+    const xmlText = await res.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+    window.rituaisCodex = [...xmlDoc.querySelectorAll('ritual')].map(r => ({
+      id: r.getAttribute('id'),
+      uno: r.querySelector('uno')?.textContent.toLowerCase() || '',
+      duo: r.querySelector('duo')?.textContent.toLowerCase() || '',
+      spirit: r.querySelector('spirit')?.textContent.toLowerCase() || '',
+    }));
+    console.log('Codex carregado, total:', window.rituaisCodex.length);
+  } catch (e) {
+    console.error('Erro carregando codex:', e);
+  }
+}
 
+// Função para filtrar rituais que combinam com o texto
+function filtrarRituais(texto) {
+  const txtLower = texto.toLowerCase();
+  return window.rituaisCodex.filter(ritual =>
+    txtLower.includes(ritual.uno) ||
+    txtLower.includes(ritual.duo) ||
+    txtLower.includes(ritual.spirit)
+  );
+}
+
+// Função para formatar os rituais para mandar na conversa
+function gerarTextoRituais(rituais) {
+  if (!rituais.length) return '';
+  return '\n\n-- Rituais Relevantes do Codex --\n' + rituais.map(r =>
+    `Ritual #${r.id}:\n- Uno: ${r.uno}\n- Duo: ${r.duo}\n- Spirit: ${r.spirit}`
+  ).join('\n\n') + '\n';
+}
+
+// Carrega o codex quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', carregarCodex);
+</script>
 <script>
 function renderResponse({ intro = "", middle = "", ending = "" }) {
   const container = document.querySelector(".pages-wrapper");
