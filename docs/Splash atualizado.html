@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Splash_FINAL - Infodose</title>
+  <style>
+    :root {
+      --bg-dark: radial-gradient(ellipse at center, #0a0a0a, #000000);
+      --bg-light: radial-gradient(ellipse at center, #ffffff, #e0e0e0);
+      --circle-dark: rgba(255,255,255,0.2);
+      --circle-light: rgba(0,0,0,0.2);
+      --circle-top-dark: rgba(255,255,255,0.6);
+      --circle-top-light: rgba(0,0,0,0.5);
+      --reset-dark: rgba(255,255,255,0.2);
+      --reset-light: rgba(0,0,0,0.3);
+    }
+
+    /* Corpo com tema dark por padrão */
+    body {
+      margin: 0;
+      height: 100vh;
+      background: var(--bg-dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      animation: fadeIn 2s ease-out;
+      cursor: pointer;
+      transition: background 0.5s ease-in-out;
+    }
+    body.light-mode {
+      background: var(--bg-light);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(1.1); filter: blur(8px); }
+      to   { opacity: 1; transform: scale(1); filter: blur(0); }
+    }
+
+    /* Halo */
+    .halo {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: glow 4s ease-in-out infinite;
+      z-index: 0;
+    }
+    body.light-mode .halo {
+      background: radial-gradient(circle, rgba(0,0,0,0.08) 0%, transparent 70%);
+    }
+    @keyframes glow {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Círculo principal – aumentado para 200px */
+    .circle-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+    .circle {
+      width: 200px;
+      height: 200px;
+      border: 3px solid var(--circle-dark);
+      border-top: 3px solid var(--circle-top-dark);
+      border-radius: 50%;
+      animation: spin 6s linear infinite;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    body.light-mode .circle {
+      border: 3px solid var(--circle-light);
+      border-top: 3px solid var(--circle-top-light);
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Efeito de pulso (respiro) no círculo */
+    .pulse-effect {
+      animation: pulseEffect 0.6s ease-out;
+    }
+    @keyframes pulseEffect {
+      0% { transform: scale(1); box-shadow: none; }
+      50% { transform: scale(1.1); box-shadow: 0 0 16px rgba(255,255,255,0.4); }
+      100% { transform: scale(1); box-shadow: none; }
+    }
+
+    /* Contêiner para o SVG do símbolo central */
+    #symbol {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 200px;
+      height: 200px;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .svg-container {
+      width: 60px;
+      height: 60px;
+      margin: auto;
+    }
+
+    /* Botão de troca de tema (topo central) */
+    .theme-switch {
+      position: fixed;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 4px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 2px;
+      cursor: pointer;
+      z-index: 999;
+      transition: background 0.4s ease, transform 0.3s ease, box-shadow 0.4s ease;
+    }
+    .theme-switch.active {
+      transform: translateX(-50%) scale(1.2);
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 0 12px 6px rgba(255,255,255,0.3);
+    }
+
+    /* Botão de reset (parte inferior) */
+    #reset-button {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--reset-dark);
+      background: transparent;
+      opacity: 0.15;
+      cursor: pointer;
+      z-index: 20;
+      transition: all 0.25s ease;
+    }
+    body.light-mode #reset-button {
+      border-color: var(--reset-light);
+      background: rgba(0,0,0,0.04);
+    }
+    #reset-button:hover {
+      opacity: 0.4;
+    }
+
+    /* Fade-out para transição */
+    .fade-out {
+      animation: fadeOut 1.2s forwards ease-in-out;
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: scale(1); filter: blur(0); }
+      100% { opacity: 0; transform: scale(0.9); filter: blur(8px); }
+    }
+
+    /* Gradiente suave no fundo */
+    body::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to top, rgba(255,255,255,0.08), transparent);
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="halo"></div>
+  <div class="circle-wrapper" id="circleWrapper">
+    <div class="circle" id="circle"></div>
+  </div>
+  <!-- Contêiner para o símbolo SVG -->
+  <div id="symbol">
+    <div class="svg-container" id="svgContainer"></div>
+  </div>
+  <!-- Botão de troca de tema -->
+  <div class="theme-switch" id="themeSwitch" onclick="toggleTheme(event)"></div>
+  <!-- Botão de reset -->
+  <div id="reset-button" onclick="resetSplash()" title="Reset Pulso"></div>
+  <!-- Áudio de respiração sonora -->
+  <audio id="respiracaoAudio" autoplay loop>
+    <source src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Binaural_Breathing_60BPM.ogg" type="audio/ogg">
+  </audio>
+  <script>
+    // Força o tema dark por padrão e carrega o tema salvo
+    document.documentElement.setAttribute('data-theme', 'dark');
+    let isDark = true;
+    if(localStorage.getItem("infodose_theme") === "light") {
+      document.body.classList.add("light-mode");
+      isDark = false;
+    }
+
+    // Carregar o SVG do símbolo; redimensionado para 60x60 e centralizado
+    fetch('simbolos_extraidos/simbolo_infodose 2.svg')
+      .then(response => response.text())
+      .then(svgText => {
+        const container = document.getElementById("svgContainer");
+        container.innerHTML = svgText;
+        const svgElement = container.querySelector("svg");
+        if (svgElement) {
+          svgElement.setAttribute("width", "60");
+          svgElement.setAttribute("height", "60");
+          svgElement.style.display = "block";
+          svgElement.style.margin = "auto";
+        }
+      })
+      .catch(e => console.error("Erro ao carregar SVG:", e));
+
+    // Função para alternar tema via clique no botão superior
+    function toggleTheme(event) {
+      event.stopPropagation();
+      isDark = !document.body.classList.contains("light-mode");
+      document.body.classList.toggle("light-mode", !isDark);
+      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+      localStorage.setItem("infodose_theme", isDark ? "dark" : "light");
+      const themeSwitch = document.getElementById("themeSwitch");
+      themeSwitch.classList.add("active");
+      const circle = document.getElementById("circle");
+      circle.classList.add("pulse-effect");
+      setTimeout(() => {
+        themeSwitch.classList.remove("active");
+        circle.classList.remove("pulse-effect");
+      }, 700);
+    }
+
+    // Função para reset do splash: reinicia a página mantendo o tema atual
+    function resetSplash() {
+      const resetBtn = document.getElementById("reset-button");
+      const circle = document.getElementById("circle");
+      resetBtn.classList.add("pulse-effect");
+      circle.classList.add("pulse-effect");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+
+    // Função para transição manual: ao clicar no círculo, a transição para Index_FINAL.html
+    function triggerTransition() {
+      const audio = document.getElementById("respiracaoAudio");
+      if (audio) audio.pause();
+      const circle = document.getElementById("circle");
+      circle.classList.add("pulse-effect");
+      document.body.classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = "Index_FINAL.html";
+      }, 1200);
+    }
+
+    // Ativar transição somente com clique no círculo
+    document.getElementById("circleWrapper").addEventListener("click", (e) => {
+      if(e.target.closest("#circle")) {
+        triggerTransition();
+      }
+    });
+
+    // Duplo clique fora do círculo (no body) ativa efeito de micropulso no círculo
+    let lastClickTime = 0;
+    document.body.addEventListener("click", (e) => {
+      if(e.target.closest("#circleWrapper")) return;
+      const now = Date.now();
+      if(now - lastClickTime < 400) {
+        const circle = document.getElementById("circle");
+        circle.classList.add("pulse-effect");
+        setTimeout(() => circle.classList.remove("pulse-effect"), 700);
+      }
+      lastClickTime = now;
+    });
+  </script>
+</body>
+</html>

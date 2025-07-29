@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Splash_V8_Blessed</title>
+<style>
+    /* Tema Escuro (Padrão) */
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(ellipse at center, #0a0a0a, #000000);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      animation: fadeIn 2s ease-out;
+      cursor: pointer;
+      transition: background 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .halo {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: glow 4s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .symbol {
+      width: 200px;
+      animation: pulse 3s infinite;
+      z-index: 2;
+      transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 0.9; }
+    }
+
+    /* Pulso sutil ao trocar de tema */
+    .symbol.pulse-effect {
+      animation: pulseThemeChange 0.4s ease-out;
+    }
+
+    @keyframes pulseThemeChange {
+      0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6)); }
+      50% { transform: scale(1.08); filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9)); }
+      100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6)); }
+    }
+
+    /* Ajuste de sombras e brilho para modo claro */
+    .light-mode .halo {
+      background: radial-gradient(circle, rgba(0,0,0,0.08) 0%, transparent 70%);
+    }
+
+    .light-mode .symbol svg {
+      stroke: url(#grad-light);
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
+    }
+
+    .symbol svg {
+      stroke: url(#grad-dark);
+    }
+
+    /* Botão Minimalista de Troca de Tema */
+    .theme-switch {
+      position: absolute;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.4s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    .theme-switch.active {
+      transform: translateX(-50%) scale(1.2);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    /* Tema Claro */
+    body.light-mode {
+      background: radial-gradient(ellipse at center, #f0f0f0, #dcdcdc);
+    }
+
+    body.light-mode .theme-switch {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    body.light-mode .theme-switch.active {
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+  </style>
+<style>
+  .fade-out {
+    animation: fadeOut 1.2s forwards ease-in-out;
+  }
+  @keyframes fadeOut {
+    0% { opacity: 1; transform: scale(1); filter: blur(0); }
+    100% { opacity: 0; transform: scale(0.9); filter: blur(8px); }
+  }
+</style>
+<style>
+body.light-mode {
+  background: radial-gradient(ellipse at center, #ffffff, #e0e0e0);
+  color: #000;
+}
+body.light-mode .theme-switch {
+  background: rgba(0, 0, 0, 0.4);
+}
+</style>
+<style>
+.theme-switch {
+  transition: background 0.4s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.4s ease-in-out;
+}
+.theme-switch.active {
+  transform: translateX(-50%) scale(1.2);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 12px 6px rgba(255,255,255,0.3);
+}
+</style>
+
+<style>
+@keyframes fadeInCircle {
+  from { opacity: 0; transform: translateX(-50%) scale(0.6); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+@keyframes fadeOutCircle {
+  from { opacity: 1; transform: translateX(-50%) scale(1); }
+  to { opacity: 0; transform: translateX(-50%) scale(0.5); }
+}
+</style>
+
+
+<style>
+  /* Tema claro e escuro */
+  body.light-mode {
+    background: radial-gradient(ellipse at center, #ffffff, #e0e0e0);
+    color: #000;
+  }
+
+  body.light-mode .symbol svg circle {
+    stroke: #333;
+  }
+
+  body.light-mode .halo {
+    background: radial-gradient(circle, rgba(0,0,0,0.08) 0%, transparent 70%);
+  }
+
+  .symbol svg circle {
+    transition: stroke 0.6s ease-in-out;
+  }
+
+  .halo {
+    transition: background 0.6s ease-in-out;
+  }
+
+  .symbol.pulse-light {
+    animation: pulseGlow 1.6s ease-out;
+  }
+
+  @keyframes pulseGlow {
+    0% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 14px rgba(255,255,255,0.4)); transform: scale(1.08); }
+    100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); transform: scale(1); }
+  }
+
+  #reset-button {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+    background: transparent;
+    opacity: 0.1;
+    animation: fadeInCircle 3s ease-in forwards;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.4s ease-in-out;
+  }
+
+  body.light-mode #reset-button {
+    border: 2px solid rgba(0,0,0,0.1);
+    background: rgba(0,0,0,0.03);
+  }
+
+  #reset-button:hover {
+    opacity: 0.4;
+    box-shadow: 0 0 6px rgba(255,255,255,0.2);
+  }
+
+  @keyframes fadeOutCircle {
+    from { opacity: 0.15; transform: translateX(-50%) scale(1); }
+    to { opacity: 0; transform: translateX(-50%) scale(0.4); }
+  }
+
+  /* Gradiente suave para iluminar fundo por trás do círculo */
+  body::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(to top, rgba(255,255,255,0.08), transparent);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+</style>
+
+
+<style>
+  /* HALO ampliado e mais vibrante */
+  .halo {
+    background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+    animation: glow 4s ease-in-out infinite;
+    width: 520px;
+    height: 520px;
+  }
+
+  @keyframes glow {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.12); opacity: 1; }
+  }
+
+  .symbol.pulse-light {
+    animation: pulseGlow 1.2s ease-out;
+  }
+
+  @keyframes pulseGlow {
+    0% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 25px rgba(255,255,255,0.45)); transform: scale(1.1); }
+    100% { filter: drop-shadow(0 0 0px rgba(255,255,255,0)); transform: scale(1); }
+  }
+
+  #reset-button {
+    opacity: 0.25;
+    transition: all 0.4s ease;
+    z-index: 1000;
+  }
+
+  #reset-button:hover {
+    opacity: 0.6;
+    box-shadow: 0 0 6px rgba(255,255,255,0.3);
+  }
+
+  body.light-mode {
+    background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%);
+  }
+
+  body.light-mode .halo {
+    background: radial-gradient(circle, rgba(0,0,0,0.06) 0%, transparent 70%);
+  }
+
+  body.light-mode #reset-button {
+    background: rgba(0,0,0,0.05);
+    border-color: rgba(0,0,0,0.1);
+  }
+
+  body::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to top, rgba(255,255,255,0.15), transparent);
+    z-index: 0;
+    pointer-events: none;
+  }
+</style>
+
+</head>
+<body onclick="triggerTransition()">
+<div class="halo"></div>
+<div class="symbol" id="symbol">
+<svg height="200" viewbox="0 0 200 200" width="200" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="grad-dark" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#ffffff; stop-opacity:0.8"></stop>
+<stop offset="100%" style="stop-color:#cccccc; stop-opacity:0.3"></stop>
+</lineargradient>
+<lineargradient id="grad-light" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#555555; stop-opacity:0.8"></stop>
+<stop offset="100%" style="stop-color:#aaaaaa; stop-opacity:0.3"></stop>
+</lineargradient>
+</defs>
+<circle cx="100" cy="100" fill="none" r="90" stroke="url(#grad-dark)" stroke-width="2"></circle>
+<line opacity="0.2" stroke="url(#grad-dark)" stroke-width="3" x1="100" x2="100" y1="10" y2="190"></line>
+<path d="M100 10 A90 90 0 0 0 100 190" fill="none" stroke="url(#grad-dark)" stroke-width="6"></path>
+</svg>
+</div>
+<div class="theme-switch" id="themeSwitch" onclick="toggleTheme(event)"></div>
+<script>
+    let transitionTriggered = false;
+
+    function triggerTransition() {
+      if (transitionTriggered) return;
+      transitionTriggered = true;
+
+      const symbol = document.getElementById('symbol');
+      symbol.classList.add('active');
+
+      setTimeout(() => {
+        
+    document.body.classList.add('fade-out');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000);
+    
+      }, 1000);
+    }
+
+    setTimeout(() => {
+      triggerTransition();
+    }, 7000);
+
+    function toggleTheme(event) {
+      event.stopPropagation();
+      document.body.classList.toggle('light-mode');
+      const themeSwitch = document.getElementById('themeSwitch');
+      const symbol = document.getElementById('symbol');
+
+      themeSwitch.classList.add('active');
+      symbol.classList.add('pulse-effect');
+
+      setTimeout(() => {
+        themeSwitch.classList.remove('active');
+        symbol.classList.remove('pulse-effect');
+      }, 500);
+
+      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+
+      const svg = document.querySelector('.symbol svg');
+      if (document.body.classList.contains('light-mode')) {
+        svg.querySelectorAll("circle, line, path").forEach(el => el.setAttribute("stroke", "url(#grad-light)"));
+      } else {
+        svg.querySelectorAll("circle, line, path").forEach(el => el.setAttribute("stroke", "url(#grad-dark)"));
+      }
+    }
+
+    function applyAutoTheme() {
+      const hour = new Date().getHours();
+      const preferredTheme = localStorage.getItem('theme');
+
+      if (preferredTheme) {
+        document.body.classList.toggle('light-mode', preferredTheme === 'light');
+      } else {
+        document.body.classList.toggle('light-mode', hour >= 6 && hour < 18);
+      }
+    }
+
+    applyAutoTheme();
+  </script>
+<audio autoplay="" id="respiracaoAudio" loop="">
+<source src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Binaural_Breathing_60BPM.ogg" type="audio/ogg"/>
+</audio>
+<script>
+  let transitionTriggered = false;
+
+  function triggerTransition() {
+    if (transitionTriggered) return;
+    transitionTriggered = true;
+
+    const symbol = document.getElementById('symbol');
+    const audio = document.getElementById('respiracaoAudio');
+    if (audio) audio.pause();
+
+    symbol.classList.add('active');
+    document.body.classList.add('fade-out');
+
+    setTimeout(() => {
+      window.location.href = 'MetaLux_UI_FINAL_V14_FUSAO_SPLASH.html';
+    }, 1200);
+  }
+
+  // Tocar áudio de respiração simbólica ao iniciar
+  window.addEventListener('DOMContentLoaded', () => {
+    const audio = document.getElementById('respiracaoAudio');
+    if (audio) {
+      audio.volume = 0.6;
+      audio.play().catch(() => {
+        // silenciosamente falha se o navegador bloquear autoplay
+      });
+    }
+
+    setTimeout(() => {
+      triggerTransition();
+    }, 7000);
+  });
+</script>
+<script>
+document.documentElement.setAttribute('data-theme', 'dark');
+
+let isDark = true;
+function toggleTheme(event) {
+  event.stopPropagation();
+  const themeSwitch = document.getElementById('themeSwitch');
+  isDark = !isDark;
+  document.body.classList.toggle('light-mode', !isDark);
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  themeSwitch.classList.add('active');
+  setTimeout(() => {
+    themeSwitch.classList.remove('active');
+  }, 500);
+}
+</script>
+
+<div id="reset-button" onclick="resetSplash()" style="
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: transparent;
+  opacity: 0;
+  animation: fadeInCircle 3s ease-in forwards;
+  cursor: pointer;
+  z-index: 10;
+"></div>
+
+<script>
+function resetSplash() {
+  const btn = document.getElementById('reset-button');
+  btn.style.animation = "fadeOutCircle 0.8s forwards";
+  setTimeout(() => {
+    window.location.reload();
+  }, 800);
+}
+</script>
+
+
+<script>
+  document.documentElement.setAttribute('data-theme', 'dark');
+  let isDark = true;
+
+  function toggleTheme(event) {
+    event.stopPropagation();
+    const themeSwitch = document.getElementById('themeSwitch');
+    isDark = !isDark;
+    document.body.classList.toggle('light-mode', !isDark);
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    themeSwitch.classList.add('active');
+
+    // Adiciona brilho/pulso ao círculo
+    const symbol = document.getElementById("symbol");
+    symbol.classList.add("pulse-light");
+    setTimeout(() => {
+      symbol.classList.remove("pulse-light");
+    }, 800);
+
+    setTimeout(() => {
+      themeSwitch.classList.remove('active');
+    }, 500);
+  }
+
+  function resetSplash() {
+    const btn = document.getElementById('reset-button');
+    btn.style.animation = "fadeOutCircle 0.8s forwards";
+    setTimeout(() => {
+      window.location.reload();
+    }, 800);
+  }
+</script>
+
+
+<script>
+  document.documentElement.setAttribute('data-theme', 'dark');
+  let isDark = true;
+  let transitionTriggered = false;
+
+  function toggleTheme(event) {
+    event.stopPropagation();
+    const themeSwitch = document.getElementById('themeSwitch');
+    isDark = !isDark;
+    document.body.classList.toggle('light-mode', !isDark);
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    themeSwitch.classList.add('active');
+
+    const symbol = document.getElementById("symbol");
+    symbol.classList.add("pulse-light");
+    setTimeout(() => {
+      symbol.classList.remove("pulse-light");
+    }, 800);
+
+    setTimeout(() => {
+      themeSwitch.classList.remove('active');
+    }, 500);
+  }
+
+  function triggerTransition() {
+    if (transitionTriggered) return;
+    transitionTriggered = true;
+    const symbol = document.getElementById('symbol');
+    const audio = document.getElementById('respiracaoAudio');
+    if (audio) audio.pause();
+    symbol.classList.add('active');
+    document.body.classList.add('fade-out');
+    setTimeout(() => {
+      window.location.href = 'Index_FINAL.html';
+    }, 1200);
+  }
+
+  function resetSplash() {
+    const btn = document.getElementById('reset-button');
+    btn.style.animation = "fadeOutCircle 0.8s forwards";
+    setTimeout(() => {
+      window.location.reload();
+    }, 800);
+  }
+</script>
+
+</body>
+</html>

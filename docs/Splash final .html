@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infodose - Splash Pulso</title>
+  <style>
+    :root {
+      --bg-dark: radial-gradient(ellipse at center, #0a0a0a, #000000);
+      --bg-light: radial-gradient(ellipse at center, #ffffff, #e6e6e6);
+      --circle-dark: rgba(255,255,255,0.2);
+      --circle-light: rgba(0,0,0,0.2);
+      --circle-top-dark: rgba(255,255,255,0.6);
+      --circle-top-light: rgba(0,0,0,0.5);
+      --reset-dark: rgba(255,255,255,0.2);
+      --reset-light: rgba(0,0,0,0.3);
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: var(--bg-dark);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      animation: fadeIn 1.8s ease-out;
+      cursor: pointer;
+      transition: background 0.6s ease;
+    }
+    body.light-mode {
+      background: var(--bg-light);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(1.05); filter: blur(10px); }
+      to { opacity: 1; transform: scale(1); filter: blur(0); }
+    }
+
+    .halo {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: haloGlow 6s ease-in-out infinite;
+      transition: background 0.8s ease;
+      z-index: 0;
+    }
+    body.light-mode .halo {
+      background: radial-gradient(circle, rgba(0,0,0,0.05) 0%, transparent 70%);
+    }
+
+    @keyframes haloGlow {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.05); opacity: 0.7; }
+    }
+
+    .circle-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+    .circle {
+      width: 180px;
+      height: 180px;
+      border: 3px solid var(--circle-dark);
+      border-top: 3px solid var(--circle-top-dark);
+      border-radius: 50%;
+      animation: spin 6s linear infinite;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+    }
+    body.light-mode .circle {
+      border: 3px solid var(--circle-light);
+      border-top: 3px solid var(--circle-top-light);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .circle.pulse-theme {
+      animation: pulseTheme 0.6s ease-out;
+    }
+
+    @keyframes pulseTheme {
+      0% { transform: scale(1); box-shadow: none; }
+      50% { transform: scale(1.15); box-shadow: 0 0 16px rgba(255,255,255,0.4); }
+      100% { transform: scale(1); box-shadow: none; }
+    }
+
+    #symbol {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 180px;
+      height: 180px;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .svg-container {
+      width: 60px;
+      height: 60px;
+      margin: auto;
+    }
+
+    #reset-button {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--reset-dark);
+      background: transparent;
+      opacity: 0.15;
+      cursor: pointer;
+      z-index: 20;
+      transition: all 0.25s ease;
+    }
+    body.light-mode #reset-button {
+      border-color: var(--reset-light);
+      background: rgba(0,0,0,0.04);
+    }
+
+    #reset-button:hover {
+      opacity: 0.4;
+      box-shadow: 0 0 6px rgba(255,255,255,0.2);
+    }
+
+    .theme-switch {
+      position: fixed;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 4px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 2px;
+      cursor: pointer;
+      z-index: 999;
+      transition: all 0.4s ease;
+    }
+    .theme-switch.active {
+      background: rgba(255,255,255,0.9);
+      transform: translateX(-50%) scale(1.2);
+      box-shadow: 0 0 12px 6px rgba(255,255,255,0.3);
+    }
+
+    .fade-out {
+      animation: fadeOut 1s forwards ease-in-out;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: scale(1); filter: blur(0); }
+      100% { opacity: 0; transform: scale(0.9); filter: blur(8px); }
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to top, rgba(255,255,255,0.08), transparent);
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="halo"></div>
+
+  <div class="circle-wrapper" id="circleWrapper">
+    <div class="circle" id="circle"></div>
+  </div>
+
+  <div id="symbol">
+    <div class="svg-container" id="svgContainer"></div>
+  </div>
+
+  <div class="theme-switch" onclick="toggleTheme(event)" id="themeSwitch"></div>
+
+  <div id="reset-button" onclick="resetSplash()" title="Reset Pulso"></div>
+
+  <audio id="respiracaoAudio" autoplay loop>
+    <source src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Binaural_Breathing_60BPM.ogg" type="audio/ogg">
+  </audio>
+
+  <script>
+    // Preserva tema
+    document.addEventListener("DOMContentLoaded", () => {
+      const saved = localStorage.getItem("tema");
+      if (saved === "light") {
+        document.body.classList.add("light-mode");
+        document.documentElement.setAttribute("data-theme", "light");
+        isDark = false;
+      }
+    });
+
+    let isDark = true;
+    const circle = document.getElementById("circle");
+
+    function toggleTheme(event) {
+      event.stopPropagation();
+      isDark = !document.body.classList.contains("light-mode");
+      document.body.classList.toggle("light-mode", isDark === false);
+      localStorage.setItem("tema", isDark ? "dark" : "light");
+      const switchBtn = document.getElementById("themeSwitch");
+      switchBtn.classList.add("active");
+      circle.classList.add("pulse-theme");
+      setTimeout(() => {
+        switchBtn.classList.remove("active");
+        circle.classList.remove("pulse-theme");
+      }, 700);
+    }
+
+    function resetSplash() {
+      const btn = document.getElementById('reset-button');
+      circle.classList.add("pulse-theme");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    }
+
+    function triggerTransition() {
+      const audio = document.getElementById("respiracaoAudio");
+      if (audio) audio.pause();
+      document.body.classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = "Index_FINAL.html";
+      }, 1200);
+    }
+
+    let lastClick = 0;
+    document.getElementById("circleWrapper").addEventListener("click", (e) => {
+      const now = Date.now();
+      if (now - lastClick < 400) {
+        circle.classList.add("pulse-theme");
+        setTimeout(() => circle.classList.remove("pulse-theme"), 700);
+      } else {
+        triggerTransition();
+      }
+      lastClick = now;
+    });
+
+    // Carregar SVG corretamente
+    fetch('simbolos_extraidos/simbolo_infodose 2.svg')
+      .then(res => res.text())
+      .then(svg => {
+        const cont = document.getElementById("svgContainer");
+        cont.innerHTML = svg;
+        const svgEl = cont.querySelector("svg");
+        if (svgEl) {
+          svgEl.setAttribute("width", "60");
+          svgEl.setAttribute("height", "60");
+          svgEl.style.display = "block";
+          svgEl.style.margin = "auto";
+        }
+      })
+      .catch(e => console.warn("SVG não carregado", e));
+  </script>
+</body>
+</html>

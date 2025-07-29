@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Infodose – Portal Simbólico</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0b0c10;
+      color: #f5f5f5;
+      font-family: 'Unbounded', sans-serif;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 5vh 5vw;
+      background: radial-gradient(circle at center, #16191f, #0b0c10);
+      border-bottom: 2px solid #3c3f47;
+    }
+
+    header h1 {
+      font-size: 3em;
+      color: #e1e1e1;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    header p {
+      font-size: 1.2em;
+      margin-top: 1rem;
+      color: #b0b0b0;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .section {
+      padding: 6vh 10vw;
+      border-bottom: 1px solid #333;
+    }
+
+    .section h2 {
+      font-size: 2.2em;
+      color: #ffde59;
+      margin-bottom: 1rem;
+    }
+
+    .section p {
+      font-size: 1.1em;
+      line-height: 1.6;
+      color: #dcdcdc;
+      max-width: 800px;
+    }
+
+    .infodose-pill {
+      display: flex;
+      justify-content: center;
+      margin-top: 3rem;
+    }
+
+    .pill-button {
+      padding: 15px 30px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: white;
+      font-size: 1.1em;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      font-weight: bold;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .pill-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #ff4b2b88;
+    }
+
+    .element-symbols {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      margin-top: 4rem;
+    }
+
+    .symbol {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 15px;
+      width: 160px;
+      margin: 1rem;
+      text-align: center;
+      transition: background 0.3s ease, transform 0.3s ease;
+      cursor: pointer;
+    }
+
+    .symbol:hover {
+      background: rgba(255,255,255,0.1);
+      transform: scale(1.05);
+    }
+
+    .symbol h3 {
+      color: #78f0ff;
+      margin-bottom: 0.5rem;
+    }
+
+    .symbol p {
+      font-size: 0.95em;
+      color: #ccc;
+    }
+
+    footer {
+      background: #0d0f14;
+      text-align: center;
+      padding: 3rem 1rem;
+      font-size: 0.9em;
+      color: #888;
+    }
+
+    footer a {
+      color: #ffde59;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .section h2 {
+        font-size: 1.6em;
+      }
+
+      header h1 {
+        font-size: 2.2em;
+      }
+
+      .pill-button {
+        font-size: 1em;
+        padding: 12px 24px;
+      }
+
+      .symbol {
+        width: 100%;
+        max-width: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Infodose</h1>
+    <p>Descubra a ativação simbólica que interpreta seus sentimentos e revela o arquétipo do seu dia.</p>
+  </header>
+
+  <section class="section">
+    <h2>O que é a Infodose?</h2>
+    <p>Infodose é uma tecnologia simbólica criada para expandir seu autoconhecimento. Ela une arquétipos, frequência, dopamina e som para ativar o seu código interno e transformar a sua rotina.</p>
+  </section>
+
+  <section class="section">
+    <h2>Elementos e Arquétipos</h2>
+    <p>Cada dia revela um novo arquétipo, guiado pelos cinco elementos do Feng Shui. Responda 3 perguntas simbólicas e descubra qual força está ativa em você hoje.</p>
+    
+    <div class="element-symbols">
+      <div class="symbol">
+        <h3>Água</h3>
+        <p>Cuidador, Sábio</p>
+      </div>
+      <div class="symbol">
+        <h3>Madeira</h3>
+        <p>Criador, Explorador</p>
+      </div>
+      <div class="symbol">
+        <h3>Fogo</h3>
+        <p>Herói, Rebelde</p>
+      </div>
+      <div class="symbol">
+        <h3>Terra</h3>
+        <p>Governante, Prestativo</p>
+      </div>
+      <div class="symbol">
+        <h3>Metal</h3>
+        <p>Mago, Inocente</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Ative sua Dose</h2>
+    <p>Com apenas 3 perguntas simbólicas, você desbloqueia sua Infodose diária. Conecte-se com seu arquétipo, ouça sua frequência e manifeste seu dia com clareza.</p>
+    <div class="infodose-pill">
+      <button class="pill-button" onclick="window.location.href='https://infodose.com.br/ativar'">Ativar Dose</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>Desenvolvido por <a href="https://infodose.com.br">Kodux</a> – Sempre único, sempre seu.</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Splash - Modo Secreto Refinado</title>
+  <style>
+    /* Tema Escuro (Padrão) */
+    body {
+      margin: 0;
+      height: 100vh;
+      background: radial-gradient(ellipse at center, #0a0a0a, #000000);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      animation: fadeIn 2s ease-out;
+      cursor: pointer;
+      transition: background 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .halo {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: haloGlow 6s ease-in-out infinite;
+      transition: background 0.8s ease;
+    }
+    @keyframes haloGlow {
+      0%, 100% { transform: scale(1); opacity: 0.4; }
+      50% { transform: scale(1.05); opacity: 0.7; }
+    }
+    .circle-wrapper {
+      position: relative;
+      z-index: 2;
+    }
+    .circle {
+      width: 160px;
+      height: 160px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top: 3px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      animation: spin 6s linear infinite;
+      position: relative;
+      cursor: pointer;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Container do SVG (símbolo) – reduzido e centralizado */
+    #symbol {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 160px;
+      height: 160px;
+      z-index: 3;
+      pointer-events: none; /* para que o clique ocorra no círculo de fundo */
+    }
+    #symbol .svg-container {
+      width: 80px;
+      height: 80px;
+      margin: auto;
+    }
+    /* Botão de Troca de Tema */
+    .theme-switch {
+      position: fixed;
+      top: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: background 0.4s ease-in-out, transform 0.3s ease-in-out, box-shadow 0.4s ease-in-out;
+      z-index: 999;
+    }
+    .theme-switch.active {
+      transform: translateX(-50%) scale(1.2);
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 12px 6px rgba(255,255,255,0.3);
+    }
+    /* Botão de Reset – sempre visível com leve opacidade */
+    #reset-button {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.2);
+      background: transparent;
+      opacity: 0.15;
+      cursor: pointer;
+      z-index: 20;
+      transition: all 0.25s ease-in-out;
+    }
+    body.light-mode #reset-button {
+      border: 2px solid rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.04);
+    }
+    #reset-button:hover {
+      opacity: 0.4;
+      box-shadow: 0 0 6px rgba(255,255,255,0.2);
+    }
+    .reset-zoom {
+      animation: resetZoom 0.4s ease-in-out forwards;
+    }
+    @keyframes resetZoom {
+      0% { transform: translateX(-50%) scale(1); opacity: 0.15; }
+      50% { transform: translateX(-50%) scale(1.4); opacity: 0.4; box-shadow: 0 0 14px rgba(255,255,255,0.2); }
+      100% { transform: translateX(-50%) scale(0.4); opacity: 0; }
+    }
+    /* Fade-out para transição geral */
+    .fade-out {
+      animation: fadeOut 1s forwards ease-in-out;
+    }
+    @keyframes fadeOut {
+      0% { opacity: 1; transform: scale(1); filter: blur(0); }
+      100% { opacity: 0; transform: scale(0.9); filter: blur(8px); }
+    }
+    /* Gradiente para fundo abaixo do círculo */
+    body::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to top, rgba(255,255,255,0.08), transparent);
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body onclick="triggerTransition()">
+  <div class="halo"></div>
+  <div class="circle-wrapper" onclick="triggerTransition()">
+    <div class="circle"></div>
+  </div>
+  <!-- Contêiner para o símbolo SVG -->
+  <div id="symbol">
+    <div class="svg-container">
+      <!-- SVG será inserido aqui -->
+    </div>
+  </div>
+  <!-- Botão de Troca de Tema -->
+  <div class="theme-switch" onclick="toggleTheme(event)" id="themeSwitch"></div>
+  <!-- Botão de Reset visível e com efeitos refinados -->
+  <div id="reset-button" onclick="resetSplash()" title="Reset Pulso"></div>
+  <!-- Áudio de respiração sonora -->
+  <audio id="respiracaoAudio" autoplay loop>
+    <source src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Binaural_Breathing_60BPM.ogg" type="audio/ogg">
+  </audio>
+  <script>
+    // Preserva tema com localStorage
+    document.addEventListener("DOMContentLoaded", () => {
+      const saved = localStorage.getItem("tema");
+      if (saved === "light") {
+        document.body.classList.add("light-mode");
+        document.documentElement.setAttribute("data-theme", "light");
+      } else {
+        document.body.classList.remove("light-mode");
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    });
+
+    let isDark = true;
+    function toggleTheme(event) {
+      event.stopPropagation();
+      const themeSwitch = document.getElementById('themeSwitch');
+      isDark = !isDark;
+      document.body.classList.toggle('light-mode', !isDark);
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      localStorage.setItem("tema", isDark ? "dark" : "light");
+
+      const symbol = document.getElementById("symbol");
+      symbol.classList.add("symbol-breath");
+      themeSwitch.classList.add('active');
+      setTimeout(() => {
+        symbol.classList.remove("symbol-breath");
+        themeSwitch.classList.remove('active');
+      }, 800);
+    }
+
+    function resetSplash() {
+      const btn = document.getElementById('reset-button');
+      const symbol = document.getElementById("symbol");
+      btn.classList.add("reset-zoom");
+      symbol.classList.add("symbol-breath");
+      setTimeout(() => {
+        window.location.reload();
+      }, 450);
+    }
+
+    function triggerTransition() {
+      const symbol = document.getElementById('symbol');
+      const audio = document.getElementById('respiracaoAudio');
+      if (audio) audio.pause();
+      symbol.classList.add('active');
+      document.body.classList.add('fade-out');
+      // Removido timeout automático para transição; agora só via clique no pulso
+    }
+
+    // Sistema de duplo clique para modo secreto
+    let lastClickTime = 0;
+    document.addEventListener('click', (e) => {
+      const now = new Date().getTime();
+      if (now - lastClickTime < 400) {
+        document.body.classList.toggle('secreto');
+      }
+      lastClickTime = now;
+    });
+  </script>
+  <!-- Inserir o símbolo SVG reduzido (exemplo, símbolo_infodose 2.svg) -->
+  <script>
+    // Carregar o SVG e ajustar o tamanho
+    fetch('simbolos_extraidos/simbolo_infodose 2.svg')
+      .then(response => response.text())
+      .then(svgText => {
+        const container = document.querySelector("#symbol .svg-container");
+        container.innerHTML = svgText;
+        // Ajustar o SVG inserido para tamanho ideal (80px x 80px) centralizado
+        const svgElement = container.querySelector("svg");
+        if (svgElement) {
+          svgElement.setAttribute("width", "80");
+          svgElement.setAttribute("height", "80");
+          svgElement.style.display = "block";
+          svgElement.style.margin = "auto";
+        }
+      })
+      .catch(err => console.error("Erro ao carregar SVG:", err));
+  </script>
+</body>
+</html>
