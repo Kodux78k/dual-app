@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>MetaLux – Ritual Entry</title><style>
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(to bottom, #0c0c0c, #1a1a1a);
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  color: #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  overflow: hidden;
+}
+h1 {
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+h2 {
+  font-size: 1.1rem;
+  font-weight: 300;
+  opacity: 0.7;
+  margin-top: 0;
+}
+#circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  margin: 3rem auto;
+  background: radial-gradient(circle, #ffffff33 0%, #ffffff05 70%);
+  border: 2px solid rgba(255,255,255,0.2);
+  animation: pulseCircle 3s ease-in-out infinite;
+}
+@keyframes pulseCircle {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(255,255,255,0.1); }
+  50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(255,255,255,0.3); }
+}
+button {
+  padding: 0.6rem 1.6rem;
+  border-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 0.5rem;
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+}
+button:hover {
+  background: rgba(255,255,255,0.1);
+}
+#button-container {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+</style></head><body><div><h1>If you arrived here</h1><h2>you’re ready to remember.</h2><div id="circle"></div><div id="button-container"><button>Start</button><button>Enter Ritual</button></div></div></body></html>
