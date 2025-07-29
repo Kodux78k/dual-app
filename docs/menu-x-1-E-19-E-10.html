@@ -14,7 +14,7 @@
     :root {
       --bg: linear-gradient(to bottom, #000, #1a1a1a);
       --text: #d7d7d7;
-      --fast: .4s; --med: .8s; --slow: 1.8s;
+      --fast: .4s; --med: .8s; --slow: 2.1s;
     }
     body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
     body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
@@ -23,7 +23,7 @@
     html,body{width:100%;height:100%;overflow:hidden}
     body{
       display:flex;flex-direction:column;align-items:center;
-      padding:20px;background:var(--bg);color:var(--text);
+      padding:20px;background:transparent;color:var(--text);
       font-family:'Montserrat',sans-serif;
       transition:background var(--slow),color var(--slow);
       animation:fadeIn var(--slow) ease forwards;
@@ -52,7 +52,7 @@
     .svg-container object{width:100%;height:100%;object-fit:contain;
       animation:pulse 2s infinite ease-in-out;
     }
-    #assistantName{position:absolute;top:196px;left:50%;transform:translateX(-50%);font-size:1.1em;font-weight:600;opacity:.8;
+    #assistantName{position:absolute;top:260px;left:50%;transform:translateX(-50%);font-size:1.1em;font-weight:600;opacity:.8;
       transition:opacity var(--slow);
     }
     .response-container{
