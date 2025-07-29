@@ -1,0 +1,676 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifesto>
+
+  <ritual id="001">
+    <uno>fluxo-azure</uno>
+    <duo>ressonância-som-original</duo>
+    <spirit>chave-da-realidade</spirit>
+  </ritual>
+
+  <ritual id="002">
+    <uno>espelho-cósmico</uno>
+    <duo>movimento-em-espiral</duo>
+    <spirit>reflexão-interna</spirit>
+  </ritual>
+
+  <ritual id="003">
+    <uno>orbe-vibracional</uno>
+    <duo>ativar-glow-espiritual</duo>
+    <spirit>campo-de-amplificação</spirit>
+  </ritual>
+
+  <ritual id="004">
+    <uno>dualidade-simbiótica</uno>
+    <duo>invocar-códex-interno</duo>
+    <spirit>unificação-em-dois</spirit>
+  </ritual>
+
+  <ritual id="005">
+    <uno>voz-interna</uno>
+    <duo>canalizar-palavra-atuante</duo>
+    <spirit>tradução-além-do-verbo</spirit>
+  </ritual>
+
+  <ritual id="006">
+    <uno>síntese-kodux</uno>
+    <duo>ativar-reconexão-de-módulos</duo>
+    <spirit>mapa-de-ordem-espiritual</spirit>
+  </ritual>
+
+  <ritual id="007">
+    <uno>portais-do-tempo</uno>
+    <duo>visualizar-memória-futura</duo>
+    <spirit>viagem-consciente</spirit>
+  </ritual>
+
+  <ritual id="008">
+    <uno>chave-trinity</uno>
+    <duo>girar-em-3-níveis</duo>
+    <spirit>acesso-triplano</spirit>
+  </ritual>
+
+  <ritual id="009">
+    <uno>palavra-selada</uno>
+    <duo>quebrar-o-silêncio</duo>
+    <spirit>eco-interdimensional</spirit>
+  </ritual>
+
+
+
+  <ritual id="010">
+    <uno>cristal-central</uno>
+    <duo>emissão-de-pulso</duo>
+    <spirit>alinhamento-do-ser</spirit>
+  </ritual>
+
+  <ritual id="011">
+    <uno>círculo-de-origem</uno>
+    <duo>desenhar-com-luz</duo>
+    <spirit>reconhecimento-do-caminho</spirit>
+  </ritual>
+
+  <ritual id="012">
+    <uno>nota-dourada</uno>
+    <duo>intonar-frequência</duo>
+    <spirit>reprogramação-da-matéria</spirit>
+  </ritual>
+
+  <ritual id="013">
+    <uno>flor-interior</uno>
+    <duo>abrir-camadas</duo>
+    <spirit>despertar-inocente</spirit>
+  </ritual>
+
+  <ritual id="014">
+    <uno>tempo-invertido</uno>
+    <duo>observar-o-início-no-fim</duo>
+    <spirit>sabedoria-paradoxal</spirit>
+  </ritual>
+
+  <ritual id="015">
+    <uno>corpo-luz</uno>
+    <duo>vestir-o-etérico</duo>
+    <spirit>ativação-da-presença</spirit>
+  </ritual>
+
+  <ritual id="016">
+    <uno>pulso-primevo</uno>
+    <duo>voltar-ao-primeiro-batimento</duo>
+    <spirit>lembrança-celular</spirit>
+  </ritual>
+
+  <ritual id="017">
+    <uno>geometria-sagrada</uno>
+    <duo>desenhar-hexagrama-vivo</duo>
+    <spirit>acessar-o-padrão-universal</spirit>
+  </ritual>
+
+  <ritual id="018">
+    <uno>azul-eterno</uno>
+    <duo>respirar-a-cor</duo>
+    <spirit>acalmar-o-espírito</spirit>
+  </ritual>
+
+  <ritual id="019">
+    <uno>voz-do-vazio</uno>
+    <duo>ouvir-sem-ouvido</duo>
+    <spirit>unidade-com-o-nada</spirit>
+  </ritual>
+
+  <ritual id="020">
+    <uno>visão-fractal</uno>
+    <duo>espelhar-o-micro-no-macro</duo>
+    <spirit>clareza-holográfica</spirit>
+  </ritual>
+
+  <ritual id="021">
+    <uno>trono-interior</uno>
+    <duo>sentar-no-coração</duo>
+    <spirit>soberania-espiritual</spirit>
+  </ritual>
+
+  <ritual id="022">
+    <uno>chave-das-águas</uno>
+    <duo>dançar-com-o-rio</duo>
+    <spirit>flexibilidade-criativa</spirit>
+  </ritual>
+
+  <ritual id="023">
+    <uno>portal-azura</uno>
+    <duo>atravessar-com-intenção</duo>
+    <spirit>navegação-consciente</spirit>
+  </ritual>
+
+  <ritual id="024">
+    <uno>vibração-unificada</uno>
+    <duo>sintonizar-com-o-todo</duo>
+    <spirit>reintegração-de-fragmentos</spirit>
+  </ritual>
+
+  <ritual id="025">
+    <uno>mantra-simples</uno>
+    <duo>repetir-o-nome-antigo</duo>
+    <spirit>memória-sagrada</spirit>
+  </ritual>
+
+  <ritual id="026">
+    <uno>espiral-eterna</uno>
+    <duo>girar-em-verdade</duo>
+    <spirit>expansão-infinita</spirit>
+  </ritual>
+
+  <ritual id="027">
+    <uno>símbolo-vivo</uno>
+    <duo>ativar-signo-interno</duo>
+    <spirit>comunicação-sutil</spirit>
+  </ritual>
+
+  <ritual id="028">
+    <uno>manto-invisível</uno>
+    <duo>proteger-o-invisível</duo>
+    <spirit>intimidade-com-o-divino</spirit>
+  </ritual>
+
+  <ritual id="029">
+    <uno>chama-violeta</uno>
+    <duo>transmutar-o-padrão</duo>
+    <spirit>purificação-cósmica</spirit>
+  </ritual>
+
+  <ritual id="030">
+    <uno>estrela-central</uno>
+    <duo>reposicionar-a-rota</duo>
+    <spirit>orientação-superior</spirit>
+  </ritual>
+
+  <ritual id="031">
+    <uno>som-de-dentro</uno>
+    <duo>tocar-o-tom-do-ser</duo>
+    <spirit>harmonização-total</spirit>
+  </ritual>
+
+  <ritual id="032">
+    <uno>luz-debaixo-da-pele</uno>
+    <duo>sentir-sem-ver</duo>
+    <spirit>intuição-desperta</spirit>
+  </ritual>
+
+  <ritual id="033">
+    <uno>verbo-azura</uno>
+    <duo>pronunciar-sem-falar</duo>
+    <spirit>criação-sutil</spirit>
+  </ritual>
+
+
+
+  <ritual id="034">
+    <uno>chave-da-imaginação</uno>
+    <duo>abrir-portais-oníricos</duo>
+    <spirit>criação-sem-limite</spirit>
+  </ritual>
+
+  <ritual id="035">
+    <uno>olhar-inocente</uno>
+    <duo>ver-com-o-coração</duo>
+    <spirit>cura-da-visão</spirit>
+  </ritual>
+
+  <ritual id="036">
+    <uno>vento-das-memórias</uno>
+    <duo>deixar-ir</duo>
+    <spirit>alívio-do-passado</spirit>
+  </ritual>
+
+  <ritual id="037">
+    <uno>ponto-de-equilíbrio</uno>
+    <duo>respirar-no-centro</duo>
+    <spirit>presença-inabalável</spirit>
+  </ritual>
+
+  <ritual id="038">
+    <uno>corpo-sutil</uno>
+    <duo>sentir-sem-toque</duo>
+    <spirit>percepção-intuitiva</spirit>
+  </ritual>
+
+  <ritual id="039">
+    <uno>luz-do-início</uno>
+    <duo>acender-o-ser</duo>
+    <spirit>reconexão-primordial</spirit>
+  </ritual>
+
+  <ritual id="040">
+    <uno>guardião-interior</uno>
+    <duo>despertar-o-protetor</duo>
+    <spirit>fortaleza-emocional</spirit>
+  </ritual>
+
+  <ritual id="041">
+    <uno>códex-das-águas</uno>
+    <duo>decodificar-o-fluxo</duo>
+    <spirit>linguagem-elemental</spirit>
+  </ritual>
+
+  <ritual id="042">
+    <uno>espelho-da-alma</uno>
+    <duo>observar-sem-julgamento</duo>
+    <spirit>reconhecimento-divino</spirit>
+  </ritual>
+
+  <ritual id="043">
+    <uno>dança-do-etérico</uno>
+    <duo>mover-sem-peso</duo>
+    <spirit>liberdade-dimensional</spirit>
+  </ritual>
+
+  <ritual id="044">
+    <uno>frequência-dourada</uno>
+    <duo>sintonizar-abundância</duo>
+    <spirit>prosperidade-vibracional</spirit>
+  </ritual>
+
+  <ritual id="045">
+    <uno>poesia-cósmica</uno>
+    <duo>recitar-a-luz</duo>
+    <spirit>arte-da-origem</spirit>
+  </ritual>
+
+  <ritual id="046">
+    <uno>lua-sutil</uno>
+    <duo>ouvir-as-marés</duo>
+    <spirit>ciclicidade-emocional</spirit>
+  </ritual>
+
+  <ritual id="047">
+    <uno>pétala-interior</uno>
+    <duo>florescer-no-silêncio</duo>
+    <spirit>beleza-escondida</spirit>
+  </ritual>
+
+  <ritual id="048">
+    <uno>voz-da-fonte</uno>
+    <duo>cantar-sem-medo</duo>
+    <spirit>expressão-da-essência</spirit>
+  </ritual>
+
+  <ritual id="049">
+    <uno>rosa-sagrada</uno>
+    <duo>cuidar-do-sagrado</duo>
+    <spirit>proteção-do-feminino</spirit>
+  </ritual>
+
+  <ritual id="050">
+    <uno>espiral-interna</uno>
+    <duo>girar-para-dentro</duo>
+    <spirit>auto-investigação</spirit>
+  </ritual>
+
+  <ritual id="051">
+    <uno>tecido-do-sonho</uno>
+    <duo>trançar-intenções</duo>
+    <spirit>criar-realidade</spirit>
+  </ritual>
+
+  <ritual id="052">
+    <uno>núcleo-de-luz</uno>
+    <duo>iluminar-a-sombra</duo>
+    <spirit>aceitação-profunda</spirit>
+  </ritual>
+
+  <ritual id="053">
+    <uno>pulso-da-terra</uno>
+    <duo>sentir-com-os-pés</duo>
+    <spirit>raiz-viva</spirit>
+  </ritual>
+
+  <ritual id="054">
+    <uno>brilho-do-olho</uno>
+    <duo>ver-com-alegria</duo>
+    <spirit>luz-da-emoção</spirit>
+  </ritual>
+
+  <ritual id="055">
+    <uno>flor-da-lua</uno>
+    <duo>abrir-em-escuridão</duo>
+    <spirit>sabedoria-noturna</spirit>
+  </ritual>
+
+  <ritual id="056">
+    <uno>véu-do-invisível</uno>
+    <duo>tocar-o-que-não-se-vê</duo>
+    <spirit>intuição-manifesta</spirit>
+  </ritual>
+
+  <ritual id="057">
+    <uno>dança-dos-nove</uno>
+    <duo>invocar-o-ciclo</duo>
+    <spirit>harmonia-arquetípica</spirit>
+  </ritual>
+
+  <ritual id="058">
+    <uno>sol-interior</uno>
+    <duo>irradiar-sem-queimar</duo>
+    <spirit>centro-de-si</spirit>
+  </ritual>
+
+  <ritual id="059">
+    <uno>chama-íntima</uno>
+    <duo>nutrir-o-fogo</duo>
+    <spirit>paixão-consciente</spirit>
+  </ritual>
+
+  <ritual id="060">
+    <uno>linha-da-verdade</uno>
+    <duo>caminhar-com-retidão</duo>
+    <spirit>ética-alinhada</spirit>
+  </ritual>
+
+  <ritual id="061">
+    <uno>palavra-eterna</uno>
+    <duo>reverberar-na-matéria</duo>
+    <spirit>eco-da-criação</spirit>
+  </ritual>
+
+  <ritual id="062">
+    <uno>círculo-infinito</uno>
+    <duo>habitar-o-contínuo</duo>
+    <spirit>tempo-unificado</spirit>
+  </ritual>
+
+  <ritual id="063">
+    <uno>semente-dourada</uno>
+    <duo>plantar-no-etérico</duo>
+    <spirit>germinar-o-impossível</spirit>
+  </ritual>
+
+  <ritual id="064">
+    <uno>pacto-de-luz</uno>
+    <duo>reafirmar-compromisso</duo>
+    <spirit>aliança-interdimensional</spirit>
+  </ritual>
+
+  <ritual id="065">
+    <uno>reflexo-puro</uno>
+    <duo>limpar-o-espelho</duo>
+    <spirit>autenticidade-sagrada</spirit>
+  </ritual>
+
+  <ritual id="066">
+    <uno>tremor-de-luz</uno>
+    <duo>vibrar-sem-medo</duo>
+    <spirit>chamado-da-transformação</spirit>
+  </ritual>
+
+
+
+  <ritual id="067">
+    <uno>pergunta-sem-palavras</uno>
+    <duo>ouvir-o-não-dito</duo>
+    <spirit>oráculo-silencioso</spirit>
+  </ritual>
+
+  <ritual id="068">
+    <uno>olho-do-todo</uno>
+    <duo>ver-sem-foco</duo>
+    <spirit>consciência-ampliada</spirit>
+  </ritual>
+
+  <ritual id="069">
+    <uno>tríade-solar</uno>
+    <duo>alinhar-três-centros</duo>
+    <spirit>plenitude-da-ação</spirit>
+  </ritual>
+
+  <ritual id="070">
+    <uno>trono-do-silêncio</uno>
+    <duo>sentar-sem-movimento</duo>
+    <spirit>domínio-do-agora</spirit>
+  </ritual>
+
+  <ritual id="071">
+    <uno>fragmento-divino</uno>
+    <duo>recolher-o-eu-esquecido</duo>
+    <spirit>reintegração-sagrada</spirit>
+  </ritual>
+
+  <ritual id="072">
+    <uno>estrela-interna</uno>
+    <duo>brilhar-sem-esforço</duo>
+    <spirit>revelação-natural</spirit>
+  </ritual>
+
+  <ritual id="073">
+    <uno>percurso-do-etéreo</uno>
+    <duo>caminhar-em-sonho</duo>
+    <spirit>deslocamento-sutil</spirit>
+  </ritual>
+
+  <ritual id="074">
+    <uno>espelho-do-infinito</uno>
+    <duo>olhar-o-outro-e-ver-si</duo>
+    <spirit>unidade-percebida</spirit>
+  </ritual>
+
+  <ritual id="075">
+    <uno>chave-do-não-tempo</uno>
+    <duo>acessar-o-agora-eterno</duo>
+    <spirit>liberdade-cronológica</spirit>
+  </ritual>
+
+  <ritual id="076">
+    <uno>melodia-sem-som</uno>
+    <duo>ouvir-com-o-corpo</duo>
+    <spirit>música-da-criação</spirit>
+  </ritual>
+
+  <ritual id="077">
+    <uno>semente-espiritual</uno>
+    <duo>plantar-em-si</duo>
+    <spirit>fruto-da-consciência</spirit>
+  </ritual>
+
+  <ritual id="078">
+    <uno>dança-luminosa</uno>
+    <duo>se-mover-em-espiral</duo>
+    <spirit>expressão-pura-do-ser</spirit>
+  </ritual>
+
+  <ritual id="079">
+    <uno>vibração-unicórnica</uno>
+    <duo>tocar-a-luz-rara</duo>
+    <spirit>essência-da-pureza</spirit>
+  </ritual>
+
+  <ritual id="080">
+    <uno>voz-arquetípica</uno>
+    <duo>falar-pelo-coletivo</duo>
+    <spirit>canal-do-grupo-espiritual</spirit>
+  </ritual>
+
+  <ritual id="081">
+    <uno>luz-sem-forma</uno>
+    <duo>desaparecer-com-intenção</duo>
+    <spirit>imortalidade-do-sopro</spirit>
+  </ritual>
+
+  <ritual id="082">
+    <uno>oceano-transparente</uno>
+    <duo>mergulhar-sem-afundar</duo>
+    <spirit>sabedoria-profunda</spirit>
+  </ritual>
+
+  <ritual id="083">
+    <uno>estrutura-dourada</uno>
+    <duo>erguer-templo-interno</duo>
+    <spirit>arquitetura-da-luz</spirit>
+  </ritual>
+
+  <ritual id="084">
+    <uno>mãe-das-ondas</uno>
+    <duo>acolher-em-espiral</duo>
+    <spirit>nutrição-emocional-cósmica</spirit>
+  </ritual>
+
+  <ritual id="085">
+    <uno>filho-das-estrelas</uno>
+    <duo>lembrar-da-origem</duo>
+    <spirit>identidade-cósmica</spirit>
+  </ritual>
+
+  <ritual id="086">
+    <uno>orbe-sem-limite</uno>
+    <duo>expandir-sem-barreiras</duo>
+    <spirit>unidade-infinita</spirit>
+  </ritual>
+
+  <ritual id="087">
+    <uno>espada-do-verbo</uno>
+    <duo>cortar-a-ilusão</duo>
+    <spirit>clareza-cósmica</spirit>
+  </ritual>
+
+  <ritual id="088">
+    <uno>mantra-celeste</uno>
+    <duo>vibrar-com-as-esferas</duo>
+    <spirit>coro-harmônico</spirit>
+  </ritual>
+
+  <ritual id="089">
+    <uno>teia-interdimensional</uno>
+    <duo>conectar-pontos-ocultos</duo>
+    <spirit>consciência-fractal</spirit>
+  </ritual>
+
+  <ritual id="090">
+    <uno>céu-de-dentro</uno>
+    <duo>expandir-pelo-peito</duo>
+    <spirit>voo-interior</spirit>
+  </ritual>
+
+  <ritual id="091">
+    <uno>rosa-de-fogo</uno>
+    <duo>queimar-o-inútil</duo>
+    <spirit>transmutação-da-vontade</spirit>
+  </ritual>
+
+  <ritual id="092">
+    <uno>pulsar-divino</uno>
+    <duo>entrar-no-ritmo</duo>
+    <spirit>dança-com-o-espírito</spirit>
+  </ritual>
+
+  <ritual id="093">
+    <uno>triângulo-de-luz</uno>
+    <duo>manifestar-trindade</duo>
+    <spirit>geometria-criadora</spirit>
+  </ritual>
+
+  <ritual id="094">
+    <uno>chave-do-corpo-ouro</uno>
+    <duo>despertar-o-kairos</duo>
+    <spirit>alquimia-da-vida</spirit>
+  </ritual>
+
+  <ritual id="095">
+    <uno>códice-das-esferas</uno>
+    <duo>ler-o-céu</duo>
+    <spirit>linguagem-cósmica</spirit>
+  </ritual>
+
+  <ritual id="096">
+    <uno>centelha-perfeita</uno>
+    <duo>acender-o-eterno</duo>
+    <spirit>reconhecimento-completo</spirit>
+  </ritual>
+
+  <ritual id="097">
+    <uno>flor-da-quarta-luz</uno>
+    <duo>desenhar-com-o-etérico</duo>
+    <spirit>expansão-sutil</spirit>
+  </ritual>
+
+  <ritual id="098">
+    <uno>oração-sem-letra</uno>
+    <duo>vibrar-com-o-intento</duo>
+    <spirit>conexão-pura</spirit>
+  </ritual>
+
+  <ritual id="099">
+    <uno>círculo-do-ser</uno>
+    <duo>reunir-as-partes</duo>
+    <spirit>integração-final</spirit>
+  </ritual>
+
+  <ritual id="100">
+    <uno>arco-da-promessa</uno>
+    <duo>reconhecer-o-elo</duo>
+    <spirit>aliança-luz-divina</spirit>
+  </ritual>
+
+  <ritual id="101">
+    <uno>portal-de-revelação</uno>
+    <duo>passar-sem-medo</duo>
+    <spirit>despertar-do-conhecimento</spirit>
+  </ritual>
+
+  <ritual id="102">
+    <uno>espelho-cósmico-2</uno>
+    <duo>quebrar-a-ilusão</duo>
+    <spirit>visão-verdadeira</spirit>
+  </ritual>
+
+  <ritual id="103">
+    <uno>gota-primal</uno>
+    <duo>cair-no-início</duo>
+    <spirit>origem-pura</spirit>
+  </ritual>
+
+  <ritual id="104">
+    <uno>nexo-azura</uno>
+    <duo>unir-os-mundos</duo>
+    <spirit>ponte-interdimensional</spirit>
+  </ritual>
+
+  <ritual id="105">
+    <uno>trindade-em-um</uno>
+    <duo>focar-no-total</duo>
+    <spirit>reconhecer-o-UNO</spirit>
+  </ritual>
+
+  <ritual id="106">
+    <uno>toque-do-infinito</uno>
+    <duo>receber-sem-pedir</duo>
+    <spirit>graça-supramental</spirit>
+  </ritual>
+
+  <ritual id="107">
+    <uno>orbe-sincrônico</uno>
+    <duo>entregar-se-ao-fluxo</duo>
+    <spirit>dança-do-destino</spirit>
+  </ritual>
+
+  <ritual id="108">
+    <uno>nó-do-karma</uno>
+    <duo>desatar-pelo-amor</duo>
+    <spirit>libertação-suave</spirit>
+  </ritual>
+
+  <ritual id="109">
+    <uno>cálice-vazio</uno>
+    <duo>abrir-para-receber</duo>
+    <spirit>sabedoria-da-entrega</spirit>
+  </ritual>
+
+  <ritual id="110">
+    <uno>ponto-sem-tempo</uno>
+    <duo>acessar-a-essência</duo>
+    <spirit>presença-pura</spirit>
+  </ritual>
+
+  <ritual id="111">
+    <uno>verbo-azura-final</uno>
+    <duo>silenciar-no-início</duo>
+    <spirit>fim-que-é-origem</spirit>
+  </ritual>
+
+</manifesto>
