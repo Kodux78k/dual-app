@@ -12,7 +12,7 @@
     <style>
     /* ——— SEU CSS INTEGRAL (ajustes) ——— */
     :root {
-      --bg: transparent;
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
       --text: #d7d7d7;
       --fast: .4s; --med: .8s; --slow: 1.8s;
     }
@@ -23,7 +23,7 @@
     html,body{width:100%;height:100%;overflow:hidden}
     body{
       display:flex;flex-direction:column;align-items:center;
-      padding:20px;background:var(--bg);color:var(--text);
+      padding:20px;background:transparent;color:var(--text);
       font-family:'Montserrat',sans-serif;
       transition:background var(--slow),color var(--slow);
       animation:fadeIn var(--slow) ease forwards;
