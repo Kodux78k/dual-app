@@ -38,7 +38,7 @@
       width:30px;height:30px;border:1px solid var(--text);
       border-radius:50%;background:transparent;opacity:.3;
       cursor:pointer;transition:opacity var(--med),border-color var(--med);
-      z-index:10;
+      z-index:999910;
     }
     #themeToggle:hover{opacity:.8}
     #particles-js{position:absolute;inset:0;z-index:0}
@@ -59,7 +59,7 @@
       position:fixed;left:20px;right:20px;bottom:156px;padding:12px;
       background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);
       border-radius:20px;max-height:calc(100vh - 200px);
-      overflow-y:auto;z-index:999;transition:background var(--slow);
+      overflow-y:auto;z-index:999999;transition:background var(--slow);
       animation:fadeIn var(--slow) ease forwards;
     }
     body.light  .response-container{background:rgba(255,255,255,0.3)}
@@ -123,14 +123,14 @@
     .response-block:hover{box-shadow:0 0 15px rgba(0,255,255,.4)}
     .response-block.clicked{animation:clickPulse var(--med) ease-out}
     .response-block.expanded{
-      transform:scale(1.03);background:rgba(0,0,0,.6);z-index:2;
+      transform:scale(1.03);background:rgba(0,0,0,.6);z-index:999992;
     }
     .intro{background:linear-gradient(135deg,rgba(0,255,255,.2),rgba(0,100,100,.1));border-left:4px solid #0ff}
     .middle{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(50,50,50,.1));border-left:4px solid rgba(255,255,255,.4)}
     .ending{background:linear-gradient(135deg,rgba(255,0,255,.2),rgba(100,0,100,.1));border-left:4px solid #f0f}
     .input-container{
       position:fixed;left:20px;right:20px;bottom:90px;
-      display:flex;gap:6px;z-index:2;
+      display:flex;gap:6px;z-index:999992;
     }
     .input-container input{
       flex:1;padding:10px;border:none;border-radius:20px;
@@ -194,7 +194,7 @@
 .response-block.expanded {
   transform: scale(1.03);
   background: rgba(0, 0, 0, .6);
-  z-index: 2;
+  z-index: 999902;
 }
 .symbol-btn {
   background: rgba(0, 255, 255, 0.1);
@@ -253,7 +253,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      z-index: 40;
+      z-index: 4999990;
     }
 
     .symbol-button {
@@ -340,7 +340,7 @@
       padding: 1rem;
       border-radius: 20px;
       backdrop-filter: blur(8px);
-      z-index: 70;
+      z-index: 7999990;
     }
 
     #decoderBox input {
@@ -471,7 +471,7 @@
               border-radius: 12px;
               padding: 4px 10px;
               cursor: pointer;
-              z-index: 10;
+              z-index: 1099;
             }
           </style>
           <div class="overlay">
