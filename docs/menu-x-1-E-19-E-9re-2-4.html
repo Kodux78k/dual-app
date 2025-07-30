@@ -210,6 +210,93 @@
 .symbol-btn:hover {
   background: rgba(0, 255, 255, 0.3);
 }
+.response-block.full {
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(6px);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.inline-button, .emoji-button {
+  display: inline-block;
+  padding: 0.4em 0.8em;
+  margin: 0.2em;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  background: linear-gradient(135deg, #0ff4, #f0f4);
+  color: #000;
+  font-size: 0.9em;
+  transition: background 0.3s ease;
+}
+
+.inline-button.clicked,
+.emoji-button.clicked {
+  background: linear-gradient(135deg, #0ff, #f0f);
+  transform: scale(1.05);
+}
+.page-section {
+  margin-bottom: 3rem;
+  padding: 1rem;
+  scroll-margin-top: 80px;
+}
+
+.response-block {
+  margin-bottom: 1.2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.inline-button, .emoji-button {
+  display: inline-block;
+  background: linear-gradient(135deg, #0ff4, #f0f4);
+  border: none;
+  border-radius: 8px;
+  padding: 0.3em 0.6em;
+  margin: 0.2em;
+  font-size: 0.95em;
+  font-weight: bold;
+  color: black;
+  cursor: pointer;
+}
+
+.inline-button.clicked,
+.emoji-button.clicked {
+  background: linear-gradient(135deg, #0ff, #f0f);
+  transform: scale(1.05);
+}
+.section-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #0ff;
+  text-shadow: 0 0 5px #0ff8;
+}
+.section-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+  color: #fff;
+  text-shadow: 0 0 3px #0ff8;
+}
+
+.section-subtitle.intro {
+  color: #0ff;
+}
+
+.section-subtitle.middle {
+  color: #f0f;
+}
+
+.section-subtitle.ending {
+  color: #ff0;
+}
     /* ————— FIM DO CSS ————— */
   </style>
     <style>
@@ -320,7 +407,7 @@
 
    
     #uploadComponentBtn { top: 330px; }
-    #remoteComponentBtn { top: 380px; }
+    #remoteComponentBtn { top: 375px; }
     #toggleDecoderBtn { top: 420px; }
 
     #uploadComponentBtn:hover,
@@ -396,6 +483,7 @@
   50% { transform: scale(1.021); opacity: 1; }
   100% { transform: scale(1); opacity: 0.4; }
 }
+
 
 </style>
 </head>
@@ -1212,7 +1300,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-29.txt',
+            TRAINING_FILE:'data/codex/mtlx-o.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
@@ -1332,8 +1420,7 @@ function loadConfig(){
       speechSynthesis.cancel();
       speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
     }
-
-    function splitText(t){
+function splitText(t){
       let ps = t.split(/\n\s*\n/).filter(p=>p.trim());
       if(ps.length % 3 !== 0){
         ps = (t.match(/[^\.!\?]+[\.!\?]+/g)||[]).map(s=>s.trim());
@@ -1344,32 +1431,45 @@ function loadConfig(){
       }
       return out;
     }
+    
+    function renderResponse(txt) {
+  const wrap = $('.pages-wrapper');
+  wrap.innerHTML = '';
+  pages = [];
+  currentPage = 0;
+  autoAdvance = false;
 
-    function renderResponse(txt){
-      const wrap=$('.pages-wrapper');
-      wrap.innerHTML=''; pages=[]; currentPage=0; autoAdvance=true;
-      txt = txt
-        .replace(/`([^`]+)`/g,'<code>$1</code>')
-        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g,'<em>$1</em>');
-      const groups = splitText(txt),
-            titles = ['🎁 Recompensa Inicial','👁️ Exploração','⚡️ Antecipação'];
+  // Substituições simbióticas
+  txt = txt
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/$begin:math:display$(.+?)$end:math:display$/g, (_, label) =>
+      `<button class="inline-button" data-action="${label}">${label}</button>`)
+    .replace(/([\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u2600-\u26FF\u2700-\u27BF])/gu,
+      emoji => `<button class="emoji-button" data-emoji="${emoji}">${emoji}</button>`);
 
-      groups.forEach((grp, gi)=>{
-        const pg = create('div','page'+(gi===0?' active':''),'');
-        grp.forEach((para,j)=>{
-          const cls = j===0?'intro':j===1?'middle':'ending';
-          const block = create('div',`response-block ${cls}`,`<p>${para}</p>`);
-          block.addEventListener('click',()=>{
-            autoAdvance=false;
-                  const cleanPara = para
-          .replace(/["“”‘’]/g, '')                        // aspas
-          .replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g, ''); // emojis
+  const groups = splitText(txt);
+  const labels = ['🎁 Recompensa Inicial', '👁️ Exploração', '⚡️ Antecipação'];
+
+  groups.forEach((grp, gi) => {
+    const pg = create('div', 'page-section', '');
+
+    grp.forEach((para, j) => {
+      const cls = j === 0 ? 'intro' : j === 1 ? 'middle' : 'ending';
+      const html = marked.parse(para);
       
+      // Título simbólico por tipo Trinity
+      const title = create('h3', `section-subtitle ${cls}`, labels[j]);
+      const block = create('div', `response-block ${cls}`, html);
+
+      block.addEventListener('click', () => {
+        autoAdvance = false;
+        const cleanPara = para.replace(/["“”‘’]/g, '').replace(
+          /[\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u2600-\u26FF\u2700-\u27BF]/gu, ''
+        );
         const utter = new SpeechSynthesisUtterance(cleanPara);
         speechSynthesis.cancel();
         speechSynthesis.speak(utter);
-      
+
         if (!block.dataset.spoken) {
           block.dataset.spoken = '1';
           block.classList.add('clicked');
@@ -1379,41 +1479,54 @@ function loadConfig(){
             isEnabled = true;
             localStorage.setItem(STORAGE_KEY, '1');
             updateUI();
-              }
-              showLoading(' Pulso em Expansão...');
-              conversation.push({role:'user',content:`${titles[j]}\n\n${para}`});
-              callAI();
-            }
-          });
-          pg.appendChild(block);
-        });
-        wrap.appendChild(pg);
-        pages.push(pg);
+          }
+          showLoading(' Pulso em Expansão...');
+          conversation.push({ role: 'user', content: `${labels[j]}\n\n${para}` });
+          callAI();
+        }
       });
+
+      pg.appendChild(title);
+      pg.appendChild(block);
+    });
+
+    wrap.appendChild(pg);
+    pages.push(pg);
+  });
+
 
       $('#pageIndicator').textContent = `1 / ${pages.length}`;
       autoSpeakPage(0);
+    scrollToPage(0);
     }
+    
+function scrollToPage(i) {
+  if (!pages[i]) return;
+  pages[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  currentPage = i;
+  $('#pageIndicator').textContent = `${i + 1} / ${pages.length}`;
+  speakPage(i);
+}
+    function speakPage(i) {
+  const txts = Array.from(pages[i].querySelectorAll('p, div'))
+    .map(p => p.textContent).join(' ').trim();
 
-    function autoSpeakPage(i){
-  const txts = Array.from(pages[i].querySelectorAll('p'))
-    .map(p=>p.textContent).join(' ');
+  if (!txts) return;
+
   speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(txts);
-  
   utter.onend = () => {
     if (autoAdvance && i < pages.length - 1) {
-      changePage(1);
+      scrollToPage(i + 1);
     } else if (i === pages.length - 1) {
-      // Aqui, só após a ÚLTIMA página:
-      speechSynthesis.speak(
-        new SpeechSynthesisUtterance('Do seu jeito. Sempre único. Sempre seu.')
-      );
+      speechSynthesis.speak(new SpeechSynthesisUtterance(
+        'Do seu jeito. Sempre único. Sempre seu.'
+      ));
     }
   };
-
   speechSynthesis.speak(utter);
 }
+
 
     function changePage(d){
       const np = currentPage + d;
@@ -1424,7 +1537,11 @@ function loadConfig(){
       $('#pageIndicator').textContent = `${np+1} / ${pages.length}`;
       if(autoAdvance) autoSpeakPage(np)
     }
-
+function changePage(d) {
+  const np = currentPage + d;
+  if (np < 0 || np >= pages.length) return;
+  scrollToPage(np);
+}
     async function callAI() {
   try {
     // Pega a última mensagem do usuário
@@ -1597,6 +1714,63 @@ function gerarTextoRituais(rituais) {
 
 // Carrega o codex quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', carregarCodex);
+</script>
+<script>
+function renderResponse(txt) {
+  const wrap = $('.pages-wrapper');
+  wrap.innerHTML = '';
+  autoAdvance = false;
+
+  // Transforma markdown em HTML com estilo
+  txt = txt
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/$begin:math:display$(.+?)$end:math:display$/g, (_, label) => `<button class="inline-button" data-action="${label}">${label}</button>`)
+    .replace(/([\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}\u2600-\u26FF\u2700-\u27BF])/gu, 
+      (emoji) => `<button class="emoji-button" data-emoji="${emoji}">${emoji}</button>`
+    );
+
+  const html = marked.parse(txt);
+
+  const block = create('div', 'response-block full', html);
+  wrap.appendChild(block);
+
+  // Eventos para botões [ações] e emojis 🌀
+  block.querySelectorAll('.inline-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const label = btn.dataset.action;
+      const clean = label.replace(/["“”‘’]/g, '');
+      const utter = new SpeechSynthesisUtterance(clean);
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+      btn.classList.add('clicked');
+      conversation.push({ role: 'user', content: label });
+      showLoading(`Pulso simbiótico: ${label}`);
+      callAI();
+    });
+  });
+
+  block.querySelectorAll('.emoji-button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const emoji = btn.dataset.emoji;
+      const utter = new SpeechSynthesisUtterance(emoji);
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+      btn.classList.add('clicked');
+      conversation.push({ role: 'user', content: emoji });
+      showLoading(`Chave emocional: ${emoji}`);
+      callAI();
+    });
+  });
+
+  // Fala automática do texto renderizado
+  const plainText = block.textContent.replace(/\s+/g, ' ').trim();
+  const utter = new SpeechSynthesisUtterance(plainText);
+  utter.onend = () => {
+    speechSynthesis.speak(new SpeechSynthesisUtterance('Do seu jeito. Sempre único. Sempre seu.'));
+  };
+  speechSynthesis.cancel();
+  speechSynthesis.speak(utter);
+}
 </script>
 <script>
 function renderResponse({ intro = "", middle = "", ending = "" }) {
