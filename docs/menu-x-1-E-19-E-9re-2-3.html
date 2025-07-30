@@ -1533,13 +1533,16 @@ function loadConfig(){
         loadConfig(); $('#loginBox').classList.remove('active');
       });
 
-      // toggle apenas da área de resposta (blocos/loading)
-      document.body.addEventListener('click',e=>{
-        if(e.target.closest('.footer-text')){
-          document.querySelector('.pages-wrapper').classList.toggle('collapsed');
-          e.target.closest('.footer-text').classList.toggle('active');
-        }
-      });
+      // toggle da área de resposta (blocos/loading) e da parte inferior (controles/input)
+document.body.addEventListener('click', e => {
+  if (e.target.closest('.footer-text')) {
+    document.querySelector('.pages-wrapper')?.classList.toggle('collapsed');
+    document.querySelector('.response-controls')?.classList.toggle('collapsed');
+    document.querySelector('.input-container')?.classList.toggle('collapsed');
+    
+    e.target.closest('.footer-text').classList.toggle('active');
+  }
+});
     }
 
     function onSend(){
