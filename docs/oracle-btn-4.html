@@ -1,0 +1,138 @@
+<script type="module">
+  class BotaoOraculoTrinity extends HTMLElement {
+    constructor() {
+      super();
+      const shadow = this.attachShadow({ mode: 'open' });
+
+      // HTML interno do componente
+      shadow.innerHTML = `
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+          * { box-sizing: border-box; }
+          :host {
+            display: block;
+            font-family: 'Montserrat', monospace;
+            color: #0ff;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid #0ff;
+            padding: 1em;
+            margin: 1em 0;
+            box-shadow: 0 0 10px #0ff;
+          }
+          label {
+            display: inline-block;
+            padding: 0.8em 1.5em;
+            border: 2px dashed #f0f;
+            background: rgba(0,0,0,0.5);
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+          }
+          label:hover {
+            box-shadow: 0 0 20px #f0f;
+          }
+          button {
+            margin-top: 1em;
+            background: transparent;
+            border: 1px solid #0ff;
+            color: #0ff;
+            padding: 0.5em 1em;
+            cursor: pointer;
+          }
+          button:hover {
+            background: #0ff;
+            color: #000;
+          }
+        </style>
+        <label>
+          🔮 Abrir Portal-Oráculo
+          <input type="file" accept=".txt,.html,.pdf,.docx,.csv" hidden />
+        </label>
+        <button id="abrirModos">🧭 Ver Modos Salvos</button>
+        <div id="modosSalvos"></div>
+      `;
+
+      const input = shadow.querySelector('input');
+      const abrirBtn = shadow.querySelector('#abrirModos');
+      const modosDiv = shadow.querySelector('#modosSalvos');
+
+      shadow.querySelector('label').onclick = () => input.click();
+
+      input.addEventListener('change', async (e) => {
+        const arquivo = e.target.files[0];
+        if (!arquivo) return;
+
+        const nomeChave = `dual_modo_${arquivo.name}`;
+
+        const detectarPadroes = (texto) => {
+          const padrões = Array.from(texto.matchAll(/[^\x00-\x7F]/g));
+          let output = `🧬 ARQUIVO CONSAGRADO:\n\n${texto.substring(0, 300)}...\n\n(Modo KOBLLUX ativado)\n`;
+          if (padrões.length > 0) {
+            output += `🌐 Padrões MetaLux detectados: ${padrões.map(p => p[0]).join(' ')}\n`;
+          }
+          localStorage.setItem(nomeChave, texto);
+          window.renderResponse && window.renderResponse(output, '📂 Modo ' + arquivo.name);
+        };
+
+        const lerTextoPlano = () => {
+          const leitor = new FileReader();
+          leitor.onload = (e) => detectarPadroes(e.target.result);
+          leitor.readAsText(arquivo);
+        };
+
+        const lerPDF = () => {
+          const leitor = new FileReader();
+          leitor.onload = () => {
+            const typedarray = new Uint8Array(leitor.result);
+            pdfjsLib.getDocument({ data: typedarray }).promise.then(pdf => {
+              pdf.getPage(1).then(page => {
+                page.getTextContent().then(content => {
+                  const texto = content.items.map(i => i.str).join(' ');
+                  detectarPadroes(texto);
+                });
+              });
+            });
+          };
+          leitor.readAsArrayBuffer(arquivo);
+        };
+
+        const lerDOCX = () => {
+          const leitor = new FileReader();
+          leitor.onload = () => {
+            mammoth.extractRawText({ arrayBuffer: leitor.result })
+              .then(result => detectarPadroes(result.value));
+          };
+          leitor.readAsArrayBuffer(arquivo);
+        };
+
+        if (arquivo.name.endsWith('.txt') || arquivo.name.endsWith('.html') || arquivo.name.endsWith('.csv')) {
+          lerTextoPlano();
+        } else if (arquivo.name.endsWith('.pdf')) {
+          lerPDF();
+        } else if (arquivo.name.endsWith('.docx')) {
+          lerDOCX();
+        } else {
+          alert("⚠️ Tipo de arquivo não suportado ainda.");
+        }
+      });
+
+      abrirBtn.onclick = () => {
+        modosDiv.innerHTML = '';
+        Object.keys(localStorage).forEach(chave => {
+          if (chave.startsWith('dual_modo_')) {
+            const btn = document.createElement('button');
+            btn.textContent = chave.replace('dual_modo_', '');
+            btn.onclick = () => {
+              const conteudo = localStorage.getItem(chave);
+              window.renderResponse && window.renderResponse(`🔎 Conteúdo salvo:\n\n${conteudo.substring(0, 300)}...`, '📂 ' + btn.textContent);
+            };
+            modosDiv.appendChild(btn);
+          }
+        });
+      };
+    }
+  }
+
+  customElements.define('botao-oraculo-trinity', BotaoOraculoTrinity);
+</script>

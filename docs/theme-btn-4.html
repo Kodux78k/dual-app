@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="default">
+<head>
+  <meta charset="UTF-8" />
+  <title>Temas Simbióticos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pulse-color: rgba(255, 255, 255, 0.3);
+    }
+
+    body {
+      background: var(--bg, #000);
+      color: var(--text, #fff);
+      transition: background 0.5s, color 0.5s;
+      font-family: sans-serif;
+    }
+
+    .theme-buttons-wrapper {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      z-index: 10000;
+    }
+
+    .toggle-button {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 10px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      animation: pulse 3s infinite;
+    }
+
+    .theme-buttons {
+      display: flex;
+      gap: 10px;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .theme-buttons.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.8);
+    }
+
+    .theme-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: transform 0.2s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .theme-button:hover {
+      transform: scale(1.1);
+    }
+
+    .matrix    { background: linear-gradient(135deg, #00ff00, #003300); }
+    .cyberpunk { background: linear-gradient(135deg, #ff00ff, #00ffff); }
+    .tesseract {
+      background: linear-gradient(135deg, #0033cc, #00ccff);
+      font-family: 'Orbitron', sans-serif;
+      animation: pulseTesseract 1.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 var(--pulse-color); }
+      70%  { box-shadow: 0 0 0 10px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    @keyframes pulseTesseract {
+      0%   { transform: scale(1);     filter: drop-shadow(0 0 3px #00ccff); }
+      100% { transform: scale(1.1);   filter: drop-shadow(0 0 10px #00ccff); }
+    }
+
+    /* Botão antigo */
+    #themeSelectorBtn {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: linear-gradient(to right, #4a148c, #880e4f);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #ff00ff;
+      z-index: 9999;
+      transition: transform 0.3s ease;
+    }
+
+    #themeSelectorBtn:hover {
+      transform: scale(1.05);
+    }
+
+    main {
+      padding: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <h1>Bem-vindo à Interface Simbiótica</h1>
+    <p>Use os botões de tema para alternar a realidade visual.</p>
+  </main>
+
+  <!-- Botão original que você já usava -->
+  <button id="themeSelectorBtn" onclick="toggleThemes()">🌌 Alternar Temas</button>
+
+  <!-- Novo sistema simbiótico -->
+  <div class="theme-buttons-wrapper">
+    <button class="toggle-button" onclick="toggleThemes()" title="Mostrar/Ocultar Temas">🎨</button>
+    <div class="theme-buttons hidden" id="themeButtons">
+      <button class="theme-button matrix" onclick="setTheme('matrix')" title="Matrix">🧪</button>
+      <button class="theme-button cyberpunk" onclick="setTheme('cyberpunk')" title="Cyberpunk">👾</button>
+      <button class="theme-button tesseract" onclick="setTheme('tesseract')" title="Tesseract">🌀</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleThemes() {
+      const themeContainer = document.getElementById('themeButtons');
+      themeContainer.classList.toggle('hidden');
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+
+      // Aplica variáveis para efeitos baseados no tema (você pode expandir)
+      switch (theme) {
+        case 'matrix':
+          document.body.style.setProperty('--bg', '#001100');
+          document.body.style.setProperty('--text', '#00ff00');
+          break;
+        case 'cyberpunk':
+          document.body.style.setProperty('--bg', '#0a0014');
+          document.body.style.setProperty('--text', '#ff00ff');
+          break;
+        case 'tesseract':
+          document.body.style.setProperty('--bg', '#001133');
+          document.body.style.setProperty('--text', '#00ccff');
+          break;
+        default:
+          document.body.style.setProperty('--bg', '#000');
+          document.body.style.setProperty('--text', '#fff');
+      }
+
+      // Chama render simbiótico
+      if (typeof renderResponse === 'function') {
+        renderResponse(`🧬 Tema ativado: **${theme}**`, 'theme-change');
+      }
+    }
+  </script>
+
+</body>
+</html>

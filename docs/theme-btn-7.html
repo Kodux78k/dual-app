@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temas Simbióticos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --theme-bg: #000000;
+      --theme-color: #ffffff;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--theme-bg);
+      color: var(--theme-color);
+      font-family: system-ui, sans-serif;
+      transition: background 0.6s ease, color 0.6s ease;
+      min-height: 100vh;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+    }
+
+    /* 🔘 BOTÃO TOGGLE */
+    #toggleThemeBtns {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #0ff, #f0f);
+      color: white;
+      font-size: 20px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 0 12px #0ff;
+      transition: transform 0.3s ease;
+    }
+
+    #toggleThemeBtns:active {
+      transform: scale(0.95);
+    }
+
+    /* 🎨 BOTÕES DE TEMA */
+    .theme-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .theme-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background-color: transparent;
+      border: 2px solid rgba(255,255,255,0.6);
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 8px rgba(255,255,255,0.3);
+      backdrop-filter: blur(6px);
+      animation: pulse 2s infinite;
+      transition: transform 0.3s ease;
+    }
+
+    .theme-button:hover {
+      transform: scale(1.1);
+    }
+
+    .neon-theme {
+      font-family: 'Orbitron', sans-serif;
+      background: radial-gradient(circle at center, #0ff, #00f, #f0f);
+      animation: pulseNeon 1.5s infinite alternate;
+      box-shadow: 0 0 12px #0ff, 0 0 20px #f0f;
+      color: #000;
+    }
+
+    /* 📱 POSICIONAMENTO MOBILE */
+    #themeToggleWrapper,
+    #themeButtons {
+      position: fixed;
+      left: 20px;
+      z-index: 9999;
+    }
+
+    #themeToggleWrapper {
+      bottom: 90px;
+    }
+
+    #themeButtons {
+      bottom: 20px;
+      flex-direction: row;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+      70% { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    }
+
+    @keyframes pulseNeon {
+      0% { box-shadow: 0 0 10px #0ff, 0 0 20px #f0f; transform: scale(1); }
+      100% { box-shadow: 0 0 20px #0ff, 0 0 40px #f0f; transform: scale(1.1); }
+    }
+
+    @media (max-width: 480px) {
+      main {
+        padding: 16px;
+      }
+
+      .theme-button {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+      }
+
+      #toggleThemeBtns {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+      }
+
+      #themeButtons {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <h1>🌐 Temas Simbióticos</h1>
+    <p>Toque no botão para alternar temas visuais dinâmicos.</p>
+  </main>
+
+  <!-- 🔘 BOTÃO TOGGLE -->
+  <div id="themeToggleWrapper">
+    <button id="toggleThemeBtns" onclick="toggleThemeButtons()">🎨</button>
+  </div>
+
+  <!-- 🎨 BOTÕES DE TEMA -->
+  <div id="themeButtons" class="theme-buttons hidden">
+    <button class="theme-button" onclick="setTheme('light')" title="Tema Claro">🌞</button>
+    <button class="theme-button" onclick="setTheme('dark')" title="Tema Escuro">🌙</button>
+    <button class="theme-button neon-theme" onclick="setTheme('neon')" title="Tema Neon">⚡</button>
+  </div>
+
+  <script>
+    function toggleThemeButtons() {
+      document.getElementById('themeButtons').classList.toggle('hidden');
+    }
+
+    function setTheme(theme) {
+      let bg = '#000', color = '#fff';
+
+      if (theme === 'light') {
+        bg = 'linear-gradient(135deg, #fff, #ddd)';
+        color = '#000';
+      } else if (theme === 'dark') {
+        bg = 'linear-gradient(135deg, #111, #333)';
+        color = '#fff';
+      } else if (theme === 'neon') {
+        bg = 'linear-gradient(135deg, #000000, #001122)';
+        color = '#00ffee';
+      }
+
+      document.documentElement.style.setProperty('--theme-bg', bg);
+      document.documentElement.style.setProperty('--theme-color', color);
+
+      if (typeof renderResponse === 'function') {
+        renderResponse(`🎨 Tema ativado: **${theme.toUpperCase()}**`, { tag: `tema-${theme}` });
+      }
+    }
+  </script>
+
+</body>
+</html>

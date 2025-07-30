@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Temas com Toggle e Gradientes</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap');
+
+    :root {
+      --theme-bg: #ffffff;
+      --theme-color: #000000;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--theme-bg);
+      color: var(--theme-color);
+      font-family: sans-serif;
+      transition: background 0.6s ease, color 0.6s ease;
+    }
+
+    .theme-buttons-wrapper {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      z-index: 1000;
+    }
+
+    .toggle-button {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 10px;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+      animation: pulse 3s infinite;
+    }
+
+    .theme-buttons {
+      display: flex;
+      gap: 10px;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    .theme-buttons.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.8);
+    }
+
+    .theme-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      transition: transform 0.2s ease;
+      animation: pulse 2s infinite;
+    }
+
+    .theme-button:hover {
+      transform: scale(1.1);
+    }
+
+    .theme1 {
+      background: linear-gradient(135deg, #00c6ff, #0072ff);
+    }
+
+    .theme2 {
+      background: linear-gradient(135deg, #00ff88, #005533);
+    }
+
+    .theme3 {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(45deg, #ff00cc, #3333ff, #00fff0);
+      background-size: 400% 400%;
+      animation: bgShift 5s ease infinite, pulseGlow 2.5s infinite;
+      border: 2px solid #ffffff66;
+      box-shadow: 0 0 10px #0ff, 0 0 20px #f0f, inset 0 0 10px #0ff;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.2); }
+      70% { box-shadow: 0 0 0 12px rgba(255,255,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 10px #0ff, 0 0 20px #f0f, inset 0 0 10px #0ff; }
+      50% { box-shadow: 0 0 15px #0ff, 0 0 30px #f0f, inset 0 0 14px #f0f; }
+    }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    main {
+      padding: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="theme-buttons-wrapper">
+    <button class="toggle-button" onclick="toggleThemes()" title="Mostrar/Ocultar Temas">🎨</button>
+    <div class="theme-buttons" id="themeButtons">
+      <button class="theme-button theme1" onclick="setTheme('light')" title="Tema Claro">🌞</button>
+      <button class="theme-button theme2" onclick="setTheme('dark')" title="Tema Escuro">🌙</button>
+      <button class="theme-button theme3" onclick="setTheme('neon')" title="Tema Pulsante">⚡</button>
+    </div>
+  </div>
+
+  <main>
+    <h1>Tema com Toggle e Estilo Avançado</h1>
+    <p>Toque no botão 🎨 para mostrar ou ocultar os temas. O raio ⚡ ativa o modo neon pulsante.</p>
+  </main>
+
+  <script>
+    function toggleThemes() {
+      const themeContainer = document.getElementById('themeButtons');
+      themeContainer.classList.toggle('hidden');
+    }
+
+    function setTheme(theme) {
+      if (theme === 'light') {
+        document.documentElement.style.setProperty('--theme-bg', 'linear-gradient(180deg, #ffffff, #e0e0ff)');
+        document.documentElement.style.setProperty('--theme-color', '#000000');
+      } else if (theme === 'dark') {
+        document.documentElement.style.setProperty('--theme-bg', 'linear-gradient(180deg, #121212, #000000)');
+        document.documentElement.style.setProperty('--theme-color', '#f0f0f0');
+      } else if (theme === 'neon') {
+        document.documentElement.style.setProperty('--theme-bg', 'linear-gradient(180deg, #000000, #0ff, #f0f)');
+        document.documentElement.style.setProperty('--theme-color', '#39ff14');
+      }
+    }
+  </script>
+
+</body>
+</html>

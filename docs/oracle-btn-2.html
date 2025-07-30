@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Portal-Oráculo Simbiótico</title>
+  <style>
+    body {
+      background: #000;
+      color: #0ff;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2em;
+    }
+
+    #portalCósmico {
+      padding: 1em 2em;
+      border: 2px dashed #f0f;
+      background: rgba(0,0,0,0.9);
+      background-image: url('fractal_azura.png');
+      background-size: cover;
+      background-position: center;
+      color: #fff;
+      font-size: 1.2em;
+      cursor: pointer;
+      margin-bottom: 1em;
+      transition: all 0.3s ease;
+    }
+
+    #portalCósmico:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #f0f;
+    }
+
+    #legenda, #modosSalvos {
+      color: #ccc;
+      text-align: center;
+      margin-top: 1em;
+      font-size: 0.9em;
+    }
+
+    #modosSalvos button {
+      margin: 0.2em;
+      padding: 0.5em 1em;
+      font-size: 0.9em;
+      background: #111;
+      color: #0ff;
+      border: 1px solid #0ff;
+      cursor: pointer;
+    }
+
+    #modosSalvos button:hover {
+      background: #0ff;
+      color: #000;
+    }
+
+    button#abrirModos {
+      margin-top: 1.5em;
+      padding: 0.6em 1.2em;
+      background: #222;
+      color: #0ff;
+      border: 2px solid #0ff;
+      cursor: pointer;
+    }
+
+    button#abrirModos:hover {
+      background: #0ff;
+      color: #000;
+    }
+  </style>
+  <!-- Bibliotecas para PDF e DOCX -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+  <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
+</head>
+<body>
+
+  <label id="portalCósmico">
+    🔮 Abrir Portal-Oráculo 🔮
+    <input type="file" id="inputOraculo" accept=".txt,.html,.pdf,.docx,.csv" hidden>
+  </label>
+
+  <button id="abrirModos" onclick="listarModos()">🧭 Ver Modos Salvos</button>
+
+  <div id="modosSalvos"></div>
+
+  <div id="legenda">
+    ✦ TXT = Espaço da Mente<br>
+    ✦ CSV = Tabelas do Kaos<br>
+    ✦ PDF = Pergaminhos Sagrados<br>
+    ✦ DOCX = Doutrinas Ocultas<br>
+    ✦ HTML = Portais de Interface<br>
+  </div>
+
+  <script>
+    const input = document.getElementById('inputOraculo');
+    const portal = document.getElementById('portalCósmico');
+
+    portal.addEventListener('click', () => input.click());
+
+    input.addEventListener('change', async (e) => {
+      const arquivo = e.target.files[0];
+      if (!arquivo) return;
+
+      const nomeChave = `dual_modo_${arquivo.name}`;
+
+      const lerTextoPlano = () => {
+        const leitor = new FileReader();
+        leitor.onload = function(evento) {
+          const conteudo = evento.target.result;
+          alert(`🧬 ARQUIVO CONSAGRADO:\n\n${conteudo.substring(0, 300)}...\n\n(Modo KOBLLUX ativado)`);
+          detectarPadroes(conteudo);
+          localStorage.setItem(nomeChave, conteudo);
+        };
+        leitor.readAsText(arquivo);
+      };
+
+      const lerPDF = () => {
+        const leitor = new FileReader();
+        leitor.onload = function() {
+          const typedarray = new Uint8Array(leitor.result);
+          pdfjsLib.getDocument({ data: typedarray }).promise.then(pdf => {
+            pdf.getPage(1).then(page => {
+              page.getTextContent().then(content => {
+                const texto = content.items.map(i => i.str).join(' ');
+                alert(`📘 PDF LIDO:\n\n${texto.substring(0, 300)}...`);
+                detectarPadroes(texto);
+                localStorage.setItem(nomeChave, texto);
+              });
+            });
+          });
+        };
+        leitor.readAsArrayBuffer(arquivo);
+      };
+
+      const lerDOCX = () => {
+        const leitor = new FileReader();
+        leitor.onload = function() {
+          mammoth.extractRawText({ arrayBuffer: leitor.result })
+            .then(result => {
+              const texto = result.value;
+              alert(`📄 DOCX LIDO:\n\n${texto.substring(0, 300)}...`);
+              detectarPadroes(texto);
+              localStorage.setItem(nomeChave, texto);
+            });
+        };
+        leitor.readAsArrayBuffer(arquivo);
+      };
+
+      const detectarPadroes = (texto) => {
+        const padrões = Array.from(texto.matchAll(/[^\x00-\x7F]/g));
+        if (padrões.length > 0) {
+          console.log("🌐 Padrões MetaLux detectados:");
+          padrões.forEach((c, i) => {
+            console.log(`Símbolo ${i + 1}: ${c[0]} (charCode ${c[0].charCodeAt(0)})`);
+          });
+        } else {
+          console.log("🧘 Nenhum padrão MetaLux encontrado.");
+        }
+      };
+
+      if (arquivo.name.endsWith('.txt') || arquivo.name.endsWith('.html') || arquivo.name.endsWith('.csv')) {
+        lerTextoPlano();
+      } else if (arquivo.name.endsWith('.pdf')) {
+        lerPDF();
+      } else if (arquivo.name.endsWith('.docx')) {
+        lerDOCX();
+      } else {
+        alert("⚠️ Tipo de arquivo ainda não suportado.");
+      }
+    });
+
+    function listarModos() {
+      const container = document.getElementById('modosSalvos');
+      container.innerHTML = '';
+      Object.keys(localStorage).forEach(chave => {
+        if (chave.startsWith('dual_modo_')) {
+          const btn = document.createElement('button');
+          btn.textContent = chave.replace('dual_modo_', '');
+          btn.onclick = () => {
+            const conteudo = localStorage.getItem(chave);
+            alert(`🔎 Conteúdo do modo "${chave}":\n\n${conteudo.substring(0, 300)}...`);
+          };
+          container.appendChild(btn);
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>

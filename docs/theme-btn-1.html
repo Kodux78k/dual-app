@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Temas com Botões</title>
+  <style>
+    :root {
+      --theme-bg: #ffffff;
+      --theme-color: #000000;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--theme-bg);
+      color: var(--theme-color);
+      font-family: sans-serif;
+      transition: background-color 0.5s ease, color 0.5s ease;
+    }
+
+    .theme-buttons {
+      position: fixed;
+      left: 20px;
+      bottom: 20px;
+      display: flex;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .theme-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+      animation: pulse 2s infinite;
+      transition: transform 0.2s ease;
+    }
+
+    .theme-button:hover {
+      transform: scale(1.1);
+    }
+
+    .theme1 { background: #007BFF; }
+    .theme2 { background: #28A745; }
+    .theme3 { background: #FFC107; }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0,0,0,0.2); }
+      70% { box-shadow: 0 0 0 10px rgba(0,0,0,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="theme-buttons">
+    <button class="theme-button theme1" onclick="setTheme('light')" title="Tema Claro">🌞</button>
+    <button class="theme-button theme2" onclick="setTheme('dark')" title="Tema Escuro">🌙</button>
+    <button class="theme-button theme3" onclick="setTheme('neon')" title="Tema Neon">⚡</button>
+  </div>
+
+  <main style="padding: 40px;">
+    <h1>Exemplo de Troca de Tema</h1>
+    <p>Use os botões no canto inferior esquerdo para mudar o tema.</p>
+  </main>
+
+  <script>
+    function setTheme(theme) {
+      if (theme === 'light') {
+        document.documentElement.style.setProperty('--theme-bg', '#ffffff');
+        document.documentElement.style.setProperty('--theme-color', '#000000');
+      } else if (theme === 'dark') {
+        document.documentElement.style.setProperty('--theme-bg', '#121212');
+        document.documentElement.style.setProperty('--theme-color', '#f0f0f0');
+      } else if (theme === 'neon') {
+        document.documentElement.style.setProperty('--theme-bg', '#0f0f0f');
+        document.documentElement.style.setProperty('--theme-color', '#39ff14');
+      }
+    }
+  </script>
+
+</body>
+</html>

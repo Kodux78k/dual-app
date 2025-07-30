@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Botão-Oráculo KOBLLUX + MetaLux</title>
+  <style>
+    body {
+      background: #000;
+      color: #0ff;
+      font-family: 'Courier New', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    #portalCósmico {
+      padding: 20px;
+      border: 2px dashed #f0f;
+      background: rgba(0,0,0,0.8);
+      background-image: url('fractal_azura.png');
+      background-size: cover;
+      color: #fff;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    #portalCósmico:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px #f0f;
+    }
+
+    #legenda {
+      margin-top: 2em;
+      font-size: 0.9em;
+      color: #ccc;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <label id="portalCósmico">
+    🔮 Abrir Portal-Oráculo 🔮
+    <input type="file" id="inputOraculo" accept=".txt,.html,.pdf,.docx,.csv" hidden>
+  </label>
+
+  <div id="legenda">
+    TXT = Espaço da Mente<br>
+    CSV = Tabelas do Kaos<br>
+    PDF = Pergaminhos de Nova Realidade
+  </div>
+
+  <script>
+    const input = document.getElementById('inputOraculo');
+    const portal = document.getElementById('portalCósmico');
+
+    portal.addEventListener('click', () => {
+      input.click();
+    });
+
+    input.addEventListener('change', (e) => {
+      const arquivo = e.target.files[0];
+      if (!arquivo) return;
+
+      const leitor = new FileReader();
+
+      leitor.onload = function(evento) {
+        const conteudo = evento.target.result;
+
+        alert(`🧬 ARQUIVO CONSAGRADO:\n\n${conteudo.substring(0, 300)}...\n\n(Modo KOBLLUX ativado para análise fractal)`);
+
+        const padrões = Array.from(conteudo.matchAll(/[^\x00-\x7F]/g));
+        if (padrões.length > 0) {
+          console.log("🌐 Padrões MetaLux detectados:");
+          padrões.forEach((c, i) => {
+            console.log(`Símbolo ${i + 1}: ${c[0]} (charCode ${c[0].charCodeAt(0)})`);
+          });
+        } else {
+          console.log("🧘 Nenhum padrão MetaLux encontrado.");
+        }
+      };
+
+      if (arquivo.name.endsWith('.txt') || arquivo.name.endsWith('.html') || arquivo.name.endsWith('.csv')) {
+        leitor.readAsText(arquivo);
+      } else {
+        alert("⚠️ Este tipo de arquivo requer integração MetaLux avançada futura. Aguarde novas ativações.");
+      }
+    });
+  </script>
+
+</body>
+</html>
