@@ -50,7 +50,7 @@
     }
     .svg-container.fading{opacity:0}
     .svg-container object{width:100%;height:100%;object-fit:contain;
-      animation:pulse 2s infinite ease-in-out;
+      animation:pulse 9s infinite ease-in-out;
     }
     #assistantName{top:199px;font-size:0.9em;font-weight:600;opacity:.8;
       transition:opacity var(--slow);
@@ -60,7 +60,7 @@
       background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);
       border-radius:20px;max-height:calc(100vh - 200px);
       overflow-y:auto;z-index:999999;transition:background var(--slow);
-      animation:fadeIn var(--slow) ease forwards;
+      /* animation:fadeIn var(--slow) ease forwards;*/
     }
     body.light  .response-container{background:rgba(255,255,255,0.3)}
     body.medium .response-container{background:rgba(0,0,0,0.2)}
@@ -242,6 +242,25 @@
 .emoji-button.clicked {
   background: linear-gradient(135deg, #0ff, #f0f);
   transform: scale(1.05);
+}
+.section-subtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+  color: #fff;
+  text-shadow: 0 0 3px #0ff8;
+}
+
+.section-subtitle.intro {
+  color: #0ff;
+}
+
+.section-subtitle.middle {
+  color: #f0f;
+}
+
+.section-subtitle.ending {
+  color: #ff0;
 }
     /* ————— FIM DO CSS ————— */
   </style>
@@ -1381,7 +1400,8 @@ function loadConfig(){
     function renderResponse(txt) {
   const wrap = $('.pages-wrapper');
   wrap.innerHTML = '';
-  pages = []; currentPage = 0;
+  pages = [];
+  currentPage = 0;
   autoAdvance = false;
 
   // Substituições simbióticas
@@ -1393,13 +1413,17 @@ function loadConfig(){
       emoji => `<button class="emoji-button" data-emoji="${emoji}">${emoji}</button>`);
 
   const groups = splitText(txt);
-  const titles = ['🎁 Recompensa Inicial', '👁️ Exploração', '⚡️ Antecipação'];
+  const labels = ['🎁 Recompensa Inicial', '👁️ Exploração', '⚡️ Antecipação'];
 
   groups.forEach((grp, gi) => {
     const pg = create('div', 'page-section', '');
+
     grp.forEach((para, j) => {
       const cls = j === 0 ? 'intro' : j === 1 ? 'middle' : 'ending';
       const html = marked.parse(para);
+      
+      // Título simbólico por tipo Trinity
+      const title = create('h3', `section-subtitle ${cls}`, labels[j]);
       const block = create('div', `response-block ${cls}`, html);
 
       block.addEventListener('click', () => {
@@ -1422,11 +1446,12 @@ function loadConfig(){
             updateUI();
           }
           showLoading(' Pulso em Expansão...');
-          conversation.push({ role: 'user', content: `${titles[j]}\n\n${para}` });
+          conversation.push({ role: 'user', content: `${labels[j]}\n\n${para}` });
           callAI();
         }
       });
 
+      pg.appendChild(title);
       pg.appendChild(block);
     });
 
