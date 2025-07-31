@@ -236,15 +236,23 @@
   from { bottom: 69px; opacity: 0.5; }
   to { bottom: 12px; opacity: 1; }
 }
+#btn-expandir-ritual.move-to-bottom {
+  position: fixed;
+  bottom: 12px; /* você pode ajustar conforme a altura do footer */
+  z-index: 999988;
+  animation: moveBtnDown var(--fast) ease-out forwards;
+}
 
+@keyframes moveBtnDown {
+  from { bottom: 189px; opacity: 0.3; }
+  to { bottom: 12px; opacity: 1; }
+}
 
 .input-container {
   bottom: 20px !important;
 }
 
-#btn-expandir-ritual {
-  bottom: 189px !important;
-}
+
 
 
 @keyframes expandirPulsoBtn {
@@ -267,7 +275,7 @@
 #btn-expandir-ritual {
   position: fixed;
   right: 22px;
-  bottom: 196px !important;
+  bottom: 196px;
   z-index: 99999;
   animation: expandirPulsoBtn var(--fast) ease-out forwards !important;
   transition: all var(--fast) ease-out;
@@ -455,7 +463,7 @@
 
 #btn-expandir-ritual {
   position: fixed;
-  bottom: 33px;
+  bottom: 189px;
   
   z-index: 99999;
   padding: 8px 10px;
@@ -1282,7 +1290,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-29.txt',
+            TRAINING_FILE:'data/codex/mtlx-oo-5.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
@@ -1653,13 +1661,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputContainer = document.querySelector(".input-container");
   const controls = document.querySelector(".control-buttons");
   const pagination = document.querySelector(".pagination");
+  const btnExpandir = document.getElementById("#btn-expandir-ritual"); // novo
 
-  if (footer && inputContainer && controls && pagination) {
+  if (footer && inputContainer && controls && pagination && btnExpandir) {
     footer.addEventListener("click", () => {
       inputContainer.classList.toggle("hidden");
       controls.classList.toggle("hidden");
       pagination.classList.toggle("hidden");
       footer.classList.toggle("move-to-bottom");
+      btnExpandir.classList.toggle("move-to-bottom"); // adiciona classe ao botão
     });
   }
 });
@@ -1847,5 +1857,5 @@ window.addEventListener("DOMContentLoaded", () => {
   if (savedTheme) document.body.className = savedTheme;
 });
 </script>
-<button id="expandAllResponses" style="position:fixed;top:20px;left:20px;z-index:999999;background:#000;color:#0ff;border:1px solid #0ff;padding:8px 14px;border-radius:8px;font-family:monospace;cursor:pointer;">🔄 Modo Expandir</button></body>
+<button id="expandAllResponses" style="position:fixed;top:8px;left:20px;z-index:999999;background:#000;color:#0ff;border:1px solid #0ff;padding:8px 14px;border-radius:8px;font-family:monospace;cursor:pointer;">ASCII9</button></body>
 </html>
