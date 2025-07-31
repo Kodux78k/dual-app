@@ -1232,12 +1232,12 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-29.txt',
+            TRAINING_FILE:'data/codex/mtlx-oo-5.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
             CHUNK_SIZE   :12000,
-            AUTH_TOKEN   :'Bearer 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'
+            AUTH_TOKEN   :'Bearer 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'
           };
 
     let training = '', chunks = [], chunkIndex = 0;
@@ -1711,7 +1711,7 @@ uiBL.cancel.play().catch(()=>{});
 <!-- Novo sistema RenderResponse simbiótico -->
 <audio id="clickSound" src="assets/sounds/ui/click.mp3" preload="auto"></audio>
 
-<button id="expandAllResponses" style="position:fixed;bottom:140px;right:22px;z-index:10;">🔓 Expandir</button>
+<button id="expandAllResponses" style="position:fixed;top:20px;left:20px;z-index:10;">🔓 Expandir</button>
 
 <script>
 let responseBuffer = [];
