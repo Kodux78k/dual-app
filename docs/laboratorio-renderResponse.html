@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Laboratório RenderResponse</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 1rem;
+    }
+
+    .pages-wrapper {
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .response-block {
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 10px;
+      background: rgba(0, 255, 255, 0.05);
+      border-left: 4px solid #0ff;
+      transition: all 0.3s ease;
+    }
+
+    .response-block.clicked {
+      background: rgba(0, 255, 255, 0.1);
+      transform: scale(1.03);
+    }
+
+    .response-button, .emoji-button {
+      display: inline-block;
+      margin: 4px;
+      padding: 4px 10px;
+      border: 1px solid #0ff;
+      background: rgba(0, 0, 0, 0.4);
+      color: #0ff;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .response-button:hover, .emoji-button:hover {
+      background: #0ff;
+      color: #000;
+    }
+
+    .footer-text {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.9em;
+      opacity: 0.6;
+      cursor: pointer;
+    }
+
+    .pagination.hidden {
+      display: none;
+    }
+
+    #btn-expandir-ritual {
+      position: fixed;
+      right: 20px;
+      bottom: 80px;
+      background: #0ff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      color: #000;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    #btn-expandir-ritual.move-to-bottom-ritual {
+      bottom: 12px !important;
+      animation: moveRitualDown 0.4s ease forwards !important;
+    }
+
+    @keyframes moveRitualDown {
+      from { bottom: 80px; opacity: 0.4; }
+      to   { bottom: 12px; opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pages-wrapper"></div>
+  <div class="pagination">📄 Páginas Ativas</div>
+
+  <p class="footer-text">Clique aqui para alternar estado.</p>
+  <button id="btn-expandir-ritual">🌀 Ritual</button>
+
+  <script type="module">
+    import { renderResponse } from './renderResponseModule.js';
+
+    const texto = `
+# Título de Teste
+
+Esse é um *parágrafo de teste*. Ele inclui **negrito**, *itálico*, [botão] e "ação simbólica".
+
+Vamos continuar com o próximo item.
+
+2. Aqui está um número com ponto.
+3. Aqui continua.
+
+E emojis como 🌀 devem virar botões também.
+`;
+
+    renderResponse(texto);
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const footer = document.querySelector(".footer-text");
+      const pagination = document.querySelector(".pagination");
+      const ritualBtn = document.getElementById("btn-expandir-ritual");
+
+      if (footer && pagination && ritualBtn) {
+        footer.addEventListener("click", () => {
+          pagination.classList.toggle("hidden");
+          ritualBtn.classList.toggle("move-to-bottom-ritual");
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>
