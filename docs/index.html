@@ -386,15 +386,15 @@
     window.decodeSymbolicCode = () => {
   playButtonSound();
 
-  // TOCAR O ÁUDIO SUAVE DO PORTAL
-  const audio = new Audio('assets/sounds/suave_portal.mp3');
-  audio.volume = 1;
-  audio.play().catch(() => {});
-
   const code = document.getElementById('codeInput').value.trim().toUpperCase();
   const dest = CODE_MAP[code];
-  
+
   if (dest) {
+    // TOCAR O ÁUDIO SUAVE DO PORTAL SOMENTE SE O CÓDIGO FOR VÁLIDO
+    const audio = new Audio('assets/sounds/suave_portal.mp3');
+    audio.volume = 1;
+    audio.play().catch(() => {});
+
     gsap.to('body', {
       opacity: 0,
       duration: 1,
