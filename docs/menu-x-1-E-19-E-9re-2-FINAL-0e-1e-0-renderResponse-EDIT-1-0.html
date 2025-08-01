@@ -22,7 +22,7 @@
     html,body{width:100%;height:100%;overflow:hidden}
     body{
       display:flex;flex-direction:column;align-items:center;
-      padding:0px;background:transparent;color:var(--text);
+      padding:0px;background:var(--bg);color:var(--text);
       font-family:'Montserrat',sans-serif;
       transition:background var(--slow),color var(--slow);
       animation:fadeIn var(--slow) ease forwards;
@@ -436,7 +436,7 @@
 <body>
 <div id="assistantName"></div>
 <div class="content">
-<iframe class="active" id="frame" src="about:blank"></iframe>
+<iframe class="active" id="frame" src="index.html"></iframe>
 </div>
 <div class="symbol-bar">
 <button class="symbol-button" onclick="loadPage('about:blank')">Φ</button>
