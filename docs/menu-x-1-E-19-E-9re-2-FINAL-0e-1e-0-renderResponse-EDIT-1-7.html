@@ -9,6 +9,33 @@
 <meta content="#000000" name="theme-color"/>
 <link href="assets/icons/icon-192.png" rel="icon" type="image/png"/>
 <style>
+/* 🔁 SUBBLOCOS CLICÁVEIS */
+.nested-block {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid #0ff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.nested-header {
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  background: rgba(0, 255, 255, 0.1);
+  color: inherit;
+  user-select: none;
+  transition: background 0.3s;
+}
+.nested-header:hover {
+  background: rgba(0, 255, 255, 0.2);
+}
+.nested-content {
+  display: none;
+  padding: 10px;
+  background: rgba(0, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
     /* ——— SEU CSS INTEGRAL (ajustes) ——— */
     :root {
       --bg: linear-gradient(to bottom, #000, #1a1a1a);
