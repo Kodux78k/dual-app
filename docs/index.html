@@ -18,7 +18,7 @@
     body {
       font-family:'Montserrat',sans-serif;
       background: linear-gradient(to bottom, #000, #1a1a1a);
-      color:#fff;
+      color:#f0f;
       height:100vh; overflow:hidden;
       display:flex; align-items:center; justify-content:center;
       padding-top:48px; position:relative;
@@ -26,9 +26,9 @@
     }
     @keyframes fadeInBody { to { opacity:1 } }
 
-    #particles-js {
+   /* #particles-js {
       position:absolute; inset:0; z-index:0;
-    }
+    } */
 
     .center-group {
       z-index:2;
@@ -215,7 +215,7 @@
 </head>
 <body>
 
-  <div id="particles-js"></div>
+  <!-- <div id="particles-js"></div> !-->
 
   <div class="center-group">
     <div class="logo-container" id="logoDual">
@@ -519,7 +519,7 @@
       window.location.href = PIX_LINK;
     });
 
-    particlesJS('particles-js', {
+    /* particlesJS('particles-js', {
       particles: {
         number:{value:48,density:{enable:true,value_area:600}},
         color:{value:['#0ff','#f0f']},
@@ -529,7 +529,7 @@
         move:{enable:true,speed:1.2,random:true,out_mode:'out'}
       },
       retina_detect:true
-    });
+    }); */
   </script>
 </body>
 </html>
