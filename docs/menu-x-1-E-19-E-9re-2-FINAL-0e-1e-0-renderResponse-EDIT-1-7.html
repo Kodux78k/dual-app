@@ -2491,5 +2491,94 @@ setInterval(transformarSimbolosAvancado, 1000);
   100% { transform: scale(1); opacity: 0; }
 }
 </style>
+<script>
+function parseNestedBlocks(text) {
+  const regex = /:::(.+?)\n([\s\S]*?):::/g;
+  let html = '';
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    const before = text.slice(lastIndex, match.index).trim();
+    if (before) html += `<p>${before.replace(/\n/g, '<br>')}</p>`;
+
+    const title = match[1].trim();
+    const content = match[2].trim().replace(/\n/g, '<br>');
+
+    html += `
+      <div class="nested-block">
+        <div class="nested-header">${title}</div>
+        <div class="nested-content">${content}</div>
+      </div>
+    `;
+    lastIndex = regex.lastIndex;
+  }
+
+  const after = text.slice(lastIndex).trim();
+  if (after) html += `<p>${after.replace(/\n/g, '<br>')}</p>`;
+
+  return html;
+}
+
+function renderResponse(texto, classe = "middle") {
+  const responseContainer = document.querySelector("#response .pages-wrapper");
+  const page = document.createElement("div");
+  page.className = "page active";
+
+  const bloco = document.createElement("div");
+  bloco.className = `response-block ${classe}`;
+  bloco.innerHTML = parseNestedBlocks(texto);
+
+  page.appendChild(bloco);
+  responseContainer.appendChild(page);
+}
+
+  function handleExternalLink(link) {
+    if(link.includes("youtube.com") || link.includes("youtu.be")) {
+      document.getElementById("decodedPreview").innerText = "🌐 Link de vídeo detectado: " + link;
+    } else if(link.endsWith(".html")) {
+      document.getElementById("decodedPreview").innerText = "🌐 Página HTML detectada: " + link;
+    } else {
+      document.getElementById("decodedPreview").innerText = "⚠️ Link não reconhecido: " + link;
+    }
+  }
+
+
+  // 📦 JSON simbólico
+  document.getElementById("jsonTrainingInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (file && file.type === "application/json") {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          const output = document.getElementById("jsonOutput");
+          const title = data.title || "Treinamento";
+          const chapters = data.chapters || [];
+          output.innerHTML = `<b>📚 ${title}</b><ul style="padding-left: 18px;">` +
+            chapters.map(c => `<li>✦ ${c.name}: <code>${c.prompt}</code></li>`).join("") + "</ul>";
+        } catch (err) {
+          document.getElementById("jsonOutput").innerText = "⚠️ Erro ao ler JSON.";
+        }
+      };
+      reader.readAsText(file);
+    }
+  });
+
+  // 🧠 HTML externo decoder
+  document.getElementById("decoderFileInput").addEventListener("change", function(event) {
+    const file = event.target.files[0];
+    if (file && file.type === "text/html") {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const iframe = document.getElementById("decoderFrame");
+        iframe.style.display = "block";
+        iframe.srcdoc = e.target.result;
+      };
+      reader.readAsText(file);
+    }
+  });
+
+</script>
 </body>
 </html>
