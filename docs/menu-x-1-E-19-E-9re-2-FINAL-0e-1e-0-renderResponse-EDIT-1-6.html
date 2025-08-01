@@ -2076,6 +2076,7 @@ renderResponse('...');
 callAI(input).then(resp => renderResponse(resp));
 });
   </script>
+    <script>
     /**
 * Expande o suporte a Markdown no texto renderizado
 */
@@ -2414,8 +2415,8 @@ setInterval(transformarSimbolosAvancado, 1000);
   display: inline-block;
   padding: 4px 8px;
   margin: 2px;
-  background: rgba(0, 0, 64, 0.5);
-  border: 1px solid #0ff;
+  background: var(--bg);
+  border: 1px solid var(--bg);
   border-radius: 6px;
   color: #0ff;
   cursor: pointer;
@@ -2443,7 +2444,7 @@ setInterval(transformarSimbolosAvancado, 1000);
 .tipo-chave    { background: #220; color: #ff0; border: 1px solid #ff0; }
 .tipo-aspa     { background: #202; color: #f0f; border: 1px solid #f0f; }
 .tipo-emoji {
-  background: #021;
+  background: var(--bg);
   color: #0f0;
   border: 1px solid #0f0;
   border-radius: 50%;         /* deixa redondo */
