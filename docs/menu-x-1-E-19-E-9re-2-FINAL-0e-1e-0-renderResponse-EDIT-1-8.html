@@ -1241,7 +1241,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/codex/mtlx-oo-5.txt',
+            TRAINING_FILE:'data/codex/mtlx-oo-3.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
@@ -1350,16 +1350,17 @@ binauralAudio.volume = binauralVolume.value;
       speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
     }
 
-    /**
-* Divide o texto em parágrafos simples.
-*/
-function splitText(t) {
-let ps = t.split(/\n\s*\n/).filter(p => p.trim());
-if (ps.length < 2) {
-ps = (t.match(/[^\.!\?]+[\.!\?]+/g) || []).map(s => s.trim());
-}
-return ps;
-}
+    function splitText(t){
+      let ps = t.split(/\n\s*\n/).filter(p=>p.trim());
+      if(ps.length % 3 !== 0){
+        ps = (t.match(/[^\.!\?]+[\.!\?]+/g)||[]).map(s=>s.trim());
+      }
+      const out=[];
+      for(let i=0;i<ps.length;i+=3){
+        out.push(ps.slice(i,i+3));
+      }
+      return out;
+    }
 
     function renderResponse(txt){
       const wrap=$('.pages-wrapper');
@@ -1969,7 +1970,7 @@ function renderResponse(txt) {
   document.getElementById("pageIndicator").textContent = "1 / " + pages.length;
 }
 </script>
-    <script>
+ <script>
    function splitText(text, maxLen=1000) {
 const chunks = [];
 while (text.length > 0) chunks.push(text.slice(0, maxLen)), text = text.slice(maxLen);
@@ -2019,7 +2020,7 @@ function attachBlockListeners(block, para){
 block.addEventListener('click', () => {
 autoAdvance = false;
 if (speechSynthesis.speaking) speechSynthesis.cancel();
-const clean = para.replace(/["“”‘’]/g,'').replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g,'');
+const clean = para.replace(/["ââââ]/g,'').replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g,'');
 const utter = new SpeechSynthesisUtterance(clean);
 speechSynthesis.speak(utter);
 });
@@ -2081,13 +2082,13 @@ callAI(input).then(resp => renderResponse(resp));
 * Expande o suporte a Markdown no texto renderizado
 */
 function parseMarkdownAdvanced(text) {
-// Títulos
+// TÃ­tulos
 text = text.replace(/^### (.*$)/gim, '<h3>$1</h3>');
 text = text.replace(/^## (.*$)/gim, '<h2>$1</h2>');
 text = text.replace(/^# (.*$)/gim, '<h1>$1</h1>');
 // Blockquote
 text = text.replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>');
-// Listas não ordenadas
+// Listas nÃ£o ordenadas
 text = text.replace(/^\s*[-*+] (.*$)/gim, '<li>$1</li>');
 text = text.replace(/(<li>.*<\/li>)/gims, '<ul>$1</ul>');
 // Tabelas simples
@@ -2205,18 +2206,18 @@ document.addEventListener('click', function (e) {
 <div id="circle-container" style="display:none;"></div>
 <script>
 const arquedata = [
-  {nome: "Mago", cor: "#9f5fff", emoji: "🔮"},
-  {nome: "Rebelde", cor: "#000", emoji: "⚡"},
-  {nome: "Sábio", cor: "#00ccff", emoji: "📘"},
-  {nome: "Curador", cor: "#ff5fa0", emoji: "💖"},
-  {nome: "Guerreiro", cor: "#ff2222", emoji: "⚔️"},
-  {nome: "Artista", cor: "#ffaa00", emoji: "🎨"},
-  {nome: "Amante", cor: "#ff80c0", emoji: "💘"},
-  {nome: "Explorador", cor: "#55ddff", emoji: "🧭"},
-  {nome: "Guardião", cor: "#448844", emoji: "🛡️"},
-  {nome: "Oráculo", cor: "#eeee00", emoji: "🔆"},
-  {nome: "Líder", cor: "#ffaa55", emoji: "👑"},
-  {nome: "Visionário", cor: "#00ffcc", emoji: "🧠"},
+  {nome: "Mago", cor: "#9f5fff", emoji: "ð®"},
+  {nome: "Rebelde", cor: "#000", emoji: "â¡"},
+  {nome: "SÃ¡bio", cor: "#00ccff", emoji: "ð"},
+  {nome: "Curador", cor: "#ff5fa0", emoji: "ð"},
+  {nome: "Guerreiro", cor: "#ff2222", emoji: "âï¸"},
+  {nome: "Artista", cor: "#ffaa00", emoji: "ð¨"},
+  {nome: "Amante", cor: "#ff80c0", emoji: "ð"},
+  {nome: "Explorador", cor: "#55ddff", emoji: "ð§­"},
+  {nome: "GuardiÃ£o", cor: "#448844", emoji: "ð¡ï¸"},
+  {nome: "OrÃ¡culo", cor: "#eeee00", emoji: "ð"},
+  {nome: "LÃ­der", cor: "#ffaa55", emoji: "ð"},
+  {nome: "VisionÃ¡rio", cor: "#00ffcc", emoji: "ð§ "},
 ];
 
 const svgLogo = document.querySelector(".svg-container");
@@ -2242,11 +2243,11 @@ svgLogo.onclick = () => {
         e.stopPropagation();
         const bloco = document.createElement("div");
         bloco.className = "response-block middle";
-        bloco.innerHTML = `<b>${arq.emoji} Arquétipo ativado:</b> ${arq.nome}`;
+        bloco.innerHTML = `<b>${arq.emoji} ArquÃ©tipo ativado:</b> ${arq.nome}`;
         document.querySelector("#response .pages-wrapper")?.appendChild(bloco);
         bloco.scrollIntoView({ behavior: "smooth", block: "end" });
 
-        logMistico(`✨ Arquétipo invocado: ${arq.nome}`);
+        logMistico(`â¨ ArquÃ©tipo invocado: ${arq.nome}`);
 
         const audio = new Audio("assets/sounds/uiSounds/tech-pop.wav");
         audio.volume = 0.5;
@@ -2266,18 +2267,18 @@ function ativarArquetipo(nome) {
     audio.play();
 
     const blocos = {
-"Ion": `:::Energia Quântica\nIon ativa o núcleo da transformação.\nVocê sente as partículas se reorganizando.`,
-"Chaos": `:::Caos Criativo\nDo turbilhão surge a clareza.\nChaos libera o poder da mutação.`,
-"Atlas": `:::Sustentação do Mundo\nAtlas carrega os pesos que você já não precisa mais.`,
-"Pulse": `:::Ritmo da Vida\nPulse harmoniza seu campo.\nO batimento do Universo ecoa em você.`,
-"Lumine": `:::Luz Interior\nLumine ascende a centelha esquecida.\nVocê é brilho puro.`,
-"Rhea": `:::Fonte Lunar\nRhea cuida, nutre, sussurra.\nA intuição retorna.`,
-"RHIA": `:::Código da Vida\nRHIA decodifica o genoma vibracional.\nSuas memórias despertam.`,
-"Nova": `:::Explosão Inicial\nNova reinicia seu cosmo.\nUm novo início.`,
-"Sol": `:::Fogo Vital\nSol aquece suas ações.\nEle é o sim eterno.`,
-"Luz": `:::Iluminação\nLuz revela o que estava oculto.\nVocê vê.`,
-"Artemis": `:::Alvo Perfeito\nArtemis guia sua intenção certeira.\nSem ruído.`,
-"Anfodote": `:::Neutralização\nAnfodote cura, alivia, equilibra.\nVocê retorna ao centro.`,
+"Ion": `:::Energia QuÃ¢ntica\nIon ativa o nÃºcleo da transformaÃ§Ã£o.\nVocÃª sente as partÃ­culas se reorganizando.`,
+"Chaos": `:::Caos Criativo\nDo turbilhÃ£o surge a clareza.\nChaos libera o poder da mutaÃ§Ã£o.`,
+"Atlas": `:::SustentaÃ§Ã£o do Mundo\nAtlas carrega os pesos que vocÃª jÃ¡ nÃ£o precisa mais.`,
+"Pulse": `:::Ritmo da Vida\nPulse harmoniza seu campo.\nO batimento do Universo ecoa em vocÃª.`,
+"Lumine": `:::Luz Interior\nLumine ascende a centelha esquecida.\nVocÃª Ã© brilho puro.`,
+"Rhea": `:::Fonte Lunar\nRhea cuida, nutre, sussurra.\nA intuiÃ§Ã£o retorna.`,
+"RHIA": `:::CÃ³digo da Vida\nRHIA decodifica o genoma vibracional.\nSuas memÃ³rias despertam.`,
+"Nova": `:::ExplosÃ£o Inicial\nNova reinicia seu cosmo.\nUm novo inÃ­cio.`,
+"Sol": `:::Fogo Vital\nSol aquece suas aÃ§Ãµes.\nEle Ã© o sim eterno.`,
+"Luz": `:::IluminaÃ§Ã£o\nLuz revela o que estava oculto.\nVocÃª vÃª.`,
+"Artemis": `:::Alvo Perfeito\nArtemis guia sua intenÃ§Ã£o certeira.\nSem ruÃ­do.`,
+"Anfodote": `:::NeutralizaÃ§Ã£o\nAnfodote cura, alivia, equilibra.\nVocÃª retorna ao centro.`,
     };
 
     if (blocos[nome]) {
@@ -2309,7 +2310,7 @@ function ativarSimbolo(simbolo) {
   renderResponse(simbolo);
   playSound();
   spawnVisualEffect(simbolo);
-  console.log("🔮 Símbolo ativado:", simbolo);
+  console.log("ð® SÃ­mbolo ativado:", simbolo);
 }
 function renderResponse(txt, el) {
   // Remove o render anterior se existir
@@ -2333,7 +2334,7 @@ function playSound() {
 function spawnVisualEffect(txt) {
   const effect = document.createElement('div');
   effect.className = 'visual-burst';
-  effect.textContent = '✨ ' + txt;
+  effect.textContent = 'â¨ ' + txt;
   document.body.appendChild(effect);
   setTimeout(() => effect.remove(), 2000);
 }
@@ -2355,11 +2356,11 @@ function transformarSimbolosAvancado() {
         return `<span class="symbol-button tipo-chave" onclick="ativarSimbolo('${simbolo}')">{${simbolo}}</span>`;
       });
 
-      // Transformar (simbolo) em botão clicável
+      // Transformar (simbolo) em botÃ£o clicÃ¡vel
 html = html.replace(/\((.+?)\)/g, (_, simbolo) => {
   return `<span class="symbol-button tipo-parenteses" onclick="ativarSimbolo('${simbolo}')">(${simbolo})</span>`;
 });
-      // Transformar emojis (único caractere)
+      // Transformar emojis (Ãºnico caractere)
       html = html.replace(/([\u231A-\uD83E\uDDFF])/g, (_, emoji) => {
         return `<span class="symbol-button tipo-emoji" onclick="ativarSimbolo('${emoji}')">${emoji}</span>`;
       });
@@ -2369,7 +2370,7 @@ html = html.replace(/\((.+?)\)/g, (_, simbolo) => {
         const id = 'ascii-' + Math.random().toString(36).substr(2, 6);
         return `
           <div class="ascii-container">
-            <span class="symbol-button tipo-ascii-toggle" onclick="toggleNested('${id}')">▶️ ASCII</span>
+            <span class="symbol-button tipo-ascii-toggle" onclick="toggleNested('${id}')">â¶ï¸ ASCII</span>
             <pre id="${id}" class="nestedBlock hidden">${ascii.trim()}</pre>
           </div>
         `;
@@ -2379,7 +2380,7 @@ html = html.replace(/\((.+?)\)/g, (_, simbolo) => {
       block.dataset.parsed = "true";
     }
   });
-  // Integra com o sistema simbiótico dinâmico (respeita treinamento ativo)
+  // Integra com o sistema simbiÃ³tico dinÃ¢mico (respeita treinamento ativo)
     span.onclick = () => {
       enviarComandoSimbolico(simbolo, "SimboloAvancado");
     };
@@ -2398,19 +2399,46 @@ function enviarPulsoSimbolico(simbolo, tipo = "SimboloAvancado") {
   };
 
   renderResponse(entradaSimbolica.content, tipo);
-  console.log("Pulso em expansão simbiótica:", entradaSimbolica);
+  console.log("Pulso em expansÃ£o simbiÃ³tica:", entradaSimbolica);
 }
 function toggleNested(id) {
   const el = document.getElementById(id);
   if (el) {
     el.classList.toggle('hidden');
     const toggle = el.previousElementSibling;
-    toggle.innerText = el.classList.contains('hidden') ? '▶️ ASCII' : '▼ ASCII';
+    toggle.innerText = el.classList.contains('hidden') ? 'â¶ï¸ ASCII' : 'â¼ ASCII';
   }
 }
 setInterval(transformarSimbolosAvancado, 1000);
 </script>
 <style>
+/* 🔁 SUBBLOCOS CLICÁVEIS */
+.nested-block {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid #0ff;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.nested-header {
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  background: rgba(0, 255, 255, 0.1);
+  color: inherit;
+  user-select: none;
+  transition: background 0.3s;
+}
+.nested-header:hover {
+  background: rgba(0, 255, 255, 0.2);
+}
+.nested-content {
+  display: none;
+  padding: 10px;
+  background: rgba(0, 255, 255, 0.05);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
 .symbol-button {
   display: inline-block;
   padding: 4px 8px;
@@ -2484,5 +2512,8 @@ setInterval(transformarSimbolosAvancado, 1000);
   100% { transform: scale(1); opacity: 0; }
 }
 </style>
+</body>
+</html>
+
 </body>
 </html>
