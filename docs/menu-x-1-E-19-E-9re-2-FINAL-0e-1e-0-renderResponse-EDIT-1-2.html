@@ -22,7 +22,7 @@
     html,body{width:100%;height:100%;overflow:hidden}
     body{
       display:flex;flex-direction:column;align-items:center;
-      padding:20px;background:transparent;color:var(--text);
+      padding:0px;background:transparent;color:var(--text);
       font-family:'Montserrat',sans-serif;
       transition:background var(--slow),color var(--slow);
       animation:fadeIn var(--slow) ease forwards;
@@ -1749,9 +1749,9 @@ uiBL.cancel.play().catch(()=>{});
   accent-color: #0ff;
 }
 #userButton {
-  display: flex;
+  display: none;
   position: fixed;
-  bottom: 40px;
+  bottom: 240px;
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(135deg, #0ff, #f0f);
