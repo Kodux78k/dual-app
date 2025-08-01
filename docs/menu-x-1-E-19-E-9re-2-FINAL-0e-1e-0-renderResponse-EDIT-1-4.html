@@ -22,7 +22,7 @@
     html,body{width:100%;height:100%;overflow:hidden}
     body{
       display:flex;flex-direction:column;align-items:center;
-      padding:0px;background:transparent;color:var(--text);
+      padding:0px;background:var(--bg);color:var(--text);
       font-family:'Montserrat',sans-serif;
       transition:background var(--slow),color var(--slow);
       animation:fadeIn var(--slow) ease forwards;
@@ -251,7 +251,7 @@
       margin: 0;
       height: 100vh;
       overflow: hidden;
-      background: transparent;
+      background: var(--bg);
       color: var(--text);
       font-family: 'Montserrat', sans-serif;
     }
@@ -1241,7 +1241,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-28.txt',
+            TRAINING_FILE:'data/codex/mtlx-oo-3.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
