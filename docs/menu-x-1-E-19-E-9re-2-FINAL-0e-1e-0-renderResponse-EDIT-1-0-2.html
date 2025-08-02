@@ -340,8 +340,8 @@
       padding: 4px;
       border: none;
       border-radius: 6px;
-      background: rgba(0, 255, 255, 0.1);
-      color: #fff;
+      background: var(--bg);
+      color: var(--text);
       font-weight: bold;
       font-size: 0.9em;
       cursor: pointer;
@@ -354,8 +354,8 @@
 
    
     #uploadComponentBtn { top: 330px; }
-    #remoteComponentBtn { top: 380px; }
-    #toggleDecoderBtn { top: 430px; }
+    #remoteComponentBtn { top: 370px; }
+    #toggleDecoderBtn { top: 410px; }
 
     #uploadComponentBtn:hover,
     #remoteComponentBtn:hover,
@@ -410,8 +410,8 @@
   z-index: 99999;
   padding: 8px 10px;
   font-size: 12px;
-  background: rgba(0,255,255,0.2);
-  color: #F0F;
+  background: var(--bg);
+  color: var(--text);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -426,9 +426,9 @@
 #btn-expandir-ritual { right: 33px; }
 
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 0.4; }
+  0% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.021); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(1); opacity: 0.8; }
 }
 
 </style>
@@ -1241,7 +1241,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/codex/mtlx-oo-5.txt',
+            TRAINING_FILE:'data/codex/mtlx-o.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
@@ -2020,14 +2020,14 @@ function transformarSimbolosAvancado() {
       );
 
       // Chaves {simbolo}
-      html = html.replace(/\{(.+?)\}/g, (_, simbolo) =>
-        `<span class="symbol-button tipo-chave" onclick="enviarPulsoSimbolico('${simbolo}')">{${simbolo}}</span>`
-      );
+      //html = html.replace(/\{(.+?)\}/g, (_, simbolo) =>
+       // `<span class="symbol-button tipo-chave" onclick="enviarPulsoSimbolico('${simbolo}')">{${simbolo}}</span>`
+    //  ); //
 
       // Parênteses (simbolo)
-      html = html.replace(/\((.+?)\)/g, (_, simbolo) =>
-        `<span class="symbol-button tipo-parenteses" onclick="enviarPulsoSimbolico('${simbolo}')">(${simbolo})</span>`
-      );
+      //html = html.replace(/\((.+?)\)/g, (_, simbolo) =>
+       //* `<span class="symbol-button tipo-parenteses" onclick="enviarPulsoSimbolico('${simbolo}')">(${simbolo})</span>`
+     // );*//
 
       // Emojis únicos (corrigido: evita quadrado duplicado)
       html = html.replace(/([\p{Emoji}])/gu, (_, emoji) =>
