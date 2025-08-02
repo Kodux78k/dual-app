@@ -1641,14 +1641,21 @@ function renderResponse(data) {
     /**
 * Divide o texto em parágrafos simples.
 */
-function splitText(t) {
-let ps = t.split(/\n\s*\n/).filter(p => p.trim());
-if (ps.length < 2) {
-ps = (t.match(/[^\.!\?]+[\.!\?]+/g) || []).map(s => s.trim());
-}
-return ps;
-}
+function splitText(text, maxLength = 450) {
+  const result = [];
+  let chunk = "";
 
+  for (let sentence of text.split(/(?<=[.!?])\s+/)) {
+    if ((chunk + sentence).length > maxLength) {
+      result.push(chunk.trim());
+      chunk = sentence;
+    } else {
+      chunk += " " + sentence;
+    }
+  }
+  if (chunk.trim()) result.push(chunk.trim());
+  return result;
+}
     function renderResponse(txt){
       const wrap=$('.pages-wrapper');
       wrap.innerHTML=''; pages=[]; currentPage=0; autoAdvance=true;
