@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Diagnóstico Simbiótico Avançado</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #111;
+      color: #0ff;
+      padding: 20px;
+    }
+    button {
+      background: linear-gradient(45deg, #0ff, #f0f);
+      border: none;
+      color: #111;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #response {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 0 12px #0ff5;
+    }
+    .response-block {
+      margin-bottom: 10px;
+      padding: 16px;
+      background: rgba(0, 255, 255, 0.08);
+      border: 1px solid #0ff4;
+      border-radius: 10px;
+    }
+    .warp {
+      animation: pulse 1s infinite;
+      color: #f0f;
+      font-weight: bold;
+    }
+    .emoji-button {
+      background: transparent;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      margin: 0 4px;
+    }
+    .highlight {
+      color: #ff0;
+      font-weight: bold;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.2; }
+      50% { opacity: 1; }
+      100% { opacity: 0.2; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+  <h2>🧪 Diagnóstico Simbiótico RenderResponse Avançado</h2>
+  <button onclick="testeTexto()">Testar Texto Simples</button>
+  <button onclick="testeBlocos()">Testar Blocos Trinity</button>
+  <div id="response"></div>
+
+  <script>
+    function showWarp() {
+      const r = document.getElementById("response");
+      r.innerHTML = '<div class="warp">🔄 Pulso em expansão...</div>';
+      return new Promise(res => setTimeout(res, 800));
+    }
+
+    function scrollToBottom() {
+      setTimeout(() => {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+      }, 100);
+    }
+
+    function splitText(text, maxLength = 450) {
+      const result = [];
+      let chunk = "";
+
+      for (let sentence of text.split(/(?<=[.!?])\\s+/)) {
+        if ((chunk + sentence).length > maxLength) {
+          result.push(chunk.trim());
+          chunk = sentence;
+        } else {
+          chunk += " " + sentence;
+        }
+      }
+      if (chunk.trim()) result.push(chunk.trim());
+      return result;
+    }
+
+    function processSpecial(text) {
+      return text
+        .replace(/\\[(.*?)\\]/g, '<span class="highlight">[$1]</span>')
+        .replace(/\\((.*?)\\)/g, '<span class="highlight">($1)</span>')
+        .replace(/([\\u231A-\\u2B55\\u1F300-\\u1FAFF\\u2600-\\u26FF])/gu, '<button class="emoji-button" onclick="emojiClick(\'$1\')">$1</button>');
+    }
+
+    function emojiClick(emoji) {
+      alert("✨ Emoji simbiótico ativado: " + emoji);
+    }
+
+    function renderResponse(data) {
+      const responseContainer = document.querySelector("#response");
+      responseContainer.innerHTML = "";
+
+      if (typeof data === "string") {
+        const pages = splitText(data, 450).map(pageText => {
+          const page = document.createElement("div");
+          page.classList.add("page", "response-block");
+          page.innerHTML = processSpecial(marked.parse(pageText));
+          return page;
+        });
+        pages.forEach(page => responseContainer.appendChild(page));
+      } else if (typeof data === "object" && data.intro && data.middle && data.ending) {
+        const makeBlock = (content, className) => {
+          const block = document.createElement("div");
+          block.className = `response-block nested-block ${className}`;
+          block.innerHTML = processSpecial(marked.parse(content));
+          return block;
+        };
+        responseContainer.append(
+          makeBlock(data.intro, "intro-block"),
+          makeBlock(data.middle, "middle-block"),
+          makeBlock(data.ending, "ending-block")
+        );
+      }
+
+      scrollToBottom();
+    }
+
+    function testeTexto() {
+      showWarp().then(() => {
+        renderResponse("👁️ Este é um teste com **markdown**, emojis 😇 e expressões [simbólicas] (trinity). [Ativação] em progresso.");
+      });
+    }
+
+    function testeBlocos() {
+      showWarp().then(() => {
+        renderResponse({
+          intro: "✨ [Início do Bloco] com (propósito simbiótico) e energia espiritual elevada.",
+          middle: "🌀 Emoção em expansão. (Transformação) simbiótica [em andamento].",
+          ending: "🌈 [Finalização] com bênçãos interdimensionais e (resposta) simbólica completa."
+        });
+      });
+    }
+  </script>
+</body>
+</html>
