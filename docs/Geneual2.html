@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌀 Núcleo de Antecipação</title>
+  <style>
+    :root {
+      --bg: rgba(0, 0, 0, 0.6);
+      --text: #0ff;
+      --size-step: 33px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: var(--size-step);
+      font-family: 'Montserrat', sans-serif;
+      background: transparent !important;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .core-container {
+      width: calc(var(--size-step) * 2);
+      height: calc(var(--size-step) * 2);
+      border-radius: 50%;
+      background: transparent !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid transparent;
+      border-image: linear-gradient(45deg, #ff0, #0ff, #0ffff) 1;
+      animation: pulse-border 2s infinite;
+      font-size: 2em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: var(--size-step);
+    }
+
+    .core-container.pulsando {
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+    }
+
+    .label {
+      font-size: 0.9em;
+      margin-bottom: calc(var(--size-step) * 1.2);
+      max-width: 90%;
+    }
+
+    .triade {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--size-step);
+      width: 100%;
+      max-width: 400px;
+      margin-top: var(--size-step);
+    }
+
+    .triade div {
+      padding: var(--size-step);
+      border-radius: var(--size-step);
+      background: var(--bg);
+      color: var(--text);
+      backdrop-filter: blur(6px);
+      transition: transform 0.3s, background 0.3s;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .triade div:hover {
+      transform: scale(1.05);
+      background: linear-gradient(90deg, var(--bg), #0ff3);
+    }
+
+    .dopamina {
+      background: linear-gradient(90deg, var(--bg), #0ff5);
+    }
+
+    .ritmo {
+      background: linear-gradient(90deg, var(--bg), #f0f5);
+    }
+
+    .padroes {
+      background: linear-gradient(90deg, var(--bg), #ff05);
+    }
+
+    .botoes {
+      margin-top: calc(var(--size-step) * 1.5);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .botoes button {
+      background: transparent;
+      border: 1px solid var(--text);
+      color: var(--text);
+      padding: 10px;
+      border-radius: var(--size-step);
+      backdrop-filter: blur(4px);
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      font-weight: bold;
+    }
+
+    .botoes button:hover {
+      background: var(--text);
+      color: #000;
+    }
+
+    @keyframes pulse-border {
+      0% { box-shadow: 0 0 6px #0ff; }
+      50% { box-shadow: 0 0 20px #ff0; }
+      100% { box-shadow: 0 0 6px #0ff; }
+    }
+
+    @media (max-width: 600px) {
+      .triade {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="anticipationCore" class="core-container">⚡</div>
+  <div class="label">CLIQUE NO NÚCLEO PARA ATIVAR<br>O CICLO DE ANTECIPAÇÃO</div>
+
+  <div class="triade">
+    <div class="dopamina" onclick="ativarSelo('neuroquimica_antecipacao')">DOPAMINA</div>
+    <div class="ritmo" onclick="ativarSelo('ritmo_biologico')">RITMO</div>
+    <div class="padroes" onclick="ativarSelo('padroes_ocultos')">PADRÕES</div>
+  </div>
+
+  <div class="botoes">
+    <button onclick="alert('Explorando Limiar Biológico...')">🌐 Explorar Limiar Biológico</button>
+    <button onclick="alert('Dados de antecipação carregados')">📊 Ver Dados de Antecipação</button>
+    <button onclick="location.reload()">🔄 Reiniciar Ciclo</button>
+  </div>
+
+  <script>
+    const core = document.getElementById('anticipationCore');
+    let chargeLevel = 0;
+    let chargeInterval;
+
+    core.addEventListener('mouseenter', () => {
+      core.classList.add('pulsando');
+      chargeInterval = setInterval(() => {
+        chargeLevel = Math.min(chargeLevel + 10, 100);
+        core.style.background = `radial-gradient(circle, #ff00ff ${100 - chargeLevel}%, #000)`;
+        if (chargeLevel === 100) {
+          clearInterval(chargeInterval);
+          core.innerHTML = '🌀';
+          logMistico('nucleo_supercarregado');
+        }
+      }, 100);
+    });
+
+    core.addEventListener('mouseleave', () => {
+      core.classList.remove('pulsando');
+      chargeLevel = 0;
+      clearInterval(chargeInterval);
+      core.style.background = 'transparent';
+      core.innerHTML = '⚡';
+    });
+
+    function ativarSelo(nome) {
+      console.log(`🔮 Selo ativado: ${nome}`);
+    }
+
+    function logMistico(evento) {
+      console.log(`✨ Evento místico: ${evento}`);
+    }
+  </script>
+
+</body>
+</html>
