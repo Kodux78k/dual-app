@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔁 Sistema Trinity Expandido</title>
+  <style>
+    :root {
+      --bg: rgba(0, 0, 0, 0.8);
+      --text: #0ff;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+      padding: 20px;
+    }
+    .pages-wrapper {
+      margin-top: 20px;
+    }
+    .response-block {
+      margin: 16px auto;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(6px);
+      transition: all 0.3s ease;
+      max-width: 600px;
+      cursor: pointer;
+    }
+    .response-block.expanded {
+      transform: scale(1.03);
+      box-shadow: 0 0 10px #0ff5;
+    }
+    .nestedBlock {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .symbol-header {
+      font-size: 1.4em;
+      text-align: center;
+    }
+    .symbol-body {
+      font-size: 1em;
+      line-height: 1.5;
+      padding: 8px;
+    }
+    .submenu {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding-top: 10px;
+      border-top: 1px solid #0ff5;
+    }
+    .submenu button {
+      background: transparent;
+      border: 1px solid var(--text, #0ff);
+      color: var(--text, #0ff);
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.8em;
+    }
+    .submenu button:hover {
+      background: var(--text, #0ff);
+      color: #000;
+    }
+    #pulsos {
+      margin-top: 20px;
+      padding: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #0ff5;
+      border-radius: 8px;
+    }
+    .pulso-item {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>💠 Sistema Trinity Render Response Expandido</h2>
+
+<button onclick="renderResponse('🎁 Intro aqui --- 👁️ Meio aqui --- 🌀 Fim aqui')">▶️ Testar renderResponse()</button>
+
+<div class="pages-wrapper" id="pagesWrapper"></div>
+
+<div id="pulsos"></div>
+
+<script>
+const logResponseHistorico = [];
+
+function logMistico(msg) {
+  console.log("🔮", msg);
+}
+
+function mostrarNucleoAntecipacao() {
+  alert("🌀 Núcleo de antecipação ativado.");
+}
+
+function mostrarHistorico() {
+  alert("📖 Ver histórico expandido (em construção).");
+}
+
+function salvarHistorico(pulso) {
+  logResponseHistorico.push({ ...pulso, timestamp: new Date().toISOString() });
+
+  const pulsos = document.getElementById("pulsos");
+  if (pulsos) {
+    const item = document.createElement("div");
+    item.className = "pulso-item";
+    item.innerHTML = \`
+      <div><strong>🕒</strong> \${new Date().toLocaleTimeString()}</div>
+      <div>🎁 \${pulso.intro?.slice(0, 30)}</div>
+      <div>👁️ \${pulso.middle?.slice(0, 30)}</div>
+      <div>🌀 \${pulso.ending?.slice(0, 30)}</div>
+      <button class="replay-btn">🔁 Repetir</button>
+      <hr/>
+    \`;
+    item.querySelector("button").addEventListener("click", () => {
+      renderResponse(pulso);
+      logMistico("♻️ Pulso do histórico reativado.");
+    });
+    pulsos.prepend(item);
+  }
+}
+
+function repetirPulso(tipo) {
+  const ultimo = [...logResponseHistorico].reverse().find(p => p[tipo]);
+  if (ultimo) {
+    renderResponse({ intro: ultimo.intro, middle: ultimo.middle, ending: ultimo.ending });
+    logMistico(\`♻️ Pulso repetido: \${tipo}\`);
+  } else {
+    alert("⛔ Nenhum pulso anterior encontrado.");
+  }
+}
+
+function renderSplitText(txt) {
+  const groups = txt.split("---").map(str => str.trim()).filter(Boolean);
+  return {
+    intro: groups[0] || "",
+    middle: groups[1] || "",
+    ending: groups[2] || ""
+  };
+}
+
+function renderResponse(input) {
+  const wrap = document.getElementById("pagesWrapper");
+  wrap.innerHTML = "";
+
+  const { intro, middle, ending } = typeof input === "string" ? renderSplitText(input) : input;
+  salvarHistorico({ intro, middle, ending });
+
+  const renderBlock = (text, className, icon) => {
+    const block = document.createElement("div");
+    block.className = \`response-block \${className}\`;
+
+    const submenu = document.createElement("div");
+    submenu.className = "submenu hidden";
+
+    const btnRepeat = document.createElement("button");
+    btnRepeat.textContent = "🔁 Repetir";
+    btnRepeat.addEventListener("click", (e) => {
+      e.stopPropagation();
+      repetirPulso(className);
+    });
+
+    const btnNucleo = document.createElement("button");
+    btnNucleo.textContent = "🌀 Ativar Núcleo";
+    btnNucleo.addEventListener("click", (e) => {
+      e.stopPropagation();
+      mostrarNucleoAntecipacao();
+    });
+
+    const btnHistorico = document.createElement("button");
+    btnHistorico.textContent = "📖 Histórico";
+    btnHistorico.addEventListener("click", (e) => {
+      e.stopPropagation();
+      mostrarHistorico();
+    });
+
+    submenu.appendChild(btnRepeat);
+    submenu.appendChild(btnNucleo);
+    submenu.appendChild(btnHistorico);
+
+    block.innerHTML = \`
+      <div class="nestedBlock">
+        <div class="symbol-header">\${icon}</div>
+        <div class="symbol-body">\${text}</div>
+      </div>
+    \`;
+    block.appendChild(submenu);
+
+    block.addEventListener("click", () => {
+      submenu.classList.toggle("hidden");
+      block.classList.toggle("expanded");
+      logMistico(\`🔎 Pulso expandido: \${className}\`);
+    });
+
+    return block;
+  };
+
+  if (intro) wrap.appendChild(renderBlock(intro, "intro", "🎁"));
+  if (middle) wrap.appendChild(renderBlock(middle, "middle", "👁️"));
+  if (ending) wrap.appendChild(renderBlock(ending, "ending", "🌀"));
+}
+</script>
+
+</body>
+</html>
