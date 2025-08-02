@@ -1970,5 +1970,203 @@ function renderResponse(txt) {
   document.getElementById("pageIndicator").textContent = "1 / " + pages.length;
 }
 </script>
+<script>
+// ========= Função renderResponse simbiótica =========
+function renderResponse(txt) {
+  const wrap = document.querySelector(".pages-wrapper");
+  wrap.innerHTML = "";
+  let pages = [], currentPage = 0;
+  txt = renderMarkdown(txt);
+
+  const groups = splitText(txt),
+        titles = ["🎁 Recompensa Inicial", "👁️ Exploração", "⚡️ Antecipação"];
+
+  groups.forEach((grp, gi) => {
+    const pg = document.createElement("div");
+    pg.className = "page" + (gi === 0 ? " active" : "");
+
+    grp.forEach((para, j) => {
+      const cls = j === 0 ? "intro" : j === 1 ? "middle" : "ending";
+      const block = document.createElement("div");
+      block.className = "response-block " + cls;
+      block.innerHTML = "<p>" + para + "</p>";
+
+      block.addEventListener("click", () => {
+        speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(block.textContent);
+        speechSynthesis.speak(utter);
+        block.classList.add("clicked");
+      });
+
+      pg.appendChild(block);
+    });
+
+    wrap.appendChild(pg);
+    pages.push(pg);
+  });
+
+  document.getElementById("pageIndicator").textContent = "1 / " + pages.length;
+
+  // 👇 Ativa automaticamente o primeiro bloco renderizado
+  setTimeout(() => {
+    const firstBlock = document.querySelector(".response-block");
+    if (firstBlock) firstBlock.click();
+  }, 200);
+}
+</script>
+<style>
+.symbol-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  margin: 3px 4px;
+  background: var(--bg, #000);
+  color: var(--text, #0ff);
+  border: 1px solid var(--text, #0ff);
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 0.95em;
+  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: 0 0 4px var(--text, #0ff);
+  cursor: pointer;
+}
+.symbol-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #f0f, 0 0 4px #0ff;
+}
+
+/* Emojis redondos */
+.tipo-emoji {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.3em;
+  padding: 0;
+  background: var(--bg, #000);
+  color: var(--text, #0f0);
+  border: 1px solid var(--text, #0f0);
+  font-family: 'Montserrat', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Botão para colchetes, sem círculo, só botão normal */
+.tipo-colchete  {
+  background: var(--bg);
+  border-color: var(--text);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Outros estilos para ASCII e hidden */
+.tipo-ascii-toggle {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px dashed var(--text);
+  font-weight: bold;
+}
+.nestedBlock {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--bg, #111);
+  border: 1px dashed var(--text, #0ff);
+  color: var(--text, #0ff);
+  font-family: 'Montserrat', sans-serif;
+  white-space: pre-wrap;
+  border-radius: 10px;
+}
+.hidden {
+  display: none;
+}
+</style>
+
+<script>
+function transformarSimbolosAvancado() {
+  const targetBlocks = document.querySelectorAll('.renderResponse, .response-block, .output-block, .console');
+
+  targetBlocks.forEach(block => {
+    if (!block.dataset.parsed) {
+      let html = block.innerHTML;
+
+      // Colchetes [simbolo] => botão simples, sem círculo extra
+      html = html.replace(/\[(.+?)\]/g, (_, simbolo) =>
+        `<span class="symbol-button tipo-colchete" onclick="enviarPulsoSimbolico('${simbolo}')">[${simbolo}]</span>`
+      );
+
+      // Chaves {simbolo} (comentado por enquanto)
+      /*
+      html = html.replace(/\{(.+?)\}/g, (_, simbolo) =>
+        `<span class="symbol-button tipo-chave" onclick="enviarPulsoSimbolico('${simbolo}')">{${simbolo}}</span>`
+      );
+      */
+
+      // Parênteses (simbolo) (comentado por enquanto)
+      /*
+      html = html.replace(/\((.+?)\)/g, (_, simbolo) =>
+        `<span class="symbol-button tipo-parenteses" onclick="enviarPulsoSimbolico('${simbolo}')">(${simbolo})</span>`
+      );
+      */
+
+      // Emojis únicos (apenas emojis, sem duplicação ou quadrados)
+      html = html.replace(/([\p{Emoji}])/gu, (_, emoji) =>
+        `<span class="symbol-button tipo-emoji" onclick="enviarPulsoSimbolico('${emoji}')">${emoji}</span>`
+      );
+
+      // ASCII blocks (3+ linhas)
+      html = html.replace(/(?:<br\s*\/?>\s*){2,}([\s\S]+?)(?:<br\s*\/?>\s*){2,}/g, (_, ascii) => {
+        const id = 'ascii-' + Math.random().toString(36).substr(2, 6);
+        return `
+          <div class="ascii-container">
+            <span class="symbol-button tipo-ascii-toggle" onclick="toggleNested('${id}')">▶️ ASCII</span>
+            <pre id="${id}" class="nestedBlock hidden">${ascii.trim()}</pre>
+          </div>`;
+      });
+
+      block.innerHTML = html;
+      block.dataset.parsed = "true";
+    }
+  });
+}
+
+function enviarPulsoSimbolico(simbolo, tipo = "SimboloAvancado") {
+  const role = localStorage.getItem("role") || "user";
+  const system = localStorage.getItem("system") || "";
+
+  const entradaSimbolica = {
+    role,
+    content: `[${simbolo}]`,
+    system,
+    tipo,
+  };
+
+  renderResponse(entradaSimbolica.content, tipo);
+  console.log("🔮 Pulso simbiótico:", entradaSimbolica);
+}
+
+function toggleNested(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('hidden');
+    const toggle = el.previousElementSibling;
+    toggle.innerText = el.classList.contains('hidden') ? '▶️ ASCII' : '▼ ASCII';
+  }
+}
+
+// Otimizado com MutationObserver (sem setInterval)
+const observer = new MutationObserver(transformarSimbolosAvancado);
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
 </body>
 </html>
