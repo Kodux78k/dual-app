@@ -1947,5 +1947,86 @@ function renderResponse(txt) {
   document.getElementById("pageIndicator").textContent = "1 / " + pages.length;
 }
 </script>
+<script>
+function spawnVisualEffect(txt) {
+  const effect = document.createElement('div');
+  effect.className = 'visual-burst';
+  effect.textContent = 'â¨ ' + txt;
+  document.body.appendChild(effect);
+  setTimeout(() => effect.remove(), 2000);
+}
+
+function transformarSimbolosAvancado() {
+  const targetBlocks = document.querySelectorAll('.renderResponse, .response-block, .output-block, .console');
+
+  targetBlocks.forEach(block => {
+    if (!block.dataset.parsed) {
+      let html = block.innerHTML;
+
+      // Transformar colchetes [simbolo]
+      html = html.replace(/\[(.+?)\]/g, (_, simbolo) => {
+        return `<span class="symbol-button tipo-colchete" onclick="ativarSimbolo('${simbolo}')">[${simbolo}]</span>`;
+      });
+
+      // Transformar chaves {simbolo}
+      html = html.replace(/\{(.+?)\}/g, (_, simbolo) => {
+        return `<span class="symbol-button tipo-chave" onclick="ativarSimbolo('${simbolo}')">{${simbolo}}</span>`;
+      });
+
+      // Transformar (simbolo) em botÃ£o clicÃ¡vel
+html = html.replace(/\((.+?)\)/g, (_, simbolo) => {
+  return `<span class="symbol-button tipo-parenteses" onclick="ativarSimbolo('${simbolo}')">(${simbolo})</span>`;
+});
+      // Transformar emojis (Ãºnico caractere)
+      html = html.replace(/([\u231A-\uD83E\uDDFF])/g, (_, emoji) => {
+        return `<span class="symbol-button tipo-emoji" onclick="ativarSimbolo('${emoji}')">${emoji}</span>`;
+      });
+
+      // Detectar blocos de ASCII art (3+ linhas)
+      html = html.replace(/(?:<br\s*\/?>\s*){2,}([\s\S]+?)(?:<br\s*\/?>\s*){2,}/g, (match, ascii) => {
+        const id = 'ascii-' + Math.random().toString(36).substr(2, 6);
+        return `
+          <div class="ascii-container">
+            <span class="symbol-button tipo-ascii-toggle" onclick="toggleNested('${id}')">â¶ï¸ ASCII</span>
+            <pre id="${id}" class="nestedBlock hidden">${ascii.trim()}</pre>
+          </div>
+        `;
+      });
+
+      block.innerHTML = html;
+      block.dataset.parsed = "true";
+    }
+  });
+  // Integra com o sistema simbiÃ³tico dinÃ¢mico (respeita treinamento ativo)
+    span.onclick = () => {
+      enviarComandoSimbolico(simbolo, "SimboloAvancado");
+    };
+}
+
+    
+function enviarPulsoSimbolico(simbolo, tipo = "SimboloAvancado") {
+  const role = localStorage.getItem("role") || "user";
+  const system = localStorage.getItem("system") || "";
+
+  const entradaSimbolica = {
+    role: role,
+    content: `[${simbolo}]`,
+    system: system,
+    tipo: tipo,
+  };
+
+  renderResponse(entradaSimbolica.content, tipo);
+  console.log("Pulso em expansÃ£o simbiÃ³tica:", entradaSimbolica);
+}
+function toggleNested(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('hidden');
+    const toggle = el.previousElementSibling;
+    toggle.innerText = el.classList.contains('hidden') ? 'â¶ï¸ ASCII' : 'â¼ ASCII';
+  }
+}
+setInterval(transformarSimbolosAvancado, 1000);
+</script>
 </body>
 </html>
