@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>⚡ Transferência Rápida via Bluetooth</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 25px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .btn-download {
+      display: inline-block;
+      background-color: #6200ee;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s;
+      margin: 15px 0;
+    }
+    .btn-download:hover {
+      background-color: #3700b3;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+    .instructions {
+      background-color: #f1f1f1;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    .step-number {
+      background-color: #6200ee;
+      color: white;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 15px;
+      flex-shrink: 0;
+      font-size: 14px;
+    }
+    .emoji {
+      font-size: 24px;
+      margin-right: 10px;
+    }
+    .symbol-button {
+      display: inline-block;
+      cursor: pointer;
+      font-size: 20px;
+      margin: 0 3px;
+      transition: transform 0.2s;
+    }
+    .symbol-button:hover {
+      transform: scale(1.3);
+    }
+    .note {
+      margin-top: 20px;
+      font-style: italic;
+      font-size: 14px;
+    }
+  </style>
+  <script>
+    function enviarPulsoSimbolico(simbolo) {
+      alert("Pulso simbólico enviado: " + simbolo);
+      // Aqui você pode adicionar qualquer lógica extra de envio
+    }
+  </script>
+</head>
+<body>
+
+  <h1>⚡ Transferência Rápida via Bluetooth</h1>
+
+  <div>
+    <span class="symbol-button tipo-emoji" onclick="enviarPulsoSimbolico('⚡')">⚡</span>
+    <span class="symbol-button tipo-emoji" onclick="enviarPulsoSimbolico('6')">6</span>
+    <span class="symbol-button tipo-emoji" onclick="enviarPulsoSimbolico('0')">0</span>
+    <span class="symbol-button tipo-emoji" onclick="enviarPulsoSimbolico('#')">#</span>
+  </div>
+
+  <div class="card">
+    <h2>⚡ Teste de Bluetooth com Dual</h2>
+    <p>Arquivo otimizado para transferência rápida via app Dual.</p>
+    <a href="data:text/plain,Teste de transferência rápida Dual" download="teste_rapido_dual.txt" class="btn-download">⬇️ Baixar Arquivo Teste (1KB)</a>
+  </div>
+
+  <div class="instructions">
+    <h3>📋 Passo a Passo:</h3>
+    <div class="step">
+      <div class="step-number">1</div>
+      <div>Baixe o arquivo acima clicando no botão roxo.</div>
+    </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <div>Abra o app Dual no dispositivo de origem.</div>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <div>Selecione <strong>Compartilhar</strong> → <strong>Arquivos</strong>.</div>
+    </div>
+    <div class="step">
+      <div class="step-number">4</div>
+      <div>Escolha o arquivo <code>teste_rapido_dual.txt</code>.</div>
+    </div>
+    <div class="step">
+      <div class="step-number">5</div>
+      <div>Selecione <strong>Bluetooth</strong> como método de envio.</div>
+    </div>
+    <div class="step">
+      <div class="step-number">6</div>
+      <div>Escolha o dispositivo parceiro na lista.</div>
+    </div>
+    <div class="step">
+      <div class="step-number">7</div>
+      <div>Aceite a transferência no dispositivo destino.</div>
+    </div>
+    <div class="note">⚠️ Certifique-se que ambos dispositivos estão com Bluetooth ativado e visível.</div>
+  </div>
+
+</body>
+</html>

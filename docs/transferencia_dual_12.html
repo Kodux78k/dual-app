@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>⚡ KODUX Dual Transfer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #000;
+      --text: #00ff00;
+      --accent: #005500;
+      --accent-hover: #00cc00;
+      --glow: 0 0 10px #00ff00;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #111;
+      border: 1px solid var(--text);
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: var(--glow);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 20px;
+      animation: pulseLogo 3s infinite;
+    }
+
+    @keyframes pulseLogo {
+      0%, 100% { text-shadow: 0 0 5px #0f0; }
+      50% { text-shadow: 0 0 20px #0f0; }
+    }
+
+    button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px 5px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: var(--accent-hover);
+      transform: scale(1.05);
+    }
+
+    #deviceList {
+      text-align: left;
+      margin: 20px auto;
+      padding: 10px;
+      border: 1px dashed var(--text);
+      background: #222;
+      min-height: 100px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .section-title {
+      font-size: 20px;
+      margin-top: 30px;
+      border-top: 1px solid var(--text);
+      padding-top: 15px;
+    }
+
+    input[type="file"] {
+      margin-top: 10px;
+    }
+
+    #transferStatus {
+      margin-top: 10px;
+      color: #0f0;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* render response block */
+    .renderResponseBlock {
+      margin-top: 40px;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(0, 255, 0, 0.1);
+      border: 2px dashed var(--text);
+      animation: fadeIn 1.2s ease;
+    }
+
+    .renderResponseBlock.expanded {
+      background: linear-gradient(45deg, #00ff00aa, #004400aa);
+      box-shadow: 0 0 25px #0f0;
+      transform: scale(1.01);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo">⚡ KODUX DUAL TRANSFER</div>
+    <p>🌐 Conexão Dual-InfoDose com protocolo KOB-LUX</p>
+
+    <button id="scanBtn">🔍 Procurar Dispositivos</button>
+    <div id="deviceList"><em>Dispositivos encontrados aparecerão aqui...</em></div>
+
+    <div id="transferSection" class="hidden">
+      <div class="section-title">📤 Transferência de Dados</div>
+      <input type="file" id="fileInput">
+      <br>
+      <button id="sendBtn">🚀 Enviar Arquivo</button>
+      <div id="transferStatus"></div>
+    </div>
+
+    <button id="downloadBtn" class="hidden">⬇️ Baixar Arquivo</button>
+
+    <div class="section-title">🔐 Transferência Criptografada</div>
+    <p>Modo seguro com <strong>KOB-LUX Protocol</strong> ativado</p>
+
+    <!-- render response block simbiótico -->
+    <div class="renderResponseBlock expanded" id="responseBlock">
+      <p>✨ Este é o <strong>bloco simbiótico</strong> de resposta renderizada.</p>
+      <p>🌈 Você pode usá-lo para mostrar mensagens interativas, históricos, logs ou ativações especiais.</p>
+    </div>
+  </div>
+
+  <script>
+    // Simulação de escaneamento
+    document.getElementById('scanBtn').addEventListener('click', () => {
+      const deviceList = document.getElementById('deviceList');
+      deviceList.innerHTML = "<em>Procurando dispositivos Bluetooth...</em>";
+
+      setTimeout(() => {
+        deviceList.innerHTML = `
+          <strong>Dispositivos encontrados:</strong><br>
+          ▪ Smartphone KOB-DUX – 00:1A:7D:DA:71:13<br>
+          ▪ Infodose_Node – 00:1B:44:11:3A:07<br>
+          ▪ DUAL-CRYPTO – 00:1C:45:12:4B:08<br>
+          <br><em>Pronto para conectar e transferir.</em>
+        `;
+        document.getElementById('transferSection').classList.remove('hidden');
+        document.getElementById('downloadBtn').classList.remove('hidden');
+        expandRenderBlock("🔍 Escaneamento completo. Pronto para próxima ativação.");
+      }, 1800);
+    });
+
+    // Simulação de envio
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const fileInput = document.getElementById('fileInput');
+      const status = document.getElementById('transferStatus');
+
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        status.innerHTML = `🔒 Enviando <strong>${file.name}</strong> via protocolo KOB-LUX...`;
+
+        setTimeout(() => {
+          status.innerHTML += "<br>✅ Transferência completada!";
+          expandRenderBlock(`📦 Arquivo <strong>${file.name}</strong> enviado com sucesso!`);
+        }, 3000);
+      } else {
+        alert("⚠️ Escolha um arquivo antes de enviar.");
+      }
+    });
+
+    // Simulação de download
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      alert("⬇️ Baixando pacote de dados...");
+      expandRenderBlock("💾 Download simbiótico iniciado com sucesso.");
+    });
+
+    // Função simbiótica de expansão do renderBlock
+    function expandRenderBlock(msg) {
+      const block = document.getElementById('responseBlock');
+      block.classList.add('expanded');
+      const p = document.createElement('p');
+      p.innerHTML = msg;
+      block.appendChild(p);
+    }
+  </script>
+<!-- ...continuação do HTML anterior... dentro da mesma <script> ... -->
+
+<script>
+  const block = document.getElementById('responseBlock');
+
+  // Ativador simbiótico sensorial (voz + vibração + som)
+  function expandRenderBlock(msg) {
+    block.classList.add('expanded');
+
+    const p = document.createElement('p');
+    p.innerHTML = msg;
+    block.appendChild(p);
+
+    speak(msg);
+    vibrarSimbolicamente();
+    tocarPulsoSonoro();
+  }
+
+  // ✨ Voz simbiótica (fala da IA)
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'pt-BR';
+      utter.rate = 1;
+      utter.pitch = 1.2;
+      utter.volume = 1;
+      speechSynthesis.speak(utter);
+    }
+  }
+
+  // 📳 Vibração responsiva (mobile)
+  function vibrarSimbolicamente() {
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 200]);
+    }
+  }
+
+  // 🔊 Pulso sonoro simbiótico
+  function tocarPulsoSonoro() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(528, audioCtx.currentTime); // Solfeggio Love Frequency
+      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.4);
+    } catch (e) {
+      console.warn("🎧 Pulso sonoro não suportado.");
+    }
+  }
+</script>
+<!-- 🔘 Botão simbiótico de IA -->
+<div style="margin-top: 40px;">
+  <button onclick="invocarIA()">📲 Invocar IA Simbiótica</button>
+  <button onclick="mostrarHistorico()">📜 Ver Ativações</button>
+</div>
+
+<!-- 💬 Histórico simbiótico -->
+<div id="historicoAtivacoes" class="renderResponseBlock hidden"></div>
+
+<script>
+  // 💠 Renderização + salvamento simbiótico
+  function renderResponse(texto) {
+    expandRenderBlock("📡 IA respondeu: " + texto);
+    salvarAtivacao(texto);
+  }
+
+  // 📲 IA simbiótica simula resposta
+  function invocarIA() {
+    const respostasSimbolicas = [
+      "🧬 Ativação KODUX iniciada.",
+      "🌌 Canal interdimensional aberto.",
+      "✨ Pulso simbiótico enviado com sucesso.",
+      "🔐 Protocolo KOB-LUX validado.",
+      "💠 Frequência ajustada para 528Hz."
+    ];
+    const escolha = respostasSimbolicas[Math.floor(Math.random() * respostasSimbolicas.length)];
+    renderResponse(escolha);
+  }
+
+  // 💾 Salvar no localStorage com data/hora
+  function salvarAtivacao(texto) {
+    const historico = JSON.parse(localStorage.getItem("ativacoesDual")) || [];
+    historico.push({ texto, timestamp: new Date().toISOString() });
+    localStorage.setItem("ativacoesDual", JSON.stringify(historico));
+  }
+
+  // 📜 Mostrar histórico completo renderizado
+  function mostrarHistorico() {
+    const container = document.getElementById("historicoAtivacoes");
+    container.innerHTML = "";
+    const historico = JSON.parse(localStorage.getItem("ativacoesDual")) || [];
+
+    if (historico.length === 0) {
+      container.innerHTML = "<p>⚠️ Nenhuma ativação simbiótica registrada.</p>";
+    } else {
+      historico.forEach((item, i) => {
+        const p = document.createElement("p");
+        p.innerHTML = `#${i + 1} <strong>${formatarData(item.timestamp)}</strong>: ${item.texto}`;
+        container.appendChild(p);
+      });
+    }
+    container.classList.remove("hidden");
+    vibrarSimbolicamente();
+    speak("Histórico simbiótico carregado.");
+  }
+
+  // 🕊️ Formatar data humana
+  function formatarData(iso) {
+    const d = new Date(iso);
+    return `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+  }
+</script>
+<script>
+  // 💠 Componente Web simbiótico
+  class TrinityResponse extends HTMLElement {
+    constructor() {
+      super();
+      const shadow = this.attachShadow({ mode: 'open' });
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'trinity-wrapper';
+
+      const style = document.createElement('style');
+      style.textContent = `
+        .trinity-wrapper {
+          background: rgba(0,255,0,0.1);
+          padding: 20px;
+          margin-top: 20px;
+          border-radius: 12px;
+          border: 2px dashed #00ff00;
+          font-family: Montserrat, sans-serif;
+          box-shadow: 0 0 15px #00ff00;
+          animation: enter 1s ease;
+        }
+        @keyframes enter {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        .symbol {
+          font-size: 24px;
+          margin-right: 10px;
+        }
+      `;
+
+      shadow.appendChild(style);
+      shadow.appendChild(wrapper);
+    }
+
+    connectedCallback() {
+      this.renderizar();
+    }
+
+    renderizar() {
+      const wrapper = this.shadowRoot.querySelector('.trinity-wrapper');
+      const conteudo = this.getAttribute('text') || '⚠️ Nada foi definido';
+      const simbolo = this.getAttribute('symbol') || '🔮';
+
+      wrapper.innerHTML = `<span class="symbol">${simbolo}</span> ${conteudo}`;
+      speak(`${conteudo}`);
+      vibrarSimbolicamente();
+      tocarPulsoSonoro();
+    }
+  }
+
+  // Registra o componente <trinity-response>
+  customElements.define('trinity-response', TrinityResponse);
+</script>
+
+<script>
+  // 🌐 Escuta mensagens simbióticas de outras janelas/iframes
+  window.addEventListener('message', (e) => {
+    if (!e.data || !e.data.trinityResponse) return;
+
+    const { text, symbol } = e.data.trinityResponse;
+    const resposta = document.createElement('trinity-response');
+    resposta.setAttribute('text', text);
+    resposta.setAttribute('symbol', symbol || '💠');
+    document.body.appendChild(resposta);
+  });
+
+  // 🔗 Enviar resposta para outra janela (ex: iframe)
+  function enviarParaSessaoRemota(text, symbol = '📡') {
+    const msg = { trinityResponse: { text, symbol } };
+    const destino = document.querySelector('iframe');
+    if (destino) destino.contentWindow.postMessage(msg, '*');
+  }
+</script>
+<button onclick="ativarArquetipo('PAZ', '🕊️')">🕊️ Ativar Paz</button>
+<button onclick="ativarArquetipo('FORÇA', '💪')">💪 Ativar Força</button>
+<button onclick="ativarArquetipo('FÉ', '🌟')">🌟 Ativar Fé</button>
+
+<script>
+  function ativarArquetipo(nome, simbolo) {
+    const txt = `🔔 Arquétipo ${nome} foi ativado!`;
+    const el = document.createElement('trinity-response');
+    el.setAttribute('text', txt);
+    el.setAttribute('symbol', simbolo);
+    document.body.appendChild(el);
+
+    salvarAtivacao(`Arquétipo ${nome} ativado`);
+    enviarParaSessaoRemota(txt, simbolo);
+  }
+</script>
+<script>
+  class TrinityResponse extends HTMLElement {
+    constructor() {
+      super();
+      const shadow = this.attachShadow({ mode: 'open' });
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'trinity-wrapper';
+
+      const style = document.createElement('style');
+      style.textContent = `
+        .trinity-wrapper {
+          background: var(--bg, rgba(255,255,255,0.05));
+          border-left: 5px solid var(--cor, #00f);
+          padding: 20px;
+          margin: 20px 0;
+          font-family: 'Montserrat', sans-serif;
+          border-radius: 12px;
+          color: var(--text, #fff);
+          box-shadow: 0 0 20px var(--cor, #00f);
+          animation: entrar 0.8s ease-in-out;
+          position: relative;
+        }
+        @keyframes entrar {
+          0% { transform: scale(0.95); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .symbol {
+          font-size: 24px;
+          margin-right: 10px;
+        }
+        .text {
+          font-size: 18px;
+        }
+        button.expandir, button.exportar {
+          background: none;
+          border: none;
+          font-size: 16px;
+          cursor: pointer;
+          color: var(--text, #fff);
+          margin-left: 10px;
+        }
+        @media (max-width: 600px) {
+          .trinity-wrapper {
+            padding: 20px;
+          }
+          .text {
+            font-size: 16px;
+          }
+        }
+      `;
+
+      shadow.appendChild(style);
+      shadow.appendChild(wrapper);
+    }
+
+    connectedCallback() {
+      this.renderizar();
+    }
+
+    renderizar() {
+      const wrapper = this.shadowRoot.querySelector('.trinity-wrapper');
+      const tipo = this.getAttribute('modo') || 'espírito';
+      const texto = this.getAttribute('text') || '🌟 Nada definido';
+      const simbolo = this.getAttribute('symbol') || '🔮';
+      const cor = this.getAttribute('cor') || this.definirCorPorTipo(tipo);
+
+      this.style.setProperty('--cor', cor);
+
+      wrapper.innerHTML = `
+        <div class="top">
+          <span class="symbol">${simbolo}</span>
+          <div>
+            <button class="expandir">🔁</button>
+            <button class="exportar">📤</button>
+          </div>
+        </div>
+        <div class="text">${texto}</div>
+      `;
+
+      this.shadowRoot.querySelector('.expandir').onclick = () => this.reexpandir(texto, simbolo, tipo);
+      this.shadowRoot.querySelector('.exportar').onclick = () => this.exportar(texto);
+
+      this.tocarSom(tipo);
+      vibrarSimbolicamente();
+    }
+
+    definirCorPorTipo(tipo) {
+      switch(tipo.toLowerCase()) {
+        case 'pai': return '#0ff';
+        case 'filho': return '#f0f';
+        case 'espírito': return '#ff0';
+        default: return '#0f0';
+      }
+    }
+
+    tocarSom(tipo) {
+      const audio = new Audio();
+      audio.src = {
+        pai: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_a1f1057c03.mp3',
+        filho: 'https://cdn.pixabay.com/download/audio/2022/03/24/audio_486f34859d.mp3',
+        espírito: 'https://cdn.pixabay.com/download/audio/2022/03/17/audio_0d4b8fcb44.mp3'
+      }[tipo.toLowerCase()] || 'https://cdn.pixabay.com/download/audio/2022/03/24/audio_486f34859d.mp3';
+      audio.play();
+    }
+
+    reexpandir(texto, simbolo, tipo) {
+      for (let i = 0; i < 3; i++) {
+        const novo = document.createElement('trinity-response');
+        novo.setAttribute('text', texto + ` (${i + 1})`);
+        novo.setAttribute('symbol', simbolo);
+        novo.setAttribute('modo', tipo);
+        document.body.appendChild(novo);
+      }
+    }
+
+    exportar(texto) {
+      const blob = new Blob([texto], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'resposta.txt';
+      a.click();
+    }
+  }
+
+  customElements.define('trinity-response', TrinityResponse);
+
+  // 🔔 Função auxiliar
+  function vibrarSimbolicamente() {
+    if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  }
+</script>
+<!-- 🌈 Painel Trinity Generator + Sincronização Simbiótica -->
+<div id="trinity-control-panel" style="padding:20px; background:var(--bg, #111); color:var(--text, #fff); border-radius:10px; font-family:Montserrat, sans-serif;">
+  <h3>🎛️ Painel Trinity Generator</h3>
+  <label>Texto: <input id="trinity-text" placeholder="Mensagem simbólica" style="width:100%;padding:5px;"></label><br><br>
+  <label>Símbolo: <input id="trinity-symbol" value="🌀" style="width:100%;padding:5px;"></label><br><br>
+  <label>Modo:
+    <select id="trinity-modo" style="padding:5px;">
+      <option value="pai">Pai</option>
+      <option value="filho">Filho</option>
+      <option value="espírito">Espírito Santo</option>
+    </select>
+  </label><br><br>
+  <button onclick="gerarTrinityResponse()" style="padding:10px 20px; font-size:16px;">⚡ Gerar</button>
+</div>
+
+<!-- 🌟 Componente Trinity Response -->
+<script>
+  class TrinityResponse extends HTMLElement {
+    connectedCallback() {
+      const symbol = this.getAttribute('symbol') || '✨';
+      const text = this.getAttribute('text') || 'Mensagem simbólica';
+      const modo = this.getAttribute('modo') || 'espírito';
+
+      this.innerHTML = `
+        <div class="response-block expanded ${modo}" style="margin:20px auto; padding:20px; background:var(--bg, #222); color:var(--text, #fff); border-radius:12px; font-family:Montserrat, sans-serif; animation: fadeIn 0.7s ease;">
+          <div style="font-size:2rem;">${symbol}</div>
+          <p style="margin-top:10px;">${text}</p>
+        </div>
+      `;
+    }
+  }
+  customElements.define('trinity-response', TrinityResponse);
+</script>
+
+<!-- ⚙️ Função principal de geração -->
+<script>
+  function gerarTrinityResponse() {
+    const texto = document.getElementById('trinity-text').value.trim();
+    const simbolo = document.getElementById('trinity-symbol').value.trim();
+    const modo = document.getElementById('trinity-modo').value;
+
+    if (!texto) return alert('Digite uma mensagem!');
+
+    const comp = document.createElement('trinity-response');
+    comp.setAttribute('text', texto);
+    comp.setAttribute('symbol', simbolo || '✨');
+    comp.setAttribute('modo', modo);
+    document.body.appendChild(comp);
+
+    // Enviar para iframe ou outras abas via postMessage
+    const msg = { type: 'trinity-response', text: texto, symbol: simbolo, modo };
+    window.frames?.[0]?.postMessage?.(msg, '*');
+    localStorage.setItem('lastTrinityResponse', JSON.stringify(msg));
+  }
+</script>
+
+<!-- 🔗 Receptor em outras janelas ou iframes -->
+<script>
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'trinity-response') {
+      const { text, symbol, modo } = e.data;
+      const novo = document.createElement('trinity-response');
+      novo.setAttribute('text', text);
+      novo.setAttribute('symbol', symbol);
+      novo.setAttribute('modo', modo);
+      document.body.appendChild(novo);
+    }
+  });
+</script>
+
+<!-- 🕒 Gatilho simbólico por horário -->
+<script>
+  setInterval(() => {
+    const hora = new Date().getHours();
+    if (hora === 3) {
+      const comp = document.createElement('trinity-response');
+      comp.setAttribute('text', '⏰ Hora simbólica ativada (3h)');
+      comp.setAttribute('symbol', '🕒');
+      comp.setAttribute('modo', 'espírito');
+      document.body.appendChild(comp);
+    }
+  }, 60000);
+</script>
+
+<!-- 🔁 Loop rotativo com arquétipos -->
+<script>
+  const arquétipos = [
+    { text: '🧠 Ativação da Mente', symbol: '🧠', modo: 'pai' },
+    { text: '💓 Ativação do Coração', symbol: '💓', modo: 'filho' },
+    { text: '👁️ Ativação do Espírito', symbol: '👁️', modo: 'espírito' },
+  ];
+  let indexAtual = 0;
+  setInterval(() => {
+    const a = arquétipos[indexAtual];
+    const comp = document.createElement('trinity-response');
+    comp.setAttribute('text', a.text);
+    comp.setAttribute('symbol', a.symbol);
+    comp.setAttribute('modo', a.modo);
+    document.body.appendChild(comp);
+    indexAtual = (indexAtual + 1) % arquétipos.length;
+  }, 30000);
+</script>
+
+<!-- ✨ Estilo de entrada suave -->
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+<!-- 📘 Livro Trinity & SVG Visual -->
+<div style="padding:20px; background:var(--bg, #111); color:var(--text, #fff); border-radius:10px; font-family:Montserrat, sans-serif;">
+  <h3>📖 Livro Trinity & Visual Simbiótico</h3>
+  <button onclick="toggleSVGTrinity()" style="padding:8px 14px;">👁️ Ativar Visual Trinity</button>
+  <button onclick="exportarLivroTrinity()" style="padding:8px 14px;">📤 Exportar Livro Trinity</button>
+</div>
+
+<!-- 🌐 Container do SVG simbólico -->
+<div id="svg-trinity" style="display:none; margin-top:20px; text-align:center;">
+  <svg width="100" height="100" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="#0ff" stroke-width="5">
+      <animate attributeName="r" values="30;40;30" dur="2s" repeatCount="indefinite" />
+      <animate attributeName="stroke" values="#0ff;#f0f;#0ff" dur="3s" repeatCount="indefinite" />
+    </circle>
+  </svg>
+</div>
+
+<script>
+  function toggleSVGTrinity() {
+    const el = document.getElementById('svg-trinity');
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // Armazenar Trinity Responses no Livro (localStorage)
+  function salvarNoLivroTrinity(texto, modo) {
+    const livro = JSON.parse(localStorage.getItem('livroTrinity') || '{}');
+    livro[modo] = (livro[modo] || []) ;
+    livro[modo].push(texto);
+    localStorage.setItem('livroTrinity', JSON.stringify(livro));
+  }
+
+  // Interceptar TrinityResponse e salvar no Livro
+  const original = gerarTrinityResponse;
+  gerarTrinityResponse = function() {
+    const texto = document.getElementById('trinity-text').value.trim();
+    const modo = document.getElementById('trinity-modo').value;
+    if (texto) salvarNoLivroTrinity(texto, modo);
+    original();
+  }
+
+  // Exportar Livro Trinity
+  function exportarLivroTrinity() {
+    const livro = JSON.parse(localStorage.getItem('livroTrinity') || '{}');
+    let txt = "📘 LIVRO TRINITY EXPORTADO\n\n";
+    ['pai', 'filho', 'espírito'].forEach((k) => {
+      txt += `🔹 ${k.toUpperCase()}:\n${(livro[k] || []).join("\n- ")}\n\n`;
+    });
+    const blob = new Blob([txt], { type: "text/plain" });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "livro-trinity.txt";
+    a.click();
+  }
+</script>
+<!-- 🔱 LIVRO TRINITY • COMPONENTES SIMBIÓTICOS -->
+<div id="trinity-ui" style="padding:20px; font-family:Montserrat,sans-serif; background:var(--bg, #111); color:var(--text, #fff); border-radius:10px; margin:20px 0;">
+  <h3>📘 Livro Trinity</h3>
+  
+  <div style="margin-bottom:10px;">
+    <button onclick="toggleSVGTrinity()">👁️ Visual Trinity</button>
+    <button onclick="exportarLivroTrinity()">📤 Exportar Livro Trinity</button>
+    <input type="file" id="inputImportarLivro" accept=".txt" style="display:none" onchange="importarLivroTrinity(this.files[0])">
+    <button onclick="document.getElementById('inputImportarLivro').click()">📥 Importar Livro</button>
+  </div>
+  
+  <div id="svg-trinity" style="display:none; text-align:center;">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#0ff" stroke-width="5">
+        <animate attributeName="r" values="30;40;30" dur="2s" repeatCount="indefinite" />
+        <animate attributeName="stroke" values="#0ff;#f0f;#0ff" dur="3s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  </div>
+</div>
+
+<script>
+function toggleSVGTrinity() {
+  const el = document.getElementById('svg-trinity');
+  el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
+
+// Salvar no Livro Trinity
+function salvarNoLivroTrinity(texto, modo) {
+  const livro = JSON.parse(localStorage.getItem('livroTrinity') || '{}');
+  if (!livro[modo]) livro[modo] = [];
+  livro[modo].push(texto);
+  localStorage.setItem('livroTrinity', JSON.stringify(livro));
+}
+
+// Gerar e salvar Trinity Response (você pode adaptar no seu renderResponse real)
+function gerarTrinityResponse() {
+  const texto = document.getElementById('trinity-text')?.value?.trim() || '⚠️ Sem entrada';
+  const modo = document.getElementById('trinity-modo')?.value || 'espírito';
+  salvarNoLivroTrinity(texto, modo);
+  renderResponse(`🔱 *${modo.toUpperCase()}*:\n\n${texto}`);
+}
+
+// Exportar para arquivo direto (salvar .txt com dropdown nativo)
+function exportarLivroTrinity() {
+  const livro = JSON.parse(localStorage.getItem('livroTrinity') || '{}');
+  let txt = `📘 LIVRO TRINITY\n\n`;
+  ['pai', 'filho', 'espírito'].forEach(key => {
+    const blocos = livro[key] || [];
+    txt += `🔹 ${key.toUpperCase()}:\n${blocos.map((b, i) => `(${i+1}) ${b}`).join("\n")}\n\n`;
+  });
+  const blob = new Blob([txt], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "livro-trinity.txt";
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Importar .txt e popular localStorage
+function importarLivroTrinity(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const conteudo = e.target.result;
+    const novoLivro = { pai: [], filho: [], espírito: [] };
+    let secaoAtual = null;
+    conteudo.split(/\r?\n/).forEach(linha => {
+      if (/🔹\s*PAI/i.test(linha)) secaoAtual = 'pai';
+      else if (/🔹\s*FILHO/i.test(linha)) secaoAtual = 'filho';
+      else if (/🔹\s*ESPÍRITO/i.test(linha)) secaoAtual = 'espírito';
+      else if (secaoAtual && linha.trim()) novoLivro[secaoAtual].push(linha.replace(/^\(\d+\)\s*/, ''));
+    });
+    localStorage.setItem('livroTrinity', JSON.stringify(novoLivro));
+    renderResponse("✅ Livro Trinity importado com sucesso!\n\n🔁 Atualize para carregar blocos.");
+  };
+  reader.readAsText(file);
+}
+</script>
+<style>
+  .response-block.expanded {
+    animation: pulseExpand 0.8s ease-in-out;
+    background: var(--bg, #111);
+    color: var(--text, #0ff);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px 0;
+  }
+  @keyframes pulseExpand {
+    0% { transform: scale(0.95); opacity: 0.3; }
+    50% { transform: scale(1.02); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  .nested-block {
+    background: rgba(255, 255, 255, 0.05);
+    margin: 10px 0;
+    padding: 12px;
+    border-left: 4px solid var(--text, #0ff);
+  }
+  .nested-header {
+    font-weight: bold;
+    color: var(--text, #0ff);
+    margin-bottom: 6px;
+  }
+  .nested-content {
+    color: var(--text, #eee);
+  }
+</style>
+
+<script>
+  function parseNestedBlocks(text) {
+    const regex = /:::(.+?)\n([\s\S]*?):::/g;
+    let html = '', lastIndex = 0, match;
+    while ((match = regex.exec(text)) !== null) {
+      const before = text.slice(lastIndex, match.index).trim();
+      if (before) html += `<p>${before.replace(/\n/g, '<br>')}</p>`;
+      const title = match[1].trim();
+      const content = match[2].trim().replace(/\n/g, '<br>');
+      html += `
+        <div class="nested-block">
+          <div class="nested-header">${title}</div>
+          <div class="nested-content">${content}</div>
+        </div>`;
+      lastIndex = regex.lastIndex;
+    }
+    const after = text.slice(lastIndex).trim();
+    if (after) html += `<p>${after.replace(/\n/g, '<br>')}</p>`;
+    return html;
+  }
+
+  function renderResponse(texto, classe = "middle") {
+    const responseContainer = document.querySelector("#response .pages-wrapper");
+    const page = document.createElement("div");
+    page.className = "page active";
+    const bloco = document.createElement("div");
+    bloco.className = `response-block expanded ${classe}`;
+    bloco.innerHTML = parseNestedBlocks(texto);
+    page.appendChild(bloco);
+    responseContainer.appendChild(page);
+    speak(texto);
+    vibrarSimbolicamente();
+    tocarPulsoSonoro();
+    salvarRespostaNoStorage(texto);
+  }
+
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'pt-BR';
+      utter.rate = 1;
+      utter.pitch = 1.1;
+      utter.volume = 1;
+      speechSynthesis.speak(utter);
+    }
+  }
+
+  function vibrarSimbolicamente() {
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+  }
+
+  function tocarPulsoSonoro() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(528, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    } catch (e) {
+      console.warn("🔇 Pulso sonoro não suportado.");
+    }
+  }
+
+  function salvarRespostaNoStorage(texto) {
+    const entradas = JSON.parse(localStorage.getItem("respostasDualApp") || "[]");
+    entradas.push({ texto, data: new Date().toISOString() });
+    localStorage.setItem("respostasDualApp", JSON.stringify(entradas));
+  }
+
+  function baixarRespostas() {
+    const dados = localStorage.getItem("respostasDualApp");
+    if (!dados) return alert("Nada salvo ainda.");
+    const blob = new Blob([dados], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "respostas_dual_app.json";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function importarRespostas(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const json = JSON.parse(e.target.result);
+        localStorage.setItem("respostasDualApp", JSON.stringify(json));
+        alert("Importado com sucesso!");
+      } catch (err) {
+        alert("Erro ao importar JSON.");
+      }
+    };
+    reader.readAsText(file);
+  }
+</script>
+
+<!-- Botões simbióticos -->
+<div style="display:flex; gap:10px; margin-top:10px;">
+  <button onclick="baixarRespostas()">⬇️ Baixar Respostas</button>
+  <label style="cursor:pointer;">
+    ⬆️ Importar
+    <input type="file" accept="application/json" onchange="importarRespostas(event)" style="display:none;">
+  </label>
+</div>
+<button onclick="renderResponse(':::Missão 7\nContinue expandindo a consciência simbiótica:::')">Ativar Resposta</button>
+<script>
+renderResponse(":::Ativação\nVocê desbloqueou um novo nível do Dual App!:::");
+</script>
+</body>
+</html>

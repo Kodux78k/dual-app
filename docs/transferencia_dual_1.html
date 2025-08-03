@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>⚡ KODUX - Conexão Dual Bluetooth</title>
+  <style>
+    :root {
+      --bg: #000;
+      --text: #00ff00;
+      --accent: #005500;
+      --accent-hover: #007700;
+    }
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      text-align: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      border: 1px solid var(--text);
+      border-radius: 10px;
+      background: #111;
+      padding: 30px;
+      box-shadow: 0 0 10px var(--text);
+    }
+    .logo {
+      font-size: 28px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      color: var(--text);
+    }
+    button {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      margin: 10px 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: var(--accent-hover);
+    }
+    #deviceList {
+      text-align: left;
+      margin: 20px auto;
+      padding: 10px;
+      border: 1px dashed var(--text);
+      min-height: 100px;
+      max-height: 250px;
+      overflow-y: auto;
+      background: #222;
+    }
+    .hidden {
+      display: none;
+    }
+    .section-title {
+      font-size: 20px;
+      margin-top: 30px;
+      border-top: 1px solid var(--text);
+      padding-top: 15px;
+    }
+    input[type="file"] {
+      margin-top: 10px;
+    }
+    #transferStatus {
+      margin-top: 10px;
+      color: #0f0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo">۞ KODUX DUAL BLUETOOTH ۞</div>
+    <p>🌐 Conexão Dual-InfoDose: encontre dispositivos próximos e transfira dados com segurança.</p>
+    
+    <button id="scanBtn">🔍 Procurar Dispositivos</button>
+
+    <div id="deviceList">
+      <em>Dispositivos encontrados aparecerão aqui...</em>
+    </div>
+
+    <div id="transferSection" class="hidden">
+      <div class="section-title">📤 Transferência de Dados</div>
+      <input type="file" id="fileInput">
+      <br>
+      <button id="sendBtn">🚀 Enviar Arquivo</button>
+      <div id="transferStatus"></div>
+    </div>
+
+    <button id="downloadBtn" class="hidden">⬇️ Baixar Arquivo</button>
+
+    <div class="section-title">🔐 Dual-Crypto Transfer</div>
+    <p>Modo de transferência criptografada ativado<br><strong>۞ KOB-LUX ۞ Protocolo ativo</strong></p>
+  </div>
+
+  <script>
+    document.getElementById('scanBtn').addEventListener('click', () => {
+      const deviceList = document.getElementById('deviceList');
+      deviceList.innerHTML = "<em>Procurando dispositivos...</em>";
+
+      setTimeout(() => {
+        deviceList.innerHTML = `
+          <strong>Dispositivos encontrados:</strong><br>
+          ▪ Smartphone KOB-DUX (00:1A:7D:DA:71:13) - 5.0Hz<br>
+          ▪ Infodose_Node (00:1B:44:11:3A:07) - 4.2Hz<br>
+          ▪ DUAL-CRYPTO (00:1C:45:12:4B:08) - 5.1Hz<br>
+          <br><em>Selecione um dispositivo para transferência...</em>
+        `;
+        document.getElementById('transferSection').classList.remove('hidden');
+        document.getElementById('downloadBtn').classList.remove('hidden');
+      }, 1500);
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      alert("📦 Iniciando download do pacote simbiótico...\n⚡ KOB-LUX protocol activated!");
+    });
+
+    document.getElementById('sendBtn').addEventListener('click', () => {
+      const fileInput = document.getElementById('fileInput');
+      const status = document.getElementById('transferStatus');
+      if (fileInput.files.length > 0) {
+        const fileName = fileInput.files[0].name;
+        status.innerHTML = `🔒 Enviando <strong>${fileName}</strong> via Bluetooth com criptografia...`;
+        setTimeout(() => {
+          status.innerHTML += "<br>✅ Transferência completa! ۞ KOB ۞";
+        }, 3000);
+      } else {
+        alert("⚠️ Selecione um arquivo primeiro!");
+      }
+    });
+  </script>
+
+</body>
+</html>
