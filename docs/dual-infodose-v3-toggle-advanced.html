@@ -748,7 +748,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
     max-height: calc(2.5 * 1.2em);
     overflow-y: auto;
     padding: 0.4em;
-    font-size: 0.88em;
+    font-size: 0.93em;
     color: #0ff;
     position: relative;
   }
@@ -1320,7 +1320,7 @@ binauralAudio.volume = binauralVolume.value;
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
             CHUNK_SIZE   :12000,
-            AUTH_TOKEN   :'Bearer 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'
+            AUTH_TOKEN   :'Bearer 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'
           };
 
     let training = '', chunks = [], chunkIndex = 0;
@@ -2434,13 +2434,7 @@ document.addEventListener("DOMContentLoaded", () => {
     logMistico("🎤 Voz detectada: " + transcript);
     document.getElementById("sendBtn").click();
 
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = 432;
-    osc.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.5);
+    
   };
 
   recognition.onerror = (event) => {
