@@ -711,6 +711,376 @@
     a.click();
   }
 </script>
+<!-- 🔱 LIVRO TRINITY • COMPONENTES SIMBIÓTICOS -->
+<div id="trinity-ui" style="padding:20px; font-family:Montserrat,sans-serif; background:var(--bg, #111); color:var(--text, #fff); border-radius:10px; margin:20px 0;">
+  <h3>📘 Livro Trinity</h3>
+  
+  <div style="margin-bottom:10px;">
+    <button onclick="toggleSVGTrinity()">👁️ Visual Trinity</button>
+    <button onclick="exportarLivroTrinity()">📤 Exportar Livro Trinity</button>
+    <input type="file" id="inputImportarLivro" accept=".txt" style="display:none" onchange="importarLivroTrinity(this.files[0])">
+    <button onclick="document.getElementById('inputImportarLivro').click()">📥 Importar Livro</button>
+  </div>
+  
+  <div id="svg-trinity" style="display:none; text-align:center;">
+    <svg width="100" height="100" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#0ff" stroke-width="5">
+        <animate attributeName="r" values="30;40;30" dur="2s" repeatCount="indefinite" />
+        <animate attributeName="stroke" values="#0ff;#f0f;#0ff" dur="3s" repeatCount="indefinite" />
+      </circle>
+    </svg>
+  </div>
+</div>
+
+<script>
+function toggleSVGTrinity() {
+  const el = document.getElementById('svg-trinity');
+  el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+}
+
+// Salvar no Livro Trinity
+function salvarNoLivroTrinity(texto, modo) {
+  const livro = JSON.parse(localStorage.getItem('livroTrinity') || '{}');
+  if (!livro[modo]) livro[modo] = [];
+  livro[modo].push(texto);
+  localStorage.setItem('livroTrinity', JSON.stringify(livro));
+}
+
+// Gerar e salvar Trinity Response (você pode adaptar no seu renderResponse real)
+function gerarTrinityResponse() {
+  const texto = document.getElementById('trinity-text')?.value?.trim() || '⚠️ Sem entrada';
+  const modo = document.getElementById('trinity-modo')?.value || 'espírito';
+  salvarNoLivroTrinity(texto, modo);
+  renderResponse(`🔱 *${modo.toUpperCase()}*:\n\n${texto}`);
+}
+
+// Exportar para arquivo direto (salvar .txt com dropdown nativo)
+function exportarLivroTrinity() {
+  const livro = JSON.parse(localStorage.getItem('livroTrinity') || '{}');
+  let txt = `📘 LIVRO TRINITY\n\n`;
+  ['pai', 'filho', 'espírito'].forEach(key => {
+    const blocos = livro[key] || [];
+    txt += `🔹 ${key.toUpperCase()}:\n${blocos.map((b, i) => `(${i+1}) ${b}`).join("\n")}\n\n`;
+  });
+  const blob = new Blob([txt], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = "livro-trinity.txt";
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// Importar .txt e popular localStorage
+function importarLivroTrinity(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const conteudo = e.target.result;
+    const novoLivro = { pai: [], filho: [], espírito: [] };
+    let secaoAtual = null;
+    conteudo.split(/\r?\n/).forEach(linha => {
+      if (/🔹\s*PAI/i.test(linha)) secaoAtual = 'pai';
+      else if (/🔹\s*FILHO/i.test(linha)) secaoAtual = 'filho';
+      else if (/🔹\s*ESPÍRITO/i.test(linha)) secaoAtual = 'espírito';
+      else if (secaoAtual && linha.trim()) novoLivro[secaoAtual].push(linha.replace(/^\(\d+\)\s*/, ''));
+    });
+    localStorage.setItem('livroTrinity', JSON.stringify(novoLivro));
+    renderResponse("✅ Livro Trinity importado com sucesso!\n\n🔁 Atualize para carregar blocos.");
+  };
+  reader.readAsText(file);
+}
+</script>
+<style>
+  .response-block.expanded {
+    animation: pulseExpand 0.8s ease-in-out;
+    background: var(--bg, #111);
+    color: var(--text, #0ff);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 10px 0;
+  }
+  @keyframes pulseExpand {
+    0% { transform: scale(0.95); opacity: 0.3; }
+    50% { transform: scale(1.02); opacity: 1; }
+    100% { transform: scale(1); }
+  }
+  .nested-block {
+    background: rgba(255, 255, 255, 0.05);
+    margin: 10px 0;
+    padding: 12px;
+    border-left: 4px solid var(--text, #0ff);
+  }
+  .nested-header {
+    font-weight: bold;
+    color: var(--text, #0ff);
+    margin-bottom: 6px;
+  }
+  .nested-content {
+    color: var(--text, #eee);
+  }
+</style>
+
+<script>
+  function parseNestedBlocks(text) {
+    const regex = /:::(.+?)\n([\s\S]*?):::/g;
+    let html = '', lastIndex = 0, match;
+    while ((match = regex.exec(text)) !== null) {
+      const before = text.slice(lastIndex, match.index).trim();
+      if (before) html += `<p>${before.replace(/\n/g, '<br>')}</p>`;
+      const title = match[1].trim();
+      const content = match[2].trim().replace(/\n/g, '<br>');
+      html += `
+        <div class="nested-block">
+          <div class="nested-header">${title}</div>
+          <div class="nested-content">${content}</div>
+        </div>`;
+      lastIndex = regex.lastIndex;
+    }
+    const after = text.slice(lastIndex).trim();
+    if (after) html += `<p>${after.replace(/\n/g, '<br>')}</p>`;
+    return html;
+  }
+
+  function renderResponse(texto, classe = "middle") {
+    const responseContainer = document.querySelector("#response .pages-wrapper");
+    const page = document.createElement("div");
+    page.className = "page active";
+    const bloco = document.createElement("div");
+    bloco.className = `response-block expanded ${classe}`;
+    bloco.innerHTML = parseNestedBlocks(texto);
+    page.appendChild(bloco);
+    responseContainer.appendChild(page);
+    speak(texto);
+    vibrarSimbolicamente();
+    tocarPulsoSonoro();
+    salvarRespostaNoStorage(texto);
+  }
+
+  function speak(text) {
+    if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'pt-BR';
+      utter.rate = 1;
+      utter.pitch = 1.1;
+      utter.volume = 1;
+      speechSynthesis.speak(utter);
+    }
+  }
+
+  function vibrarSimbolicamente() {
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
+    }
+  }
+
+  function tocarPulsoSonoro() {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(528, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.3);
+    } catch (e) {
+      console.warn("🔇 Pulso sonoro não suportado.");
+    }
+  }
+
+  function salvarRespostaNoStorage(texto) {
+    const entradas = JSON.parse(localStorage.getItem("respostasDualApp") || "[]");
+    entradas.push({ texto, data: new Date().toISOString() });
+    localStorage.setItem("respostasDualApp", JSON.stringify(entradas));
+  }
+
+  function baixarRespostas() {
+    const dados = localStorage.getItem("respostasDualApp");
+    if (!dados) return alert("Nada salvo ainda.");
+    const blob = new Blob([dados], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "respostas_dual_app.json";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function importarRespostas(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const json = JSON.parse(e.target.result);
+        localStorage.setItem("respostasDualApp", JSON.stringify(json));
+        alert("Importado com sucesso!");
+      } catch (err) {
+        alert("Erro ao importar JSON.");
+      }
+    };
+    reader.readAsText(file);
+  }
+</script>
+
+<!-- Botões simbióticos -->
+<div style="display:flex; gap:10px; margin-top:10px;">
+  <button onclick="baixarRespostas()">⬇️ Baixar Respostas</button>
+  <label style="cursor:pointer;">
+    ⬆️ Importar
+    <input type="file" accept="application/json" onchange="importarRespostas(event)" style="display:none;">
+  </label>
+</div>
+<label>Frequência:
+  <select id="frequenciaSelect">
+    <option>2.4 GHz</option>
+    <option>5 GHz</option>
+    <option>6 GHz (Wi-Fi 6E)</option>
+    <option>Simbólica Quantum</option>
+  </select>
+</label>
+<script>
+class TrinityConnection extends HTMLElement {
+  connectedCallback() {
+    this.innerHTML = `
+    <style>
+      .connection-panel {
+        padding: 20px;
+        background: var(--bg, #111);
+        color: var(--text, #fff);
+        border-radius: 10px;
+        font-family: Montserrat, sans-serif;
+        box-shadow: 0 0 10px #0ff8;
+      }
+      .connection-panel select, .connection-panel button {
+        margin-top: 10px;
+        padding: 8px;
+        font-size: 16px;
+        border-radius: 5px;
+      }
+    </style>
+    <div class="connection-panel">
+      <h3>🔗 Conexão Interdimensional</h3>
+      <button onclick="scanDispositivos()">📡 Buscar Dispositivos Bluetooth</button>
+      <div id="dispositivosDetectados" style="margin-top:10px;"></div>
+      <label>Frequência:
+        <select id="frequenciaSelect">
+          <option>2.4 GHz</option>
+          <option>5 GHz</option>
+          <option>6 GHz (Wi-Fi 6E)</option>
+          <option>Simbólica Quantum</option>
+        </select>
+      </label>
+    </div>`;
+  }
+}
+customElements.define('trinity-connection', TrinityConnection);
+
+async function scanDispositivos() {
+  const container = document.getElementById("dispositivosDetectados");
+  container.innerHTML = "🔍 Buscando dispositivos...";
+  try {
+    const device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true
+    });
+    container.innerHTML = `✅ Dispositivo detectado: <strong>${device.name || 'Desconhecido'}</strong>`;
+  } catch (err) {
+    container.innerHTML = `⚠️ Falha: ${err.message}`;
+  }
+}
+</script>
+
+<!-- USO -->
+<trinity-connection></trinity-connection>
+<script>
+function salvarTextoComoArquivo(nomeArquivo, conteudo) {
+  const blob = new Blob([conteudo], { type: "text/plain" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = nomeArquivo;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  URL.revokeObjectURL(a.href);
+  a.remove();
+}
+</script>
+<!-- 🌐 WebComponent Trinity Response com integração simbólica e bluetooth -->
+<script>
+class TrinityResponse extends HTMLElement {
+  constructor() {
+    super();
+    const shadow = this.attachShadow({ mode: "open" });
+    shadow.innerHTML = `
+      <style>
+        :host {
+          display: block;
+          font-family: 'Montserrat', sans-serif;
+          background: var(--bg, #111);
+          color: var(--text, #0ff);
+          padding: 20px;
+          border-radius: 12px;
+          box-shadow: 0 0 15px #0ff7;
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+        .device-list {
+          margin-top: 10px;
+        }
+        .device {
+          padding: 6px;
+          margin: 4px 0;
+          border: 1px solid #0ff5;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.2s ease;
+        }
+        .device:hover {
+          background: #0ff2;
+        }
+      </style>
+      <div class="header">
+        <span>📡 Dispositivos Detectados</span>
+        <button id="scan">🔍 Buscar</button>
+      </div>
+      <div class="device-list" id="devices">
+        <div class="device">🔄 Nenhum dispositivo ainda...</div>
+      </div>
+    `;
+  }
+
+  connectedCallback() {
+    this.shadowRoot.querySelector("#scan").addEventListener("click", async () => {
+      const list = this.shadowRoot.querySelector("#devices");
+      list.innerHTML = `<div class="device">⏳ Procurando...</div>`;
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true
+        });
+        list.innerHTML = `
+          <div class="device">📱 ${device.name || "Dispositivo sem nome"} conectado!</div>
+        `;
+      } catch (err) {
+        list.innerHTML = `<div class="device">⚠️ Cancelado ou erro: ${err.message}</div>`;
+      }
+    });
+  }
+}
+
+customElements.define("trinity-response", TrinityResponse);
+</script>
+
+<!-- ✨ Use na sua página: -->
+<trinity-response></trinity-response>
 
 </body>
 </html>
