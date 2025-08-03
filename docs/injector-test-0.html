@@ -1,0 +1,90 @@
+<!-- Botão ativador simbiótico -->
+<button id="injectorBtn" style="position:fixed; top:4px; left:20px; font-size:12px; z-index:9999; padding:3px 7px; border-radius:4px; background:#111; color:#0ff; border:1px solid #0ff;">⚙️JS+</button>
+
+<!-- Painel simbiótico -->
+<div id="injectorPanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.92); padding:16px; border-radius:8px; z-index:10000; width:90%; max-width:640px; height:420px; box-shadow:0 0 20px #0ff; color:#0ff; font-family:monospace;">
+  <textarea id="injectorInput" placeholder="// Cole seu código aqui" style="width:100%; height:60%; background:#111; color:#0f0; border:1px solid #0ff; padding:8px; border-radius:4px; resize:vertical;"></textarea>
+  <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+    <button onclick="injectorExecute()">▶️ Executar JS</button>
+    <button onclick="injectorInjectCSS()">🎨 Injetar CSS</button>
+    <button onclick="injectorRenderHTML()">🌐 Render HTML</button>
+    <button onclick="injectorRenderInResponse()">📄 Render Response</button>
+    <button onclick="copyInjector()">📋 Copiar</button>
+    <button onclick="injectorImport()">📂 Importar</button>
+    <button onclick="injectorExport()">💾 Exportar</button>
+    <button onclick="document.getElementById('injectorPanel').style.display='none'">❌ Fechar</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById("injectorBtn").onclick = () => {
+    const panel = document.getElementById("injectorPanel");
+    panel.style.display = (panel.style.display === "none") ? "block" : "none";
+  };
+
+  function injectorExecute() {
+    const code = document.getElementById("injectorInput").value;
+    try {
+      eval(code);
+      alert("✅ JS executado!");
+    } catch (e) {
+      alert("❌ Erro: " + e.message);
+    }
+  }
+
+  function injectorInjectCSS() {
+    const code = document.getElementById("injectorInput").value;
+    const style = document.createElement("style");
+    style.innerHTML = code;
+    document.head.appendChild(style);
+    alert("🎨 CSS injetado!");
+  }
+
+  function injectorRenderHTML() {
+    const html = document.getElementById("injectorInput").value;
+    const frame = document.createElement("iframe");
+    frame.style = "width:100%; height:300px; margin-top:8px; border:1px solid #0ff;";
+    frame.sandbox = "allow-scripts allow-same-origin";
+    frame.srcdoc = html;
+    document.getElementById("injectorPanel").appendChild(frame);
+  }
+
+  function injectorRenderInResponse() {
+    const html = document.getElementById("injectorInput").value;
+    if (typeof renderResponse === 'function') {
+      renderResponse(`---\n### 🔮 Código Injetado\n\n\`\`\`html\n${html.replace(/</g,"&lt;")}\n\`\`\`\n\n---\n<div class="rendered-html">${html}</div>\n---`);
+      document.getElementById("injectorPanel").style.display = "none";
+    } else {
+      alert("⚠️ Função renderResponse não encontrada.");
+    }
+  }
+
+  function copyInjector() {
+    const ta = document.getElementById("injectorInput");
+    ta.select();
+    document.execCommand("copy");
+    alert("📋 Copiado.");
+  }
+
+  function injectorImport() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".html,.js,.txt";
+    input.onchange = () => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        document.getElementById("injectorInput").value = reader.result;
+      };
+      reader.readAsText(input.files[0]);
+    };
+    input.click();
+  }
+
+  function injectorExport() {
+    const blob = new Blob([document.getElementById("injectorInput").value], {type: 'text/plain'});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "codigo-injetado.txt";
+    a.click();
+  }
+</script>
