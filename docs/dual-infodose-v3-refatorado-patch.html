@@ -249,7 +249,7 @@
 <style>
     body {
       margin: 0;
-      height: 100vh;
+      height: 100dvh;
       overflow: hidden;
       background: var(--bg);
       color: var(--text);
@@ -2518,6 +2518,7 @@ function ATIVAR_KOBLLUX_PATCH() {
   const style = document.createElement("style");
   style.textContent = `
     :root {
+    
       --mask-gradient: linear-gradient(45deg, #F0F, #0FF);
     }
 
@@ -2526,16 +2527,29 @@ function ATIVAR_KOBLLUX_PATCH() {
     .kitty-button,
     .toggle-button,
     .upload-symbolic-button,
-    .input-container,
+    
     .response-container,
     .login-container,
     #decoderBox,
     #koblluxPlayer,
     #pulsos-container {
-      -webkit-mask-image: var(--mask-gradient);
+      background: var(--bg, #000);
+  color: var(--text, #0ff);
+
+
+  font-family: 'Montserrat', sans-serif;
+        
+        -webkit-mask-image: var(--mask-gradient);
       mask-image: var(--mask-gradient);
       border-image: var(--mask-gradient);
       border-image-slice: 1;
+
+      border: 1px solid rgba(0, 255, 255, 0.2);
+     
+
+  transition: transform 0.2s, box-shadow 0.3s;
+
+  cursor: pointer;
     }
 
     .symbol-btn {
