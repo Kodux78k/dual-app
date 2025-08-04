@@ -640,5 +640,74 @@ body {
       retina_detect:true
     }); 
   </script>
+  
+ 
+  <style>
+     body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      /*background: transparent;*/
+    }
+
+    .fake-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* ou 'contain' se quiser ver tudo */
+      object-position: center;
+      z-index: -1;
+      opacity: 0.2; /* ajusta a transparência */
+      pointer-events: none; /* deixa os cliques passarem por ela */
+      transition: opacity 0.5s ease;
+    }
+
+    .upload-btn {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    #imgUpload {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- IMG como plano de fundo fake -->
+  <img id="bgImage" class="fake-bg" src="assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG" alt="BG Fake" />
+
+  <!-- Botão de upload -->
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">📤 Trocar imagem</button>
+  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
+
+  <script>
+    function trocarImagem(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('bgImage');
+        img.src = e.target.result;
+        console.log("◉ Imagem substituída com sucesso!");
+        if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+
 </body>
 </html>
