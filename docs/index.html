@@ -224,14 +224,50 @@
       transform: translateX(-50%) scale(1.05);
       background: rgba(0, 255, 255, 0.2);
     }
-    #toggleDecoderBtn { top: 150px; }
-    #uploadHTMLBtn  { top: 109px; }
+    #toggleDecoderBtn { top: 139px; }
+    #uploadHTMLBtn  { top: 99px; }
+
 body {
+  position: relative;
+  background: 
+    linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7)),
+    url('assets/styles/themes/bgs/Dark-BG.png'); /* textura cósmica */
+  background-blend-mode: lighten;
+  background-size: cover;
+  background-position: center
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  animation: pulsarKobllux 12s ease-in-out infinite;
+  z-index: 0;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Animação de pulsar body {
   background: 
     linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7));
   background-blend-mode: lighten;
+}cósmico */
+@keyframes pulsarKobllux {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.05);
+  }
 }
 
+/* Blur espiritual com ::before opcional */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(3px);
+  pointer-events: none;
+  z-index: 1;
+}
   </style>
       <!-- body {background: transparent !important; !-->
 </head>
