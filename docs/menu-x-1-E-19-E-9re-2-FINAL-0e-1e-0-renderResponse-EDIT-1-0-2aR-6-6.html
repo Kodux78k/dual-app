@@ -114,7 +114,7 @@
     }
     .pagination button:hover{transform:scale(1.2)}
     .response-block{
-      margin:1rem 0;padding:1.3rem;border-radius:12px;
+      margin:1rem 0;padding:1.8rem;border-radius:12px;
       line-height:1.8;position:relative;overflow:hidden;
       animation:fadeIn var(--slow) ease forwards,pulse 12s infinite ease-in-out;
       transition:box-shadow var(--fast),transform var(--fast);
@@ -2342,7 +2342,183 @@ function salvarHistorico(pulso) {
 }
 </style>
 
-<div class="pages-wrapper" id="pagesWrapper"></div>
+<script>
+function splitText(text, maxLen=1000) {
+  const chunks = [];
+  while (text.length > 0) chunks.push(text.slice(0, maxLen)), text = text.slice(maxLen);
+  return chunks;
+}
+function callAI(prompt) {
+  return fetch('/api/ai', { method:'POST', body: JSON.stringify({ prompt }) })
+    .then(r => r.json()).then(r => r.text);
+}
+function renderResponse(txt){
+  const wrap = document.querySelector('.pages-wrapper');
+  wrap.innerHTML = '';
+  pages = []; currentPage = 0; autoAdvance = true;
+
+  txt = txt
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>');
+
+  const paras = splitText(txt),
+        total = paras.length;
+  if (total === 0) return;
+
+  const maxPerPage = 3,
+        numPages   = Math.ceil(total / maxPerPage),
+        baseSize   = Math.floor(total / numPages),
+        extra      = total % numPages;
+
+  let cursor = 0;
+  for(let i = 0; i < numPages; i++){
+    const thisSize = baseSize + (i < extra ? 1 : 0),
+          pg        = document.createElement('div');
+    pg.className = 'page' + (i === 0 ? ' active' : '');
+
+    for(let j = 0; j < thisSize; j++){
+      const para = paras[cursor++].trim(),
+            posClass = j === 0 ? 'intro' : (j === thisSize - 1 ? 'ending' : 'middle'),
+            block = document.createElement('div');
+      block.className = `response-block ${posClass}`;
+      block.innerHTML = `<p>${para}</p>`;
+      processDynamicCommands(block.querySelector('p'));
+      attachBlockListeners(block, para);
+      pg.appendChild(block);
+    }
+
+    wrap.appendChild(pg);
+    pages.push(pg);
+  }
+
+  document.getElementById('pageIndicator').textContent = `1 / ${pages.length}`;
+  autoSpeakPage(0);
+}
+function attachBlockListeners(block, para){
+  block.addEventListener('click', () => {
+    autoAdvance = false;
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
+    const clean = para.replace(/["“”‘’]/g,'').replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g,'');
+    const utter = new SpeechSynthesisUtterance(clean);
+    speechSynthesis.speak(utter);
+  });
+}
+function autoSpeakPage(i=0){
+  if (!pages[i]) return;
+  const blocks = pages[i].querySelectorAll('.response-block');
+  let idx = 0;
+  const speakNext = () => {
+    if (idx >= blocks.length) return;
+    const u = new SpeechSynthesisUtterance(blocks[idx].textContent);
+    u.onend = speakNext;
+    speechSynthesis.speak(u);
+    idx++;
+  };
+  speakNext();
+}
+function renderASCIIResponse(container, ascii) {
+  container.innerHTML = `<pre class="ascii-art">${ascii}</pre>`;
+}
+function createAsciiButton(text, callback) {
+  const btn = document.createElement('button');
+  btn.textContent = text;
+  btn.onclick = callback;
+  return btn;
+}
+function processDynamicCommands(root) {
+  root.innerHTML = root.innerHTML.replace(
+    /\[\[button:([^\|\]]+)\|([^\]]+)\]\]/g,
+    (_, lbl, cmd) => {
+      const id = `btn-${Date.now()}-${Math.random()}`;
+      setTimeout(() => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', () => handleCommand(cmd));
+      }, 0);
+      return `<button id="${id}">${lbl}</button>`;
+    }
+  );
+}
+function handleCommand(cmd) {
+  if (cmd.startsWith('ascii:')) {
+    const art = cmd.split(':')[1];
+    const cont = document.querySelector('#chat-container');
+    renderASCIIResponse(cont, atob(art));
+  } else {
+    callAI(cmd).then(resp => {
+      renderResponse(resp);
+    });
+  }
+}
+document.getElementById('send-btn').addEventListener('click', () => {
+  const input = document.getElementById('input-box').value;
+  renderResponse('...');
+  callAI(input).then(resp => renderResponse(resp));
+});
+</script>
+
+
+
+
+
+<script>
+let preferClean = localStorage.getItem('preferClean') === 'false' ? false : true;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleModeBtn = document.createElement('button');
+  toggleModeBtn.id = 'toggleCleanMode';
+  toggleModeBtn.innerText = '💬=' + (preferClean ? '🫧' : '🫆');
+  toggleModeBtn.style.cssText = `
+    position: fixed;
+    top: 8px;
+    left: 20px;
+    padding: 6px 9px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #0ff;
+    border: none;
+    border-radius: 5px;
+    font-size: 9px;
+    opacity:0.8;
+    cursor: pointer;
+    z-index: 3;
+  `;
+  document.body.appendChild(toggleModeBtn);
+
+  toggleModeBtn.addEventListener('click', () => {
+    preferClean = !preferClean;
+    localStorage.setItem('preferClean', preferClean);
+    toggleModeBtn.innerText = ':' + (preferClean ? '🫧' : '🫆');
+    if (navigator.vibrate) navigator.vibrate([30]);
+  });
+});
+
+function showLoading(msg){
+  const wrap = document.querySelector('.pages-wrapper');
+  wrap.innerHTML = '';
+  const p = document.createElement('div');
+  p.className = 'page active';
+  const foot = document.createElement('p');
+  foot.className = 'footer-text loading pulse-glow';
+  msg.split('').forEach((ch, i) => {
+    const sp = document.createElement('span');
+    sp.textContent = ch;
+    sp.style.animationDelay = (i * 0.04) + 's';
+    sp.classList.add('typewriter-char');
+    foot.appendChild(sp);
+    if (navigator.vibrate) navigator.vibrate(5);
+  });
+  p.appendChild(foot);
+  wrap.appendChild(p);
+  document.getElementById('pageIndicator').textContent = '1 / 1';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
+  if (navigator.vibrate) navigator.vibrate([20,10,20]);
+}
+
+function vibrateOnResponse() {
+  if (navigator.vibrate) navigator.vibrate([12, 6, 12]);
+}
+</script>
 
 
 
