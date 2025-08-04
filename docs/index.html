@@ -234,11 +234,11 @@ body {
     url('assets/styles/themes/bgs/Dark-BG.png'); /* textura cósmica */
   background-blend-mode: lighten;
   background-size: cover;
-  background-position: center
+  background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
   animation: pulsarKobllux 12s ease-in-out infinite;
-  z-index: 0;
+  z-index: -1;
   overflow-x: hidden;
   min-height: 100vh;
 }
@@ -266,7 +266,7 @@ body::before {
   height: 100vh;
   backdrop-filter: blur(3px);
   pointer-events: none;
-  z-index: 1;
+  z-index: -2;
 }
   </style>
       <!-- body {background: transparent !important; !-->
