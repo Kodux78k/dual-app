@@ -1639,10 +1639,10 @@ function renderResponse({ intro = "", middle = "", ending = "" }) {
 
     const parsed = content
       .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match => {
-        return `<button class="symbol-btn" onclick="logMistico('Emoji: ${match}')">${match}</button>`;
+        return `<button class="symbol-btn" onclick="registrarPulsoEEnviar('Emoji: ${match}')">${match}</button>`;
       })
       .replace(/\[(.+?)\]/g, (match, p1) => {
-        return `<button class="symbol-btn" onclick="logMistico('[${p1}]')">[${p1}]</button>`;
+        return `<button class="symbol-btn" onclick="registrarPulsoEEnviar('[${p1}]')">[${p1}]</button>`;
       });
 
     block.innerHTML = parsed;
@@ -2149,7 +2149,7 @@ function transformarSimbolosAvancado() {
 
       // Colchetes [simbolo]
       html = html.replace(/\[(.+?)\]/g, (_, simbolo) =>
-        `<span class="symbol-button tipo-colchete" onclick="enviarPulsoSimbolico('${simbolo}')">[${simbolo}]</span>`
+        `<span class="symbol-button tipo-colchete" onclick="registrarPulsoEEnviar('${simbolo}')">[${simbolo}]</span>`
       );
 
       // Chaves {simbolo}
@@ -2164,7 +2164,7 @@ function transformarSimbolosAvancado() {
 
       // Emojis únicos (corrigido: evita quadrado duplicado)
       html = html.replace(/([\p{Emoji}])/gu, (_, emoji) =>
-        `<span class="symbol-button tipo-emoji" onclick="enviarPulsoSimbolico('${emoji}')">${emoji}</span>`
+        `<span class="symbol-button tipo-emoji" onclick="registrarPulsoEEnviar('${emoji}')">${emoji}</span>`
       );
 
       // ASCII blocks (3+ linhas)
@@ -2622,19 +2622,33 @@ function ATIVAR_KOBLLUX_PATCH() {
     });
   }
 
-  // LOG MISTICO — Universal logging visual
-  window.logMistico = function(msg) {
-    const el = document.createElement("div");
-    el.className = "debug-mistico";
-    el.innerText = "◉ " + msg;
-    const pulsos = document.getElementById("pulsos");
-    if (pulsos) {
-      pulsos.appendChild(el);
-      pulsos.scrollTop = pulsos.scrollHeight;
-    } else {
-      console.log("[KOBLLUX LOG]:", msg);
-    }
-  };
+  // LOG MISTICO — Universal logging visual + ações opcionais
+window.logMistico = function(msg, options = {}) {
+  const el = document.createElement("div");
+  el.className = "debug-mistico";
+  el.innerText = "◉ " + msg;
+
+  const pulsos = document.getElementById("pulsos");
+  if (pulsos) {
+    pulsos.appendChild(el);
+    pulsos.scrollTop = pulsos.scrollHeight;
+  } else {
+    console.log("[KOBLLUX LOG]:", msg);
+  }
+
+  // Ações opcionais integradas ao log
+  if (options.enviarPulso && options.simbolo) {
+    registrarPulsoEEnviar(options.simbolo);
+  }
+
+  if (options.callAI) {
+    callAI();
+  }
+
+  if (options.updateUI) {
+    updateUI();
+  }
+};
 
   // Eventos extras
   document.getElementById("toggleBtn")?.addEventListener("click", () => logMistico("🧠 Assistente Toggled"));
@@ -2645,6 +2659,25 @@ function ATIVAR_KOBLLUX_PATCH() {
   });
 
   logMistico("✨ PATCH KOBLLUX SUPREMO ativado");
+}
+</script>
+<script>
+function registrarPulsoEEnviar(simbolo) {
+  logMistico(`🧿 Pulso simbólico ativado: ${simbolo}`);
+  
+  if (!isEnabled) {
+    isEnabled = true;
+    localStorage.setItem(STORAGE_KEY, '1');
+    updateUI();
+  }
+
+  showLoading(` Pulso simbiótico de "${simbolo}" em expansão...`);
+  conversation.push({
+    role: 'user',
+    content: `✨ Pulso simbólico: ${simbolo}`
+  });
+
+  callAI();
 }
 </script>
 <script>ATIVAR_KOBLLUX_PATCH();</script>
