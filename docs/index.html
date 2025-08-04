@@ -170,6 +170,18 @@
       cursor: pointer;
       z-index: 10;
     }
+    #uploadHTMLBtn{
+Position: fixed;
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      right:19px;
+      z-index: 10;
+      }
     #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
     #buyTokens { display:none; }
     #buyTokens button {
@@ -209,8 +221,8 @@
       font-size:1em;
     }
 
-    #toggleDecoderBtn,
-    #uploadHTMLBtn {
+    #toggleDecoderBtn
+     {
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
@@ -234,8 +246,9 @@
       transform: translateX(-50%) scale(1.05);
       background: rgba(0, 255, 255, 0.2);
     }
-    #toggleDecoderBtn { top: 138px; }
-    #uploadHTMLBtn  { top: 93px; }
+    /* #toggleDecoderBtn { top: 138px; } */
+   /* #uploadHTMLBtn  { top: 93px; } */
+
 #userBgOptions {
   background: rgba(0, 0, 0, 0.5);
   padding: 12px;
@@ -322,6 +335,18 @@ body {
       <input type="text" id="user" placeholder="Usuário" required>
       <input type="password" id="pass" placeholder="Senha" required>
       <button class="btn-full" id="submitBtn">Entrar</button>
+      <div>  <!-- Botão de upload -->
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">🖼️</button>
+  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
+</div>
+        <div id="decoderBox">
+    <input type="text" id="codeInput" placeholder="Digite o selo...">
+    <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+  </div>
+  <button id="toggleDecoderBtn">🧬</button>
+  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+  <button id="uploadHTMLBtn">☍</button>
+      
       <div id="messageBox"></div>
       <div id="buyTokens">
         <button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
@@ -330,20 +355,11 @@ body {
         <div id="loggedUsername" class="username"></div>
         <button id="logoutBtn" class="btn-full">Desconectar</button>
       </div>
-      <div>  <!-- Botão de upload -->
-  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">🖼️</button>
-  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
-</div>
+      
     </div>
   </div>
 
-  <div id="decoderBox">
-    <input type="text" id="codeInput" placeholder="Digite o selo...">
-    <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
-  </div>
-  <button id="toggleDecoderBtn">🧬</button>
-  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
-  <button id="uploadHTMLBtn">☍</button>
+  
 
   <script type="module">
     const loginBox   = document.getElementById('loginBox');
