@@ -159,7 +159,17 @@
     .logout-area .btn-full::before {
       background: linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5));
     }
-
+.upload-btn {
+      
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10;
+    }
     #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
     #buyTokens { display:none; }
     #buyTokens button {
@@ -226,7 +236,47 @@
     }
     #toggleDecoderBtn { top: 138px; }
     #uploadHTMLBtn  { top: 93px; }
+#userBgOptions {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 16px;
+  margin-top: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn var(--fast) ease;
+}
 
+#userBgOptions button {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background 0.3s, transform 0.3s;
+}
+
+#userBgOptions button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.03);
+}
+
+#userBgOptions .thumbnails img {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+#userBgOptions .thumbnails img:hover {
+  border-color: #fff;
+  opacity: 1;
+}
 /* body {background: linear-gradient(to top, rgba(68, 68, 68, 0.3), rgba(255, 255, 255, 0.2));} */
 body {
   background: 
@@ -280,6 +330,10 @@ body {
         <div id="loggedUsername" class="username"></div>
         <button id="logoutBtn" class="btn-full">Desconectar</button>
       </div>
+      <div>  <!-- Botão de upload -->
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">🖼️</button>
+  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
+</div>
     </div>
   </div>
 
@@ -312,7 +366,7 @@ body {
 
     const USERS_JSON = 'users/usersid.json';
     const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
-
+    
     const CODE_MAP = {
       "DUAL": "menu.html",
       "KBX": "menu-x-1.html",
@@ -665,19 +719,7 @@ body {
       transition: opacity 0.5s ease;
     }
 
-    .upload-btn {
-      position: fixed;
-      top: 56px;
-      left: 20px;
-      padding: 8px 16px;
-      font-size: 12px;
-      border: none;
-      border-radius: 6px;
-      background: #222;
-      color: #fff;
-      cursor: pointer;
-      z-index: 10;
-    }
+    
 
     #imgUpload {
       display: none;
@@ -686,11 +728,8 @@ body {
 
 
   <!-- IMG como plano de fundo fake -->
-  <img id="bgImage" class="fake-bg" src="assets/styles/themes/bgs/Dark-BG.png" alt="BG Fake" />
+  <img id="bgImage" class="fake-bg" src="assets/styles/themes/bgs/Dark-BG.png" alt="" />
 
-  <!-- Botão de upload -->
-  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">🖼️</button>
-  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
 
   <script>
     function trocarImagem(event) {
@@ -706,7 +745,76 @@ body {
       };
       reader.readAsDataURL(file);
     }
+    
   </script>
+<script>
+// 🎛️ BG Personalizado
+const bg = document.getElementById('bgImage');
+const imgUpload = document.getElementById('imgUpload');
+const cycleBtn = document.getElementById('cycleBtn');
+const userBgOptions = document.getElementById('userBgOptions');
+const BG_KEY = "bgImageSource";
+const FILTER_KEY = "bgImageFilter";
+const imagens = [
+  'assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG',
+  'assets/styles/themes/bgs/Nebula-Galaxy.png',
+  'assets/styles/themes/bgs/Circuit-Spirit.jpg',
+  'assets/styles/themes/bgs/Temple-Net.png'
+];
+let indexAtual = 0;
 
+function toggleUserOptions() {
+  userBgOptions.style.display = userBgOptions.style.display === 'none' ? 'flex' : 'none';
+}
+
+function loadUserBG() {
+  const savedSrc = localStorage.getItem(BG_KEY) || 'about:blank';
+  const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
+  bg.src = savedSrc;
+  bg.style.filter = savedFilter;
+}
+
+function setBG(src) {
+  bg.src = src;
+  localStorage.setItem(BG_KEY, src);
+  logMistico("📷 BG set via thumbnail");
+}
+
+function applyFilter(filter) {
+  bg.style.filter = filter;
+  localStorage.setItem(FILTER_KEY, filter);
+  logMistico("🎨 Filtro aplicado: " + filter);
+}
+
+imgUpload.addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataURL = e.target.result;
+    bg.src = dataURL;
+    localStorage.setItem(BG_KEY, dataURL);
+    logMistico("🖼️ BG set via upload");
+  };
+  reader.readAsDataURL(file);
+});
+
+cycleBtn.addEventListener('click', () => {
+  indexAtual = (indexAtual + 1) % imagens.length;
+  const nextSrc = imagens[indexAtual];
+  setBG(nextSrc);
+  logMistico("🔁 BG ciclado");
+});
+
+function logMistico(msg) {
+  if (window.logMistico) {
+    window.logMistico(msg);
+  } else {
+    console.log("◉", msg);
+  }
+}
+
+window.addEventListener('load', loadUserBG);
+</script>
 </body>
 </html>
