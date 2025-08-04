@@ -1262,7 +1262,7 @@ binauralAudio.volume = binauralVolume.value;
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
             CHUNK_SIZE   :12000,
-            AUTH_TOKEN   :'Bearer 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'
+            AUTH_TOKEN   :'Bearer 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'
           };
 
     let training = '', chunks = [], chunkIndex = 0;
@@ -2344,6 +2344,318 @@ function salvarHistorico(pulso) {
 
 <div class="pages-wrapper" id="pagesWrapper"></div>
 
+<script>
+function splitText(text, maxLen=1000) {
+  const chunks = [];
+  while (text.length > 0) chunks.push(text.slice(0, maxLen)), text = text.slice(maxLen);
+  return chunks;
+}
+function callAI(prompt) {
+  return fetch('/api/ai', { method:'POST', body: JSON.stringify({ prompt }) })
+    .then(r => r.json()).then(r => r.text);
+}
+function renderResponse(txt){
+  const wrap = document.querySelector('.pages-wrapper');
+  wrap.innerHTML = '';
+  pages = []; currentPage = 0; autoAdvance = true;
 
+  txt = txt
+    .replace(/`([^`]+)`/g,'<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>');
+
+  const paras = splitText(txt),
+        total = paras.length;
+  if (total === 0) return;
+
+  const maxPerPage = 3,
+        numPages   = Math.ceil(total / maxPerPage),
+        baseSize   = Math.floor(total / numPages),
+        extra      = total % numPages;
+
+  let cursor = 0;
+  for(let i = 0; i < numPages; i++){
+    const thisSize = baseSize + (i < extra ? 1 : 0),
+          pg        = document.createElement('div');
+    pg.className = 'page' + (i === 0 ? ' active' : '');
+
+    for(let j = 0; j < thisSize; j++){
+      const para = paras[cursor++].trim(),
+            posClass = j === 0 ? 'intro' : (j === thisSize - 1 ? 'ending' : 'middle'),
+            block = document.createElement('div');
+      block.className = `response-block ${posClass}`;
+      block.innerHTML = `<p>${para}</p>`;
+      processDynamicCommands(block.querySelector('p'));
+      attachBlockListeners(block, para);
+      pg.appendChild(block);
+    }
+
+    wrap.appendChild(pg);
+    pages.push(pg);
+  }
+
+  document.getElementById('pageIndicator').textContent = `1 / ${pages.length}`;
+  autoSpeakPage(0);
+}
+function attachBlockListeners(block, para){
+  block.addEventListener('click', () => {
+    autoAdvance = false;
+    if (speechSynthesis.speaking) speechSynthesis.cancel();
+    const clean = para.replace(/["“”‘’]/g,'').replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g,'');
+    const utter = new SpeechSynthesisUtterance(clean);
+    speechSynthesis.speak(utter);
+  });
+}
+function autoSpeakPage(i=0){
+  if (!pages[i]) return;
+  const blocks = pages[i].querySelectorAll('.response-block');
+  let idx = 0;
+  const speakNext = () => {
+    if (idx >= blocks.length) return;
+    const u = new SpeechSynthesisUtterance(blocks[idx].textContent);
+    u.onend = speakNext;
+    speechSynthesis.speak(u);
+    idx++;
+  };
+  speakNext();
+}
+function renderASCIIResponse(container, ascii) {
+  container.innerHTML = `<pre class="ascii-art">${ascii}</pre>`;
+}
+function createAsciiButton(text, callback) {
+  const btn = document.createElement('button');
+  btn.textContent = text;
+  btn.onclick = callback;
+  return btn;
+}
+function processDynamicCommands(root) {
+  root.innerHTML = root.innerHTML.replace(
+    /\[\[button:([^\|\]]+)\|([^\]]+)\]\]/g,
+    (_, lbl, cmd) => {
+      const id = `btn-${Date.now()}-${Math.random()}`;
+      setTimeout(() => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', () => handleCommand(cmd));
+      }, 0);
+      return `<button id="${id}">${lbl}</button>`;
+    }
+  );
+}
+function handleCommand(cmd) {
+  if (cmd.startsWith('ascii:')) {
+    const art = cmd.split(':')[1];
+    const cont = document.querySelector('#chat-container');
+    renderASCIIResponse(cont, atob(art));
+  } else {
+    callAI(cmd).then(resp => {
+      renderResponse(resp);
+    });
+  }
+}
+document.getElementById('send-btn').addEventListener('click', () => {
+  const input = document.getElementById('input-box').value;
+  renderResponse('...');
+  callAI(input).then(resp => renderResponse(resp));
+});
+</script>
+
+
+
+
+
+<script>
+let preferClean = localStorage.getItem('preferClean') === 'false' ? false : true;
+
+document.addEventListener("DOMContentLoaded", () => {
+  const toggleModeBtn = document.createElement('button');
+  toggleModeBtn.id = 'toggleCleanMode';
+  toggleModeBtn.innerText = '💬=' + (preferClean ? '🫧' : '🫆');
+  toggleModeBtn.style.cssText = `
+    position: fixed;
+    top: 8px;
+    left: 20px;
+    padding: 6px 9px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #0ff;
+    border: none;
+    border-radius: 5px;
+    font-size: 9px;
+    opacity:0.8;
+    cursor: pointer;
+    z-index: 3;
+  `;
+  document.body.appendChild(toggleModeBtn);
+
+  toggleModeBtn.addEventListener('click', () => {
+    preferClean = !preferClean;
+    localStorage.setItem('preferClean', preferClean);
+    toggleModeBtn.innerText = ':' + (preferClean ? '🫧' : '🫆');
+    if (navigator.vibrate) navigator.vibrate([30]);
+  });
+});
+
+function showLoading(msg){
+  const wrap = document.querySelector('.pages-wrapper');
+  wrap.innerHTML = '';
+  const p = document.createElement('div');
+  p.className = 'page active';
+  const foot = document.createElement('p');
+  foot.className = 'footer-text loading pulse-glow';
+  msg.split('').forEach((ch, i) => {
+    const sp = document.createElement('span');
+    sp.textContent = ch;
+    sp.style.animationDelay = (i * 0.04) + 's';
+    sp.classList.add('typewriter-char');
+    foot.appendChild(sp);
+    if (navigator.vibrate) navigator.vibrate(5);
+  });
+  p.appendChild(foot);
+  wrap.appendChild(p);
+  document.getElementById('pageIndicator').textContent = '1 / 1';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
+  if (navigator.vibrate) navigator.vibrate([20,10,20]);
+}
+
+function vibrateOnResponse() {
+  if (navigator.vibrate) navigator.vibrate([12, 6, 12]);
+}
+</script>
+<script>
+function ATIVAR_KOBLLUX_PATCH() {
+  // CSS refinado com bordas suaves
+  const style = document.createElement("style");
+  style.textContent = `
+    :root {
+      --mask-gradient: linear-gradient(45deg, #F0F, #0FF);
+    }
+
+    .response-container,
+    
+    #koblluxPlayer,
+    button,
+    .symbol-button,
+    .kitty-button,
+    .toggle-button,
+    .upload-symbolic-button {
+      -webkit-mask-image: var(--mask-gradient);
+      mask-image: var(--mask-gradient);
+      border-image: var(--mask-gradient);
+      border-image-slice: 1;
+      border-width: 1px;
+      border-style: solid;
+      border-radius: 8px;
+    }
+
+    .symbol-btn {
+      -webkit-mask-image: var(--mask-gradient);
+      mask-image: var(--mask-gradient);
+      border-image: var(--mask-gradient);
+      border-image-slice: 1;
+      border-width: 1px;
+      border-style: solid;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: 2px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .response-block {
+      padding: 1.8rem !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // renderResponse aprimorado
+  window.renderResponse = function(text) {
+    const container = document.querySelector(".pages-wrapper");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const sentences = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+    const classes = ["intro", "middle", "ending"];
+
+    sentences.forEach((para, index) => {
+      const block = document.createElement("div");
+      block.className = "response-block " + classes[index % 3];
+
+      const parsed = para
+        .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match =>
+          `<button class="symbol-btn" onclick="logMistico('Emoji: ${match}')">${match}</button>`
+        )
+        .replace(/\[(.+?)\]/g, (match, p1) =>
+          `<button class="symbol-btn" onclick="logMistico('[${p1}]')">[${p1}]</button>`
+        );
+
+      block.innerHTML = parsed;
+
+      block.addEventListener("click", () => {
+        block.classList.toggle("expanded");
+        const pulsos = document.getElementById("pulsos");
+        if (pulsos) pulsos.classList.toggle("expanded");
+        logMistico("◉ Expandiu bloco: " + block.className);
+      });
+
+      container.appendChild(block);
+    });
+
+    logMistico("✅ renderResponse executado com " + sentences.length + " blocos");
+  };
+
+  // VoiceBtn refinado
+  const voiceBtn = document.getElementById("voiceBtn");
+  if (voiceBtn) {
+    voiceBtn.addEventListener("click", () => {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'pt-BR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const inputField = document.getElementById("userInput");
+        if (inputField) {
+          inputField.value = transcript;
+          document.getElementById("sendBtn")?.click();
+          logMistico("🎤 Voz capturada: " + transcript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        logMistico("❌ Erro no microfone: " + event.error);
+      };
+
+      logMistico("🎤 Microfone ativado");
+    });
+  }
+
+  // LOG MISTICO — Universal logging visual
+  window.logMistico = function(msg) {
+    const el = document.createElement("div");
+    el.className = "debug-mistico";
+    el.innerText = "◉ " + msg;
+    const pulsos = document.getElementById("pulsos");
+    if (pulsos) {
+      pulsos.appendChild(el);
+      pulsos.scrollTop = pulsos.scrollHeight;
+    } else {
+      console.log("[KOBLLUX LOG]:", msg);
+    }
+  };
+
+  // Eventos extras
+  document.getElementById("toggleBtn")?.addEventListener("click", () => logMistico("🧠 Assistente Toggled"));
+  document.getElementById("kittyBtn")?.addEventListener("click", () => logMistico("🐱 Kitty ativado"));
+  document.getElementById("sendBtn")?.addEventListener("click", () => {
+    const msg = document.getElementById("userInput")?.value;
+    logMistico("📤 Enviado: " + msg);
+  });
+
+  logMistico("✨ PATCH KOBLLUX SUPREMO ativado");
+}
+</script>
 </body>
 </html>
