@@ -556,9 +556,17 @@ body {
     }
 
     toggleDecoderBtn.addEventListener('click', () => {
-      playButtonSound();
-      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
-    });
+  playButtonSound();
+
+  const isVisible = decoderBox.style.display === 'block';
+  decoderBox.style.display = isVisible ? 'none' : 'block';
+
+  // Animação fluida
+  gsap.fromTo(decoderBox,
+    { opacity: 0, y: -20 },
+    { opacity: isVisible ? 0 : 1, y: 0, duration: 0.4, ease: "power2.out" }
+  );
+});
 
     uploadBtn.addEventListener('click', () => {
       playButtonSound();
@@ -594,23 +602,25 @@ body {
   const dest = CODE_MAP[code];
 
   if (dest) {
-    // TOCAR O ÁUDIO SUAVE DO PORTAL SOMENTE SE O CÓDIGO FOR VÁLIDO
-    const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav'); // <- tirou a barra no final
-audio.volume = 1;
-audio.play().catch(() => {}); // ignora erro se áudio não tocar
-
-gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
-gsap.to('.infodose', { opacity: 0, duration: 0.6 });
-gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
-
-gsap.to('body', {
-  opacity: 0,
-  duration: 1,
-  onComplete: () => {
-    window.location.href = dest;
-  }
-});
-  } else {
+  const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
+  audio.volume = 1;
+  audio.play().catch(() => {});
+  
+  gsap.to('.logo-container', { scale: 0.9, duration: 1.4, ease: 'power3.out' });
+  gsap.to('.infodose', { opacity: 0, y: -20, duration: 0.8 });
+  gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
+  gsap.to('body', {
+    opacity: 0,
+    duration: 1.8,
+    delay: 0.4,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 99); // tempo extra para terminar áudio
+    }
+  });
+} else {
     alert('Selo desconhecido ou não registrado.');
   }
 };
@@ -756,18 +766,22 @@ gsap.to('body', {
 
   <script>
     function trocarImagem(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+  const file = event.target.files[0];
+  if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = document.getElementById('bgImage');
-        img.src = e.target.result;
-        console.log("◉ Imagem substituída com sucesso!");
-        if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
-      };
-      reader.readAsDataURL(file);
-    }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById('bgImage');
+    img.src = e.target.result;
+
+    // ✅ Salvar no localStorage
+    localStorage.setItem("bgImageSource", e.target.result);
+
+    console.log("◉ Imagem substituída com sucesso!");
+    if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
+  };
+  reader.readAsDataURL(file);
+}
     
   </script>
 <script>
