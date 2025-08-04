@@ -1455,8 +1455,11 @@ binauralAudio.volume = binauralVolume.value;
         const pg = create('div','page'+(gi===0?' active':''),'');
         grp.forEach((para,j)=>{
           const cls = j===0?'intro':j===1?'middle':'ending';
-          const block = create('div',`response-block ${cls}`,`<p>${para}</p>`);
-          block.addEventListener('click',()=>{
+            const parsedPara = para.replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match => {
+              return `<button class="symbol-btn" onclick="registrarPulsoEEnviar('${match}')">${match}</button>`;
+            });
+            const block = create('div', `response-block ${cls}`, `<p>${parsedPara}</p>`);
+                      block.addEventListener('click',()=>{
             autoAdvance=false;
                   const cleanPara = para
           .replace(/["“”‘’]/g, '')                        // aspas
@@ -1490,7 +1493,23 @@ binauralAudio.volume = binauralVolume.value;
       $('#pageIndicator').textContent = `1 / ${pages.length}`;
       autoSpeakPage(0);
     }
+function registrarPulsoEEnviar(simbolo) {
+  logMistico(`🧿 Pulso simbólico ativado: ${simbolo}`);
+  
+  if (!isEnabled) {
+    isEnabled = true;
+    localStorage.setItem(STORAGE_KEY, '1');
+    updateUI();
+  }
 
+  showLoading(` Pulso simbiótico de "${simbolo}" em expansão...`);
+  conversation.push({
+    role: 'user',
+    content: `✨ Pulso simbólico: ${simbolo}`
+  });
+
+  callAI();
+}
     function autoSpeakPage(i){
   const txts = Array.from(pages[i].querySelectorAll('p'))
     .map(p=>p.textContent).join(' ');
@@ -2149,7 +2168,7 @@ function transformarSimbolosAvancado() {
 
       // Colchetes [simbolo]
       html = html.replace(/\[(.+?)\]/g, (_, simbolo) =>
-        `<span class="symbol-button tipo-colchete" onclick="enviarPulsoSimbolico('${simbolo}')">[${simbolo}]</span>`
+        `<span class="symbol-button tipo-colchete" onclick="registrarPulsoEEnviar('${simbolo}')">[${simbolo}]</span>`
       );
 
       // Chaves {simbolo}
@@ -2574,10 +2593,10 @@ function ATIVAR_KOBLLUX_PATCH() {
 
       const parsed = para
         .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match =>
-          `<button class="symbol-btn" onclick="logMistico('Emoji: ${match}')">${match}</button>`
+          `<button class="symbol-btn" onclick="registrarPulsoEEnviar('${match}')">${match}</button>`
         )
         .replace(/\[(.+?)\]/g, (match, p1) =>
-          `<button class="symbol-btn" onclick="logMistico('[${p1}]')">[${p1}]</button>`
+          `<button class="symbol-btn" onclick="registrarPulsoEEnviar('${match}')">${match}</button>`
         );
 
       block.innerHTML = parsed;
@@ -2695,10 +2714,10 @@ function ATIVAR_KOBLLUX_PATCH() {
 
       const parsed = para
         .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match =>
-          `<button class="symbol-btn" onclick="logMistico('Emoji: ${match}')">${match}</button>`
+          `<button class="symbol-btn" onclick="registrarPulsoEEnviar('${match}')">${match}</button>`
         )
         .replace(/\[(.+?)\]/g, (match, p1) =>
-          `<button class="symbol-btn" onclick="logMistico('[${p1}]')">[${p1}]</button>`
+          `<button class="symbol-btn" onclick="registrarPulsoEEnviar('${match}')">${match}</button>`
         );
 
       block.innerHTML = parsed;
