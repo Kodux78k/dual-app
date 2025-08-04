@@ -2173,10 +2173,10 @@ function renderResponse({ intro = "", middle = "", ending = "" }) {
 
     const parsed = content
       .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match => {
-        return `<button class="symbol-btn" onclick="expandirPulso(); logMistico('Emoji: ${match}')">${match}</button>`;
+        return `<button class="symbol-btn" onclick="enviarPulsoSimbolico(); logMistico('Emoji: ${match}')">${match}</button>`;
       })
       .replace(/\[(.+?)\]/g, (match, p1) => {
-        return `<button class="symbol-btn" onclick="expandirPulso(); logMistico('[${p1}]')">[${p1}]</button>`;
+        return `<button class="symbol-btn" onclick="enviarPulsoSimbolico(); logMistico('[${p1}]')">[${p1}]</button>`;
       });
 
     block.innerHTML = parsed;
@@ -2222,9 +2222,9 @@ function renderResponse(input) {
     const submenu = document.createElement("div");
     submenu.className = "submenu hidden";
     submenu.innerHTML = `
-      <button onclick="logMistico('🔁 Reiniciando pulso: ${className}')">🔄 Repetir Pulso</button>
-      <button onclick="mostrarNucleoAntecipacao()">🌀 Ativar Núcleo</button>
-      <button onclick="alert('💾 Exportar conteúdo em construção')">📥 Exportar</button>
+      <button onclick="enviarPulsoSimbolico('🔁 Reiniciando pulso: ${className}')">🔄 Repetir Pulso</button>
+      <button onclick="enviarPulsoSimbolico()">🌀 Ativar Núcleo</button>
+      <button onclick="enviarPulsoSimbolico('💾 Exportar conteúdo em construção')">📥 Exportar</button>
     `;
 
     block.innerHTML = `
@@ -2352,6 +2352,6 @@ function salvarHistorico(pulso) {
 </style>
 
 <div class="pages-wrapper" id="pagesWrapper"></div>
-<div id="pulsos"></div>
+
 </body>
 </html>
