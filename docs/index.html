@@ -147,7 +147,8 @@
       
     }
     .logout-area .username {
-      font-weight: 300;
+      /* font-weight: 300;*/
+      font-weight: bold;
       color: #fff;
       margin-bottom: 1rem;
       font-size: 1.1em; opacity:0.8;
@@ -202,7 +203,7 @@ Position: fixed;
     #decoderBox {
       display:none;
       position:fixed;
-      top:389px;
+      top:33px;
       left:50%;
       transform:translateX(-50%);
       background:rgba(0,0,0,0.6);
@@ -230,7 +231,7 @@ Position: fixed;
       padding: 0.3rem 0.7rem;
       border: none;
       border-radius: 20px;
-      background: rgba(0, 255, 255, 0.1);
+      background: rgba(255,255,255,0.15);
       color: #444;
       font-weight: bold;
       font-size: 0.95em;
@@ -299,7 +300,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  opacity: 0.18;
+  opacity: 0.24;
 }
 /* Animação de pulsar body {
   background: 
@@ -336,7 +337,7 @@ body {
       <input type="password" id="pass" placeholder="Senha" required>
       <button class="btn-full" id="submitBtn">Entrar</button>
       <div>  <!-- Botão de upload -->
-  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">🖼️</button>
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
   <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
 </div>
         <div id="decoderBox">
