@@ -28,7 +28,7 @@
     /* ——— SEU CSS INTEGRAL (ajustes) ——— */
     :root {
       --bg: linear-gradient(to bottom, #000, #1a1a1a);
-      --text: #d7d7d7;
+      --text: #444;
       --fast: .4s; --med: .8s; --slow: 1.8s;
     }
     body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
@@ -225,21 +225,19 @@
       background: rgba(0, 255, 255, 0.2);
     }
     #toggleDecoderBtn { top: 138px; }
-    #uploadHTMLBtn  { top: 89px; }
+    #uploadHTMLBtn  { top: 93px; }
 
 /* body {background: linear-gradient(to top, rgba(68, 68, 68, 0.3), rgba(255, 255, 255, 0.2));} */
 body {
-  background-image: url('assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG'); /* opcional */
+  background: 
+    linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7)),
+    url('assets/styles/themes/bgs/Dark-BG.png'); /* opcional */
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
   opacity: 0.18;
-  z-index: 0;
-  
 }
-
-
 /* Animação de pulsar body {
   background: 
     linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7));
