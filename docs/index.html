@@ -291,7 +291,11 @@ Position: fixed;
   border-color: #fff;
   opacity: 1;
 }
- body {background: linear-gradient(to top, rgba(68, 68, 68, 0.3), rgba(255, 255, 255, 0.2));} 
+ body {background: 
+  linear-gradient(to top, rgba(68, 68, 68, 0.4), 
+  rgba(255, 255, 255, 0.6));
+      pointer-events: none; /* deixa os cliques passarem por ela */
+} 
 
 /* Animação de pulsar body {
   background: 
@@ -779,7 +783,7 @@ Position: fixed;
       height: 100vh;
       object-fit: cover; /* ou 'contain' se quiser ver tudo */
       object-position: center;
-      z-index: -1;
+      z-index: -2;
       opacity: 0.24; /* ajusta a transparência */
       pointer-events: none; /* deixa os cliques passarem por ela */
       transition: opacity 0.5s ease;
