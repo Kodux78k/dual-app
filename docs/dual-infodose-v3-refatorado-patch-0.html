@@ -2524,8 +2524,7 @@ function ATIVAR_KOBLLUX_PATCH() {
 
     button,
     .symbol-button,
-    .kitty-button,
-    .toggle-button,
+   
     .upload-symbolic-button,
     
     .response-container,
@@ -2533,20 +2532,15 @@ function ATIVAR_KOBLLUX_PATCH() {
     #decoderBox,
     #koblluxPlayer,
     #pulsos-container {
-      background: var(--bg, #000);
-  color: var(--text, #0ff);
-  border: 1px solid var(--text, #0ff);
 
-  font-family: 'Montserrat', sans-serif;
-        
-        -webkit-mask-image: var(--mask-gradient);
+    -webkit-mask-image: var(--mask-gradient);
       mask-image: var(--mask-gradient);
       border-image: var(--mask-gradient);
-      border-image-slice: 1;
-
-      border: 1px solid rgba(0, 255, 255, 0.2);
-     
-
+      border-image-slice: 2;
+      border-width: 0.1rem;
+      border-style: solid;
+      border-radius: 8px;
+    
   transition: transform 0.2s, box-shadow 0.3s;
 
   cursor: pointer;
