@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KOBLLUX ∞ Ritual Fractal 3D</title>
+  <style>
+    :root {
+      --gold: #f7d774;
+      --aqua: #00ffe0;
+      --deep: #1a002f;
+      --night: #0f001a;
+      --glow-gold: drop-shadow(0 0 8px #f7d774);
+      --glow-aqua: drop-shadow(0 0 16px #00ffe0);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      background: radial-gradient(ellipse at center, var(--deep), var(--night));
+      color: var(--gold);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 12px;
+      text-shadow: 0 0 14px var(--gold);
+    }
+    #controls, #scoreboard {
+      display: flex;
+      gap: 10px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+    button, select {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: var(--aqua);
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 8px var(--aqua);
+      cursor: pointer;
+    }
+    #game3D {
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      border: 1px solid #333;
+      margin: 14px auto;
+      border-radius: 12px;
+      background: #000;
+    }
+    #mainGrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto;
+      margin-bottom: 16px;
+    }
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 24px solid transparent;
+      border-right: 24px solid transparent;
+      border-bottom: 40px solid var(--gold);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .triangle:hover {
+      border-bottom-color: var(--aqua);
+    }
+    #log {
+      background: rgba(0,0,0,0.6);
+      padding: 10px;
+      max-width: 95vw;
+      height: 140px;
+      overflow-y: auto;
+      border-radius: 10px;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+    #toggle3D {
+      margin-bottom: 10px;
+      background: #111;
+      color: var(--aqua);
+    }
+  </style>
+</head>
+<body>
+  <h1>KOBLLUX Ritual Fractal ∞ 3D</h1>
+  <div id="controls">
+    <select id="modo">
+      <option value="solo">Solo</option>
+      <option value="duo">Duo</option>
+      <option value="ritual">Ritual</option>
+    </select>
+    <button onclick="gerarJogo()">Invocar</button>
+    <button onclick="comprarCarta()">🎴 Carta</button>
+    <button onclick="rolarDado()">🎲 Dado</button>
+    <button onclick="resetar()">↻ Resetar</button>
+    <button id="toggle3D" onclick="toggle3D()">🔁 3D</button>
+  </div>
+
+  <div id="scoreboard">P1: <span id="p1">0</span> | P2: <span id="p2">0</span></div>
+  <div id="mainGrid"></div>
+  <div id="game3D" style="display: none;">[Visualização 3D - Placeholder]</div>
+  <div id="log"></div>
+
+  <script>
+    (() => {
+      const base = [3,6,9,7];
+      const ops = [
+        {symbol:'+', fn: (a,b)=>a+b},
+        {symbol:'×', fn: (a,b)=>a*b},
+        {symbol:'↺', fn: (a,b)=>(a+b)%12}
+      ];
+      const grid = document.getElementById('mainGrid');
+      const log = document.getElementById('log');
+      const p1 = document.getElementById('p1');
+      const p2 = document.getElementById('p2');
+      const modo = document.getElementById('modo');
+      const game3D = document.getElementById('game3D');
+      let pontos = [0, 0], turno = 0;
+
+      window.gerarJogo = () => {
+        grid.innerHTML = '';
+        for(let i=0;i<12;i++){
+          const el = document.createElement('div');
+          el.className = 'triangle';
+          el.onclick = () => ativar(i, el);
+          grid.appendChild(el);
+        }
+        log.innerText += '\n:: Ritual Invocado ::';
+      };
+
+      function ativar(i, el){
+        const a = base[i%base.length];
+        const b = base[(i+1)%base.length];
+        const op = ops[i%ops.length];
+        const r = op.fn(a,b);
+        el.style.borderBottomColor = '#00ffe0';
+        setTimeout(() => el.style.borderBottomColor = '#f7d774', 800);
+        log.innerText += `\n[T${i+1}] ${a} ${op.symbol} ${b} = ${r}`;
+        pontos[turno] += r;
+        if(modo.value === 'duo') turno = 1-turno;
+        p1.textContent = pontos[0];
+        p2.textContent = pontos[1];
+        log.scrollTop = log.scrollHeight;
+      }
+
+      window.resetar = () => {
+        grid.innerHTML = '';
+        pontos = [0,0];
+        p1.textContent = 0;
+        p2.textContent = 0;
+        log.innerText += '\n:: Resetado ::';
+      };
+
+      window.comprarCarta = () => {
+        const cartas = ['+10','×2','-5','Zerar','+3'];
+        const sorte = cartas[Math.floor(Math.random()*cartas.length)];
+        if(sorte==='+10') pontos[turno]+=10;
+        if(sorte==='×2') pontos[turno]*=2;
+        if(sorte==='-5') pontos[turno]-=5;
+        if(sorte==='Zerar') pontos[turno]=0;
+        if(sorte==='+3') pontos[turno]+=3;
+        log.innerText += `\n🎴 Carta: ${sorte}`;
+        p1.textContent = pontos[0];
+        p2.textContent = pontos[1];
+      };
+
+      window.rolarDado = () => {
+        const v = Math.floor(Math.random()*6)+1;
+        pontos[turno] += v;
+        log.innerText += `\n🎲 Dado: ${v}`;
+        p1.textContent = pontos[0];
+        p2.textContent = pontos[1];
+      };
+
+      window.toggle3D = () => {
+        game3D.style.display = game3D.style.display === 'none' ? 'block' : 'none';
+      };
+    })();
+  </script>
+</body>
+</html>

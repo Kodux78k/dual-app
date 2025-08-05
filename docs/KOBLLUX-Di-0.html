@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KOBΛLLUX ∞ Interface Expandida</title>
+  <style>
+    :root {
+      --gold: #f7d774;
+      --aqua: #00ffe0;
+      --deep: #2b0045;
+      --night: #0f001f;
+      --glow-gold: drop-shadow(0 0 8px #f7d774);
+      --glow-aqua: drop-shadow(0 0 14px #00ffe0);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      background: radial-gradient(circle at center, var(--deep), var(--night));
+      color: var(--gold);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px 5vw;
+    }
+
+    h1 {
+      margin-bottom: 24px;
+      text-align: center;
+      text-shadow: 0 0 12px var(--gold);
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 24px;
+      width: 100%;
+      max-width: 640px;
+      justify-items: center;
+    }
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 40px solid transparent;
+      border-right: 40px solid transparent;
+      border-bottom: 70px solid var(--gold);
+      transition: all 0.4s ease;
+      cursor: pointer;
+      filter: var(--glow-gold);
+      animation: pulse 3s infinite ease-in-out;
+      position: relative;
+      border-radius: 2px;
+    }
+
+    .triangle.down {
+      transform: rotate(180deg);
+    }
+
+    .triangle:hover {
+      transform: scale(1.2);
+      filter: var(--glow-aqua);
+    }
+
+    .triangle::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: -40px;
+      width: 80px;
+      height: 6px;
+      background: linear-gradient(to right, var(--gold), white);
+      border-radius: 4px;
+      opacity: 0.5;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.9;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.12);
+      }
+    }
+
+    #log {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 16px;
+      border-radius: 12px;
+      margin-top: 30px;
+      width: 100%;
+      max-width: 640px;
+      height: 160px;
+      overflow-y: auto;
+      border: 1px solid #f7d77466;
+      font-size: 13.5px;
+      line-height: 1.4;
+      backdrop-filter: blur(6px);
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>KOBΛLLUX ∴ Interface Fractal Expandida</h1>
+  <div class="container" id="fractalGrid"></div>
+  <div id="log"></div>
+  <audio id="blip" src="https://cdn.pixabay.com/download/audio/2023/03/30/audio_7e2c7d96e0.mp3?filename=click-124467.mp3" preload="auto"></audio>
+
+  <script>
+    const base = [3, 6, 9, 7];
+    const ops = [
+      { symbol: "×", fn: (a, b) => a * b },
+      { symbol: "+", fn: (a, b) => a + b },
+      { symbol: "↺", fn: (a, b) => (a + b) % 12 }
+    ];
+
+    const grid = document.getElementById("fractalGrid");
+    const log = document.getElementById("log");
+    const audio = document.getElementById("blip");
+
+    const triangles = Array.from({length: 9}, (_, i) => ({
+      id: `T${i + 1}`,
+      direction: i >= 6 ? "down" : "up",
+      pos: i
+    }));
+
+    function createTriangle(t) {
+      const el = document.createElement("div");
+      el.className = `triangle ${t.direction === "down" ? "down" : ""}`;
+      el.title = t.id;
+
+      el.onclick = () => {
+        const a = base[t.pos % base.length];
+        const b = base[(t.pos + 1) % base.length];
+        const op = ops[t.pos % ops.length];
+        const res = op.fn(a, b);
+        const msg = `[${t.id}] ${a} ${op.symbol} ${b} = ${res}`;
+        log.innerHTML += `<div>${msg}</div>`;
+        log.scrollTop = log.scrollHeight;
+        el.style.borderBottomColor = "var(--aqua)";
+        el.style.filter = "var(--glow-aqua)";
+        el.style.animation = "none";
+        audio.currentTime = 0;
+        audio.play();
+        setTimeout(() => {
+          el.style.borderBottomColor = "var(--gold)";
+          el.style.filter = "var(--glow-gold)";
+          el.style.animation = "pulse 3s infinite ease-in-out";
+        }, 900);
+      };
+
+      return el;
+    }
+
+    triangles.forEach(t => grid.appendChild(createTriangle(t)));
+  </script>
+</body>
+</html>

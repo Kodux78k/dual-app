@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOBLLUX Advocacia Digital • Pequenas Causas e Soluções</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+    :root {
+      --primary: #00f0ff;
+      --accent: #161a36;
+      --bg: transparent;
+      --glow: 0 0 15px var(--primary);
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100dvh;
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--bg) !important;
+      color: #e0f7fa;
+      padding: 33px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    main {
+      width: 100%;
+      max-width: 1024px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+    .section {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid #00eaff33;
+      border-radius: 16px;
+      box-shadow: 0 0 15px #00eaff33;
+      padding: 24px;
+      animation: fadeIn 0.8s ease-out;
+    }
+    h2 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      text-shadow: 0 0 6px var(--primary);
+    }
+    textarea, input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #00f0ff44;
+      color: white;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 16px;
+      padding: 12px 18px;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px var(--primary);
+      transition: transform 0.2s ease;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .output {
+      margin-top: 16px;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .flex-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 700px) {
+      .flex-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    footer {
+      margin-top: auto;
+      padding: 100px 0 30px;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="section">
+      <h2>📋 Registro de Ocorrência (BO Digital)</h2>
+      <div class="flex-grid">
+        <input id="nomeBO" placeholder="Seu Nome Completo">
+        <input id="cpfBO" placeholder="CPF">
+        <input id="dataBO" placeholder="Data do Fato">
+        <input id="localBO" placeholder="Local do Ocorrido">
+      </div>
+      <textarea id="descricaoBO" rows="4" placeholder="Descreva brevemente o que aconteceu..."></textarea>
+      <button onclick="gerarBO()">Gerar BO</button>
+      <div class="output" id="saidaBO">📝 O boletim de ocorrência será exibido aqui.</div>
+    </section>
+
+    <section class="section">
+      <h2>🏦 Quebra de Contrato com Bancos</h2>
+      <input id="banco" placeholder="Nome do Banco">
+      <input id="motivoBanco" placeholder="Motivo do cancelamento (ex: cobrança indevida)">
+      <textarea id="detalhesBanco" rows="4" placeholder="Explique o que ocorreu e por que deseja cancelar..."></textarea>
+      <button onclick="gerarContratoBanco()">Gerar Documento Judicial</button>
+      <div class="output" id="saidaBanco">📄 Documento bancário será gerado aqui.</div>
+    </section>
+
+    <section class="section">
+      <h2>🏠 Validação Rápida de Documentos Imobiliários</h2>
+      <input id="iptu" placeholder="Número do IPTU">
+      <input id="matricula" placeholder="Número da Matrícula do Imóvel">
+      <button onclick="validarDocumentos()">Validar</button>
+      <div class="output" id="saidaDocs">📑 Documentação será consultada...</div>
+      <button onclick="abrirEngenheiro()">Abrir Página do Engenheiro (ng-dual-0.html)</button>
+    </section>
+
+    <section class="section">
+      <h2>🌀 Ritual KOBLLUX • Solução Imediata</h2>
+      <textarea id="ritualInput" rows="4" placeholder="Descreva o problema e finalize com 'ATIVAR RITUAL'..."></textarea>
+      <button onclick="ativarRitual()">Invocar Ritual</button>
+      <div class="output" id="ritualOutput">✨ Ritual não ativado.</div>
+    </section>
+  </main>
+
+  <footer>
+    KOBLLUX • Advocacia Inteligente Integrada • Dual InfoDose Legal Flow – 2025 ∞
+  </footer>
+
+
+<style>
+:root { --primary: #00f0ff; --secondary: #1b1f47; --bg: #0a0f2c; --glow: 0 0 20px var(--primary); --error: #ff4d4d; --success: #00ff88; --warning: #ffcc00; }
+
+* {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }    html, body {
+      height: 100dvh;
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--bg) !important;
+      color: #e0f7fa;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }    header {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(0, 234, 255, 0.2);
+    }
+
+.logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #00f0ff, #00a2ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+    }    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+.user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00f0ff, #1b1f47);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      cursor: pointer;
+    }    main {
+      width: 100%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }    .section {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid #00eaff33;
+      border-radius: 16px;
+      box-shadow: 0 0 20px #00eaff44;
+      padding: 24px;
+      animation: fadeIn 0.5s ease-out;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+.section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px #00eaff66;
+    }    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+    }    .section h2 {
+      font-size: 1.6rem;
+      margin-bottom: 16px;
+      text-shadow: 0 0 6px var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+.section h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--primary), transparent);
+      margin-left: 10px;
+    }    textarea, input, select {
+      width: 100%;
+      padding: 12px 15px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #00f0ff44;
+      color: white;
+      font-size: 1rem;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+      font-family: 'Montserrat', sans-serif;
+    }    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+textarea:focus, input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+    }    .input-group {
+      position: relative;
+      margin-bottom: 15px;
+    }    .input-label {
+      position: absolute;
+      top: -10px;
+      left: 15px;
+      background: var(--bg);
+      padding: 0 8px;
+      font-size: 0.8rem;
+      color: var(--primary);
+    }
+
+button {
+      padding: 12px 24px;
+      background: var(--primary);
+      border: none;
+      border-radius: 10px;
+      margin-top: 16px;
+      cursor: pointer;
+      color: #000;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 0 10px var(--primary);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px var(--primary);
+    }    button:active {
+      transform: translateY(0);
+    }
+
+button.secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      box-shadow: none;
+    }    button.secondary:hover {
+      background: rgba(0, 240, 255, 0.1);
+    }    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+.output {
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-family: 'Roboto Mono', monospace;
+      border: 1px solid rgba(0, 234, 255, 0.1);
+      position: relative;
+    }    .output.success {
+      border-left: 4px solid var(--success);
+    }    .output.error {
+      border-left: 4px solid var(--error);
+    }
+
+.output.warning {
+      border-left: 4px solid var(--warning);
+    }    .output-title {
+      position: absolute;
+      top: -10px;
+      left: 15px;
+      background: var(--bg);
+      padding: 0 8px;
+      font-size: 0.8rem;
+      color: var(--primary);
+    }    .tooltip {
+      position: relative;
+      display: inline-block;
+      margin-left: 5px;
+      cursor: help;
+    }
+
+.tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.9rem;
+      font-weight: normal;
+      border: 1px solid var(--primary);
+    }    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }    footer {
+      width: 100%;
+      max-width: 1200px;
+      margin-top: auto;
+      padding: 30px 0 20px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      text-align: center;
+      border-top: 1px solid rgba(0, 234, 255, 0.2);
+    }
+
+@keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(0, 240, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+    }    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+.loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0, 240, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+header {
+        flex-direction: column;
+        gap: 15px;
+      }      .logo h1 {
+        font-size: 1.5rem;
+      }
+    }    / Advanced UI Components /
+    .tab-container {
+      display: flex;
+      border-bottom: 1px solid rgba(0, 234, 255, 0.2);
+      margin-bottom: 15px;
+    }
+
+.tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }    .tab.active {
+      border-bottom: 3px solid var(--primary);
+      color: var(--primary);
+    }    .tab-content {
+      display: none;
+    }
+
+.tab-content.active {
+      display: block;
+    }    .progress-bar {
+      height: 6px;
+      background: rgba(0, 234, 255, 0.2);
+      border-radius: 3px;
+      margin-top: 10px;
+      overflow: hidden;
+    }    .progress {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+.badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      background: rgba(0, 240, 255, 0.2);
+      color: var(--primary);
+      margin-left: 5px;
+    }    .context-menu {
+      position: absolute;
+      background: rgba(11, 16, 45, 0.95);
+      border: 1px solid var(--primary);
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      z-index: 100;
+      display: none;
+    }    .context-menu-item {
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+.context-menu-item:hover {
+      background: rgba(0, 240, 255, 0.1);
+      color: var(--primary);
+    }    / Dark/Light mode toggle /
+    .theme-toggle {
+      position: relative;
+      width: 50px;
+      height: 24px;
+      background: rgba(0, 240, 255, 0.2);
+      border-radius: 12px;
+      cursor: pointer;
+      margin-left: 15px;
+    }    .theme-toggle::before {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease;
+    }
+
+body.light-mode {
+      --bg: #f0f8ff;
+      --secondary: #3a47a5;
+      color: #333;
+    }    body.light-mode .section {
+      background: rgba(0, 200, 255, 0.1);
+      border: 1px solid rgba(0, 150, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 150, 255, 0.1);
+    }    body.light-mode textarea,
+    body.light-mode input,
+    body.light-mode select {
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+      border: 1px solid rgba(0, 150, 255, 0.3);
+    }
+
+body.light-mode .output {
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border: 1px solid rgba(0, 150, 255, 0.2);
+    }    body.light-mode .theme-toggle::before {
+      transform: translateX(26px);
+      background: #3a47a5;
+    }
+  
+</style>
+
+  
+    
+      <div class="app-container">
+
+  <!-- Header / Título -->
+  <div class="header">
+    <h1>KOBLLUX ADVOCACIA</h1>
+    <span class="beta-label">BETA 2.0</span>
+    <div class="logo">JD</div>
+  </div>
+
+  <!-- ⚖️ Verificação Profissional -->
+  <div class="section verificacao-profissional">
+    <h2>⚖️ Verificação Profissional</h2>
+    
+    <label for="oab-number">Número da OAB</label>
+    <input type="text" id="oab-number" value="123456/SP">
+
+    <div class="button-group">
+      <button>Verificar</button>
+      <button>Consultar OAB Nacional</button>
+    </div>
+
+    <div class="status-box">
+      <label>STATUS</label>
+      <p>📋 Nenhum dado verificado ainda.</p>
+    </div>
+  </div>
+
+  <!-- 📄 Criador de Petições Inteligente -->
+  <div class="section criador-peticoes">
+    <h2>📄 Criador de Petições Inteligente</h2>
+
+    <div class="peticao-tipo">
+      <button>Simples</button>
+      <button>Avançada</button>
+      <button>Modelos</button>
+    </div>
+
+    <div class="form-group">
+      <label for="tipo-peticao">Tipo de Petição</label>
+      <select id="tipo-peticao">
+        <option>Danos Morais</option>
+        <option>Consumidor</option>
+        <option>Família</option>
+        <option>Contratos</option>
+        <option>Civil</option>
+        <option>Trabalhista</option>
+        <option>Previdenciário</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="detalhes-caso">Detalhes do Caso</label>
+      <textarea id="detalhes-caso" placeholder="Descreva o caso ou use comandos como //ajuda, //autos, //sumario, //ritual"></textarea>
+    </div>
+
+    <div class="button-group">
+      <button>Gerar Petição</button>
+      <button>Limpar</button>
+    </div>
+
+    <p class="aviso">Modo avançado com opções detalhadas de formatação e referências jurídicas.</p>
+    <p class="aviso">Selecione entre nossos modelos pré-formatados:</p>
+
+    <div class="peticao-preview">
+      <h3>PETIÇÃO</h3>
+      <p>📜 A petição será exibida aqui.</p>
+
+      <div class="button-group">
+        <button>Exportar PDF</button>
+        <button>Exportar DOCX</button>
+        <button>Copiar Texto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔍 Pesquisa Jurídica Avançada -->
+  <div class="section pesquisa-juridica">
+    <h2>🔍 Pesquisa Jurídica Avançada</h2>
+
+    <label for="termos-pesquisa">Termos de Pesquisa</label>
+    <input type="text" id="termos-pesquisa">
+
+    <div class="button-group">
+      <button>Pesquisar</button>
+      <button>STF</button>
+      <button>STJ</button>
+    </div>
+
+    <div class="resultados">
+      <p>🔍 Utilize a pesquisa para encontrar jurisprudências relevantes.</p>
+    </div>
+  </div>
+
+  <!-- 🧠 Assistente Jurídico IA -->
+  <div class="section assistente-ia">
+    <h2>🧠 Assistente Jurídico IA</h2>
+
+    <label for="pergunta-ia">Sua Pergunta</label>
+    <textarea id="pergunta-ia" placeholder="Faça uma pergunta jurídica detalhada..."></textarea>
+
+    <div class="button-group">
+      <button>Perguntar à IA</button>
+      <button>Exemplos</button>
+    </div>
+
+    <div class="resposta-ia">
+      <p>🤖 Aguardando sua pergunta...</p>
+    </div>
+  </div>
+
+  <!-- 📅 Gerenciador de Processos -->
+  <div class="section gerenciador-processos">
+    <h2>📅 Gerenciador de Processos</h2>
+
+    <label for="numero-processo">Número do Processo</label>
+    <input type="text" id="numero-processo">
+
+    <div class="button-group">
+      <button>Adicionar</button>
+      <button>Consultar</button>
+    </div>
+
+    <div class="processos-cadastrados">
+      <p>📂 Nenhum processo cadastrado ainda.</p>
+    </div>
+  </div>
+
+  <!-- 🔹 Blue IA - Modo Ritual -->
+  <div class="section blue-ia">
+    <h2>🔹 Blue IA - Modo Ritual</h2>
+
+    <label for="comando-blue">Comando de Voz/Texto</label>
+    <input type="text" id="comando-blue">
+
+    <div class="button-group">
+      <button>🎤 Ativar Voz</button>
+      <button>Interpretar</button>
+    </div>
+
+    <div class="blue-output">
+      <p>🔊 Modo de interpretação ativo. Fale ou digite comandos.</p>
+    </div>
+  </div>
+
+  <!-- Rodapé / Sistema -->
+  <div class="footer">
+    <p>Sistema KOBLLUX ∞ Advocacia Geradora • Dual InfoDose – Movimento Legal em Expansão</p>
+    
+    <div class="footer-links">
+      <a href="#">Editar Perfil</a>
+      <a href="#">Configurações</a>
+      <a href="#">Sair</a>
+    </div>
+  </div>
+</div>
+    
+    
+    <script>
+    
+    // Theme management
+    function toggleTheme() {
+      document.body.classList.toggle('light-mode');
+      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    }</p>
+
+// Apply saved theme
+    if (localStorage.getItem('theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }    // User menu
+    function showUserMenu() {
+      const menu = document.getElementById('userMenu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.matches('.user-avatar')) {
+        document.getElementById('userMenu').style.display = 'none';
+      }
+    });
+
+// Tab functionality
+    function changeTab(evt, tabName) {
+      const tabContents = document.getElementsByClassName('tab-content');
+      for (let i = 0; i < tabContents.length; i++) {
+        tabContents[i].classList.remove('active');
+      }      const tabs = document.getElementsByClassName('tab');
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+      }      document.getElementById(tabName).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
+// Verification function with animation
+    function verificarRegistro() {
+      const val = document.getElementById("registro").value.trim();
+      const res = document.getElementById("resRegistro");
+      const progress = document.getElementById("verificacaoProgress");      res.className = "output";
+      progress.style.width = '0%';      if (val.length < 5) {
+        res.classList.add('error');
+        res.innerHTML = 'ERRO❌ Número muito curto ou inválido.';
+        return;
+      }
+
+// Simulate progress
+      let width = 0;
+      const interval = setInterval(() => {
+        width += 5;
+        progress.style.width = width + '%';        if (width >= 100) {
+          clearInterval(interval);
+          res.classList.add('success');
+          res.innerHTML = VERIFICADO✅ OAB "${val}" validada com sucesso via IA-OAB.
+Advogado(a) ativo(a) na seccional.;
+        }
+      }, 50);
+    }    // Enhanced petition generation
+    function gerarPeticao() {
+      const tipo = document.getElementById("tipoPeticao").value;
+      const texto = document.getElementById("entradaPeticao").value;
+      const out = document.getElementById("saidaPeticao");
+      const buttonText = document.getElementById("gerarPeticaoText");
+      const buttonLoader = document.getElementById("gerarPeticaoLoader");
+
+// Show loading state
+      buttonText.style.display = 'none';
+      buttonLoader.style.display = 'inline-block';
+      out.className = "output";
+      out.innerHTML = 'GERANDO Processando sua petição...';      // Simulate AI processing delay
+      setTimeout(() => {
+        buttonText.style.display = 'inline-block';
+        buttonLoader.style.display = 'none';        if (texto.includes("//ajuda")) {
+          out.innerHTML = AJUDA📚 Comandos disponíveis:
+- //autos - Adiciona seção de autos processuais
+- //cláusula - Insere cláusula padrão
+- //sumario - Gera sumário executivo
+- //referência - Adiciona referência jurídica
+- //modelo - Mostra modelo completo;
+          return;
+        }
+
+let base = EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) DE DIREITO\n\n;
+        base += O Requerente, por seu advogado (OAB ${document.getElementById("registro").value || 'XXXXXX/XX'}), vem respeitosamente à presença de Vossa Excelência expor os fatos e requerer:\n\n;        // Add context based on petition type
+        switch(tipo) {
+          case 'danos':
+            base += TRATA-SE DE AÇÃO DE INDENIZAÇÃO POR DANOS MORAIS\n\n;
+            break;
+          case 'consumidor':
+            base += TRATA-SE DE AÇÃO DECORRENTE DE RELAÇÃO DE CONSUMO\n\n;
+            break;
+          case 'familia':
+            base += TRATA-SE DE AÇÃO DE FAMÍLIA\n\n;
+            break;
+          case 'contratos':
+            base += TRATA-SE DE CONTROVÉRSIA CONTRATUAL\n\n;
+            break;
+          default:
+            base += TRATA-SE DE AÇÃO ${tipo.toUpperCase()}\n\n;
+        }        base += "${texto}"\n\n;
+        base += Diante do exposto, requer a Vossa Excelência:\n\n;
+
+// Add standard requests based on type
+        switch(tipo) {
+          case 'danos':
+            base += a) Condene o requerido ao pagamento de indenização por danos morais no valor de R$ ______;\n;
+            base += b) Condene o requerido ao pagamento de honorários advocatícios;\n;
+            base += c) Outras medidas que Vossa Excelência julgar necessárias.\n\n;
+            break;
+          case 'consumidor':
+            base += a) Condene o fornecedor a ______;\n;
+            base += b) Fixe multa diária por descumprimento;\n;
+            base += c) Condene ao pagamento de honorários advocatícios.\n\n;
+            break;
+          default:
+            base += a) ______;\n;
+            base += b) ______;\n;
+            base += c) Outras providências que Vossa Excelência julgar necessárias.\n\n;
+        }        base += Nestes termos,\nPede deferimento.\n\n;
+        base += ${getCity()}, ${getDate()}\n___________________________\nAdvogado(a)\nOAB ${document.getElementById("registro").value || 'XXXXXX/XX'};        // Add special sections based on commands
+        if (texto.includes("//autos")) {
+          base += \n\n📌 ANEXOS:\n- Cópia dos autos processuais\n- Documentos de identificação\n- Comprovantes relacionados;
+        }
+
+if (texto.includes("//sumario")) {
+          base += \n\n🧾 SUMÁRIO EXECUTIVO:\n"${texto.substring(0, 120)}${texto.length > 120 ? '...' : ''}";
+        }        if (texto.includes("//cláusula")) {
+          base += \n\n📝 CLÁUSULA PADRÃO:\n"O descumprimento das obrigações assumidas acarretará multa diária no valor de R$ 500,00 (quinhentos reais), além de juros legais e correção monetária.";
+        }        if (texto.includes("//referência")) {
+          base += \n\n⚖️ REFERÊNCIAS JURÍDICAS:\n- Art. 186, Código Civil\n- Súmula 37 do STJ\n- Jurisprudência dominante do STF;
+        }
+
+out.innerHTML = PETIÇÃO PRONTA${base.replace(/\n/g, '
+')};
+      }, 2000);
+    }    function limparPeticao() {
+      document.getElementById("entradaPeticao").value = "";
+      document.getElementById("saidaPeticao").innerHTML = 'PETIÇÃO📜 A petição será exibida aqui.';
+    }    function exportarPeticao(format) {
+      const content = document.getElementById("saidaPeticao").innerText;
+      alert(Petição exportada como ${format.toUpperCase()}!\n\n(Em um sistema real, isso baixaria o arquivo));
+      console.log(Exporting as ${format}:, content);
+    }
+
+function copiarPeticao() {
+      const content = document.getElementById("saidaPeticao").innerText;
+      navigator.clipboard.writeText(content).then(() => {
+        const original = document.getElementById("saidaPeticao").innerHTML;
+        document.getElementById("saidaPeticao").innerHTML = 'COPIADO✅ Texto copiado para a área de transferência!';
+        setTimeout(() => {
+          document.getElementById("saidaPeticao").innerHTML = original;
+        }, 2000);
+      });
+    }    // Blue IA functions
+    function interpretarBlue(valor) {
+      const v = valor.toLowerCase();
+      const out = document.getElementById("interpretaBlue");
+      out.className = "output";      if (!v) {
+        out.innerHTML = 'BLUE IA🌀 Digite ou fale um comando...';
+        return;
+      }
+
+if (v.includes("voz")) {
+        out.innerHTML = 'MODO VOZ🎙️ Modo de Comando por Voz Ativado. Fale agora...';
+      } 
+      else if (v.includes("energia") || v.includes("ritual")) {
+        out.innerHTML = 'RITUAL🔋 Fluxo energético direcionado para causa. Frequência: 432Hz ativada.';
+      } 
+      else if (v.includes("jurisprudência") || v.includes("jurisprudencia")) {
+        out.innerHTML = 'PESQUISA📚 Acessando bancos de jurisprudência...\n- STF: 12 resultados\n- STJ: 8 resultados\n- TJ/SP: 23 resultados';
+      } 
+      else if (v.includes("cláusula") || v.includes("clausula")) {
+        out.innerHTML = 'CLÁUSULA🔐 Cláusula contratual padrão aplicada:\n\n"Qualquer controvérsia será resolvida no foro de ______, com renúncia a qualquer outro."';
+      }
+      else if (v.includes("ajuda")) {
+        out.innerHTML = 'AJUDA💡 Comandos disponíveis:\n- "voz" - Ativa modo por voz\n- "ritual" - Ativa modo energético\n- "jurisprudência" - Pesquisa decisões\n- "cláusula" - Gera cláusula padrão';
+      }
+      else {
+        out.innerHTML = INTERPRETAÇÃO🧠 Comando recebido: "${v}"\n\nSugestão: Use termos como "voz", "ritual" ou "jurisprudência" para funções específicas.;
+      }
+    }    function ativarModoVoz() {
+      const out = document.getElementById("interpretaBlue");
+      out.className = "output";
+      out.innerHTML = 'MODO VOZ🎤 Ouvindo... Fale agora (experimental).\n\nDica: Diga "jurisprudência sobre danos morais"';      // In a real app, this would use the Web Speech API
+      setTimeout(() => {
+        out.innerHTML = 'MODO VOZ🔊 Comando recebido por voz: "pesquisar jurisprudência sobre danos morais"\n\n📚 Mostrando 8 resultados sobre danos morais...';
+      }, 3000);
+    }
+
+// Utility functions
+    function getCity() {
+      const cities = ["São Paulo", "Rio de Janeiro", "Belo Horizonte", "Porto Alegre", "Curitiba"];
+      return cities* cities.length)')">[Math.floor(Math.random() * cities.length)];
+    }    function getDate() {
+      const now = new Date();
+      const day = now.getDate().toString().padStart(2, '0');
+      const month = (now.getMonth() + 1).toString().padStart(2, '0');
+      const year = now.getFullYear();
+      return ${day}/${month}/${year};
+    }    // Placeholder functions for other features
+    function consultarOAB() {
+      alert("Consulta à OAB Nacional seria implementada aqui");
+    }
+
+function pesquisarJurisprudencia() {
+      const term = document.getElementById("pesquisaJuridica").value;
+      const out = document.getElementById("resultadoPesquisa");
+      out.className = "output";
+      out.innerHTML = RESULTADOS🔍 Pesquisa por "${term}":\n\n1. STJ - REsp 1.123.456 - ${term}\n2. TJSP - Apelação 1234567 - ${term}\n3. STF - ADI 7890 - ${term};
+    }    function pesquisarSTF() {
+      document.getElementById("pesquisaJuridica").value = "site:stf.jus.br " + document.getElementById("pesquisaJuridica").value;
+      pesquisarJurisprudencia();
+    }    function pesquisarSTJ() {
+      document.getElementById("pesquisaJuridica").value = "site:stj.jus.br " + document.getElementById("pesquisaJuridica").value;
+      pesquisarJurisprudencia();
+    }
+
+function perguntarIA() {
+      const question = document.getElementById("perguntaJuridica").value;
+      const out = document.getElementById("respostaIA");
+      out.className = "output";      if (!question) {
+        out.innerHTML = 'ERRO❌ Por favor, digite sua pergunta jurídica.';
+        return;
+      }      out.innerHTML = 'PROCESSANDO Consultando base de conhecimento...';
+
+// Simulate AI response
+      setTimeout(() => {
+        const responses = [
+          Com base na legislação atual e jurisprudência predominante, ${question.replace(/\?$/, '')} pode ser respondida considerando...,
+          A doutrina majoritária entende que ${question.replace(/\?$/, '')} deve ser analisado sob a ótica de...,
+          Quanto a ${question.replace(/\?$/, '')}, o STJ já decidiu que...,
+          Sua pergunta sobre ${question.replace(/\?$/, '')} envolve aspectos de...
+        ];        out.innerHTML = RESPOSTA IA🤖 ${responses* responses.length)')">[Math.floor(Math.random() * responses.length)]};
+      }, 2000);
+    }    function exemplosPerguntas() {
+      document.getElementById("perguntaJuridica").value = "Qual o prazo para ação de revisão de contrato?";
+    }
+
+function adicionarProcesso() {
+      const num = document.getElementById("numeroProcesso").value;
+      const out = document.getElementById("listaProcessos");      if (!num) {
+        out.className = "output error";
+        out.innerHTML = 'ERRO❌ Digite um número de processo válido.';
+        return;
+      }      out.className = "output success";
+      out.innerHTML = PROCESSO ADICIONADO✅ Processo ${num} cadastrado com sucesso!\n\n📅 Próxima audiência: ${getFutureDate(15)}\n⚖️ Status: Aguardando distribuição;
+    }
+
+function consultarProcesso() {
+      const num = document.getElementById("numeroProcesso").value;
+      const out = document.getElementById("listaProcessos");      if (!num) {
+        out.className = "output error";
+        out.innerHTML = 'ERRO❌ Digite um número de processo para consulta.';
+        return;
+      }      out.className = "output";
+      out.innerHTML = CONSULTA🔍 Processo ${num}:\n\n📌 Cliente: João da Silva\n⚖️ Tipo: Ação de Indenização\n📅 Último andamento: ${getPastDate(5)} - Petição inicial protocolada\n▶️ Próximo passo: Aguardando citação;
+    }
+
+function getFutureDate(days) {
+      const date = new Date();
+      date.setDate(date.getDate() + days);
+      return date.toLocaleDateString('pt-BR');
+    }    function getPastDate(days) {
+      const date = new Date();
+      date.setDate(date.getDate() - days);
+      return date.toLocaleDateString('pt-BR');
+    }    // User menu functions
+    function editarPerfil() {
+      alert("Editar perfil seria implementado aqui");
+      document.getElementById('userMenu').style.display = 'none';
+    }
+
+function configuracoes() {
+      alert("Configurações seriam implementadas aqui");
+      document.getElementById('userMenu').style.display = 'none';
+    }    function sair() {
+      alert("Você saiu do sistema");
+      document.getElementById('userMenu').style.display = 'none';
+    }
+  
+</script>
+ </body> 
+
+
+ </html>

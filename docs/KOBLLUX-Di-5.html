@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KOBΛLLUX ∞ Ritual Fractal - Expansão</title>
+  <style>
+    :root {
+      --gold: #f7d774;
+      --aqua: #00ffe0;
+      --deep: #1a002f;
+      --night: #0f001a;
+      --accent: #baffff;
+      --glow-gold: drop-shadow(0 0 8px #f7d774);
+      --glow-aqua: drop-shadow(0 0 16px #00ffe0);
+      --radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Courier New', Courier, monospace;
+      background: linear-gradient(145deg, var(--deep), var(--night));
+      color: var(--gold);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      text-shadow: 0 0 18px var(--gold);
+      font-size: 2.2rem;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    #main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      gap: 12px;
+      justify-items: center;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 34px solid var(--gold);
+      cursor: pointer;
+      filter: var(--glow-gold);
+      animation: pulse 3s infinite ease-in-out;
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    .triangle:hover {
+      transform: scale(1.15) rotate(2deg);
+      filter: var(--glow-aqua);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    button, select {
+      padding: 10px 14px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--aqua);
+      color: #000;
+      font-weight: bold;
+      box-shadow: 0 0 10px var(--aqua);
+      cursor: pointer;
+    }
+
+    #log {
+      background: rgba(0,0,0,0.6);
+      padding: 10px;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 500px;
+      height: 150px;
+      overflow-y: auto;
+      font-size: 13px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      border: 1px solid #f7d77466;
+      border-radius: 10px;
+    }
+
+    #scoreboard {
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      background: rgba(255,255,255,0.1);
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 6px #222;
+    }
+  </style>
+</head>
+<body>
+  <h1>KOBΛLLUX ∞ Ritual Fractal 🔻✨</h1>
+  <div class="panel">
+    <select id="modo">
+      <option value="normal">Modo Normal</option>
+      <option value="coop">Modo Cooperativo</option>
+      <option value="ritual">Ritual Fractal</option>
+    </select>
+    <button onclick="gerarDodecaedro()">🔺 Invocar</button>
+    <button onclick="resetar()">↻ Resetar</button>
+    <button onclick="comprarCarta()">🎴 Carta</button>
+    <button onclick="rolarDado()">🎲 Dado</button>
+  </div>
+  <div id="scoreboard">Placar: <span id="score">0</span></div>
+  <div id="main"></div>
+  <div id="log"></div>
+  <audio id="somRitual" src="https://cdn.pixabay.com/audio/2022/03/15/audio_45b13f414b.mp3" preload="auto"></audio>
+
+  <script>
+    (() => {
+      const base = [3, 6, 9, 7];
+      const ops = [
+        { symbol: "×", fn: (a,b) => a*b },
+        { symbol: "+", fn: (a,b) => a+b },
+        { symbol: "↺", fn: (a,b) => (a+b)%12 }
+      ];
+
+      const main = document.getElementById('main');
+      const log = document.getElementById('log');
+      const scoreEl = document.getElementById('score');
+      const ritualSound = document.getElementById('somRitual');
+      let dodecaedro = [], score = 0;
+
+      window.gerarDodecaedro = () => {
+        main.innerHTML = '';
+        dodecaedro = Array.from({length: 12}, (_, i) => {
+          const el = document.createElement('div');
+          el.className = 'triangle';
+          el.title = `T${i+1}`;
+          el.onclick = () => ativar(el, i);
+          main.appendChild(el);
+          return el;
+        });
+        ritualSound.play();
+        log.innerText += '\n:: Dodecaedro gerado ::';
+      };
+
+      function ativar(el, i) {
+        const a = base[i % base.length];
+        const b = base[(i+1)%base.length];
+        const op = ops[i%ops.length];
+        const res = op.fn(a,b);
+        score += res;
+        scoreEl.textContent = score;
+        el.style.borderBottomColor = 'var(--aqua)';
+        el.style.filter = 'var(--glow-aqua)';
+        setTimeout(() => {
+          el.style.borderBottomColor = 'var(--gold)';
+          el.style.filter = 'var(--glow-gold)';
+        }, 800);
+        log.innerText += `\n[T${i+1}] ${a} ${op.symbol} ${b} = ${res}`;
+        log.scrollTop = log.scrollHeight;
+      }
+
+      window.resetar = () => {
+        main.innerHTML = '';
+        score = 0;
+        scoreEl.textContent = 0;
+        log.innerText += '\n:: Resetado ::';
+      };
+
+      window.comprarCarta = () => {
+        const efeitos = ['+10', '-5', 'dobro', 'reset', '×3'];
+        const sorte = efeitos[Math.floor(Math.random() * efeitos.length)];
+        log.innerText += `\n🎴 Carta tirada: ${sorte}`;
+        if (sorte === '+10') score += 10;
+        if (sorte === '-5') score -= 5;
+        if (sorte === 'dobro') score *= 2;
+        if (sorte === 'reset') score = 0;
+        if (sorte === '×3') score *= 3;
+        scoreEl.textContent = score;
+      };
+
+      window.rolarDado = () => {
+        const valor = Math.floor(Math.random() * 6) + 1;
+        score += valor;
+        log.innerText += `\n🎲 Dado: ${valor}`;
+        scoreEl.textContent = score;
+      };
+    })();
+  </script>
+</body>
+</html>
