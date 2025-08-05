@@ -408,12 +408,16 @@
   bottom: 33px;
   
   z-index: 99999;
-  padding: 8px 10px;
-  font-size: 12px;
-  background: var(--bg);
-  color: #F0F;
-  border: none;
-  border-radius: 8px;
+border-radius:50%;
+
+  font-size: 18px;
+background:linear-gradient(42deg,#0ff,#f0f);
+      background-clip:text;-webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+
+
+  border:none
+
   cursor: pointer;
     opacity: 0.5;
   transition: opacity 0.3s ease, transform 0.2s ease;
@@ -423,7 +427,7 @@
   opacity: 1 !important;
   transform: scale(1.05);
 }
-#btn-expandir-ritual { right: 33px; }
+#btn-expandir-ritual { right: 35px; }
 
 @keyframes pulse {
   0% { transform: scale(1); opacity: 0.4; }
@@ -681,20 +685,16 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
   bottom: 30px;
   z-index: 10000;
   
-  color: #0ff;
 
-  border-radius: 4px;
-  padding: 6px 10px;
+
+
   opacity: 0.5;
-background: rgba(0, 0, 0, 0.6);
+background:linear-gradient(42deg,#0ff,#f0f);
+      background-clip:text;-webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
 
 
-  border: 1px solid transparent;
-  border-image: linear-gradient(45deg, #F0F, #0FF);
-  border-image-slice: 1;
-
-  -webkit-mask-image: radial-gradient(white, black); /* força máscara arredondada no Safari */
-  mask-image: radial-gradient(white, black);
+  border:none
 
   transition: opacity 0.3s ease, transform 0.2s ease;
 }
