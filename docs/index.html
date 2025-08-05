@@ -584,6 +584,8 @@ body {
       "169": "dual-app-990e-16.html",
       "179": "dual-app-990e-17.html",
       
+      "ADV": "ADV-gen.html"
+      
       "R630": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html",
       "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
       "R632": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html",
@@ -653,13 +655,13 @@ body {
   audio.volume = 0.6;
   audio.play().catch(() => {});
   
-  gsap.to('.logo-container', { scale: 0.9, duration: 1.4, ease: 'power3.out' });
-  gsap.to('.infodose', { opacity: 0, y: -20, duration: 0.8 });
+  gsap.to('.logo-container', { scale: 0.8, duration: 0.9, ease: 'power3.out' });
+  gsap.to('.infodose', { scale: 0, duration: 0.9, ease: 'power3.out' });
   gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
   gsap.to('body', {
     opacity: 0,
-    duration: 1.8,
-    delay: 0.2,
+    duration: 0.9,
+    delay: 0,
     ease: 'power2.inOut',
     onComplete: () => {
       setTimeout(() => {
