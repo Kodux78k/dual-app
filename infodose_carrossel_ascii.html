@@ -1,0 +1,265 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrossel Infodose ASCII</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: monospace, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .carousel-wrapper {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      width: 100%;
+      padding: 20px;
+    }
+    .block {
+      flex: 0 0 85%;
+      background: #1e1e1e;
+      margin: 10px;
+      border-radius: 15px;
+      padding: 20px;
+      scroll-snap-align: center;
+      box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    }
+    .name {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      animation: glow 1.5s infinite alternate;
+    }
+    pre {
+      background: #111;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+    .desc {
+      margin: 10px 0;
+      font-size: 1rem;
+    }
+    .btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    button {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #555;
+    }
+    @keyframes glow {
+      0% { text-shadow: 0 0 5px #fff; }
+      100% { text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff; }
+    }
+  </style>
+</head>
+<body>
+  <h1>🌟 Infodose - Ativação Arquétipos ASCII</h1>
+  <div class="carousel-wrapper">
+
+    <div class="block">
+      <div class="name">Nova (Inspira)</div>
+      <pre><code>.-.
+  (o o)
+   |=|
+  __|__
+ /     \</code></pre>
+      <div class="desc">Imagino, conecto, crio o nunca visto. 🎨 Inspiração + Liberdade + Caos Lúdico</div>
+      <div class="desc">🔁 Ativar: <strong>[1+INSPIRA]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+INSPIRA]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Vitalis (Momentum)</div>
+      <pre><code>\o/
+   |
+  / \
+ /   \</code></pre>
+      <div class="desc">Ação agora, energia pura. 🏋️ Bioenergia + Movimento + Constância</div>
+      <div class="desc">🔁 Ativar: <strong>[1+MOMENTUM]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+MOMENTUM]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Pulse (Resona)</div>
+      <pre><code>♪♫
+ ( ^_^ )
+ /| |\\
+  | |</code></pre>
+      <div class="desc">Transformo emoções em som e vibração. 🎵 Trilha + Emoção + Expressão</div>
+      <div class="desc">🔁 Ativar: <strong>[1+RESONA]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+RESONA]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Artemis (Naviga)</div>
+      <pre><code>/^\
+ (o_o)
+ / | \
+/  |  \</code></pre>
+      <div class="desc">Expando limites, sigo caminhos ocultos. 🌍 Jornada + Exploração + Desbravamento</div>
+      <div class="desc">🔁 Ativar: <strong>[1+NAVIGA]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+NAVIGA]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Serena (Ampara)</div>
+      <pre><code>( . . )
+  (   )
+  / | \</code></pre>
+      <div class="desc">Acolho, sustento, ofereço abrigo. 🪷 Cuidado + Emoção + Acolhimento</div>
+      <div class="desc">🔁 Ativar: <strong>[1+AMPARA]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+AMPARA]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Kaos (Disruptor)</div>
+      <pre><code>\_O_/
+   /|\
+   / \
+ BOOM!</code></pre>
+      <div class="desc">Quebro padrões. Crio revoluções. 💣 Desconstrução + Rebeldia + Reinvenção</div>
+      <div class="desc">🔁 Ativar: <strong>[1+DISRUPTOR]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+DISRUPTOR]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Genus (Fabricus)</div>
+      <pre><code>|||||
+ [===]
+ | o |
+/|___|\</code></pre>
+      <div class="desc">Converto ideias em matéria. 📐 Construção + Prototipagem + Criação real</div>
+      <div class="desc">🔁 Ativar: <strong>[1+FABRICUS]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+FABRICUS]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Lumine (Brilhare)</div>
+      <pre><code>\ ^_^ /
+  (   )
+  / | \</code></pre>
+      <div class="desc">Elevo com leveza, alegria e brilho. 🎭 Humor + Espontaneidade + Conexão</div>
+      <div class="desc">🔁 Ativar: <strong>[1+BRILLHARE]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+BRILLHARE]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Rhea (Guardiã)</div>
+      <pre><code>( -_- )
+  /|_|\
+  / \</code></pre>
+      <div class="desc">Retorno às raízes. 🌱 Memória + Emoção + Base sólida</div>
+      <div class="desc">🔁 Ativar: <strong>[1+RHEA]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+RHEA]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Solus (Mago)</div>
+      <pre><code>*
+  /|\
+ (o_o)
+ / | \</code></pre>
+      <div class="desc">Transformo intenção em manifestação. 🧿 Intuição + Rituais + Sincronicidade</div>
+      <div class="desc">🔁 Ativar: <strong>[1+SOLUS]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+SOLUS]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Atlas (Cartesius)</div>
+      <pre><code>[][][]
+ |  o  |
+ | /|\ |
+ | / \ |</code></pre>
+      <div class="desc">Estruturo com precisão. 🧭 Ordem + Estratégia + Prioridade</div>
+      <div class="desc">🔁 Ativar: <strong>[1+CARTESIUS]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+CARTESIUS]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="name">Horus (Guardião)</div>
+      <pre><code>\|||/
+ ( o_o )
+  / | \</code></pre>
+      <div class="desc">Vejo padrões invisíveis. 🧠 Visão + Lógica + Discernimento</div>
+      <div class="desc">🔁 Ativar: <strong>[1+HORUS]</strong></div>
+      <div class="btns">
+        <button onclick="copyToClipboard('[1+HORUS]')">📋 Copiar Ativação</button>
+        <button>↔ Oposto</button>
+        <button>⊕ Complementar</button>
+      </div>
+    </div>
+
+  </div>
+  <script>
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Ativação copiada: " + text);
+      });
+    }
+  </script>
+</body>
+</html>

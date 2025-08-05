@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modo Mayk Timanféu - ASCII</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      height: 100vh;
+    }
+
+    .instructions {
+      margin: 20px 0;
+      font-size: 1rem;
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    .carousel-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      display: flex;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .archetype {
+      flex: 0 0 85%;
+      scroll-snap-align: center;
+      background: #1e1e1e;
+      margin: 10px;
+      border-radius: 20px;
+      padding: 40px 20px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+      text-align: center;
+      transition: transform 0.3s;
+    }
+
+    .archetype:hover {
+      transform: scale(1.03);
+    }
+
+    .emoji {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: pulse 2s infinite;
+    }
+
+    .name {
+      font-size: 1.3rem;
+      font-weight: bold;
+      animation: glow 1.5s infinite alternate;
+    }
+
+    @keyframes glow {
+      0% { text-shadow: 0 0 5px #fff; }
+      100% { text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff; }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.9; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="instructions">
+    Deslize para os lados para ver os arquétipos – Modo Mayk Timanféu
+  </div>
+
+  <div class="carousel-wrapper" id="carousel">
+    <!-- Arquétipos com carinhas -->
+  </div>
+
+  <audio id="sound" src="assets/sounds/UI/sound.mp3" preload="auto"></audio>
+
+  <script>
+    const sound = document.getElementById('sound');
+    const carousel = document.getElementById('carousel');
+
+    const archetypes = [
+      { name: "O Herói", emoji: "😎" },
+      { name: "O Mago", emoji: "🧙" },
+      { name: "O Inocente", emoji: "👶" },
+      { name: "O Explorador", emoji: "🧭" },
+      { name: "O Sábio", emoji: "🧠" },
+      { name: "O Criador", emoji: "🎨" },
+      { name: "O Governante", emoji: "👑" },
+      { name: "O Cuidador", emoji: "🤱" },
+      { name: "O Amante", emoji: "❤️" },
+      { name: "O Bobo", emoji: "🤡" },
+      { name: "O Rebelde", emoji: "😈" },
+      { name: "O Forasteiro", emoji: "🌌" }
+    ];
+
+    archetypes.forEach(arch => {
+      const div = document.createElement('div');
+      div.className = 'archetype';
+
+      const emoji = document.createElement('div');
+      emoji.className = 'emoji';
+      emoji.textContent = arch.emoji;
+
+      const name = document.createElement('div');
+      name.className = 'name';
+      name.textContent = arch.name;
+
+      div.appendChild(emoji);
+      div.appendChild(name);
+
+      div.addEventListener('click', () => {
+        sound.currentTime = 0;
+        sound.play();
+      });
+
+      carousel.appendChild(div);
+    });
+  </script>
+</body>
+</html>

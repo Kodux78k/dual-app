@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Carousel Arquetípico Mayk Teste</title>
+  <style>
+    :root {
+      --transition-speed: 0.5s;
+      --blur-level: 10px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #121212;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      height: 500px;
+      perspective: 1000px;
+    }
+
+    .carousel {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform var(--transition-speed);
+      filter: blur(var(--blur-level));
+    }
+
+    .carousel.active {
+      filter: blur(0);
+    }
+
+    .archetype {
+      position: absolute;
+      width: 80%;
+      height: 80%;
+      left: 10%;
+      top: 10%;
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      backface-visibility: hidden;
+      transition: all 0.6s ease;
+      background-color: #333;
+      flex-direction: column;
+    }
+
+    .pill-image {
+      width: 120px;
+      height: 120px;
+      background-image: url('assets/icons/pill_fusion.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+      transition: transform 0.4s;
+    }
+
+    .archetype:hover .pill-image {
+      transform: scale(1.1);
+    }
+
+    .color-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      margin-top: 8px;
+      border: 2px solid white;
+    }
+
+    .archetype::before {
+      content: attr(data-name);
+      position: absolute;
+      bottom: 60px;
+      background: rgba(0,0,0,0.7);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 1rem;
+      color: white;
+      text-shadow: 0 0 5px rgba(0,0,0,0.7);
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 10;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      background: rgba(255,255,255,0.2);
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: rgba(255,255,255,0.4);
+    }
+
+    .instructions {
+      position: absolute;
+      top: 20px;
+      color: white;
+      text-align: center;
+      width: 100%;
+      opacity: 0.7;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="carousel-container">
+    <div class="instructions">
+      Deslize para os lados ou use os botões. Toque para focar.
+    </div>
+
+    <div class="carousel" id="carousel">
+      <!-- Arquétipos gerados via JS -->
+    </div>
+
+    <div class="controls">
+      <button id="prevBtn">← Anterior</button>
+      <button id="nextBtn">Próximo →</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const carousel = document.getElementById('carousel');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+
+      const archetypes = [
+        { name: "O Herói", color: "#FF5252" },
+        { name: "O Mago", color: "#FF4081" },
+        { name: "O Inocente", color: "#E040FB" },
+        { name: "O Explorador", color: "#7C4DFF" },
+        { name: "O Sábio", color: "#536DFE" },
+        { name: "O Criador", color: "#448AFF" },
+        { name: "O Governante", color: "#40C4FF" },
+        { name: "O Cuidador", color: "#18FFFF" },
+        { name: "O Amante", color: "#64FFDA" },
+        { name: "O Bobo", color: "#69F0AE" },
+        { name: "O Rebelde", color: "#B2FF59" },
+        { name: "O Forasteiro", color: "#EEFF41" }
+      ];
+
+      // Criar slides dos arquétipos
+      archetypes.forEach((archetype, index) => {
+        const slide = document.createElement('div');
+        slide.className = 'archetype';
+        slide.setAttribute('data-name', archetype.name);
+        slide.style.transform = `rotateY(${index * (360 / archetypes.length)}deg) translateZ(300px)`;
+
+        const image = document.createElement('div');
+        image.className = 'pill-image';
+
+        const dot = document.createElement('div');
+        dot.className = 'color-dot';
+        dot.style.backgroundColor = archetype.color;
+
+        slide.appendChild(image);
+        slide.appendChild(dot);
+
+        carousel.appendChild(slide);
+      });
+
+      let currentAngle = 0;
+      const angleIncrement = 360 / archetypes.length;
+
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      carousel.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+        carousel.classList.add('active');
+      }, false);
+
+      carousel.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+        setTimeout(() => carousel.classList.remove('active'), 2000);
+      }, false);
+
+      function handleSwipe() {
+        if (touchEndX < touchStartX - 50) nextArchetype();
+        if (touchEndX > touchStartX + 50) prevArchetype();
+      }
+
+      prevBtn.addEventListener('click', prevArchetype);
+      nextBtn.addEventListener('click', nextArchetype);
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft') prevArchetype();
+        if (e.key === 'ArrowRight') nextArchetype();
+      });
+
+      function prevArchetype() {
+        currentAngle += angleIncrement;
+        updateCarousel();
+      }
+
+      function nextArchetype() {
+        currentAngle -= angleIncrement;
+        updateCarousel();
+      }
+
+      function updateCarousel() {
+        carousel.style.transform = `rotateY(${currentAngle}deg)`;
+      }
+
+      // Início aleatório
+      const randomStart = Math.floor(Math.random() * archetypes.length) * angleIncrement;
+      currentAngle = randomStart;
+      updateCarousel();
+    });
+  </script>
+
+</body>
+</html>
