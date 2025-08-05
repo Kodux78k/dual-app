@@ -603,7 +603,7 @@ body {
 
   if (dest) {
   const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
-  audio.volume = 1;
+  audio.volume = 0.6;
   audio.play().catch(() => {});
   
   gsap.to('.logo-container', { scale: 0.9, duration: 1.4, ease: 'power3.out' });
@@ -612,12 +612,12 @@ body {
   gsap.to('body', {
     opacity: 0,
     duration: 1.8,
-    delay: 0.4,
+    delay: 0.2,
     ease: 'power2.inOut',
     onComplete: () => {
       setTimeout(() => {
         window.location.href = dest;
-      }, 99); // tempo extra para terminar áudio
+      }, 9); // tempo extra para terminar áudio
     }
   });
 } else {
@@ -632,7 +632,7 @@ body {
       gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
       gsap.to('.infodose', { opacity: 0, duration: 0.6 });
       gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
-      setTimeout(() => { window.location.href = 'index.html'; }, 1399);
+      setTimeout(() => { window.location.href = 'indexnovo.html'; }, 1399);
     };
 
     const lockScroll = () => {
