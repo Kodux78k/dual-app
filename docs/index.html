@@ -328,7 +328,7 @@ body {
 <!-- 🎥 MINI PLAYER TOGGLE -->
 <div id="miniPlayerContainer" style="
   position: fixed;
-  top: 80px;
+  top: 66px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 99;
@@ -902,7 +902,7 @@ window.addEventListener('load', loadUserBG);
   toggleMiniPlayer.addEventListener("click", () => {
     showing = !showing;
     iframeWrapper.style.display = showing ? "block" : "none";
-    toggleMiniPlayer.innerText = showing ? "🎥 Ocultar Player" : "🎥 Mostrar Player";
+    toggleMiniPlayer.innerText = showing ? "🎥" : "🎥";
   });
 </script>
 </body>
