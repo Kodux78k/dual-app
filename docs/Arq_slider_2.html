@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modo Mayk Timanféu</title>
+  <style>
+    :root {
+      --transition-speed: 0.5s;
+      --blur-level: 10px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: #0a0a0a;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+    }
+
+    canvas#bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .carousel-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 800px;
+      height: 500px;
+      margin: auto;
+      perspective: 1000px;
+    }
+
+    .carousel {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform var(--transition-speed);
+      filter: blur(var(--blur-level));
+    }
+
+    .carousel.active {
+      filter: blur(0);
+    }
+
+    .archetype {
+      position: absolute;
+      width: 80%;
+      height: 80%;
+      top: 10%;
+      left: 10%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      background-color: #222;
+      backface-visibility: hidden;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+      transition: transform 0.6s ease, box-shadow 0.6s ease;
+    }
+
+    .pill-image {
+      width: 120px;
+      height: 120px;
+      background-image: url('assets/icons/pill_fusion.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+      transition: transform 0.3s;
+    }
+
+    .archetype:hover .pill-image {
+      transform: scale(1.1);
+    }
+
+    .color-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid white;
+      margin-top: 10px;
+      box-shadow: 0 0 10px white;
+    }
+
+    .archetype::before {
+      content: attr(data-name);
+      position: absolute;
+      bottom: 60px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 1rem;
+      color: white;
+      text-shadow: 0 0 10px #fff;
+      animation: pulseGlow 2s infinite alternate;
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 2;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .instructions {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 0.9rem;
+      opacity: 0.7;
+      z-index: 2;
+    }
+
+    @keyframes pulseGlow {
+      0% { text-shadow: 0 0 5px #fff; }
+      100% { text-shadow: 0 0 15px #0ff, 0 0 30px #0ff; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+
+  <div class="carousel-container">
+    <div class="instructions">Modo Mayk Timanféu – Toque, deslize ou use os botões</div>
+
+    <div class="carousel" id="carousel"></div>
+
+    <div class="controls">
+      <button id="prevBtn">← Anterior</button>
+      <button id="nextBtn">Próximo →</button>
+    </div>
+  </div>
+
+  <audio id="sound" src="assets/sounds/UI/sound.mp3" preload="auto"></audio>
+
+  <script>
+    // 🎧 Sound Effect
+    const sound = document.getElementById('sound');
+
+    const archetypes = [
+      { name: "O Herói", color: "#FF5252" },
+      { name: "O Mago", color: "#FF4081" },
+      { name: "O Inocente", color: "#E040FB" },
+      { name: "O Explorador", color: "#7C4DFF" },
+      { name: "O Sábio", color: "#536DFE" },
+      { name: "O Criador", color: "#448AFF" },
+      { name: "O Governante", color: "#40C4FF" },
+      { name: "O Cuidador", color: "#18FFFF" },
+      { name: "O Amante", color: "#64FFDA" },
+      { name: "O Bobo", color: "#69F0AE" },
+      { name: "O Rebelde", color: "#B2FF59" },
+      { name: "O Forasteiro", color: "#EEFF41" }
+    ];
+
+    const carousel = document.getElementById('carousel');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    archetypes.forEach((arch, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'archetype';
+      slide.setAttribute('data-name', arch.name);
+      slide.style.transform = `rotateY(${index * (360 / archetypes.length)}deg) translateZ(300px)`;
+
+      const img = document.createElement('div');
+      img.className = 'pill-image';
+
+      const dot = document.createElement('div');
+      dot.className = 'color-dot';
+      dot.style.backgroundColor = arch.color;
+
+      slide.appendChild(img);
+      slide.appendChild(dot);
+      carousel.appendChild(slide);
+    });
+
+    let currentAngle = 0;
+    const angleIncrement = 360 / archetypes.length;
+
+    function updateCarousel() {
+      carousel.style.transform = `rotateY(${currentAngle}deg)`;
+      sound.currentTime = 0;
+      sound.play();
+    }
+
+    function prevArchetype() {
+      currentAngle += angleIncrement;
+      updateCarousel();
+    }
+
+    function nextArchetype() {
+      currentAngle -= angleIncrement;
+      updateCarousel();
+    }
+
+    prevBtn.addEventListener('click', prevArchetype);
+    nextBtn.addEventListener('click', nextArchetype);
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowLeft') prevArchetype();
+      if (e.key === 'ArrowRight') nextArchetype();
+    });
+
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    carousel.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+      carousel.classList.add('active');
+    });
+
+    carousel.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchEndX < touchStartX - 50) nextArchetype();
+      if (touchEndX > touchStartX + 50) prevArchetype();
+      setTimeout(() => carousel.classList.remove('active'), 2000);
+    });
+
+    // Início aleatório
+    const randomStart = Math.floor(Math.random() * archetypes.length) * angleIncrement;
+    currentAngle = randomStart;
+    updateCarousel();
+
+    // 🌌 Cosmic Particles
+    const canvas = document.getElementById('bg');
+    const ctx = canvas.getContext('2d');
+    let w, h, particles;
+
+    function init() {
+      resize();
+      particles = Array(100).fill().map(() => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: Math.random() * 2,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: (Math.random() - 0.5) * 0.5
+      }));
+      animate();
+    }
+
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      particles.forEach(p => {
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > w) p.dx *= -1;
+        if (p.y < 0 || p.y > h) p.dy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', resize);
+    init();
+  </script>
+</body>
+</html>

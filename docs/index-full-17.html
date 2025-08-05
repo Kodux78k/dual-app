@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central - Dual Infodose</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      overscroll-behavior: none;
+    }
+    body {
+      font-family:'Montserrat',sans-serif;
+      background: linear-gradient(to bottom, #000, #1a1a1a);
+      color:#f0f;
+      height:100vh; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      padding-top:48px; position:relative;
+      opacity:0; animation:fadeInBody 1.8s ease forwards;
+    }
+    @keyframes fadeInBody { to { opacity:1 } }
+    /* ——— SEU CSS INTEGRAL (ajustes) ——— */
+    :root {
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
+      --text: #444;
+      --fast: .4s; --med: .8s; --slow: 1.8s;
+    }
+    body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+    body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+    body.vibe  { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden}
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      padding:0px;background:var(--bg);color:var(--text);
+      font-family:'Montserrat',sans-serif;
+      transition:background var(--slow),color var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+  /*  #particles-js {
+     position:absolute; inset:0; z-index:0;
+    } */
+
+    .center-group {
+      z-index:2;
+      display:flex; flex-direction:column; align-items:center;
+      gap:1rem; padding:20px; 
+    }
+    .logo-container {
+      width:249px; 
+      animation:glow 3s ease-in-out infinite alternate;
+      cursor: pointer;
+      position:relative;
+    }
+    .logo-container object { width:100%; display:block }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #f0f) }
+      to   { filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 35px #f0f) }
+    }
+    .infodose {
+      font-size:1.4em; font-weight:300;
+      animation:fadeIn 1.5s forwards 1s; opacity:0;
+    }
+    .infodose strong { font-weight:600 }
+    @keyframes fadeIn { to { opacity:0.8 } }
+
+    .login-container {
+      width:248px; padding:0.8rem;
+      background:rgba(0,0,0,0.6);
+      border:2px solid transparent;
+      border-radius:24px; backdrop-filter:blur(8px);
+      display:flex; flex-direction:column; gap:1rem;
+      opacity:0; transition:opacity .3s;
+      pointer-events:none;
+    }
+    .login-container.active {
+      opacity:0.8; pointer-events:auto;
+    }
+    .login-container input {
+      width:100%; background:rgba(255,255,255,0.05);
+      border:none; border-bottom:1px solid rgba(255,255,255,0.3);
+      padding:0.6rem; font-size:1em; font-weight:300;
+      color:#fff; outline:none; text-align:center;
+      transition: background .3s;
+      border-radius:10px;
+    }
+    .login-container input:focus {
+      background:rgba(255,255,255,0.1);
+    }
+
+    .btn-container {
+  display: flex;
+  gap: 10px; /* espaço entre botões */
+  flex-wrap: wrap; /* quebra linha se não couber */
+}
+
+.btn-full {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  padding: 0.8rem 1.5rem; /* aumentei o padding horizontal pra ficar bonito */
+  background: rgba(255,255,255,0.05);
+  border: none;
+  border-radius: 20px;
+  font-size: 1em;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+  /* width removido para não forçar 100% */
+  flex: 1 1 auto; /* deixa os botões flexíveis no container */
+  min-width: 100px; /* largura mínima para não ficar muito pequeno */
+}
+
+.btn-full::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
+  border-radius: 20px;
+  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.btn-full:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,0.15);
+}
+
+    .logout-area {
+      display: none;
+      margin-top: 0.3rem;
+      outline: none;
+      text-align: center;
+      
+    }
+    .logout-area .username {
+      /* font-weight: 300;*/
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 1.1em; opacity:0.8;
+    }
+    .logout-area .btn-full {
+      background: rgba(255,50,50,0.1);
+      color: #f55;
+    }
+    .logout-area .btn-full::before {
+      background: linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5));
+    }
+.upload-btn {
+      
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10;
+    }
+    #uploadHTMLBtn{
+Position: fixed;
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      right:19px;
+      z-index: 10;
+      }
+    #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
+    #buyTokens { display:none; }
+    #buyTokens button {
+      width:100%; padding:0.8rem 0;
+      background:rgba(255,255,255,0.05);
+      border:2px solid transparent;
+      border-image: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5)) 1;
+      border-radius:20px;
+      font-size:1em; font-weight:600; color:#fff;
+      cursor:pointer;
+      transition: transform .3s, background .3s;
+    }
+    #buyTokens button:hover {
+      transform:scale(1.05);
+      background:rgba(255,255,255,0.15);
+    }
+
+    #decoderBox {
+      display:none;
+      position:fixed;
+      top:42px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.6);
+      padding:1rem;
+      border-radius:20px;
+      backdrop-filter:blur(8px);
+      z-index:20000;
+      text-align:center;
+    }
+    #decoderBox input {
+      padding:0.6rem;
+      width:200px;
+      text-align:center;
+      border-radius:10px;
+      border:none;
+      font-size:1em;
+    }
+
+    #toggleDecoderBtn
+     {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 19;
+      padding: 0.3rem 0.7rem;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.15);
+      color: #444;
+      font-weight: bold;
+      font-size: 0.95em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    #toggleDecoderBtn:hover,
+    #uploadHTMLBtn:hover {
+      transform: translateX(-50%) scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+    /* #toggleDecoderBtn { top: 138px; } */
+   /* #uploadHTMLBtn  { top: 93px; } */
+
+#userBgOptions {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 16px;
+  margin-top: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn var(--fast) ease;
+}
+
+#userBgOptions button {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background 0.3s, transform 0.3s;
+}
+
+#userBgOptions button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.03);
+}
+
+#userBgOptions .thumbnails img {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+#userBgOptions .thumbnails img:hover {
+  border-color: #fff;
+  opacity: 1;
+}
+ body {background: 
+  linear-gradient(to top, rgba(68, 68, 68, 0.4),rgba(255, 255, 255, 0.6));} 
+
+/* Animação de pulsar body {
+  background: 
+    linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7));
+  background-blend-mode: lighten;
+}cósmico */
+
+
+
+  </style>
+      <!-- body {background: transparent !important; !-->
+</head>
+<body>
+
+  <!-- <div id="particles-js"></div> !-->
+<!-- <div id="particles-js"></div> !-->
+<!-- 🎥 MINI PLAYER TOGGLE -->
+<div id="miniPlayerContainer" style="
+  position: fixed;
+  top: 73px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+">
+
+  <button id="toggleMiniPlayer" style="
+    background: linear-gradient(90deg, #8882f8, #c277f2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 8px rgba(140, 102, 255, 0.7);
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-weight: 600;
+  ">💊</button>
+
+  <div id="iframeWrapper" style="
+    width: 78vw;
+    max-width: 420px;
+    height: 202px;
+    border-radius: 14px;
+    overflow: auto;
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.25);
+    box-shadow: 0 0 8px rgba(199, 122, 255, 0.5);
+    display: none;
+    opacity: 0.8;
+    transition: all 0.4s ease-in-out;
+  ">
+    <iframe src="infodose_carrossel_ascii_REFINADO-1.html" style="width: 100%; height: 100%; border: none;"></iframe>
+  </div>
+</div>
+  <div class="center-group">
+    <div class="logo-container" id="logoDual">
+      <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
+      <object data="assets/icons/Dual-Orb-e2.png" type="image/png"></object>
+    </div>
+    <div class="infodose">dual.<strong>Infodose</strong></div>
+
+    <div class="login-container" id="loginBox">
+      <input type="text" id="user" placeholder="Usuário" required>
+      <input type="password" id="pass" placeholder="Senha" required>
+      <button class="btn-full" id="submitBtn">Entrar</button>
+      <div>  <!-- Botão de upload -->
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
+  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
+</div>
+        <div id="decoderBox">
+    <input type="text" id="codeInput" placeholder="Digite o selo...">
+    <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+  </div>
+  <button id="toggleDecoderBtn">
+  <img src="assets/icons/KBLX-pack/SuS-logo-1.PNG" alt="SuS Logo" style="height: 24px; vertical-align: middle;">
+</button>
+  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+  <button id="uploadHTMLBtn">☍</button>
+      
+      <div id="messageBox"></div>
+      <div id="buyTokens">
+        <button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
+      </div>
+      <div class="logout-area">
+        <div id="loggedUsername" class="username"></div>
+        <button id="logoutBtn" class="btn-full">Desconectar</button>
+      </div>
+      
+    </div>
+  </div>
+
+  
+
+  <script type="module">
+    const loginBox   = document.getElementById('loginBox');
+    const userInput  = document.getElementById('user');
+    const passInput  = document.getElementById('pass');
+    const submitBtn  = document.getElementById('submitBtn');
+    const messageBox = document.getElementById('messageBox');
+    const buyArea    = document.getElementById('buyTokens');
+    const buyBtn     = document.getElementById('buyIFTBtn');
+    const logoutArea = document.querySelector('.logout-area');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const loggedUser = document.getElementById('loggedUsername');
+    const logoDual   = document.getElementById('logoDual');
+    const storedKey  = 'infodose_user';
+
+    const decoderBox = document.getElementById('decoderBox');
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const uploadInput = document.getElementById('uploadHTML');
+    const uploadBtn   = document.getElementById('uploadHTMLBtn');
+
+    const USERS_JSON = 'users/usersid.json';
+    const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
+    
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBX": "menu-x-1.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "1991": "menu-x-1-E-19-E-9re-1.html",
+      "DBK": "dual-book-12.html",
+      "IMN": "index-manifestado.html",
+      "IMNN": "index-manifestado-tangle.html",
+      "BTS": "botao-simbolico.html",
+      "SBK": "SmbS-book-4.html",
+      "SBL": "SmbS-book-2.html",
+      "KDX": "menu-x-1-E-19-E-9_refatorado_final.html",
+      "KDI": "menu-integrado-kobllux.html",
+      "1992": "menu-x-1-E-19-E-9re-2.html",
+      "KDF": "menu-x-1-E-8.html",
+      "KDB": "menu-x-1-E-10.html",
+      "KDJ": "menu-x-1-E-19-E-9_renderresponse-final.html",
+      "HTM": "KBLX-HTML-v4.1-FULLSCREEN-SEPARADOR.html",
+      "MN6": "menu-x-1-E-6.html",
+      "MN7": "menu-x-1-E-7.html",
+      "MN8": "menu-x-1-E-8.html",
+      "MN9": "menu-x-1-E-9.html",
+      "MN10": "menu-x-1-E-10.html",
+      "MN11e": "menu-x-1-E-11e.html",
+      "MN12": "menu-x-1-E-12.html",
+      "MN13": "menu-final-com-pulso.html",
+      "MN14": "menu-pulso-final.html",
+      "MN15": "menu-x-1-E-15.html",
+      "19E9": "menu-x-1-E-19-E-9.html",
+      "19E10": "menu-x-1-E-19-E-10.html",
+      "19E11": "menu-x-1-E-19-E-11.html",
+      "MN19": "menu-x-1-E-19.html",
+      "19E8": "menu-x-1-E-19-E-8.html",
+      "19E0": "menu-x-1-E-19-E-0.html",
+      "19921": "menu-x-1-E-19-E-9re-2-1.html",
+      "19922": "menu-x-1-E-19-E-9re-2-2.html",
+      "19923": "menu-x-1-E-19-E-9re-2-3.html",
+      "19924": "menu-x-1-E-19-E-9re-2-4.html",
+      "19925": "menu-x-1-E-19-E-9re-2-5.html",
+      "19926": "menu-x-1-E-19-E-9re-2-6.html",
+      "19927": "menu-x-1-E-19-E-9re-2-7.html",
+      "19928": "menu-x-1-E-19-E-9re-2-8.html",
+      "9231": "menu-x-1-E-19-E-9-2re-3-1.html",
+      "9232": "menu-x-1-E-19-E-9-2re-3-2.html",
+      "9233": "menu-x-1-E-19-E-9-2re-3-3.html",
+      "9241": "menu-x-1-E-19-E-9-2re-4-1.html",
+      "9242": "menu-x-1-E-19-E-9-2re-4-2.html",
+      "9243": "menu-x-1-E-19-E-9-2re-4-3.html",
+      "9244": "menu-x-1-E-19-E-9-2re-4-4.html",
+
+      "920": "menu-x-1-E-19-E-9re-2-FINAL-0e-2-bgvar.html",
+      "92F0": "menu-x-1-E-19-E-9re-2-FINAL-0.html",
+      "F0E": "menu-x-1-E-19-E-9re-2-FINAL-0e.html",
+      "F01": "menu-x-1-E-19-E-9re-2-FINAL-0e-1.html",
+      "F02": "menu-x-1-E-19-E-9re-2-FINAL-0e-2.html",
+      "F03": "menu-x-1-E-19-E-9re-2-FINAL-0e-3.html",
+
+      "F30": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-0.html",
+      "F31": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-1.html",
+      "F32": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-2.html",
+      "F33": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-3.html",
+      "F34": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-4.html",
+      "F10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0.html",
+      "F11": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1.html",
+      "F12": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-2.html",
+      "F13": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-3.html",
+      "F14": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-4.html",
+      "F15": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-5.html",
+      "F16": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-6.html",
+      
+      "100": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1-0.html",
+      "101": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ATUALIZADO.html",
+      "102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO.html",
+
+      "103": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO-INTEGRADO.html",
+      "104": "menu-x-KBLUX-SYM-renderResponse-GLOWED.html",
+      "105": "RENDERRESPONSE-refinado-MODIFICADO.html",
+      "106": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-RESPONSIVO-BOTOES.html",
+      "107": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-TRINITY-ARCHE.html",
+      
+      "108": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-0.html",
+      "109": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1.html",
+      "1102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-2.html",
+      
+      "110": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0.html",
+      
+      "111": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-1.html",
+      "112": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-2.html",
+      "113": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-3.html",
+      "114": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-4.html",
+      "115": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-5.html",
+      "116": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-6.html",
+      "117": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-7.html",
+      "118": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-8.html",
+      "119": "dual-app-renderResponse-SEPARADA.html",
+      "120": "dual-app-renderResponse-UNIFICADA.html",
+      "121": "dual-app-renderResponse-UNIFICADA-COMPACTO.html",
+      "1000": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-0.html",
+    
+      "1001": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-1.html",
+      "1002": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2.html",
+      "1002A": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2a.html",
+      "1003": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-3.html",
+
+      "1008": "dualapp-renderResponse-Trinity-subblocos-integrado.html",
+      "1005": "menu-integrado-renderResponse-v1-final.html",
+      "1006": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-0.html",
+      
+      "AR1": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-1.html",
+      "AR2": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-2.html",
+      "AR3": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-3.html",
+      "AR4": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-4.html",
+      
+      "AR5": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-5.html",
+      "AR6": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6.html",
+      "AR7": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-7.html",
+      "AR8": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-8.html",
+      "AR9": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-9.html",
+      
+      "R10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-10.html",
+      
+      "R60": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-0.html",
+      "R61": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-1.html",
+      "R62": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-2.html",
+      "R63": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3.html",
+
+      "R64": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-4.html",
+      "R65": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-5.html",
+      "R66": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-6.html",
+
+      "999": "dual-infodose-v3-toggle-advanced.html",
+      "666": "dual-infodose-v2-renderResponse-simbio-ajustado.html",
+      "333": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix.html",
+
+      "990": "dual-infodose-v3-refatorado-patch-0.html",
+      "991": "dual-infodose-v3-refatorado-patch-1.html",
+      "992": "dual-infodose-v3-refatorado-patch-2.html",
+      "E99": "dual-infodose-v3-refatorado-patch.html",
+
+      "993": "dual-infodose-v3-refatorado-patch-3.html",
+      "994": "dual-infodose-v3-refatorado-patch-4.html",
+      "995": "dual-infodose-v3-refatorado-patch-5.html",
+      "996": "dual-infodose-v3-refatorado-patch-6.html",
+      "997": "dual-infodose-v3-refatorado-patch-7.html",
+      "998y": "dual-infodose-v3-refatorado-patch-8.html",
+
+      "129": "dual-app-990e-12.html",
+      "139": "dual-app-990e-13.html",
+      "90e": "dual-app-990e.html",
+      "90": "dual-app-990.html",
+      
+      "139e": "dual-app-990e-13-E.html",
+      "149": "dual-app-990e-14.html",
+      "159": "dual-app-990e-15.html",
+      "169": "dual-app-990e-16.html",
+      "179": "dual-app-990e-17.html",
+      "189": "dual-app-990e-18.html",
+      "ADV": "ADV-gen.html",
+      
+      "R630": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html",
+      "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
+      "R632": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html",
+      "R633": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-1.html",
+      
+      "MRR": "menu-RR.html",
+      "R90": "dual-infodose-v4-simbiose-final.html",
+      
+
+
+    };
+
+    function playButtonSound() {
+      const sound = new Audio('assets/sounds/uiSamples/back-action.wav');
+      sound.volume = 0.7;
+      sound.play().catch(() => {});
+    }
+
+    toggleDecoderBtn.addEventListener('click', () => {
+  playButtonSound();
+
+  const isVisible = decoderBox.style.display === 'block';
+  decoderBox.style.display = isVisible ? 'none' : 'block';
+
+  // Animação fluida
+  gsap.fromTo(decoderBox,
+    { opacity: 0, y: -20 },
+    { opacity: isVisible ? 0 : 1, y: 0, duration: 0.4, ease: "power2.out" }
+  );
+});
+
+    uploadBtn.addEventListener('click', () => {
+      playButtonSound();
+      uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+
+    const blob = new Blob([content], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    alert('Página carregada com sucesso! Redirecionando...');
+
+    setTimeout(() => {
+      window.location.href = blobUrl;
+    }, 1000);
+  };
+  reader.readAsText(file);
+      } else {
+        alert("Por favor, selecione um arquivo .html válido.");
+      }
+    });
+
+    window.decodeSymbolicCode = () => {
+  playButtonSound();
+
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const dest = CODE_MAP[code];
+
+  if (dest) {
+  const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
+  audio.volume = 0.6;
+  audio.play().catch(() => {});
+  
+  gsap.to('.logo-container', { scale: 0.8, duration: 0.9, ease: 'power3.out' });
+  gsap.to('.infodose', { scale: 0, duration: 0.9, ease: 'power3.out' });
+  gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
+  gsap.to('body', {
+    opacity: 0,
+    duration: 0.9,
+    delay: 0,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 9); // tempo extra para terminar áudio
+    }
+  });
+} else {
+    alert('Selo desconhecido ou não registrado.');
+  }
+};
+
+    const goToIndex = () => {
+      const audio = new Audio('assets/sounds/suave_portal.mp3');
+      audio.volume = 1;
+      audio.play().catch(() => {});
+      gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+      gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+      gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+      setTimeout(() => { window.location.href = 'index.html'; }, 1399);
+    };
+
+    const lockScroll = () => {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.height = '100vh';
+      document.body.style.height = '100vh';
+      window.scrollTo(0, 0);
+    };
+
+    function showLoginUI() {
+      loginBox.classList.add('active');
+      userInput.style.display  = '';
+      passInput.style.display  = '';
+      submitBtn.style.display  = '';
+      logoutArea.style.display = 'none';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    function showLogoutUI(user) {
+      loginBox.classList.add('active');
+      userInput.style.display  = 'none';
+      passInput.style.display  = 'none';
+      submitBtn.style.display  = 'none';
+      logoutArea.style.display = 'block';
+      loggedUser.textContent   = user ? `${user}` : '';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    window.addEventListener('load', () => {
+      lockScroll();
+      const stored = localStorage.getItem(storedKey);
+      stored ? showLogoutUI(stored) : showLoginUI();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const rawUser = userInput.value.trim();
+      const u = rawUser.toLowerCase();
+      const p = passInput.value.trim();
+      if (!u || !p) {
+        showLoginUI();
+        messageBox.textContent = 'Por favor, preencha usuário e senha.';
+        messageBox.style.display = 'block';
+        return;
+      }
+      try {
+        const res   = await fetch(USERS_JSON);
+        if (!res.ok) throw new Error('Falha ao carregar credenciais.');
+        const creds = await res.json();
+        if (creds[u] && creds[u] === p) {
+          localStorage.setItem(storedKey, rawUser);
+          goToIndex();
+        } else {
+          showLoginUI();
+          messageBox.textContent = creds[u] ? 'Senha incorreta para usuário mestre.' : 'Usuário ainda não conectado com o pulso.';
+          messageBox.style.display = 'block';
+          buyArea.style.display = 'block';
+        }
+      } catch (err) {
+        showLoginUI();
+        messageBox.textContent = err.message;
+        messageBox.style.display = 'block';
+        buyArea.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(storedKey);
+      showLoginUI();
+    });
+
+    logoDual.addEventListener('click', () => {
+      const user = localStorage.getItem(storedKey);
+      if (user) goToIndex();
+    });
+
+    buyBtn.addEventListener('click', () => {
+      window.location.href = PIX_LINK;
+    });
+
+    particlesJS('particles-js', {
+      particles: {
+        number:{value:48,density:{enable:true,value_area:600}},
+        color:{value:['#0ff','#f0f']},
+        shape:{type:'circle'},
+        opacity:{value:0.4,random:true},
+        size:{value:3,random:true},
+        move:{enable:true,speed:1.2,random:true,out_mode:'out'}
+      },
+      retina_detect:true
+    }); 
+  </script>
+  
+ 
+  <style>
+     body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      /*background: transparent;*/
+    }
+
+    .fake-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* ou 'contain' se quiser ver tudo */
+      object-position: center;
+      z-index: -2;
+      opacity: 0.24; /* ajusta a transparência */
+      pointer-events: none; /* deixa os cliques passarem por ela */
+      transition: opacity 0.5s ease;
+    }
+
+    
+
+    #imgUpload {
+      display: none;
+    }
+  </style>
+
+
+  <!-- IMG como plano de fundo fake -->
+  <img id="bgImage" class="fake-bg" src="assets/styles/themes/bgs/Dark-BG.png" alt="" />
+
+
+  <script>
+    function trocarImagem(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById('bgImage');
+    img.src = e.target.result;
+
+    // ✅ Salvar no localStorage
+    localStorage.setItem("bgImageSource", e.target.result);
+
+    console.log("◉ Imagem substituída com sucesso!");
+    if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
+  };
+  reader.readAsDataURL(file);
+}
+    
+  </script>
+<script>
+// 🎛️ BG Personalizado
+const bg = document.getElementById('bgImage');
+const imgUpload = document.getElementById('imgUpload');
+const cycleBtn = document.getElementById('cycleBtn');
+const userBgOptions = document.getElementById('userBgOptions');
+const BG_KEY = "bgImageSource";
+const FILTER_KEY = "bgImageFilter";
+const imagens = [
+  'assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG',
+  'assets/styles/themes/bgs/Nebula-Galaxy.png',
+  'assets/styles/themes/bgs/Circuit-Spirit.jpg',
+  'assets/styles/themes/bgs/Temple-Net.png'
+];
+let indexAtual = 0;
+
+function toggleUserOptions() {
+  userBgOptions.style.display = userBgOptions.style.display === 'none' ? 'flex' : 'none';
+}
+
+function loadUserBG() {
+  const savedSrc = localStorage.getItem(BG_KEY) || 'about:blank';
+  const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
+  bg.src = savedSrc;
+  bg.style.filter = savedFilter;
+}
+
+function setBG(src) {
+  bg.src = src;
+  localStorage.setItem(BG_KEY, src);
+  logMistico("📷 BG set via thumbnail");
+}
+
+function applyFilter(filter) {
+  bg.style.filter = filter;
+  localStorage.setItem(FILTER_KEY, filter);
+  logMistico("🎨 Filtro aplicado: " + filter);
+}
+
+imgUpload.addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataURL = e.target.result;
+    bg.src = dataURL;
+    localStorage.setItem(BG_KEY, dataURL);
+    logMistico("🖼️ BG set via upload");
+  };
+  reader.readAsDataURL(file);
+});
+
+cycleBtn.addEventListener('click', () => {
+  indexAtual = (indexAtual + 1) % imagens.length;
+  const nextSrc = imagens[indexAtual];
+  setBG(nextSrc);
+  logMistico("🔁 BG ciclado");
+});
+
+function logMistico(msg) {
+  if (window.logMistico) {
+    window.logMistico(msg);
+  } else {
+    console.log("◉", msg);
+  }
+}
+
+window.addEventListener('load', loadUserBG);
+</script>
+<script>
+  const toggleMiniPlayer = document.getElementById("toggleMiniPlayer");
+  const iframeWrapper = document.getElementById("iframeWrapper");
+
+  let showing = false;
+  toggleMiniPlayer.addEventListener("click", () => {
+    showing = !showing;
+    iframeWrapper.style.display = showing ? "block" : "none";
+    toggleMiniPlayer.innerText = showing ? "💊" : "💊";
+  });
+</script>
+</body>
+</html>
