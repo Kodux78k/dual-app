@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>⚛️ Mandala Emocional Simbiótica</title>
+  <style>
+    body {
+      background: #ffe66d;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 2em;
+      color: #2e2e2e;
+      transition: background 1s;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ff6b6b;
+    }
+
+    .controls {
+      text-align: center;
+      margin: 2em auto;
+    }
+
+    select, input {
+      font-size: 1em;
+      padding: 0.5em;
+      margin: 0.5em;
+      border-radius: 8px;
+      border: 2px solid #4ecdc4;
+    }
+
+    canvas {
+      display: block;
+      margin: 2em auto;
+      background: #fffde7;
+      border: 2px dashed #ff6b6b;
+      border-radius: 10px;
+    }
+
+    .prompt {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #4ecdc4;
+      margin-top: 1em;
+    }
+
+    .ascii-symbol {
+      text-align: center;
+      margin-top: 2em;
+      font-size: 1.6em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚡️ MANDALA EMOCIONAL</h1>
+
+  <div class="controls">
+    <label for="emo">Escolha a Emoção:</label>
+    <select id="emo">
+      <option value="saudade">Saudade</option>
+      <option value="alegria">Alegria</option>
+      <option value="raiva">Raiva</option>
+      <option value="esperança">Esperança</option>
+      <option value="melancolia">Melancolia</option>
+    </select>
+
+    <input type="text" id="detalhe" placeholder="Símbolo Oculto (ex: vento)">
+    <button onclick="desenhar()">Gerar Mandala</button>
+  </div>
+
+  <canvas id="mandala" width="400" height="400"></canvas>
+
+  <div class="prompt" id="output">
+    ✨ Aguardando sua lembrança simbólica...
+  </div>
+
+  <div class="ascii-symbol">
+    ⚛️<br>
+   /|\\<br>
+  ◊===◊<br>
+   |☾|<br>
+    ▽
+  </div>
+
+  <script>
+    const cores = {
+      saudade: "#4ecdc4",
+      alegria: "#ffe66d",
+      raiva: "#ff6b6b",
+      esperança: "#8ef59c",
+      melancolia: "#6a89cc"
+    };
+
+    function desenhar() {
+      const emoção = document.getElementById("emo").value;
+      const detalhe = document.getElementById("detalhe").value || "mistério";
+      const cor = cores[emoção];
+
+      document.body.style.background = cor;
+      const canvas = document.getElementById("mandala");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Mandala central
+      ctx.fillStyle = cor;
+      ctx.beginPath();
+      ctx.arc(200, 200, 60, 0, 2 * Math.PI);
+      ctx.fill();
+
+      // Camadas orbitais
+      for (let i = 0; i < 8; i++) {
+        let angle = (i * 2 * Math.PI) / 8;
+        let x = 200 + 100 * Math.cos(angle);
+        let y = 200 + 100 * Math.sin(angle);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, 2 * Math.PI);
+        ctx.fillStyle = i % 2 === 0 ? "#fff" : cor;
+        ctx.fill();
+      }
+
+      // Texto simbólico
+      document.getElementById("output").innerHTML =
+        `🌀 Emoção: <strong>${emoção}</strong> | Símbolo Revelado: <strong>${detalhe.split("").reverse().join("")}</strong>`;
+    }
+  </script>
+
+</body>
+</html>

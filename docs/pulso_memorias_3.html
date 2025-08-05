@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>🌌 Mandala Sensorial Total</title>
+  <style>
+    body {
+      background: #fffde7;
+      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 2em;
+      color: #333;
+      text-align: center;
+    }
+
+    h1 {
+      color: #ff6b6b;
+      font-size: 2em;
+    }
+
+    select, input, button {
+      font-size: 1em;
+      padding: 0.6em;
+      margin: 1em;
+      border-radius: 10px;
+      border: 2px solid #4ecdc4;
+    }
+
+    canvas {
+      background: #ffffff;
+      border: 2px dashed #ff6b6b;
+      border-radius: 10px;
+      margin: 1em auto;
+      display: block;
+    }
+
+    .breathing-circle {
+      width: 100px;
+      height: 100px;
+      margin: 1em auto;
+      background: #4ecdc4;
+      border-radius: 50%;
+      animation: breath 6s infinite;
+    }
+
+    @keyframes breath {
+      0% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.5); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.6; }
+    }
+
+    .audio-control {
+      margin-top: 1em;
+    }
+
+    .aroma-box {
+      margin-top: 1em;
+      font-weight: bold;
+      color: #4ecdc4;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚛️ Mandala Sensorial Total</h1>
+
+  <div>
+    <label>🌈 Emoção Base:</label>
+    <select id="emo">
+      <option value="alegria">Alegria</option>
+      <option value="raiva">Raiva</option>
+      <option value="saudade">Saudade</option>
+      <option value="esperança">Esperança</option>
+      <option value="medo">Medo</option>
+    </select>
+
+    <input type="text" id="detalhe" placeholder="Símbolo oculto...">
+    <button onclick="gerar()">🌀 Gerar</button>
+  </div>
+
+  <canvas id="mandala" width="400" height="400"></canvas>
+
+  <div class="breathing-circle" title="Respiração Ativa (5-5)"></div>
+
+  <div class="audio-control">
+    <audio id="trilha" controls loop>
+      <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_48bb1ed8f3.mp3" type="audio/mp3">
+    </audio>
+  </div>
+
+  <div id="output" class="aroma-box">✨ Escolha uma emoção para ativar o arquétipo e aroma.</div>
+
+  <script>
+    const cores = {
+      alegria: "#ffe66d",
+      raiva: "#ff6b6b",
+      saudade: "#4ecdc4",
+      esperança: "#a8e6cf",
+      medo: "#b2bec3"
+    };
+
+    const aromas = {
+      alegria: "Aroma da Alegria (Tangerina + Hortelã + Melissa)",
+      raiva: "Aroma da Revolução (Cravo + Cardamomo + Pimenta)",
+      saudade: "Aroma do Lar que Acolhe (Baunilha + Rosa)",
+      esperança: "Aroma dos Novos Caminhos (Cedro + Pimenta Rosa)",
+      medo: "Aroma das Raízes (Lavanda + Cipreste)"
+    };
+
+    const arquétipos = {
+      alegria: "Lumine A.Infodose",
+      raiva: "Kaos A.Infodose",
+      saudade: "Serena A.Infodose",
+      esperança: "Artemis A.Infodose",
+      medo: "Rhea A.Infodose"
+    };
+
+    function gerar() {
+      const emo = document.getElementById("emo").value;
+      const detalhe = document.getElementById("detalhe").value || "mistério";
+      const cor = cores[emo];
+      const canvas = document.getElementById("mandala");
+      const ctx = canvas.getContext("2d");
+
+      // Atualiza BG
+      document.body.style.background = cor;
+
+      // Mandala
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = cor;
+      ctx.beginPath();
+      ctx.arc(200, 200, 60, 0, 2 * Math.PI);
+      ctx.fill();
+
+      for (let i = 0; i < 8; i++) {
+        let angle = (i * 2 * Math.PI) / 8;
+        let x = 200 + 100 * Math.cos(angle);
+        let y = 200 + 100 * Math.sin(angle);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 20, 0, 2 * Math.PI);
+        ctx.fillStyle = i % 2 === 0 ? "#fff" : cor;
+        ctx.fill();
+      }
+
+      document.getElementById("output").innerHTML = `
+        🧬 Arquétipo Ativo: <strong>${arquétipos[emo]}</strong><br>
+        🌿 Aroma: <em>${aromas[emo]}</em><br>
+        🔮 Símbolo Revelado: <strong>${detalhe.split("").reverse().join("")}</strong>
+      `;
+
+      // Toca música (reinicia se já estiver tocando)
+      const audio = document.getElementById("trilha");
+      audio.pause();
+      audio.currentTime = 0;
+      audio.play();
+    }
+  </script>
+
+</body>
+</html>

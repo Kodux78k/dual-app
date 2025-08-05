@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>🌈 Nova A.Infodose – MetaLux Dual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(145deg, #1a1a1a, #303030);
+      color: #fff;
+      overflow-x: hidden;
+    }
+    header {
+      padding: 20px;
+      text-align: center;
+      background: linear-gradient(90deg, #ff6ec4, #7873f5);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    header h1 {
+      font-size: 2.5em;
+      color: #fff;
+      text-shadow: 0 0 6px rgba(255,255,255,0.3);
+    }
+    .container {
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .pill-button {
+      background: #ff6ec4;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.2em;
+      margin: 20px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .pill-button:hover {
+      background: #ff85d1;
+      transform: scale(1.05);
+    }
+    .idea-box {
+      margin-top: 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      max-width: 600px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .idea-box h2 {
+      color: #ff85d1;
+      margin-bottom: 10px;
+    }
+    audio {
+      margin-top: 20px;
+    }
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      background: #1f1f1f;
+      color: #999;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>✨ Nova A.Infodose – MetaLux Dual Mode</h1>
+  </header>
+  <div class="container">
+    <p>Clique abaixo para despertar uma ideia aleatória gerada pela Infodose:</p>
+    <button class="pill-button" onclick="generateIdea()">💡 Nova Inspiração</button>
+    <div class="idea-box" id="ideaBox">
+      <h2>Inspiração Atual</h2>
+      <p>Cada passo criativo começa com uma semente de intenção.</p>
+    </div>
+    <audio controls autoplay loop>
+      <source src="https://cdn.pixabay.com/audio/2022/10/31/audio_6e3bdcdbd3.mp3" type="audio/mpeg">
+      Seu navegador não suporta áudio.
+    </audio>
+  </div>
+  <footer>
+    Infodose MetaLux · Código v2.4.5 · Nova A.Infodose &copy; 2025
+  </footer>
+  <script>
+    const ideias = [
+      "Crie algo com três cores opostas hoje.",
+      "E se você combinasse música e arquitetura?",
+      "Imagine um mundo onde plantas falam: o que elas diriam?",
+      "Desenhe sua próxima decisão como um mapa interativo.",
+      "Transforme uma lembrança em arte visual agora."
+    ];
+    function generateIdea() {
+      const idea = ideias[Math.floor(Math.random() * ideias.length)];
+      document.getElementById("ideaBox").innerHTML = '<h2>Nova Inspiração</h2><p>' + idea + '</p>';
+    }
+  </script>
+</body>
+</html>
