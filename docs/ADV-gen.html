@@ -106,6 +106,28 @@
 </head>
 <body>
   <main>
+    <section class="section" id="menuGuia">
+  <h2>📌 Menu Interativo KOBLLUX</h2>
+  <p>Escolha uma das opções abaixo para continuar:</p>
+  <div class="button-group">
+    <button onclick="irParaSecao('criador-peticoes')">📝 Criar Petição</button>
+    <button onclick="irParaSecao('assistente-ia')">🤖 Perguntar à IA</button>
+    <button onclick="irParaSecao('blue-ia')">🔹 Ritual & Voz</button>
+  </div>
+  <div id="feedbackMenu" class="output">👆 Escolha uma opção para começar.</div>
+</section>
+<section class="section" id="wizardMenu">
+  <h2>🧭 Navegação Guiada KOBLLUX</h2>
+  <div id="etapaContent">
+    <p id="etapaTexto">1️⃣ Deseja verificar sua OAB antes de tudo?</p>
+    <div class="button-group">
+      <button onclick="avancarEtapa()">Sim / Avançar</button>
+      <button onclick="voltarEtapa()">Voltar</button>
+    </div>
+  </div>
+  <div id="feedbackWizard" class="output">🚀 Pronto para navegar pelas funções!</div>
+</section>
+    
     <section class="section">
       <h2>📋 Registro de Ocorrência (BO Digital)</h2>
       <div class="flex-grid">
@@ -143,6 +165,8 @@
       <button onclick="ativarRitual()">Invocar Ritual</button>
       <div class="output" id="ritualOutput">✨ Ritual não ativado.</div>
     </section>
+    
+    
   </main>
 
   <footer>
@@ -524,7 +548,100 @@ body.light-mode .output {
       transform: translateX(26px);
       background: #3a47a5;
     }
-  
+    
+    .progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 234, 255, 0.1);
+  border-radius: 5px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: var(--primary);
+  width: 0%;
+  transition: width 0.4s ease;
+}
+  .section {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), rgba(0, 200, 255, 0.02));
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  padding: 24px;
+  position: relative;
+  backdrop-filter: blur(12px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.section:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.section h2 {
+  font-size: 1.6rem;
+  color: var(--primary);
+  text-shadow: 0 0 8px var(--primary);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.button-group button {
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), #00a2ff);
+  border: none;
+  color: #000;
+  font-weight: bold;
+  box-shadow: 0 0 10px var(--primary);
+  transition: all 0.3s ease;
+}
+
+.button-group button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #00a2ff, var(--primary));
+}
+
+textarea, input, select {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  color: white;
+  margin-top: 10px;
+  font-size: 1rem;
+  font-family: 'Montserrat', sans-serif;
+  backdrop-filter: blur(4px);
+}
+
+.output {
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 4px solid var(--primary);
+  padding: 16px;
+  border-radius: 10px;
+  margin-top: 16px;
+  white-space: pre-wrap;
+  font-family: 'Roboto Mono', monospace;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background-image: url('assets/styles/themes/bgs/Nebula-BG.jpg');
+  background-size: 300px;
+  background-position: center;
+  opacity: 0.05;
+  pointer-events: none;
+}
 </style>
 
   
@@ -1007,6 +1124,56 @@ function configuracoes() {
       }
     }
   </script>
+  
+  <script>
+function irParaSecao(secaoID) {
+  const secao = document.querySelector(`.${secaoID}`);
+  const feedback = document.getElementById("feedbackMenu");
+  if (secao) {
+    secao.scrollIntoView({ behavior: "smooth" });
+    secao.classList.add("pulse");
+    feedback.innerText = `✅ Você selecionou: ${secao.querySelector('h2')?.innerText || 'Seção'}`;
+    setTimeout(() => secao.classList.remove("pulse"), 1500);
+  } else {
+    feedback.innerText = "❌ Seção não encontrada. Verifique o ID.";
+  }
+}
+</script>
+  <script>
+let etapaAtual = 0;
+const etapas = [
+  { texto: "1️⃣ Deseja verificar sua OAB antes de tudo?", alvo: "verificacao-profissional" },
+  { texto: "2️⃣ Vamos gerar sua Petição Inteligente?", alvo: "criador-peticoes" },
+  { texto: "3️⃣ Deseja consultar a IA Jurídica agora?", alvo: "assistente-ia" },
+  { texto: "4️⃣ Ativar modo Ritual ou Comando por Voz?", alvo: "blue-ia" },
+  { texto: "5️⃣ Validar documentos imobiliários?", alvo: "saidaDocs" }
+];
+
+function atualizarEtapa() {
+  const etapaTexto = document.getElementById("etapaTexto");
+  const feedback = document.getElementById("feedbackWizard");
+  etapaTexto.innerText = etapas[etapaAtual].texto;
+  const secao = document.querySelector(`.${etapas[etapaAtual].alvo}`) || document.getElementById(etapas[etapaAtual].alvo);
+  if (secao) {
+    secao.scrollIntoView({ behavior: "smooth" });
+    secao.classList.add("pulse");
+    setTimeout(() => secao.classList.remove("pulse"), 1500);
+    feedback.innerText = `✔️ Navegando para: ${etapas[etapaAtual].texto}`;
+  } else {
+    feedback.innerText = `⚠️ Seção "${etapas[etapaAtual].alvo}" não localizada.`;
+  }
+}
+
+function avancarEtapa() {
+  etapaAtual = (etapaAtual + 1) % etapas.length;
+  atualizarEtapa();
+}
+
+function voltarEtapa() {
+  etapaAtual = (etapaAtual - 1 + etapas.length) % etapas.length;
+  atualizarEtapa();
+}
+</script>
  </body> 
 
 
