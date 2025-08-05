@@ -538,17 +538,19 @@ body {
       "90e": "dual-app-990e.html",
       "90": "dual-app-990.html",
       
+      
       "139e" "dual-app-990e-13-E.html",
       "149": "dual-app-990e-14.html",
       "159": "dual-app-990e-15.html",
       "169": "dual-app-990e-16.html",
       "179": "dual-app-990e-17.html",
       
+      
       "R630": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html",
       "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
       "R632": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html",
       "R633": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-1.html",
-            
+      
       "MRR": "menu-RR.html",
       "R90": "dual-infodose-v4-simbiose-final.html",
       
@@ -563,9 +565,17 @@ body {
     }
 
     toggleDecoderBtn.addEventListener('click', () => {
-      playButtonSound();
-      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
-    });
+  playButtonSound();
+
+  const isVisible = decoderBox.style.display === 'block';
+  decoderBox.style.display = isVisible ? 'none' : 'block';
+
+  // Animação fluida
+  gsap.fromTo(decoderBox,
+    { opacity: 0, y: -20 },
+    { opacity: isVisible ? 0 : 1, y: 0, duration: 0.4, ease: "power2.out" }
+  );
+});
 
     uploadBtn.addEventListener('click', () => {
       playButtonSound();
@@ -601,23 +611,25 @@ body {
   const dest = CODE_MAP[code];
 
   if (dest) {
-    // TOCAR O ÁUDIO SUAVE DO PORTAL SOMENTE SE O CÓDIGO FOR VÁLIDO
-    const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav'); // <- tirou a barra no final
-audio.volume = 1;
-audio.play().catch(() => {}); // ignora erro se áudio não tocar
-
-gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
-gsap.to('.infodose', { opacity: 0, duration: 0.6 });
-gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
-
-gsap.to('body', {
-  opacity: 0,
-  duration: 1,
-  onComplete: () => {
-    window.location.href = dest;
-  }
-});
-  } else {
+  const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
+  audio.volume = 0.6;
+  audio.play().catch(() => {});
+  
+  gsap.to('.logo-container', { scale: 0.9, duration: 1.4, ease: 'power3.out' });
+  gsap.to('.infodose', { opacity: 0, y: -20, duration: 0.8 });
+  gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
+  gsap.to('body', {
+    opacity: 0,
+    duration: 1.8,
+    delay: 0.2,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 9); // tempo extra para terminar áudio
+    }
+  });
+} else {
     alert('Selo desconhecido ou não registrado.');
   }
 };
@@ -744,7 +756,7 @@ gsap.to('body', {
       object-fit: cover; /* ou 'contain' se quiser ver tudo */
       object-position: center;
       z-index: -1;
-      opacity: 0.18; /* ajusta a transparência */
+      opacity: 0.2; /* ajusta a transparência */
       pointer-events: none; /* deixa os cliques passarem por ela */
       transition: opacity 0.5s ease;
     }
@@ -763,18 +775,22 @@ gsap.to('body', {
 
   <script>
     function trocarImagem(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+  const file = event.target.files[0];
+  if (!file) return;
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = document.getElementById('bgImage');
-        img.src = e.target.result;
-        console.log("◉ Imagem substituída com sucesso!");
-        if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
-      };
-      reader.readAsDataURL(file);
-    }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById('bgImage');
+    img.src = e.target.result;
+
+    // ✅ Salvar no localStorage
+    localStorage.setItem("bgImageSource", e.target.result);
+
+    console.log("◉ Imagem substituída com sucesso!");
+    if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
+  };
+  reader.readAsDataURL(file);
+}
     
   </script>
 <script>
