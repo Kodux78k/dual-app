@@ -66,10 +66,92 @@
     button:hover {
       background: #555;
     }
+   
+    h1 {
+      margin: 20px 0;
+      font-size: 1.8rem;
+      background: linear-gradient(45deg, #f0f, #0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    nav a {
+      color: white;
+      padding: 10px 16px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      background: linear-gradient(45deg, #f0f, #0ff);
+      -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
+      transition: transform 0.2s;
+    }
+    nav a:hover {
+      transform: scale(1.05);
+    }
+    .block {
+      background: linear-gradient(145deg, #1a1a1a, #1f1f1f);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,255,255,0.1), 0 0 40px rgba(255,0,255,0.05);
+      margin: 30px auto;
+      max-width: 500px;
+      width: 90%;
+    }
+    .name {
+      font-size: 1.4rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      animation: glow 1.5s infinite alternate;
+      text-align: center;
+    }
+    pre {
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 1rem;
+      white-space: pre-wrap;
+      text-align: center;
+    }
+    .desc {
+      margin: 10px 0;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .btns {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 24px;
+      font-size: 0.9rem;
+      color: white;
+      cursor: pointer;
+      background: linear-gradient(45deg, #f0f, #0ff);
+      -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
+      backdrop-filter: blur(5px);
+      box-shadow: 0 0 10px rgba(255,255,255,0.2);
+      transition: transform 0.2s;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
     @keyframes glow {
       0% { text-shadow: 0 0 5px #fff; }
-      100% { text-shadow: 0 0 10px #00f5ff, 0 0 20px #00f5ff; }
+      100% { text-shadow: 0 0 15px #0ff, 0 0 25px #f0f; }
     }
+  
   </style>
 </head>
 <body>
@@ -260,6 +342,65 @@
         alert("Ativação copiada: " + text);
       });
     }
+    const archetypes = [
+  "Nova (Inspira)", "Vitalis (Momentum)", "Pulse (Resona)", "Artemis (Naviga)",
+  "Serena (Ampara)", "Kaos (Disruptor)", "Genus (Fabricus)", "Lumine (Brilhare)",
+  "Rhea (Guardiã)", "Solus (Mago)", "Atlas (Cartesius)", "Horus (Guardião)"
+];
+
+const opposites = {
+  "Nova (Inspira)": "Kaos (Disruptor)",
+  "Vitalis (Momentum)": "Serena (Ampara)",
+  "Pulse (Resona)": "Atlas (Cartesius)",
+  "Artemis (Naviga)": "Rhea (Guardiã)",
+  "Serena (Ampara)": "Vitalis (Momentum)",
+  "Kaos (Disruptor)": "Nova (Inspira)",
+  "Genus (Fabricus)": "Solus (Mago)",
+  "Lumine (Brilhare)": "Horus (Guardião)",
+  "Rhea (Guardiã)": "Artemis (Naviga)",
+  "Solus (Mago)": "Genus (Fabricus)",
+  "Atlas (Cartesius)": "Pulse (Resona)",
+  "Horus (Guardião)": "Lumine (Brilhare)"
+};
+
+const complementars = {
+  "Nova (Inspira)": "Pulse (Resona)",
+  "Vitalis (Momentum)": "Artemis (Naviga)",
+  "Pulse (Resona)": "Nova (Inspira)",
+  "Artemis (Naviga)": "Vitalis (Momentum)",
+  "Serena (Ampara)": "Rhea (Guardiã)",
+  "Kaos (Disruptor)": "Lumine (Brilhare)",
+  "Genus (Fabricus)": "Atlas (Cartesius)",
+  "Lumine (Brilhare)": "Kaos (Disruptor)",
+  "Rhea (Guardiã)": "Serena (Ampara)",
+  "Solus (Mago)": "Horus (Guardião)",
+  "Atlas (Cartesius)": "Genus (Fabricus)",
+  "Horus (Guardião)": "Solus (Mago)"
+};
+
+function goTo(type, currentName) {
+  const target = type === 'opposite' ? opposites[currentName] : complementars[currentName];
+  const blocks = document.querySelectorAll(".block");
+  blocks.forEach((block) => {
+    const name = block.querySelector(".name").textContent.trim();
+    if (name === target) {
+      block.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+  });
+}
+
+document.querySelectorAll(".block").forEach(block => {
+  const name = block.querySelector(".name").textContent.trim();
+  const buttons = block.querySelectorAll("button");
+  buttons.forEach(btn => {
+    if (btn.textContent.includes("Oposto")) {
+      btn.onclick = () => goTo("opposite", name);
+    }
+    if (btn.textContent.includes("Complementar")) {
+      btn.onclick = () => goTo("complementar", name);
+    }
+  });
+});
   </script>
 </body>
 </html>
