@@ -6,153 +6,130 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Carrossel Infodose ASCII</title>
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: monospace, sans-serif;
-      background: #121212;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .carousel-wrapper {
-      display: flex;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      width: 100%;
-      padding: 20px;
-    }
-    .block {
-      flex: 0 0 85%;
-      background: #1e1e1e;
-      margin: 10px;
-      border-radius: 15px;
-      padding: 20px;
-      scroll-snap-align: center;
-      box-shadow: 0 0 15px rgba(255,255,255,0.1);
-    }
-    .name {
-      font-size: 1.3rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      animation: glow 1.5s infinite alternate;
-    }
-    pre {
-      background: #111;
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      white-space: pre-wrap;
-    }
-    .desc {
-      margin: 10px 0;
-      font-size: 1rem;
-    }
-    .btns {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    button {
-      background: #333;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #555;
-    }
-   
-    h1 {
-      margin: 20px 0;
-      font-size: 1.8rem;
-      background: linear-gradient(45deg, #f0f, #0ff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-align: center;
-    }
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    nav a {
-      color: white;
-      padding: 10px 16px;
-      border-radius: 20px;
-      text-decoration: none;
-      font-size: 0.9rem;
-      background: linear-gradient(45deg, #f0f, #0ff);
-      -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
-      transition: transform 0.2s;
-    }
-    nav a:hover {
-      transform: scale(1.05);
-    }
-    .block {
-      background: linear-gradient(145deg, #1a1a1a, #1f1f1f);
-      border-radius: 20px;
-      padding: 25px;
-      box-shadow: 0 4px 20px rgba(0,255,255,0.1), 0 0 40px rgba(255,0,255,0.05);
-      margin: 30px auto;
-      max-width: 500px;
-      width: 90%;
-    }
-    .name {
-      font-size: 1.4rem;
-      font-weight: bold;
-      margin-bottom: 10px;
-      animation: glow 1.5s infinite alternate;
-      text-align: center;
-    }
-    pre {
-      background: #111;
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 1rem;
-      white-space: pre-wrap;
-      text-align: center;
-    }
-    .desc {
-      margin: 10px 0;
-      font-size: 1rem;
-      text-align: center;
-    }
-    .btns {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    button {
-      padding: 10px 16px;
-      border: none;
-      border-radius: 24px;
-      font-size: 0.9rem;
-      color: white;
-      cursor: pointer;
-      background: linear-gradient(45deg, #f0f, #0ff);
-      -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
-      backdrop-filter: blur(5px);
-      box-shadow: 0 0 10px rgba(255,255,255,0.2);
-      transition: transform 0.2s;
-    }
-    button:hover {
-      transform: scale(1.05);
-    }
-    @keyframes glow {
-      0% { text-shadow: 0 0 5px #fff; }
-      100% { text-shadow: 0 0 15px #0ff, 0 0 25px #f0f; }
-    }
-  
-  </style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: monospace, sans-serif;
+    background: #121212;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  h1 {
+    margin: 20px 0;
+    font-size: 1.8rem;
+    background: linear-gradient(45deg, #f0f, #0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  nav a {
+    color: white;
+    padding: 10px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    background: linear-gradient(45deg, #f0f, #0ff);
+    -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
+    transition: transform 0.2s;
+  }
+
+  nav a:hover {
+    transform: scale(1.05);
+  }
+
+  .carousel-wrapper {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .block {
+    flex: 0 0 80%;
+    background: linear-gradient(145deg, #1a1a1a, #1f1f1f);
+    margin: 20px;
+    border-radius: 20px;
+    scroll-snap-align: center;
+    box-shadow: 0 4px 20px rgba(0,255,255,0.1), 0 0 40px rgba(255,0,255,0.05);
+    max-width: 900px;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 25px;
+  }
+
+  .name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    animation: glow 1.5s infinite alternate;
+    text-align: center;
+  }
+
+  .desc {
+    font-size: 1rem;
+    margin: 10px 0;
+    text-align: center;
+    flex-grow: 1;
+  }
+
+  pre {
+    background: #111;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    white-space: pre-wrap;
+    text-align: center;
+    margin: 10px auto;
+    max-width: 95%;
+  }
+
+  .btns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 15px;
+  }
+
+  button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(45deg, #f0f, #0ff);
+    -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    transition: transform 0.2s, background 0.3s;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, #0ff, #f0f);
+  }
+
+  @keyframes glow {
+    0% { text-shadow: 0 0 5px #fff; }
+    100% { text-shadow: 0 0 15px #0ff, 0 0 25px #f0f; }
+  }
+</style>
 </head>
 <body>
   <h1>🌟 Infodose - Ativação Arquétipos ASCII</h1>
