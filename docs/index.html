@@ -325,46 +325,6 @@ body {
 
   <!-- <div id="particles-js"></div> !-->
 <div id="particles-js"></div>
-<!-- 🎥 MINI PLAYER TOGGLE -->
-<div id="miniPlayerContainer" style="
-  position: fixed;
-  top: 78px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 99;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Montserrat', sans-serif;
-">
-
-  <button id="toggleMiniPlayer" style="
-    background: linear-gradient(90deg, #8882f8, #c277f2);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 8px rgba(140, 102, 255, 0.7);
-    margin-bottom: 10px;
-    cursor: pointer;
-    font-weight: 600;
-  ">🎥</button>
-
-  <div id="iframeWrapper" style="
-    width: 88vw;
-    max-width: 420px;
-    height: 399px;
-    border-radius: 14px;
-    overflow: auto;
-    backdrop-filter: blur(8px);
-    background: rgba(0, 0, 0, 0.45);
-    box-shadow: 0 0 16px rgba(199, 122, 255, 0.5);
-    display: none;
-    transition: all 0.5s ease-in-out;
-  ">
-    <iframe src="dual-tube-25-0.html" style="width: 100%; height: 100%; border: none;"></iframe>
-  </div>
-</div>
   <div class="center-group">
     <div class="logo-container" id="logoDual">
       <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
@@ -588,7 +548,7 @@ body {
       "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
       "R632": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html",
       "R633": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-1.html",
-      
+            
       "MRR": "menu-RR.html",
       "R90": "dual-infodose-v4-simbiose-final.html",
       
@@ -603,17 +563,9 @@ body {
     }
 
     toggleDecoderBtn.addEventListener('click', () => {
-  playButtonSound();
-
-  const isVisible = decoderBox.style.display === 'block';
-  decoderBox.style.display = isVisible ? 'none' : 'block';
-
-  // Animação fluida
-  gsap.fromTo(decoderBox,
-    { opacity: 0, y: -20 },
-    { opacity: isVisible ? 0 : 1, y: 0, duration: 0.4, ease: "power2.out" }
-  );
-});
+      playButtonSound();
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    });
 
     uploadBtn.addEventListener('click', () => {
       playButtonSound();
@@ -649,25 +601,23 @@ body {
   const dest = CODE_MAP[code];
 
   if (dest) {
-  const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
-  audio.volume = 0.6;
-  audio.play().catch(() => {});
-  
-  gsap.to('.logo-container', { scale: 0.9, duration: 1.4, ease: 'power3.out' });
-  gsap.to('.infodose', { opacity: 0, y: -20, duration: 0.8 });
-  gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
-  gsap.to('body', {
-    opacity: 0,
-    duration: 1.8,
-    delay: 0.2,
-    ease: 'power2.inOut',
-    onComplete: () => {
-      setTimeout(() => {
-        window.location.href = dest;
-      }, 9); // tempo extra para terminar áudio
-    }
-  });
-} else {
+    // TOCAR O ÁUDIO SUAVE DO PORTAL SOMENTE SE O CÓDIGO FOR VÁLIDO
+    const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav'); // <- tirou a barra no final
+audio.volume = 1;
+audio.play().catch(() => {}); // ignora erro se áudio não tocar
+
+gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+
+gsap.to('body', {
+  opacity: 0,
+  duration: 1,
+  onComplete: () => {
+    window.location.href = dest;
+  }
+});
+  } else {
     alert('Selo desconhecido ou não registrado.');
   }
 };
@@ -794,7 +744,7 @@ body {
       object-fit: cover; /* ou 'contain' se quiser ver tudo */
       object-position: center;
       z-index: -1;
-      opacity: 0.2; /* ajusta a transparência */
+      opacity: 0.18; /* ajusta a transparência */
       pointer-events: none; /* deixa os cliques passarem por ela */
       transition: opacity 0.5s ease;
     }
@@ -813,22 +763,18 @@ body {
 
   <script>
     function trocarImagem(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+      const file = event.target.files[0];
+      if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = document.getElementById('bgImage');
-    img.src = e.target.result;
-
-    // ✅ Salvar no localStorage
-    localStorage.setItem("bgImageSource", e.target.result);
-
-    console.log("◉ Imagem substituída com sucesso!");
-    if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
-  };
-  reader.readAsDataURL(file);
-}
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('bgImage');
+        img.src = e.target.result;
+        console.log("◉ Imagem substituída com sucesso!");
+        if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
+      };
+      reader.readAsDataURL(file);
+    }
     
   </script>
 <script>
@@ -899,17 +845,6 @@ function logMistico(msg) {
 }
 
 window.addEventListener('load', loadUserBG);
-</script>
-<script>
-  const toggleMiniPlayer = document.getElementById("toggleMiniPlayer");
-  const iframeWrapper = document.getElementById("iframeWrapper");
-
-  let showing = false;
-  toggleMiniPlayer.addEventListener("click", () => {
-    showing = !showing;
-    iframeWrapper.style.display = showing ? "block" : "none";
-    toggleMiniPlayer.innerText = showing ? "🎥" : "🎥";
-  });
 </script>
 </body>
 </html>
