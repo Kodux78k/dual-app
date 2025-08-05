@@ -213,7 +213,7 @@
   
 
 .response-container {
-  bottom: 90px !important;
+  bottom: 99px !important;
 }
 
 .input-container.hidden,
@@ -239,11 +239,11 @@
 
 
 .input-container {
-  bottom: 22px !important;
+  bottom: 30px !important;
 }
 
 #btn-expandir-ritual {
-  bottom: 198px !important;
+  bottom: 210px !important;
 }
 </style>
 <style>
@@ -314,7 +314,7 @@
 
     .lock-button {
       position: fixed;
-      bottom: 36px;
+      bottom: 43px;
       left: 50%;
       transform: translateX(-50%);
       width: 28px;
@@ -686,7 +686,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
   z-index: 99999;
 border-radius:50%;
 
-  font-size: 18px;
+  font-size: 21px;
 background:linear-gradient(42deg,#0ff,#f0f);
       background-clip:text;-webkit-background-clip:text;
       -webkit-text-fill-color:transparent;
@@ -703,7 +703,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
   opacity: 1 !important;
   transform: scale(1.05);
 }
-#btn-expandir-ritual { right: 36px; }
+#btn-expandir-ritual { right: 40px; }
 
 @keyframes pulse {
   0% { transform: scale(1); opacity: 0.7; }
@@ -738,7 +738,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
   mask-image: radial-gradient(white, black);
 
   overflow: hidden;
-  z-index:2;
+  z-index:99992;
   cursor: pointer;
   font-family: monospace;
   text-align: center;
@@ -1320,7 +1320,7 @@ binauralAudio.volume = binauralVolume.value;
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
             CHUNK_SIZE   :12000,
-            AUTH_TOKEN   :'Bearer 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'
+            AUTH_TOKEN   :'Bearer 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'
           };
 
     let training = '', chunks = [], chunkIndex = 0;
@@ -1793,12 +1793,12 @@ uiBL.cancel.play().catch(()=>{});
   </script>
 <style>
 #btn-expandir-ritual.move-to-bottom-ritual {
-  bottom: 12px !important;
+  bottom: 18px !important;
   animation: moveRitualDown 0.4s ease forwards !important;
 }
 @keyframes moveRitualDown {
-  from { bottom: 189px; opacity: 0.4; }
-  to   { bottom: 12px; opacity: 0.6; }
+  from { bottom: 193px; opacity: 0.4; }
+  to   { bottom: 18px; opacity: 0.6; }
 }
 </style>
 <style>
@@ -2525,7 +2525,7 @@ function ATIVAR_KOBLLUX_PATCH() {
     button,
     .symbol-button,
    
-    .upload-symbolic-button,
+
     
     .response-container,
     .login-container,
