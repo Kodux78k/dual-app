@@ -325,6 +325,46 @@ body {
 
   <!-- <div id="particles-js"></div> !-->
 <div id="particles-js"></div>
+<!-- 🎥 MINI PLAYER TOGGLE -->
+<div id="miniPlayerContainer" style="
+  position: fixed;
+  top: 78px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+">
+
+  <button id="toggleMiniPlayer" style="
+    background: linear-gradient(90deg, #8882f8, #c277f2);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 0 8px rgba(140, 102, 255, 0.7);
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-weight: 600;
+  ">🎥</button>
+
+  <div id="iframeWrapper" style="
+    width: 88vw;
+    max-width: 420px;
+    height: 399px;
+    border-radius: 14px;
+    overflow: auto;
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 16px rgba(199, 122, 255, 0.5);
+    display: none;
+    transition: all 0.5s ease-in-out;
+  ">
+    <iframe src="dual-tube-25-0.html" style="width: 100%; height: 100%; border: none;"></iframe>
+  </div>
+</div>
   <div class="center-group">
     <div class="logo-container" id="logoDual">
       <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
@@ -538,13 +578,11 @@ body {
       "90e": "dual-app-990e.html",
       "90": "dual-app-990.html",
       
-      
-      "139e" "dual-app-990e-13-E.html",
+      "139e": "dual-app-990e-13-E.html",
       "149": "dual-app-990e-14.html",
       "159": "dual-app-990e-15.html",
       "169": "dual-app-990e-16.html",
       "179": "dual-app-990e-17.html",
-      
       
       "R630": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html",
       "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
@@ -861,6 +899,17 @@ function logMistico(msg) {
 }
 
 window.addEventListener('load', loadUserBG);
+</script>
+<script>
+  const toggleMiniPlayer = document.getElementById("toggleMiniPlayer");
+  const iframeWrapper = document.getElementById("iframeWrapper");
+
+  let showing = false;
+  toggleMiniPlayer.addEventListener("click", () => {
+    showing = !showing;
+    iframeWrapper.style.display = showing ? "block" : "none";
+    toggleMiniPlayer.innerText = showing ? "🎥" : "🎥";
+  });
 </script>
 </body>
 </html>
