@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central - Dual Infodose</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      overscroll-behavior: none;
+    }
+    body {
+      font-family:'Montserrat',sans-serif;
+      background: linear-gradient(to bottom, #000, #1a1a1a);
+      color:#f0f;
+      height:100vh; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      padding-top:48px; position:relative;
+      opacity:0; animation:fadeInBody 1.8s ease forwards;
+    }
+    @keyframes fadeInBody { to { opacity:1 } }
+    /* ——— SEU CSS INTEGRAL (ajustes) ——— */
+    :root {
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
+      --text: #444;
+      --fast: .4s; --med: .8s; --slow: 1.8s;
+    }
+    body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+    body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+    body.vibe  { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden}
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      padding:0px;background:var(--bg);color:var(--text);
+      font-family:'Montserrat',sans-serif;
+      transition:background var(--slow),color var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+    #particles-js {
+     position:absolute; inset:0; z-index:0;
+    } 
+
+    .center-group {
+      z-index:2;
+      display:flex; flex-direction:column; align-items:center;
+      gap:1rem; padding:20px; 
+    }
+    .logo-container {
+      width:249px; 
+      animation:glow 3s ease-in-out infinite alternate;
+      cursor: pointer;
+      position:relative;
+    }
+    .logo-container object { width:100%; display:block }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #f0f) }
+      to   { filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 35px #f0f) }
+    }
+    .infodose {
+      font-size:1.4em; font-weight:300;
+      animation:fadeIn 1.5s forwards 1s; opacity:0;
+    }
+    .infodose strong { font-weight:600 }
+    @keyframes fadeIn { to { opacity:0.8 } }
+
+    .login-container {
+      width:248px; padding:0.8rem;
+      background:rgba(0,0,0,0.6);
+      border:2px solid transparent;
+      border-radius:24px; backdrop-filter:blur(8px);
+      display:flex; flex-direction:column; gap:1rem;
+      opacity:0; transition:opacity .3s;
+      pointer-events:none;
+    }
+    .login-container.active {
+      opacity:0.8; pointer-events:auto;
+    }
+    .login-container input {
+      width:100%; background:rgba(255,255,255,0.05);
+      border:none; border-bottom:1px solid rgba(255,255,255,0.3);
+      padding:0.6rem; font-size:1em; font-weight:300;
+      color:#fff; outline:none; text-align:center;
+      transition: background .3s;
+      border-radius:10px;
+    }
+    .login-container input:focus {
+      background:rgba(255,255,255,0.1);
+    }
+
+    .btn-container {
+  display: flex;
+  gap: 10px; /* espaço entre botões */
+  flex-wrap: wrap; /* quebra linha se não couber */
+}
+
+.btn-full {
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  padding: 0.8rem 1.5rem; /* aumentei o padding horizontal pra ficar bonito */
+  background: rgba(255,255,255,0.05);
+  border: none;
+  border-radius: 20px;
+  font-size: 1em;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+  /* width removido para não forçar 100% */
+  flex: 1 1 auto; /* deixa os botões flexíveis no container */
+  min-width: 100px; /* largura mínima para não ficar muito pequeno */
+}
+
+.btn-full::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
+  border-radius: 20px;
+  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.btn-full:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,0.15);
+}
+
+    .logout-area {
+      display: none;
+      margin-top: 0.3rem;
+      outline: none;
+      text-align: center;
+      
+    }
+    .logout-area .username {
+      /* font-weight: 300;*/
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 1.1em; opacity:0.8;
+    }
+    .logout-area .btn-full {
+      background: rgba(255,50,50,0.1);
+      color: #f55;
+    }
+    .logout-area .btn-full::before {
+      background: linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5));
+    }
+.upload-btn {
+      
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10;
+    }
+    #uploadHTMLBtn{
+Position: fixed;
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      right:19px;
+      z-index: 10;
+      }
+    #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
+    #buyTokens { display:none; }
+    #buyTokens button {
+      width:100%; padding:0.8rem 0;
+      background:rgba(255,255,255,0.05);
+      border:2px solid transparent;
+      border-image: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5)) 1;
+      border-radius:20px;
+      font-size:1em; font-weight:600; color:#fff;
+      cursor:pointer;
+      transition: transform .3s, background .3s;
+    }
+    #buyTokens button:hover {
+      transform:scale(1.05);
+      background:rgba(255,255,255,0.15);
+    }
+
+    #decoderBox {
+      display:none;
+      position:fixed;
+      top:42px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.6);
+      padding:1rem;
+      border-radius:20px;
+      backdrop-filter:blur(8px);
+      z-index:20000;
+      text-align:center;
+    }
+    #decoderBox input {
+      padding:0.6rem;
+      width:200px;
+      text-align:center;
+      border-radius:10px;
+      border:none;
+      font-size:1em;
+    }
+
+    #toggleDecoderBtn
+     {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 19;
+      padding: 0.3rem 0.7rem;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.15);
+      color: #444;
+      font-weight: bold;
+      font-size: 0.95em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    #toggleDecoderBtn:hover,
+    #uploadHTMLBtn:hover {
+      transform: translateX(-50%) scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+    /* #toggleDecoderBtn { top: 138px; } */
+   /* #uploadHTMLBtn  { top: 93px; } */
+
+#userBgOptions {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 16px;
+  margin-top: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn var(--fast) ease;
+}
+
+#userBgOptions button {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background 0.3s, transform 0.3s;
+}
+
+#userBgOptions button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.03);
+}
+
+#userBgOptions .thumbnails img {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+#userBgOptions .thumbnails img:hover {
+  border-color: #fff;
+  opacity: 1;
+}
+/* body {background: linear-gradient(to top, rgba(68, 68, 68, 0.3), rgba(255, 255, 255, 0.2));} */
+body {
+  background: 
+    linear-gradient(to top, rgba(68, 68, 68, 0.4), rgba(255, 255, 255, 0.3)),
+    url('assets/styles/themes/bgs/kDark-BG.png'); /* opcional */
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  opacity: 0.24;
+}
+/* Animação de pulsar body {
+  background: 
+    linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7));
+  background-blend-mode: lighten;
+}cósmico */
+@keyframes pulsarKobllux {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.05);
+  }
+}
+
+
+}
+  </style>
+
+  <style>
+    .response-container{
+      position:fixed;left:20px;right:20px;bottom:156px;padding:12px;
+      background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);
+      border-radius:20px;max-height:calc(100vh - 200px);
+      overflow-y:auto;z-index:999;transition:background var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    body.light  .response-container{background:rgba(255,255,255,0.3)}
+    body.medium .response-container{background:rgba(0,0,0,0.2)}
+    body.vibe   .response-container{background:rgba(255,255,255,0.2)}
+    .pages-wrapper{transition:opacity var(--slow),height var(--slow);}
+    .pages-wrapper.collapsed{display:none}
+    .page{display:none;opacity:0;transition:opacity var(--slow)}
+    .page.active{display:block;opacity:1}
+    .page.initial{display:flex;align-items:center;justify-content:center;
+      height:100%;text-align:center;
+    }
+    .footer-text{
+      display:block;margin:12px auto;padding:6px 12px;
+      background:var(--bg);opacity:.5;color:var(--text);
+      font-size:0.8em;text-align:center;font-style:italic;
+      border-radius:12px;cursor:pointer;
+      transition:opacity var(--slow),transform var(--slow);
+      animation:moveGradient 8s linear infinite;
+    }
+    .footer-text.loading{background:transparent!important;backdrop-filter:none!important}
+    .footer-text.loading span{background:none!important}
+    .footer-text:hover{opacity:.6}
+    .footer-text.active{opacity:.8;animation:expandFooter var(--med) ease-out}
+    .response-controls{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-top:15px;padding-top:10px;
+      border-top:1px solid rgba(255,255,255,0.2);
+    }
+    body.light  .response-controls{border-top-color:rgba(0,0,0,0.2)}
+    body.medium .response-controls{border-top-color:rgba(255,255,255,0.2)}
+    body.vibe   .response-controls{border-top-color:rgba(0,0,0,0.4)}
+    .control-buttons,.pagination{display:flex;align-items:center;gap:10px}
+    .copy-button,.paste-button,.toggle-button,.kitty-button{
+      width:36px;height:36px;border:none;border-radius:12px;
+      background:rgba(255,255,255,0.06);display:flex;
+      align-items:center;justify-content:center;cursor:pointer;
+      transition:background var(--fast),opacity var(--slow);opacity:.7;
+    }
+    .toggle-button,.kitty-button{border-radius:50%}
+    .copy-button:hover,.paste-button:hover,
+    .toggle-button:hover,.kitty-button:hover{background:rgba(255,255,255,0.15)}
+    .toggle-button.active,.kitty-button.active{opacity:1}
+    .pagination button {
+      border: none;
+      background: linear-gradient(45deg, #0ff, #f0f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: transform var(--fast);
+    }
+    .pagination button:hover{transform:scale(1.2)}
+    .response-block{
+      margin:1rem 0;padding:1.3rem;border-radius:12px;
+      line-height:1.8;position:relative;overflow:hidden;
+      animation:fadeIn var(--slow) ease forwards,pulse 12s infinite ease-in-out;
+      transition:box-shadow var(--fast),transform var(--fast);
+    }
+    .response-block:hover{box-shadow:0 0 15px rgba(0,255,255,.4)}
+    .response-block.clicked{animation:clickPulse var(--med) ease-out}
+    .response-block.expanded{
+      transform:scale(1.03);background:rgba(0,0,0,.6);z-index:2;
+    }
+    .intro{background:linear-gradient(135deg,rgba(0,255,255,.2),rgba(0,100,100,.1));border-left:4px solid #0ff}
+    .middle{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(50,50,50,.1));border-left:4px solid rgba(255,255,255,.4)}
+    .ending{background:linear-gradient(135deg,rgba(255,0,255,.2),rgba(100,0,100,.1));border-left:4px solid #f0f}
+    .input-container{
+      position:fixed;left:20px;right:20px;bottom:90px;
+      display:flex;gap:6px;z-index:2;
+    }
+    .input-container input{
+      flex:1;padding:10px;border:none;border-radius:20px;
+      background:rgba(255,255,255,.1);color:inherit;font-size:16px;
+      transition:background var(--fast);opacity:0.7;
+    }
+    .input-container input:focus{background:rgba(255,255,255,.2)}
+    .input-container button{
+      width:60px;height:60px;border:none;
+      background:linear-gradient(42deg,#0ff,#f0f);
+      background-clip:text;-webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      font-size:48px;cursor:pointer;animation:pulse 2s infinite ease-in-out;
+      display:flex;align-items:center;justify-content:center;
+      transition:transform var(--med);opacity:.7;
+    }
+    .input-container button:hover{transform:scale(1.1)}
+    .login-container{
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:300px;padding:1.5rem 1rem;background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.15);border-radius:10px;
+      backdrop-filter:blur(8px);z-index:10;display:none;
+    }
+    .login-container.active{display:block}
+    .login-container input{
+      width:100%;background:transparent;border:none;
+      border-bottom:1px solid rgba(255,255,255,.3);
+      margin:.8rem 0;padding:.4rem 0;font-size:.95em;color:#fff;
+    }
+    .login-container input::placeholder{color:rgba(255,255,255,.5)}
+    .login-container button{
+      width:100%;margin-top:1rem;padding:.5rem 0;
+      border:1px solid #0ff;border-radius:8px;
+      background:transparent;font-size:.95em;color:#0ff;cursor:pointer;
+      transition:background .25s,color .25s;
+    }
+    .login-container button:hover{background:#0ff;color:#000}
+    
+    .response-block {
+  margin: 2rem 0;
+  padding: 1.3rem;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 1s ease forwards, pulse 12s infinite ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.response-block.intro {
+  background: linear-gradient(135deg, rgba(0,255,255,.2), rgba(0,100,100,.1));
+  border-left: 4px solid #0ff;
+}
+.response-block.middle {
+  background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(50,50,50,.1));
+  border-left: 4px solid rgba(255,255,255,.4);
+}
+.response-block.ending {
+  background: linear-gradient(135deg, rgba(255,0,255,.2), rgba(100,0,100,.1));
+  border-left: 4px solid #f0f;
+}
+.response-block.expanded {
+  transform: scale(1.03);
+  background: rgba(0, 0, 0, .6);
+  z-index: 2;
+}
+.symbol-btn {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  color: #0ff;
+  border-radius: 8px;
+  padding: 2px 6px;
+  margin: 2px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background 0.3s ease;
+}
+.symbol-btn:hover {
+  background: rgba(0, 255, 255, 0.3);
+}
+    /* ————— FIM DO CSS ————— */
+  
+
+.response-container {
+  bottom: 87px !important;
+}
+
+.input-container.hidden,
+.control-buttons.hidden,
+.pagination.hidden {
+  display: none !important;
+}
+
+.footer-text.move-to-bottom {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 12px;
+  margin: 0 auto;
+  z-index: 99999;
+  animation: moveFooterDown var(--fast) ease-out forwards;
+}
+
+@keyframes moveFooterDown {
+  from { bottom: 69px; opacity: 0.5; }
+  to { bottom: 12px; opacity: 1; }
+}
+
+
+.input-container {
+  bottom: 20px !important;
+}
+
+#btn-expandir-ritual {
+  bottom: 198px !important;
+}
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: absolute;
+      z-index: 1;
+    }
+
+    iframe.active {
+      opacity: 1;
+    }
+
+    .symbol-bar {
+      position: fixed;
+      top: 39%;
+      right: 15px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 40;
+    }
+
+    .symbol-button {
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      opacity: 0.7;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .symbol-button:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+
+    .lock-button {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      z-index: 183000;
+    }
+    
+#btn-expandir-ritual {
+  position: fixed;
+  bottom: 33px;
+  
+  z-index: 99999;
+  padding: 8px 10px;
+  font-size: 12px;
+  background: var(--bg);
+  color: #F0F;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+    opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+#btn-expandir-ritual:hover,
+ {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+#btn-expandir-ritual { right: 33px; }
+</style>
+  <style>
+#pulsos-container {
+  position: fixed;
+  top: 208px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  opacity: var(--slow);
+  border: 1px solid transparent;
+  border-image: linear-gradient(45deg, #F0F, #0FF);
+  border-image-slice: 1;
+
+  -webkit-mask-image: radial-gradient(white, black); /* força máscara arredondada no Safari */
+  mask-image: radial-gradient(white, black);
+
+  overflow: hidden;
+  z-index:2;
+  cursor: pointer;
+  font-family: monospace;
+  text-align: center;
+}
+
+  #pulsos {
+    max-height: calc(2.5 * 1.2em);
+    overflow-y: auto;
+    padding: 0.4em;
+    font-size: 0.88em;
+    color: #0ff;
+    position: relative;
+  }
+
+  #pulsos.expanded {
+    max-height: calc(12 * 1.2em);
+    overflow-y: auto;
+  }
+
+  .debug-mistico {
+    line-height: 1.2em;
+    margin-bottom: 0em; 
+    word-break: break-word;
+  }
+
+  /* FADE VISUAL no final */
+  #pulsos:not(.expanded)::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: 1.2em;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    pointer-events: none;
+  }
+.pulso-item {
+  margin-bottom: 12px;
+}
+.pulso-item button.replay-btn {
+  background: transparent;
+  border: 1px solid #0ff;
+  color: #0ff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+.pulso-item button:hover {
+  background: #0ff;
+  color: #000;
+}
+    </style>
+      <!-- body {background: transparent !important; !-->
+</head>
+<body>
+
+  <!-- <div id="particles-js"></div> !-->
+<div id="particles-js"></div>
+ <div class="container-unificado">
+
+  <!-- BLOCO 1: Logo, título e login -->
+  <div class="center-group">
+    <div class="logo-container" id="logoDual">
+      <div class="logo-click-overlay"></div>
+      <object data="assets/icons/Dual-Orb-e2.png" type="image/png"></object>
+    </div>
+    <div class="infodose">dual.<strong>Infodose</strong></div>
+
+    <!-- Login, upload, decoder -->
+    <div class="login-container">
+      <input type="text" id="user" placeholder="Usuário" required>
+      <input type="password" id="pass" placeholder="Senha" required>
+      <button class="btn-full" id="submitBtn">Entrar</button>
+
+      <div class="upload-box">
+        <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
+        <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
+      </div>
+
+      <div id="decoderBox">
+        <input type="text" id="codeInput" placeholder="Digite o selo...">
+        <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+      </div>
+
+      <button id="toggleDecoderBtn">
+        <img src="assets/icons/KBLX-pack/SuS-logo-1.PNG" alt="SuS Logo" />
+      </button>
+
+      <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+      <button id="uploadHTMLBtn">☍</button>
+
+      <div id="messageBox"></div>
+
+      <div id="buyTokens">
+        <button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
+      </div>
+
+      <div class="logout-area">
+        <div id="loggedUsername" class="username"></div>
+        <button id="logoutBtn" class="btn-full">Desconectar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 2: Área de interação -->
+  <div class="response-container" id="response">
+    <div class="pages-wrapper">
+      <div class="page initial active">
+        <strong>Clique no ◉ e diga “Oi, Dual”.</strong>
+      </div>
+    </div>
+
+    <p class="footer-text">
+      <em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em>
+    </p>
+
+    <div class="response-controls">
+      <div class="control-buttons">
+        <button class="copy-button" title="Copiar">
+          <object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object>
+        </button>
+        <button class="paste-button" title="Colar">
+          <object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object>
+        </button>
+        <button class="toggle-button" id="toggleBtn" title="Login Infodose">
+          <object data="assets/icons/KBLX-pack/SuS-logo-1.PNG" height="33" type="image/png" width="33"></object>
+        </button>
+        <button class="kitty-button" id="kittyBtn" title="Estudos">
+          <object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object>
+        </button>
+      </div>
+
+      <div class="pagination">
+        <button data-action="prev">⟵</button>
+        <span id="pageIndicator">1 / 1</span>
+        <button data-action="next">⟶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCO 3: Input de mensagem -->
+  <div class="input-container">
+    <input id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
+    <button id="sendBtn" title="Enviar">➤</button>
+    <button id="voiceBtn" title="Falar">
+      <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36"></object>
+    </button>
+  </div>
+
+</div>
+
+  
+
+  <script type="module">
+    const loginBox   = document.getElementById('loginBox');
+    const userInput  = document.getElementById('user');
+    const passInput  = document.getElementById('pass');
+    const submitBtn  = document.getElementById('submitBtn');
+    const messageBox = document.getElementById('messageBox');
+    const buyArea    = document.getElementById('buyTokens');
+    const buyBtn     = document.getElementById('buyIFTBtn');
+    const logoutArea = document.querySelector('.logout-area');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const loggedUser = document.getElementById('loggedUsername');
+    const logoDual   = document.getElementById('logoDual');
+    const storedKey  = 'infodose_user';
+
+    const decoderBox = document.getElementById('decoderBox');
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const uploadInput = document.getElementById('uploadHTML');
+    const uploadBtn   = document.getElementById('uploadHTMLBtn');
+
+    const USERS_JSON = 'users/usersid.json';
+    const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
+    
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBX": "menu-x-1.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "1991": "menu-x-1-E-19-E-9re-1.html",
+      "DBK": "dual-book-12.html",
+      "IMN": "index-manifestado.html",
+      "IMNN": "index-manifestado-tangle.html",
+      "BTS": "botao-simbolico.html",
+      "SBK": "SmbS-book-4.html",
+      "SBL": "SmbS-book-2.html",
+      "KDX": "menu-x-1-E-19-E-9_refatorado_final.html",
+      "KDI": "menu-integrado-kobllux.html",
+      "1992": "menu-x-1-E-19-E-9re-2.html",
+      "KDF": "menu-x-1-E-8.html",
+      "KDB": "menu-x-1-E-10.html",
+      "KDJ": "menu-x-1-E-19-E-9_renderresponse-final.html",
+      "HTM": "KBLX-HTML-v4.1-FULLSCREEN-SEPARADOR.html",
+      "MN6": "menu-x-1-E-6.html",
+      "MN7": "menu-x-1-E-7.html",
+      "MN8": "menu-x-1-E-8.html",
+      "MN9": "menu-x-1-E-9.html",
+      "MN10": "menu-x-1-E-10.html",
+      "MN11e": "menu-x-1-E-11e.html",
+      "MN12": "menu-x-1-E-12.html",
+      "MN13": "menu-final-com-pulso.html",
+      "MN14": "menu-pulso-final.html",
+      "MN15": "menu-x-1-E-15.html",
+      "19E9": "menu-x-1-E-19-E-9.html",
+      "19E10": "menu-x-1-E-19-E-10.html",
+      "19E11": "menu-x-1-E-19-E-11.html",
+      "MN19": "menu-x-1-E-19.html",
+      "19E8": "menu-x-1-E-19-E-8.html",
+      "19E0": "menu-x-1-E-19-E-0.html",
+      "19921": "menu-x-1-E-19-E-9re-2-1.html",
+      "19922": "menu-x-1-E-19-E-9re-2-2.html",
+      "19923": "menu-x-1-E-19-E-9re-2-3.html",
+      "19924": "menu-x-1-E-19-E-9re-2-4.html",
+      "19925": "menu-x-1-E-19-E-9re-2-5.html",
+      "19926": "menu-x-1-E-19-E-9re-2-6.html",
+      "19927": "menu-x-1-E-19-E-9re-2-7.html",
+      "19928": "menu-x-1-E-19-E-9re-2-8.html",
+      "9231": "menu-x-1-E-19-E-9-2re-3-1.html",
+      "9232": "menu-x-1-E-19-E-9-2re-3-2.html",
+      "9233": "menu-x-1-E-19-E-9-2re-3-3.html",
+      "9241": "menu-x-1-E-19-E-9-2re-4-1.html",
+      "9242": "menu-x-1-E-19-E-9-2re-4-2.html",
+      "9243": "menu-x-1-E-19-E-9-2re-4-3.html",
+      "9244": "menu-x-1-E-19-E-9-2re-4-4.html",
+
+      "920": "menu-x-1-E-19-E-9re-2-FINAL-0e-2-bgvar.html",
+      "92F0": "menu-x-1-E-19-E-9re-2-FINAL-0.html",
+      "F0E": "menu-x-1-E-19-E-9re-2-FINAL-0e.html",
+      "F01": "menu-x-1-E-19-E-9re-2-FINAL-0e-1.html",
+      "F02": "menu-x-1-E-19-E-9re-2-FINAL-0e-2.html",
+      "F03": "menu-x-1-E-19-E-9re-2-FINAL-0e-3.html",
+
+      "F30": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-0.html",
+      "F31": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-1.html",
+      "F32": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-2.html",
+      "F33": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-3.html",
+      "F34": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-4.html",
+      "F10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0.html",
+      "F11": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1.html",
+      "F12": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-2.html",
+      "F13": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-3.html",
+      "F14": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-4.html",
+      "F15": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-5.html",
+      "F16": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-6.html",
+      
+      "100": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1-0.html",
+      "101": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ATUALIZADO.html",
+      "102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO.html",
+
+      "103": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO-INTEGRADO.html",
+      "104": "menu-x-KBLUX-SYM-renderResponse-GLOWED.html",
+      "105": "RENDERRESPONSE-refinado-MODIFICADO.html",
+      "106": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-RESPONSIVO-BOTOES.html",
+      "107": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-TRINITY-ARCHE.html",
+      
+      "108": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-0.html",
+      "109": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1.html",
+      "1102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-2.html",
+      
+      "110": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0.html",
+      
+      "111": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-1.html",
+      "112": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-2.html",
+      "113": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-3.html",
+      "114": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-4.html",
+      "115": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-5.html",
+      "116": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-6.html",
+      "117": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-7.html",
+      "118": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-8.html",
+      "119": "dual-app-renderResponse-SEPARADA.html",
+      "120": "dual-app-renderResponse-UNIFICADA.html",
+      "121": "dual-app-renderResponse-UNIFICADA-COMPACTO.html",
+      "1000": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-0.html",
+    
+      "1001": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-1.html",
+      "1002": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2.html",
+      "1002A": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2a.html",
+      "1003": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-3.html",
+
+      "1008": "dualapp-renderResponse-Trinity-subblocos-integrado.html",
+      "1005": "menu-integrado-renderResponse-v1-final.html",
+      "1006": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-0.html",
+      
+      "AR1": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-1.html",
+      "AR2": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-2.html",
+      "AR3": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-3.html",
+      "AR4": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-4.html",
+      
+      "AR5": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-5.html",
+      "AR6": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6.html",
+      "AR7": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-7.html",
+      "AR8": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-8.html",
+      "AR9": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-9.html",
+      
+      "R10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-10.html",
+      
+      "R60": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-0.html",
+      "R61": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-1.html",
+      "R62": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-2.html",
+      "R63": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3.html",
+
+      "R64": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-4.html",
+      "R65": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-5.html",
+      "R66": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-6.html",
+
+      "999": "dual-infodose-v3-toggle-advanced.html",
+      "666": "dual-infodose-v2-renderResponse-simbio-ajustado.html",
+      "333": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix.html",
+
+      "990": "dual-infodose-v3-refatorado-patch-0.html",
+      "991": "dual-infodose-v3-refatorado-patch-1.html",
+      "992": "dual-infodose-v3-refatorado-patch-2.html",
+      "E99": "dual-infodose-v3-refatorado-patch.html",
+
+      "993": "dual-infodose-v3-refatorado-patch-3.html",
+      "994": "dual-infodose-v3-refatorado-patch-4.html",
+      "995": "dual-infodose-v3-refatorado-patch-5.html",
+      "996": "dual-infodose-v3-refatorado-patch-6.html",
+      "997": "dual-infodose-v3-refatorado-patch-7.html",
+      "998y": "dual-infodose-v3-refatorado-patch-8.html",
+
+      "A996": "dual-infodose-v3-refatorado-patch-6.html",
+      "A997": "dual-infodose-v3-refatorado-patch-7.html",
+      "998": "menu-x-1-E-19-E-9re-2-FINAL-EDITADO-CORRIGIDO.html",
+      
+      "R630": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html",
+      "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
+      "R632": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html",
+      "R633": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-1.html",
+      
+      "MRR": "menu-RR.html",
+      "R90": "dual-infodose-v4-simbiose-final.html",
+      
+
+
+    };
+
+    function playButtonSound() {
+      const sound = new Audio('assets/sounds/uiSamples/back-action.wav');
+      sound.volume = 0.7;
+      sound.play().catch(() => {});
+    }
+
+    toggleDecoderBtn.addEventListener('click', () => {
+      playButtonSound();
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    });
+
+    uploadBtn.addEventListener('click', () => {
+      playButtonSound();
+      uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+
+    const blob = new Blob([content], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    alert('Página carregada com sucesso! Redirecionando...');
+
+    setTimeout(() => {
+      window.location.href = blobUrl;
+    }, 1000);
+  };
+  reader.readAsText(file);
+      } else {
+        alert("Por favor, selecione um arquivo .html válido.");
+      }
+    });
+
+    window.decodeSymbolicCode = () => {
+  playButtonSound();
+
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const dest = CODE_MAP[code];
+
+  if (dest) {
+    // TOCAR O ÁUDIO SUAVE DO PORTAL SOMENTE SE O CÓDIGO FOR VÁLIDO
+    const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav'); // <- tirou a barra no final
+audio.volume = 1;
+audio.play().catch(() => {}); // ignora erro se áudio não tocar
+
+gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+
+gsap.to('body', {
+  opacity: 0,
+  duration: 1,
+  onComplete: () => {
+    window.location.href = dest;
+  }
+});
+  } else {
+    alert('Selo desconhecido ou não registrado.');
+  }
+};
+
+    const goToIndex = () => {
+      const audio = new Audio('assets/sounds/suave_portal.mp3');
+      audio.volume = 1;
+      audio.play().catch(() => {});
+      gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+      gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+      gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+      setTimeout(() => { window.location.href = 'index.html'; }, 1399);
+    };
+
+    const lockScroll = () => {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.height = '100vh';
+      document.body.style.height = '100vh';
+      window.scrollTo(0, 0);
+    };
+
+    function showLoginUI() {
+      loginBox.classList.add('active');
+      userInput.style.display  = '';
+      passInput.style.display  = '';
+      submitBtn.style.display  = '';
+      logoutArea.style.display = 'none';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    function showLogoutUI(user) {
+      loginBox.classList.add('active');
+      userInput.style.display  = 'none';
+      passInput.style.display  = 'none';
+      submitBtn.style.display  = 'none';
+      logoutArea.style.display = 'block';
+      loggedUser.textContent   = user ? `${user}` : '';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    window.addEventListener('load', () => {
+      lockScroll();
+      const stored = localStorage.getItem(storedKey);
+      stored ? showLogoutUI(stored) : showLoginUI();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const rawUser = userInput.value.trim();
+      const u = rawUser.toLowerCase();
+      const p = passInput.value.trim();
+      if (!u || !p) {
+        showLoginUI();
+        messageBox.textContent = 'Por favor, preencha usuário e senha.';
+        messageBox.style.display = 'block';
+        return;
+      }
+      try {
+        const res   = await fetch(USERS_JSON);
+        if (!res.ok) throw new Error('Falha ao carregar credenciais.');
+        const creds = await res.json();
+        if (creds[u] && creds[u] === p) {
+          localStorage.setItem(storedKey, rawUser);
+          goToIndex();
+        } else {
+          showLoginUI();
+          messageBox.textContent = creds[u] ? 'Senha incorreta para usuário mestre.' : 'Usuário ainda não conectado com o pulso.';
+          messageBox.style.display = 'block';
+          buyArea.style.display = 'block';
+        }
+      } catch (err) {
+        showLoginUI();
+        messageBox.textContent = err.message;
+        messageBox.style.display = 'block';
+        buyArea.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(storedKey);
+      showLoginUI();
+    });
+
+    logoDual.addEventListener('click', () => {
+      const user = localStorage.getItem(storedKey);
+      if (user) goToIndex();
+    });
+
+    buyBtn.addEventListener('click', () => {
+      window.location.href = PIX_LINK;
+    });
+
+    particlesJS('particles-js', {
+      particles: {
+        number:{value:48,density:{enable:true,value_area:600}},
+        color:{value:['#0ff','#f0f']},
+        shape:{type:'circle'},
+        opacity:{value:0.4,random:true},
+        size:{value:3,random:true},
+        move:{enable:true,speed:1.2,random:true,out_mode:'out'}
+      },
+      retina_detect:true
+    }); 
+  </script>
+  
+ 
+  <style>
+     body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      /*background: transparent;*/
+    }
+
+    .fake-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* ou 'contain' se quiser ver tudo */
+      object-position: center;
+      z-index: -1;
+      opacity: 0.18; /* ajusta a transparência */
+      pointer-events: none; /* deixa os cliques passarem por ela */
+      transition: opacity 0.5s ease;
+    }
+
+    
+
+    #imgUpload {
+      display: none;
+    }
+  </style>
+
+
+  <!-- IMG como plano de fundo fake -->
+  <img id="bgImage" class="fake-bg" src="assets/styles/themes/bgs/Dark-BG.png" alt="" />
+
+
+  <script>
+    function trocarImagem(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = document.getElementById('bgImage');
+        img.src = e.target.result;
+        console.log("◉ Imagem substituída com sucesso!");
+        if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
+      };
+      reader.readAsDataURL(file);
+    }
+    
+  </script>
+<script>
+// 🎛️ BG Personalizado
+const bg = document.getElementById('bgImage');
+const imgUpload = document.getElementById('imgUpload');
+const cycleBtn = document.getElementById('cycleBtn');
+const userBgOptions = document.getElementById('userBgOptions');
+const BG_KEY = "bgImageSource";
+const FILTER_KEY = "bgImageFilter";
+const imagens = [
+  'assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG',
+  'assets/styles/themes/bgs/Nebula-Galaxy.png',
+  'assets/styles/themes/bgs/Circuit-Spirit.jpg',
+  'assets/styles/themes/bgs/Temple-Net.png'
+];
+let indexAtual = 0;
+
+function toggleUserOptions() {
+  userBgOptions.style.display = userBgOptions.style.display === 'none' ? 'flex' : 'none';
+}
+
+function loadUserBG() {
+  const savedSrc = localStorage.getItem(BG_KEY) || 'about:blank';
+  const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
+  bg.src = savedSrc;
+  bg.style.filter = savedFilter;
+}
+
+function setBG(src) {
+  bg.src = src;
+  localStorage.setItem(BG_KEY, src);
+  logMistico("📷 BG set via thumbnail");
+}
+
+function applyFilter(filter) {
+  bg.style.filter = filter;
+  localStorage.setItem(FILTER_KEY, filter);
+  logMistico("🎨 Filtro aplicado: " + filter);
+}
+
+imgUpload.addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataURL = e.target.result;
+    bg.src = dataURL;
+    localStorage.setItem(BG_KEY, dataURL);
+    logMistico("🖼️ BG set via upload");
+  };
+  reader.readAsDataURL(file);
+});
+
+cycleBtn.addEventListener('click', () => {
+  indexAtual = (indexAtual + 1) % imagens.length;
+  const nextSrc = imagens[indexAtual];
+  setBG(nextSrc);
+  logMistico("🔁 BG ciclado");
+});
+
+function logMistico(msg) {
+  if (window.logMistico) {
+    window.logMistico(msg);
+  } else {
+    console.log("◉", msg);
+  }
+}
+
+window.addEventListener('load', loadUserBG);
+</script>
+  <script>
+  document.addEventListener("click", function(e) {
+    window.parent.postMessage({
+      type: "iframeClick",
+      x: e.clientX,
+      y: e.clientY
+    }, "*");
+  });
+  document.addEventListener("touchstart", function(e) {
+    const t = e.touches[0];
+    if (t) {
+      window.parent.postMessage({
+        type: "iframeClick",
+        x: t.clientX,
+        y: t.clientY
+      }, "*");
+    }
+  });
+</script>
+<script>
+  document.getElementById("btn-expandir-ritual")?.addEventListener("click", () => {
+    const pulsos = document.getElementById("pulsos");
+    if (pulsos) {
+      pulsos.classList.toggle("expanded");
+      if (!pulsos.classList.contains("expanded")) {
+        pulsos.scrollTop = pulsos.scrollHeight;
+      }
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+   (function(){
+    const STORAGE_KEY  = 'infodoseEnabled',
+          THEME_KEY    = 'infodoseTheme',
+          KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
+          KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
+          CONFIG = {
+            TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-27.txt',
+            API_URL      :'https://openrouter.ai/api/v1/chat/completions',
+            MODEL        :'deepseek/deepseek-chat-v3-0324:free',
+            TEMP         : 0.2,
+            CHUNK_SIZE   :12000,
+            AUTH_TOKEN   :'Bearer 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'
+          };
+
+    let training = '', chunks = [], chunkIndex = 0;
+    let isEnabled = false, isStudying = false;
+    let userName = '', assistantBase = '';
+    let conversation = [];
+    let pages = [], currentPage = 0, autoAdvance = true;
+    let originalLogo = '';
+
+    const $ = s => document.querySelector(s);
+    const create = (t,c,h) => {
+      const e = document.createElement(t);
+      if(c) e.className = c;
+      if(h) e.innerHTML = h;
+      return e;
+    };
+    particlesJS('particles-js',{
+      particles:{ number:{value:40}, color:{value:['#0ff','#f0f']},
+        shape:{type:'circle'}, opacity:{value:0.4}, size:{value:2.4},
+        move:{enable:true,speed:1.5}
+      }, retina_detect:true
+    });
+
+    function applyTheme(theme){
+      document.body.classList.remove('light','medium','vibe');
+      if(theme!=='dark') document.body.classList.add(theme);
+    }
+    function toggleTheme(){
+      const order=['dark','light','medium','vibe'];
+      const cur=localStorage.getItem(THEME_KEY)||'dark';
+      const next=order[(order.indexOf(cur)+1)%order.length];
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY,next);
+    }
+    function changeLogo(srcs){
+      const cont=$('#logoContainer'), obj=$('#logoObj');
+      cont.classList.add('fading');
+      cont.addEventListener('transitionend',function once(){
+        cont.removeEventListener('transitionend',once);
+        if(Array.isArray(srcs)){
+          obj.data=srcs[0];
+          obj.onerror=()=>obj.data=srcs[1];
+        } else obj.data=srcs;
+        cont.classList.remove('fading');
+      });
+    }
+
+    async function init(){
+      applyTheme(localStorage.getItem(THEME_KEY)||'dark');
+      $('#themeToggle').addEventListener('click',toggleTheme);
+      originalLogo = $('#logoObj').data;
+
+      try {
+        training = await fetch(CONFIG.TRAINING_FILE).then(r=>r.text());
+        for(let i=0;i<training.length;i+=CONFIG.CHUNK_SIZE){
+          chunks.push(training.slice(i,i+CONFIG.CHUNK_SIZE));
+        }
+      } catch(e){ console.error('Falha no treino:',e); }
+
+      loadConfig();
+      if(!conversation.length){
+        conversation.push({
+          role:'system',
+          content:(chunks[0]||training)+'\n\nVocê é o assistente Dual.infodose.'
+        });
+        chunkIndex=1;
+      }
+      bindUI();
+    }
+
+    function loadConfig(){
+      if(localStorage.getItem(STORAGE_KEY)==='1'){
+        isEnabled=true;
+        userName=localStorage.getItem('userName')||'';
+        assistantBase=localStorage.getItem('assistantBase')||'';
+        conversation=[{
+          role:'system',
+          content:(chunks[0]||training)
+            +`\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`
+        }];
+        chunkIndex=1;
+        updateUI();
+      }
+    }
+
+    function updateUI(){
+      $('#toggleBtn').classList.toggle('active',isEnabled);
+      $('#kittyBtn').classList.toggle('active',isStudying);
+      $('#assistantName').textContent = isStudying
+        ? 'Estudos dual.infodose'
+        : (isEnabled ? `${assistantBase} dual.infodose` : '');
+    }
+
+    function showLoading(msg){
+      const wrap=$('.pages-wrapper');
+      wrap.innerHTML='';
+      const p=create('div','page active'), foot=create('p','footer-text loading','');
+      msg.split('').forEach((ch,i)=>{
+        const sp=create('span'); sp.textContent=ch;
+        sp.style.animationDelay=(i*0.02)+'s'; sp.classList.add('loading');
+        foot.appendChild(sp);
+      });
+      p.appendChild(foot); wrap.appendChild(p);
+      $('#pageIndicator').textContent = '1 / 1';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
+    }
+
+    function splitText(t){
+      let ps = t.split(/\n\s*\n/).filter(p=>p.trim());
+      if(ps.length % 3 !== 0){
+        ps = (t.match(/[^\.!\?]+[\.!\?]+/g)||[]).map(s=>s.trim());
+      }
+      const out=[];
+      for(let i=0;i<ps.length;i+=3){
+        out.push(ps.slice(i,i+3));
+      }
+      return out;
+    }
+
+    function renderResponse(txt){
+      const wrap=$('.pages-wrapper');
+      wrap.innerHTML=''; pages=[]; currentPage=0; autoAdvance=true;
+      txt = txt
+        .replace(/`([^`]+)`/g,'<code>$1</code>')
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g,'<em>$1</em>');
+      const groups = splitText(txt),
+            titles = ['🎁 Recompensa Inicial','👁️ Exploração','⚡️ Antecipação'];
+
+      groups.forEach((grp, gi)=>{
+        const pg = create('div','page'+(gi===0?' active':''),'');
+        grp.forEach((para,j)=>{
+          const cls = j===0?'intro':j===1?'middle':'ending';
+          const block = create('div',`response-block ${cls}`,`<p>${para}</p>`);
+          block.addEventListener('click',()=>{
+            autoAdvance=false;
+                  const cleanPara = para
+          .replace(/["“”‘’]/g, '')                        // aspas
+          .replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g, ''); // emojis
+      
+        const utter = new SpeechSynthesisUtterance(cleanPara);
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utter);
+      
+        if (!block.dataset.spoken) {
+          block.dataset.spoken = '1';
+          block.classList.add('clicked');
+        } else {
+          block.classList.add('expanded');
+          if (!isEnabled) {
+            isEnabled = true;
+            localStorage.setItem(STORAGE_KEY, '1');
+            updateUI();
+              }
+              showLoading(' Pulso em Expansão...');
+              conversation.push({role:'user',content:`${titles[j]}\n\n${para}`});
+              callAI();
+            }
+          });
+          pg.appendChild(block);
+        });
+        wrap.appendChild(pg);
+        pages.push(pg);
+      });
+
+      $('#pageIndicator').textContent = `1 / ${pages.length}`;
+      autoSpeakPage(0);
+    }
+
+    function autoSpeakPage(i){
+  const txts = Array.from(pages[i].querySelectorAll('p'))
+    .map(p=>p.textContent).join(' ');
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(txts);
+  
+  utter.onend = () => {
+    if (autoAdvance && i < pages.length - 1) {
+      changePage(1);
+    } else if (i === pages.length - 1) {
+      // Aqui, só após a ÚLTIMA página:
+      speechSynthesis.speak(
+        new SpeechSynthesisUtterance('Do seu jeito. Sempre único. Sempre seu.')
+      );
+    }
+  };
+
+  speechSynthesis.speak(utter);
+}
+
+    function changePage(d){
+      const np = currentPage + d;
+      if(np<0||np>=pages.length) return;
+      pages[currentPage].classList.remove('active');
+      pages[np].classList.add('active');
+      currentPage=np;
+      $('#pageIndicator').textContent = `${np+1} / ${pages.length}`;
+      if(autoAdvance) autoSpeakPage(np)
+    }
+
+    async function callAI(){
+      try {
+        const res = await fetch(CONFIG.API_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': CONFIG.AUTH_TOKEN,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: CONFIG.MODEL,
+            messages: conversation,
+            temperature: CONFIG.TEMP
+          })
+        });
+
+        const payload = await res.json();
+        if (!res.ok) throw new Error(payload.error?.message || res.statusText);
+        if (!payload.choices?.length) throw new Error('Resposta vazia da API');
+        const ans = payload.choices[0].message.content.trim();
+        conversation.push({ role: 'assistant', content: ans });
+        renderResponse(ans);
+
+      } catch (err) {
+        console.error('callAI erro:', err);
+        const fallback = 'Desculpe, não consegui obter resposta. Tente novamente.';
+        conversation.push({ role: 'assistant', content: fallback });
+        renderResponse(fallback);
+      }
+    }
+
+    function bindUI(){
+      $('#sendBtn').addEventListener('click',onSend);
+      $('#userInput').addEventListener('keypress',e=>{ if(e.key==='Enter') onSend(); });
+      $('#voiceBtn').addEventListener('click',()=>{
+        const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+        rec.lang='pt-BR'; rec.start();
+        rec.onresult=evt=>{
+          $('#userInput').value=evt.results[0][0].transcript; onSend();
+        };
+      });
+
+      document.querySelector('.control-buttons').addEventListener('click',e=>{
+        if(e.target.closest('.copy-button')){
+          const txt=pages.map(p=>p.innerText.trim()).join('\n\n');
+          navigator.clipboard.writeText(txt);
+        }
+        if(e.target.closest('.paste-button')){
+          navigator.clipboard.readText().then(txt=>$('#userInput').value=txt);
+        }
+        if(e.target.closest('#toggleBtn')){
+          if(!isEnabled) $('#loginBox').classList.add('active');
+          else {
+            isEnabled=false; localStorage.removeItem(STORAGE_KEY);
+            conversation=[]; updateUI();
+          }
+        }
+        if(e.target.closest('#kittyBtn')){
+          isStudying=!isStudying;
+          if(isStudying){
+            conversation=[{
+              role:'system',
+              content:(chunks[0]||training)+'\n\nVocê é Assistente de Estudos dual.infodose.'
+            }];
+            changeLogo([KIT_PRIMARY,KIT_FALLBACK]);
+          } else {
+            changeLogo(originalLogo); loadConfig();
+          }
+          updateUI();
+        }
+      });
+
+      document.querySelector('.pagination').addEventListener('click',e=>{
+        if(e.target.dataset.action==='prev') changePage(-1);
+        if(e.target.dataset.action==='next') changePage(1);
+        autoAdvance=false;
+      });
+
+      $('#loginForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const u=$('#userName').value.trim(), a=$('#assistantInput').value.trim();
+        if(!u||!a) return alert('Preencha os dados');
+        isEnabled=true; userName=u; assistantBase=a;
+        localStorage.setItem(STORAGE_KEY,'1');
+        localStorage.setItem('userName',u);
+        localStorage.setItem('assistantBase',a);
+        loadConfig(); $('#loginBox').classList.remove('active');
+      });
+
+      // toggle apenas da área de resposta (blocos/loading)
+      document.body.addEventListener('click',e=>{
+        if(e.target.closest('.footer-text')){
+          document.querySelector('.pages-wrapper').classList.toggle('collapsed');
+          e.target.closest('.footer-text').classList.toggle('active');
+        }
+      });
+    }
+
+    function onSend(){
+      const raw=$('#userInput').value.trim(); if(!raw) return;
+      $('#userInput').value=''; autoAdvance=false;
+      showLoading('Pulso enviado...Recebendo intenção…');
+      conversation.push({role:'user',content:raw});
+      callAI();
+    }
+
+    document.addEventListener('DOMContentLoaded',init);
+  })();
+  </script>
+<script>
+function renderResponse({ intro = "", middle = "", ending = "" }) {
+  const container = document.querySelector(".pages-wrapper");
+
+  function createBlock(content, className) {
+    const block = document.createElement("div");
+    block.className = "response-block " + className;
+
+    const parsed = content
+      .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match => {
+        return `<button class="symbol-btn" onclick="logMistico('Emoji: ${match}')">${match}</button>`;
+      })
+      .replace(/\[(.+?)\]/g, (match, p1) => {
+        return `<button class="symbol-btn" onclick="logMistico('[${p1}]')">[${p1}]</button>`;
+      });
+
+    block.innerHTML = parsed;
+
+    block.addEventListener("click", () => {
+      block.classList.toggle("expanded");
+      const pulsos = document.getElementById("pulsos");
+      if (pulsos) pulsos.classList.toggle("expanded");
+      logMistico("🌀 Expandiu bloco: " + className);
+    });
+
+    return block;
+  }
+
+  if (intro)  container.appendChild(createBlock(intro, "intro"));
+  if (middle) container.appendChild(createBlock(middle, "middle"));
+  if (ending) container.appendChild(createBlock(ending, "ending"));
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const footer = document.querySelector(".footer-text");
+  const inputContainer = document.querySelector(".input-container");
+  const controls = document.querySelector(".control-buttons");
+  const pagination = document.querySelector(".pagination");
+const ritualBtn = document.getElementById("btn-expandir-ritual");
+
+  if (footer && inputContainer && controls && pagination) {
+    footer.addEventListener("click", () => {
+      inputContainer.classList.toggle("hidden");
+      controls.classList.toggle("hidden");
+      pagination.classList.toggle("hidden");
+    ritualBtn.classList.toggle("move-to-bottom-ritual");
+      footer.classList.toggle("move-to-bottom");
+    });
+  }
+});
+</script>
+<script>
+   // 🎧 Sons de interface - Coblux UI Samples
+const uiSounds = {
+click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+back: new Audio('assets/sounds/uiSamples/back.wav'),
+temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+};
+// Volume padrão
+for (const key in uiSounds) {
+uiSounds[key].volume = 0.4;
+}
+// ⛔ Remover microfone automático
+window.SpeechRecognition = null;
+window.webkitSpeechRecognition = null;
+// 🎯 Sons ao interagir
+document.addEventListener("DOMContentLoaded", () => {
+// Clique em qualquer botão
+document.querySelectorAll("button").forEach(btn => {
+btn.addEventListener("click", () => {
+uiSounds.click.currentTime = 0;
+uiSounds.click.play().catch(() => {});
+});
+btn.addEventListener("mouseover", () => {
+uiSounds.hover.currentTime = 0;
+uiSounds.hover.play().catch(() => {});
+});
+});
+// Enviar mensagem (confirmar)
+const sendBtn = document.getElementById("sendBtn");
+if (sendBtn) {
+sendBtn.addEventListener("click", () => {
+uiSounds.confirm.currentTime = 0;
+uiSounds.confirm.play().catch(() => {});
+});
+}
+// Trocar tema manualmente (temaSelector)
+const themeSelector = document.getElementById("themeSelector");
+if (themeSelector) {
+let lastIndex = themeSelector.selectedIndex;
+themeSelector.addEventListener("change", () => {
+const newIndex = themeSelector.selectedIndex;
+if (newIndex > lastIndex) {
+uiSounds.temaUp.currentTime = 0;
+uiSounds.temaUp.play().catch(() => {});
+} else if (newIndex < lastIndex) {
+uiSounds.temaDown.currentTime = 0;
+uiSounds.temaDown.play().catch(() => {});
+}
+lastIndex = newIndex;
+});
+}
+// Navegação entre páginas
+document.querySelectorAll('[data-action="prev"]').forEach(btn =>
+btn.addEventListener("click", () => {
+uiSounds.back.currentTime = 0;
+uiSounds.back.play().catch(() => {});
+})
+);
+document.querySelectorAll('[data-action="next"]').forEach(btn =>
+btn.addEventListener("click", () => {
+uiSounds.confirm.currentTime = 0;
+uiSounds.confirm.play().catch(() => {});
+})
+);
+});
+  </script>
+<script>
+   // 🎧 Novos sons com base em IDs
+const uiBL = {
+toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+};
+// Volume padrão
+for (const k in uiBL) uiBL[k].volume = 0.45;
+document.addEventListener("DOMContentLoaded", () => {
+// Botão toggle (login)
+const toggle = document.getElementById("toggleBtn");
+if (toggle) toggle.addEventListener("click", () => {
+uiBL.toggle.currentTime = 0;
+uiBL.toggle.play().catch(()=>{});
+});
+// Botão kitty
+const kitty = document.getElementById("kittyBtn");
+if (kitty) kitty.addEventListener("click", () => {
+uiBL.kitty.currentTime = 0;
+uiBL.kitty.play().catch(()=>{});
+});
+// Botão ativar no login
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+loginForm.addEventListener("submit", () => {
+uiBL.ativar.currentTime = 0;
+uiBL.ativar.play().catch(()=>{});
+});
+}
+// Copiar / colar
+document.querySelectorAll('.copy-button, .paste-button').forEach(btn =>
+btn.addEventListener("click", () => {
+uiBL.cancel.currentTime = 0;
+uiBL.cancel.play().catch(()=>{});
+})
+);
+});
+  </script>
+<style>
+#btn-expandir-ritual.move-to-bottom-ritual {
+  bottom: 12px !important;
+  animation: moveRitualDown 0.4s ease forwards !important;
+}
+@keyframes moveRitualDown {
+  from { bottom: 189px; opacity: 0.4; }
+  to   { bottom: 12px; opacity: 0.6; }
+}
+</style>
+<!-- 🌌 Botões simbióticos -->
+<style>
+#btn-expandir-ritual, {
+  position: fixed;
+  bottom: 30px;
+  z-index: 10000;
+  
+  color: #0ff;
+
+  border-radius: 4px;
+  padding: 6px 10px;
+  opacity: 0.5;
+background: rgba(0, 0, 0, 0.6);
+
+
+  border: 1px solid transparent;
+  border-image: linear-gradient(45deg, #F0F, #0FF);
+  border-image-slice: 1;
+
+  -webkit-mask-image: radial-gradient(white, black); /* força máscara arredondada no Safari */
+  mask-image: radial-gradient(white, black);
+
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+#btn-expandir-ritual:hover,
+ {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+#btn-expandir-ritual { right: 33px; }
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.021); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.4; }
+}
+</style>
+
+</style>
+<!-- 🌌 Camada Simbiótica Oculta -->
+<div id="pulsos-container">
+<div id="pulsos"></div>
+</div>
+<script>
+  const pulsos = document.getElementById("pulsos");
+
+  function logMistico(msg) {
+    const el = document.createElement("div");
+    el.className = "debug-mistico";
+    el.innerText = "🌀 " + msg;
+    pulsos.appendChild(el);
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  }
+
+  pulsos.addEventListener("click", () => {
+    pulsos.classList.toggle("expanded");
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  });
+
+  function spawnCosmicExplosion(x, y) {
+    const boom = document.createElement("div");
+    boom.style.position = "absolute";
+    boom.style.left = x + "px";
+    boom.style.top = y + "px";
+    boom.style.width = boom.style.height = "12px";
+    boom.style.borderRadius = "50%";
+    boom.style.background = "radial-gradient(circle, #0ff, #f0f0ff, transparent)";
+    boom.style.pointerEvents = "none";
+    boom.style.animation = "pulse 0.4s ease-out";
+    document.body.appendChild(boom);
+    setTimeout(() => boom.remove(), 1000);
+  }
+
+  // Pulso na página principal
+  document.addEventListener("click", e => {
+    spawnCosmicExplosion(e.clientX, e.clientY);
+    navigator.vibrate?.([5, 15, 5]);
+    logMistico("Pulso simbiótico em " + e.clientX + ", " + e.clientY);
+  });
+
+  // Recebe cliques do iframe
+  window.addEventListener("message", function(event) {
+    if (event.data?.type === "iframeClick") {
+      const iframe = document.getElementById("seuIframeID"); // Troque para o ID real do seu iframe
+      if (!iframe) return;
+
+      const rect = iframe.getBoundingClientRect();
+      const xGlobal = rect.left + event.data.x;
+      const yGlobal = rect.top + event.data.y;
+
+      spawnCosmicExplosion(xGlobal, yGlobal);
+      navigator.vibrate?.([5, 15, 5]);
+      logMistico("⚡ Pulso no iFrame em " + event.data.x + ", " + event.data.y);
+    }
+  });
+
+function renderResponse(text) {
+  const responseContainer = document.querySelector("#response");
+  const pages = splitText(text, 450).map(pageText => {
+    const page = document.createElement("div");
+    page.classList.add("page", "response-block");
+    page.innerHTML = marked.parse(pageText);
+    return page;
+  });
+  responseContainer.innerHTML = "";
+  pages.forEach(page => responseContainer.appendChild(page));
+  scrollToBottom();
+}
+
+
+function renderResponseBlocks({ intro, middle, ending }) {
+  const responseContainer = document.querySelector("#response");
+  responseContainer.innerHTML = "";
+
+  const makeBlock = (content, className) => {
+    const block = document.createElement("div");
+    block.className = `response-block nested-block ${className}`;
+    block.innerHTML = marked.parse(content);
+    return block;
+  };
+
+  const introBlock = makeBlock(intro, "intro-block");
+  const middleBlock = makeBlock(middle, "middle-block");
+  const endingBlock = makeBlock(ending, "ending-block");
+
+  responseContainer.append(introBlock, middleBlock, endingBlock);
+  scrollToBottom();
+}
+
+</script>
+</body>
+</html>
