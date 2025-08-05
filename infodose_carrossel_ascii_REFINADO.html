@@ -125,6 +125,81 @@
     background: linear-gradient(45deg, #0ff, #f0f);
   }
 
+  .block {
+    flex: 0 0 85%;
+    max-width: 900px;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(145deg, #1a1a1a, #1f1f1f);
+    border-radius: 20px;
+    scroll-snap-align: center;
+    box-shadow: 0 4px 25px rgba(0, 255, 255, 0.08), 0 0 45px rgba(255, 0, 255, 0.06);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .block-header {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    animation: glow 1.5s infinite alternate;
+    margin-bottom: 10px;
+  }
+
+  .block-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px 0;
+  }
+
+  .nested-block {
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 0.95rem;
+    color: #ccc;
+    text-align: left;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
+    transition: background 0.3s ease;
+  }
+
+  .nested-block:hover {
+    background: #181818;
+  }
+
+  .block-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .block button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 24px;
+    font-size: 0.9rem;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(45deg, #f0f, #0ff);
+    -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+  }
+
+  .block button:hover {
+    transform: scale(1.05);
+  }
+
   @keyframes glow {
     0% { text-shadow: 0 0 5px #fff; }
     100% { text-shadow: 0 0 15px #0ff, 0 0 25px #f0f; }
@@ -313,6 +388,24 @@
     </div>
 
   </div>
+  <div class="block">
+  <div class="block-header">⚡ Arquétipo: O Comunicador</div>
+
+  <div class="block-body">
+    <div class="nested-block">
+      Este arquétipo representa a ponte entre mundos: linguagem, ideias, transformação digital e conexão emocional. Ideal para interfaces de diálogo com IA.
+    </div>
+    <div class="nested-block">
+      Código de ativação: <code>ATIVAR 📘 ARQUÉTIPO.COMUNICADOR</code>
+    </div>
+  </div>
+
+  <div class="block-actions">
+    <button>🔁 Reinterpretar</button>
+    <button>📤 Exportar JSON</button>
+    <button>⚙️ Configurar IA</button>
+  </div>
+</div>
   <script>
     function copyToClipboard(text) {
       navigator.clipboard.writeText(text).then(() => {
