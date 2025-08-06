@@ -334,21 +334,28 @@ Position: fixed;
     font-weight: 600;
   ">💊</button>
 
-  <div id="iframeWrapper" style="
-    width: 78vw;
-    max-width: 420px;
-    height: 187px;
-    border-radius: 14px;
-    overflow: auto;
-    backdrop-filter: blur(8px);
-    background: rgba(0, 0, 0, 0.25);
-    box-shadow: 0 0 8px rgba(199, 122, 255, 0.5);
-    display: none;
-    opacity: 0.8;
-    transition: all 0.4s ease-in-out;
-  ">
-    <iframe src="infodose_carrossel_ascii_REFINADO-1.html" style="width: 100%; height: 100%; border: none;"></iframe>
-  </div>
+ <div id="iframeWrapper" style="
+  width: 88vw;
+  max-width: 330px;
+  height: 136px;
+  border-radius: 14px;
+  overflow: hidden; /* 👈 evita scroll molenga externo */
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 0 8px rgba(199, 122, 255, 0.5);
+  display: none;
+  opacity: 0.8;
+  transition: all 0.4s ease-in-out;
+  overscroll-behavior-x: contain; /* 👈 bloqueia bounce lateral */
+  touch-action: pan-y; /* 👈 só scroll vertical no container externo */
+">
+  <iframe src="infodose_carrossel_ascii_REFINADO-1.html" style="
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden; /* 👈 segurança extra pra evitar scroll interno */
+  "></iframe>
+</div>
 </div>
   <div class="center-group">
     <div class="logo-container" id="logoDual">
