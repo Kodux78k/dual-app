@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌌 Gerador de Histórias Quânticas - KODUX/KOBLLUX</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r148/three.min.js"></script>
+  <style>
+    :root {
+      --quantum-purple: #6a0dad;
+      --neon-blue: #00f5ff;
+      --pink-energy: #ff00ff;
+      --bg-dark: #0a0a23;
+    }
+    body {
+      margin: 0;
+      padding: 33px;
+      background: var(--bg-dark);
+      color: white;
+      font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    }
+    h1, h2 {
+      text-align: center;
+      text-shadow: 0 0 10px var(--neon-blue);
+      margin-bottom: 20px;
+    }
+    .section {
+      background: rgba(20, 20, 40, 0.9);
+      border: 1px solid var(--quantum-purple);
+      border-radius: 12px;
+      padding: 25px;
+      margin: 20px auto;
+      box-shadow: 0 0 20px rgba(106, 13, 173, 0.5);
+      max-width: 800px;
+    }
+    select, input[type="range"], textarea, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 1rem;
+    }
+    button {
+      background: linear-gradient(135deg, var(--quantum-purple), var(--pink-energy));
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      margin-top: 10px;
+      box-shadow: 0 0 12px var(--pink-energy);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px var(--pink-energy);
+      background: linear-gradient(135deg, var(--pink-energy), #ff66ff);
+    }
+    textarea { resize: none; margin-top: 15px; height: 160px; }
+    canvas { display: block; margin: 20px auto; border-radius: 10px; }
+    .story-entry { margin-top: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-left: 3px solid var(--quantum-purple); }
+    .story-entry:hover { background: rgba(255,255,255,0.1); cursor: pointer; }
+    #three-container { width: 100%; height: 300px; border-radius: 10px; border: 1px solid var(--neon-blue); margin-top: 15px; }
+  </style>
+</head>
+<body>
+  <h1>🌌 Gerador de Histórias Quânticas</h1>
+
+  <div class="section">
+    <h2>⚙️ Configurações</h2>
+    <label for="title">Título:</label>
+    <input type="text" id="title" placeholder="Ex: A Jornada Quântica de Lux" />
+    <label for="archetype">Arquétipo:</label>
+    <select id="archetype">
+      <option value="U+000A">Salto Quântico</option>
+      <option value="U+2665">Coração Quântico</option>
+      <option value="U+2605">Estrela da Sincronicidade</option>
+      <option value="U+231B">Loop Temporal</option>
+    </select>
+    <label for="intention">Intenção:</label>
+    <select id="intention">
+      <option value="alegria">Alegria</option>
+      <option value="amor">Amor</option>
+      <option value="mistério">Mistério</option>
+      <option value="transformação">Transformação</option>
+    </select>
+    <label>Complexidade: <span id="levelDisplay">5</span></label>
+    <input type="range" id="complexity" min="1" max="10" value="5" oninput="levelDisplay.textContent = this.value">
+    <label><input type="checkbox" value="paradoxo"> Paradoxo</label>
+    <label><input type="checkbox" value="espelho"> Espelho</label>
+    <label><input type="checkbox" value="vazio"> Vazio</label>
+    <label><input type="checkbox" value="simbiose"> Simbiose</label>
+    <button onclick="generateStory()">✨ Gerar História</button>
+  </div>
+
+  <div class="section">
+    <h2>📜 História</h2>
+    <textarea id="output" readonly></textarea>
+    <button onclick="copyStory()">📋 Copiar</button>
+    <button onclick="speakStory()">🔊 Narrar</button>
+    <button onclick="saveToDB()">💾 Salvar na Biblioteca</button>
+  </div>
+
+  <div class="section">
+    <h2>🧠 Biblioteca de Histórias</h2>
+    <div id="history-list">Carregando histórias salvas...</div>
+  </div>
+
+  <div class="section">
+    <h2>🌀 Visualização Holográfica</h2>
+    <div id="three-container"></div>
+  </div>
+
+<script>
+  const output = document.getElementById("output");
+  const historyList = document.getElementById("history-list");
+
+  const archetypes = {
+    'U+000A': ["Salto entre dimensões ativado...", "A linha U+000A foi ultrapassada."],
+    'U+2665': ["O coração quântico começou a pulsar...", "Amor irradiava do núcleo cósmico."],
+    'U+2605': ["Estrelas se alinharam como nunca...", "A sincronia era inevitável."],
+    'U+231B': ["O tempo se retorceu novamente...", "Ciclos temporais colapsaram."]
+  };
+  const intentions = {
+    'alegria': "Uma onda de alegria atravessou tudo.",
+    'amor': "O amor conectou todas as formas de vida.",
+    'mistério': "Mistérios surgiram do vazio absoluto.",
+    'transformação': "A transformação era irreversível."
+  };
+  const elements = {
+    paradoxo: "Realidade paradoxal detectada.",
+    espelho: "Reflexos do outro lado surgiram.",
+    vazio: "Do vazio emergiu informação pura.",
+    simbiose: "Uma nova simbiose foi formada."
+  };
+
+  function generateStory() {
+    const arch = document.getElementById("archetype").value;
+    const intent = document.getElementById("intention").value;
+    const level = document.getElementById("complexity").value;
+    const checks = document.querySelectorAll('input[type="checkbox"]:checked');
+    let story = `${archetypes[arch][Math.floor(Math.random()*2)]}\n`;
+    story += `${intentions[intent]}\n`;
+    story += `Complexidade: ${level}/10\n`;
+    checks.forEach(c => { story += elements[c.value] + "\\n"; });
+    output.value = story;
+  }
+
+  function copyStory() {
+    output.select();
+    document.execCommand("copy");
+    alert("História copiada!");
+  }
+
+  function speakStory() {
+    const speech = new SpeechSynthesisUtterance(output.value);
+    speech.lang = "pt-BR";
+    window.speechSynthesis.speak(speech);
+  }
+
+  function saveToDB() {
+    const title = document.getElementById("title").value || "Sem Título";
+    const content = output.value;
+    if (!content) return alert("Gere uma história antes de salvar.");
+    const stories = JSON.parse(localStorage.getItem("kblx_histories") || "[]");
+    stories.push({ title, content, date: new Date().toLocaleString() });
+    localStorage.setItem("kblx_histories", JSON.stringify(stories));
+    loadHistory();
+  }
+
+  function loadHistory() {
+    const stories = JSON.parse(localStorage.getItem("kblx_histories") || "[]");
+    if (stories.length === 0) return historyList.innerHTML = "<em>Nenhuma história salva.</em>";
+    historyList.innerHTML = "";
+    stories.reverse().forEach((s, i) => {
+      const el = document.createElement("div");
+      el.className = "story-entry";
+      el.innerHTML = `<strong>${s.title}</strong><br><small>${s.date}</small>`;
+      el.onclick = () => { output.value = s.content; };
+      historyList.appendChild(el);
+    });
+  }
+
+  loadHistory();
+</script>
+<script>
+  // THREE.js - animação holográfica
+  const container = document.getElementById("three-container");
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, container.clientWidth/container.clientHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ alpha: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  const geometry = new THREE.TorusKnotGeometry(5, 1.2, 100, 16);
+  const material = new THREE.MeshStandardMaterial({ color: 0xff00ff, metalness: 0.7, roughness: 0.2 });
+  const knot = new THREE.Mesh(geometry, material);
+  scene.add(knot);
+
+  const light = new THREE.PointLight(0x00f5ff, 2, 100);
+  light.position.set(10, 10, 10);
+  scene.add(light);
+
+  camera.position.z = 20;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    knot.rotation.x += 0.01;
+    knot.rotation.y += 0.01;
+    renderer.render(scene, camera);
+  }
+  animate();
+</script>
+
+
+<script>
+  const wrapper = document.querySelector('.carousel-wrapper');
+
+  let scrollTimeout;
+  wrapper.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const blocks = wrapper.querySelectorAll('.block');
+      const centerX = wrapper.scrollLeft + wrapper.clientWidth / 2;
+
+      let closestBlock = null;
+      let closestDistance = Infinity;
+
+      blocks.forEach(block => {
+        const blockCenter = block.offsetLeft + block.offsetWidth / 2;
+        const distance = Math.abs(blockCenter - centerX);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestBlock = block;
+        }
+      });
+
+      if (closestBlock) {
+        closestBlock.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      }
+    }, 150);
+  });
+
+  window.addEventListener("load", () => {
+    const firstBlock = document.querySelector(".block");
+    if (firstBlock) {
+      firstBlock.scrollIntoView({ behavior: "auto", inline: "center" });
+    }
+  });
+</script>
+
+</body>
+</html>
