@@ -39,7 +39,7 @@
       z-index:10;
     }
     #themeToggle:hover{opacity:.8}
-    #particles-js{position:absolute;inset:0;z-index:2}
+    #particles-js{position:absolute;inset:0;z-index:1}
     .svg-container{
       position:absolute;top:220px;left:50%;width:180px;height:180px;
       transform:translateX(-50%);z-index:1;
@@ -107,10 +107,10 @@
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-size: 0.8em;
+      font-size: 1.2em;
       cursor: pointer;
       transition: transform var(--fast);
-    box-shadow: none !important;
+    }
     .pagination button:hover{transform:scale(1.2)}
     .response-block{
       margin:1rem 0;padding:1.8rem;border-radius:12px;
@@ -490,7 +490,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
 <button class="symbol-button button-standard" onclick="loadPage('Solashss.html')">◑</button>
 <button class="symbol-button button-standard" onclick="loadPage('dual-tube-25-0.html')">◘</button>
 </div>
-<button class="lock-button button-standard" onclick="loadPage('index.html')"></button>
+<button class="lock-button button-standard" onclick="loadPage('index-full-with-toggle.html')"></button>
 <!-- Botões -->
 <input accept=".html" id="uploadHTML" style="display:none" type="file"/>
 <button class="button-standard" id="uploadComponentBtn">⧉</button>
@@ -1146,7 +1146,7 @@ outline: none !important;
 <button class="button-standard" id="themeToggle" title="Alternar tema"></button>
 <div id="particles-js"></div>
 <div class="svg-container" id="logoContainer">
-<object data="assets/icons/3D_logo_Dual_Infodose_9.png" id="logoObj" type="image/png"></object>
+<object data="assets/icons/3D_logo_Dual_Infodose_10.png" id="logoObj" type="image/png"></object>
 </div>
 <div class="response-container" id="response">
 <div class="pages-wrapper">
@@ -1290,7 +1290,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/codex/codex-dual-978.txt',
+            TRAINING_FILE:'data/manifesto_infinity_v3_3kb.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
