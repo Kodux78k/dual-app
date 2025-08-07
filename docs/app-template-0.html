@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dual Trinity App Template</title>
+  <style>
+    :root {
+      --primary-color: #0ff;
+      --secondary-color: #f0f;
+      --bg-blur: rgba(0, 0, 0, 0.55);
+      --font-size-small: 0.75rem;
+      --border-radius: 10px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #121212, #1f1f1f);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+
+    header, main, footer {
+      width: 100%;
+      max-width: 1024px;
+      padding: 20px;
+    }
+
+    header {
+      text-align: center;
+      background: var(--bg-blur);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--primary-color);
+    }
+
+    footer {
+      text-align: center;
+      background: var(--bg-blur);
+      border-top: 1px solid var(--secondary-color);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .btn {
+      background: rgba(255,255,255,0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(0,255,255,0.2);
+      padding: 10px 16px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+    }
+
+    .btn:hover {
+      background: rgba(0,255,255,0.15);
+      transform: scale(1.03);
+    }
+
+    .pagination-btn {
+      font-size: var(--font-size-small);
+      box-shadow: none !important;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 10px;
+      margin: 0 4px;
+      color: white;
+    }
+
+    .send-btn, .vice-btn {
+      box-shadow: none !important;
+    }
+
+    iframe.dual-frame {
+      width: 100%;
+      height: 500px;
+      border: none;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    .section-block {
+      background: var(--bg-blur);
+      padding: 16px;
+      border-radius: 12px;
+      backdrop-filter: blur(6px);
+    }
+
+    .trinity-title {
+      font-size: 1.5rem;
+      color: var(--secondary-color);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 class="trinity-title">🔺 Dual Trinity App Template</h1>
+  <p>Estrutura base para apps ativáveis, dinâmicos e sensoriais</p>
+</header>
+
+<main>
+  <div class="section-block">
+    <h2>🔄 Ativação</h2>
+    <button class="btn send-btn">Enviar</button>
+    <button class="btn vice-btn">Vice Botão</button>
+    <div style="margin-top:10px;">
+      <button class="pagination-btn">◀</button>
+      <button class="pagination-btn">1</button>
+      <button class="pagination-btn">2</button>
+      <button class="pagination-btn">▶</button>
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h2>🧬 App Conteúdo</h2>
+    <iframe src="user-pages/sample.html" class="dual-frame"></iframe>
+  </div>
+</main>
+
+<footer>
+  <p>© 2025 Dual Trinity Systems</p>
+</footer>
+
+</body>
+</html>
