@@ -39,7 +39,7 @@
       z-index:10;
     }
     #themeToggle:hover{opacity:.8}
-    #particles-js{position:absolute;inset:0;z-index:1}
+    #particles-js{position:absolute;inset:0;z-index:0}
     .svg-container{
       position:absolute;top:220px;left:50%;width:180px;height:180px;
       transform:translateX(-50%);z-index:1;
@@ -107,7 +107,7 @@
       background-clip: text;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-size: 1.2em;
+      font-size: 0.8em;
       cursor: pointer;
       transition: transform var(--fast);
     }
@@ -438,7 +438,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
   color: var(--text);
   border: 1px solid rgba(0,255,255,0.2);
   box-shadow: 0 0 8px rgba(0,255,255,0.2), 0 0 12px rgba(255,0,255,0.2);
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -452,8 +452,8 @@ background:linear-gradient(42deg,#0ff,#f0f);
 }</style>
 <style>#advancedToggleOptions input,
 #advancedToggleOptions select {
-  font-family: monospace;
-  font-size: 0.9em;
+  font-family: Montserrat;
+  font-size: 0.8em;
   backdrop-filter: blur(4px);
 }
 #advancedToggleOptions button:hover {
@@ -464,10 +464,10 @@ background:linear-gradient(42deg,#0ff,#f0f);
 .button-standard {
   border-radius: 10px;
   background: rgba(0,0,0,0.3);
-  color: #0ff;
+  color: var(--bg);
   border: 1px solid rgba(0,255,255,0.2);
   box-shadow: 0 0 10px rgba(0,255,255,0.2);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   padding: 6px 12px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -490,7 +490,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
 <button class="symbol-button button-standard" onclick="loadPage('Solashss.html')">◑</button>
 <button class="symbol-button button-standard" onclick="loadPage('dual-tube-25-0.html')">◘</button>
 </div>
-<button class="lock-button button-standard" onclick="loadPage('index-full-with-toggle.html')"></button>
+<button class="lock-button button-standard" onclick="loadPage('index.html')"></button>
 <!-- Botões -->
 <input accept=".html" id="uploadHTML" style="display:none" type="file"/>
 <button class="button-standard" id="uploadComponentBtn">⧉</button>
@@ -514,7 +514,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
               inset: 0;
               background: rgba(0,0,0,0.6);
               backdrop-filter: blur(8px);
-              z-index: 999;
+              z-index: 1;
               display: flex;
               align-items: center;
               justify-content: center;
@@ -1145,6 +1145,7 @@ outline: none !important;
 </div>
 <button class="button-standard" id="themeToggle" title="Alternar tema"></button>
 <div id="particles-js"></div>
+
 <div class="svg-container" id="logoContainer">
 <object data="assets/icons/3D_logo_Dual_Infodose_10.png" id="logoObj" type="image/png"></object>
 </div>
@@ -1178,7 +1179,7 @@ outline: none !important;
 </div>
 <div class="pagination">
 <button class="button-standard" data-action="prev">⟵</button>
-<span id="pageIndicator">1 / 1</span>
+<span id="pageIndicator">1/1</span>
 <button class="button-standard" data-action="next">⟶</button>
 </div>
 </div>
@@ -1290,7 +1291,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/manifesto_infinity_v3_3kb.txt',
+            TRAINING_FILE:'data/codex/mtlx-o.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
