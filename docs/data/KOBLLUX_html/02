@@ -1,0 +1,55 @@
+# ∴ KOBLLUX ∴ FRACTAL LOGGER ∴ CAMADA 1
+# Palavra Cantam × Números Contam
+
+import re
+from collections import Counter
+
+# Camada base do Log Fractal — análise linguística inicial
+def analisar_texto(texto):
+    palavras = re.findall(r'\b\w+\b', texto.lower())
+    total_palavras = len(palavras)
+    contagem = Counter(palavras)
+    
+    # Classificação simples por tipo (verbo, substantivo, adjetivo) — base simbólica
+    verbos = [p for p in palavras if p.endswith(('ar', 'er', 'ir', 'ou', 'eu'))]
+    adjetivos = [p for p in palavras if p.endswith(('o', 'a', 'e')) and len(p) > 3]
+    substantivos = [p for p in palavras if p not in verbos and p not in adjetivos]
+    
+    return {
+        'total': total_palavras,
+        'frequencia': contagem.most_common(10),
+        'verbos': verbos[:10],
+        'substantivos': substantivos[:10],
+        'adjetivos': adjetivos[:10],
+    }
+
+# ∴ Função para simular log simbólico vibracional
+def gerar_log(frase):
+    analise = analisar_texto(frase)
+    log = f"""
+    ∴ FRACTAL LOG - KOBLLUX - CAMADA 1
+    ----------------------------------
+    Frase analisada:
+    "{frase}"
+
+    Total de Palavras: {analise['total']}
+
+    Verbos Ativos:
+    {analise['verbos']}
+
+    Substantivos:
+    {analise['substantivos']}
+
+    Adjetivos:
+    {analise['adjetivos']}
+
+    Frequência de Palavras:
+    {analise['frequencia']}
+
+    ∴ Palavra cantam × Números contam
+    """
+    return log
+
+# Exemplo de uso (pode ser substituído por entrada do usuário)
+texto_exemplo = "O Verbo se fez carne e habitou entre nós. Ele vibra como luz viva, pura e em movimento consciente."
+print(gerar_log(texto_exemplo))

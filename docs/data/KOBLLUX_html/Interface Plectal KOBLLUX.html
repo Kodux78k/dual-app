@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interface Plectal KOBLLUX</title>
+  <style>
+    body {
+      background: #0e0e11;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #00ffe0;
+    }
+    .section {
+      border: 1px solid #444;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 10px;
+    }
+    .highlight {
+      color: #ffcc00;
+      font-weight: bold;
+    }
+    .output {
+      background: #1a1a1d;
+      padding: 15px;
+      border-radius: 5px;
+      min-height: 60px;
+      margin-top: 10px;
+      font-size: 1.1em;
+      white-space: pre-wrap;
+    }
+    button {
+      padding: 10px 20px;
+      background: #00ffe0;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    .dual-mode {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🜂 Interface Plectal KOBLLUX ∴ INFODOSE + App-DUAL</h1>
+
+<div class="section">
+  <h2>🎙️ Microfone Ativo</h2>
+  <button onclick="startRecognition()">Ativar Reconhecimento de Voz</button>
+  <div class="output" id="transcription"></div>
+</div>
+
+<div class="section">
+  <h2>🔁 INFODOSE</h2>
+  <p>Aqui está a base vibracional simbiótica. Tudo que for falado será registrado, analisado e elevado.</p>
+  <div class="output" id="infodoseLog"></div>
+</div>
+
+<div class="section dual-mode">
+  <h2>⚖️ App-DUAL</h2>
+  <button onclick="setMode('emitir')">Canal 1: Emitir</button>
+  <button onclick="setMode('receber')">Canal 2: Receber</button>
+  <div class="output" id="dualStatus">Modo atual: -</div>
+</div>
+
+<script>
+  const symbolicCorrections = {
+    'cobllux': 'KOBLLUX',
+    'koblux': 'KOBLLUX',
+    'kubrick': 'KOBLLUX',
+    'blue': 'BLLUE',
+    'codux': 'KODUX',
+    'vsica pis': 'VSICA PIS',
+    'meta lux': 'META LUX',
+    'infodose': 'INFODOSE',
+    'fit lux': 'FIT LUX',
+    'olho de horus': 'OLHO DE HORUS'
+  };
+
+  function applyCorrections(text) {
+    for (let [key, value] of Object.entries(symbolicCorrections)) {
+      let regex = new RegExp('\\b' + key + '\\b', 'gi');
+      text = text.replace(regex, value);
+    }
+    return text;
+  }
+
+  function setMode(mode) {
+    document.getElementById('dualStatus').innerText = "Modo atual: " + (mode === 'emitir' ? 'Canal 1 (Emitir)' : 'Canal 2 (Receber)');
+  }
+
+  function startRecognition() {
+    const output = document.getElementById("transcription");
+    const log = document.getElementById("infodoseLog");
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      output.innerText = "Reconhecimento de voz não suportado neste navegador.";
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "pt-BR";
+    recognition.interimResults = false;
+
+    recognition.onresult = function(event) {
+      let text = event.results[0][0].transcript;
+      let correctedText = applyCorrections(text);
+      output.innerText = correctedText;
+      log.innerText += `⧝ ${correctedText}\\n`;
+    };
+
+    recognition.onerror = function(event) {
+      output.innerText = "Erro no reconhecimento de voz: " + event.error;
+    };
+
+    recognition.start();
+  }
+</script>
+
+</body>
+</html>
