@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Infodose Ritual Toggle</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #121212, #1f1f1f);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #toggleBtn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, #0ff, #f0f);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+
+    #toggleBtn:hover {
+      transform: scale(1.05);
+    }
+
+    .container {
+      margin-top: 20px;
+      width: 95%;
+      max-width: 700px;
+      height: 60vh;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
+      box-shadow: 0 0 18px rgba(255, 255, 255, 0.1);
+      display: none;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      padding: 8px 16px;
+      cursor: pointer;
+      color: #0ff;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .tab-btn.active {
+      background: rgba(0, 255, 255, 0.3);
+    }
+
+    .tab-content {
+      display: none;
+      text-align: center;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <button id="toggleBtn">💊 Ritual Infodose</button>
+
+  <div class="container" id="panel">
+    <div class="tabs">
+      <button class="tab-btn" data-tab="intro">🌀 Introdução</button>
+      <button class="tab-btn" data-tab="archetypes">🌟 Arquétipos</button>
+      <button class="tab-btn" data-tab="codes">🔓 Ativações</button>
+      <button class="tab-btn" data-tab="connect">🌌 Conexão</button>
+    </div>
+    <div class="tab-content" id="intro">
+      <h2>Bem-vindo à Infodose</h2>
+      <p>Este é o seu painel ritualístico de ativações e arquétipos simbólicos.</p>
+    </div>
+    <div class="tab-content" id="archetypes">
+      <h2>Arquétipos</h2>
+      <p>Explore Nova, Kaos, Serena, Vitalis, entre outros...</p>
+    </div>
+    <div class="tab-content" id="codes">
+      <h2>Códigos de Ativação</h2>
+      <p>Use comandos como <strong>[1+NAVIGA]</strong>, <strong>[1+DISRUPTOR]</strong> e outros para ativar caminhos.</p>
+    </div>
+    <div class="tab-content" id="connect">
+      <h2>Conexão Sensorial</h2>
+      <p>Aromas, músicas e símbolos integrados ao seu estado emocional e energético.</p>
+    </div>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById('toggleBtn');
+    const panel = document.getElementById('panel');
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    function setActiveTab(tabId) {
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      document.querySelector('.tab-btn[data-tab="' + tabId + '"]').classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+      localStorage.setItem('infodose-active-tab', tabId);
+    }
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.getAttribute('data-tab');
+        setActiveTab(tabId);
+      });
+    });
+
+    toggleBtn.addEventListener('click', () => {
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    window.onload = () => {
+      const savedTab = localStorage.getItem('infodose-active-tab') || 'intro';
+      setActiveTab(savedTab);
+    };
+  </script>
+</body>
+</html>
