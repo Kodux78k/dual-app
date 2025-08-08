@@ -1290,12 +1290,12 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/codex/mtlx-o.txt',
+            TRAINING_FILE:'data/codex/codex-dual-978.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
             CHUNK_SIZE   :12000,
-            AUTH_TOKEN   :'Bearer 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'
+            AUTH_TOKEN   :'Bearer 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'
           };
 
     let training = '', chunks = [], chunkIndex = 0;
@@ -1399,7 +1399,7 @@ binauralAudio.volume = binauralVolume.value;
         foot.appendChild(sp);
       });
       p.appendChild(foot); wrap.appendChild(p);
-      $('#pageIndicator').textContent = '1/1';
+      $('#pageIndicator').textContent = '1|1';
       speechSynthesis.cancel();
       speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
     }
