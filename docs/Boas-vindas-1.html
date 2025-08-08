@@ -608,5 +608,288 @@ Use a paleta COBLUX (cyan, magenta, azul), com efeitos e animações suaves, man
   };
 
 </script>
+<style>
+/* Reset e base */
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+}
+html, body {
+  height: 100%;
+  background: #000011;
+  color: #00ffff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Container geral */
+#app {
+  display: flex;
+  flex: 1;
+  height: 100vh;
+  width: 100vw;
+  min-width: 320px;
+  min-height: 480px;
+  background: #000011;
+}
+
+/* Painel lateral */
+#sidepanel {
+  width: 280px;
+  background: rgba(0, 15, 31, 0.95); /* Fundo escuro translúcido para contraste */
+  border-right: 3px solid #00ffff; /* borda forte ciano */
+  display: flex;
+  flex-direction: column;
+  padding: 1.2rem;
+  color: #00ffff;
+  overflow-y: auto;
+  box-shadow: 0 0 12px #00ffffaa inset;
+  user-select: text;
+  font-weight: 600;
+}
+
+/* Labels e textos */
+#sidepanel label {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: block;
+  color: #00ffffcc;
+  text-shadow: 0 0 6px #00ffffbb;
+  user-select: text;
+}
+
+/* Prompt base */
+#promptBase {
+  flex-grow: 1;
+  background: #001e33dd; /* Azul escuro translúcido */
+  color: #00ffff;
+  border-radius: 12px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  user-select: text;
+  margin-bottom: 14px;
+  max-height: 140px;
+  border: 2px solid #00ffffcc;
+  box-shadow:
+    0 0 12px #00ffffaa inset,
+    0 0 14px #00ffff55;
+}
+
+/* Textarea Infodose */
+textarea#infodoseInput {
+  width: 100%;
+  height: 80px;
+  border-radius: 12px;
+  border: 2px solid #00ffffaa;
+  padding: 10px 12px;
+  resize: vertical;
+  font-family: monospace;
+  font-size: 0.9rem;
+  box-shadow:
+    inset 0 0 8px #00ffffaa,
+    0 0 12px #ff00ff55;
+  background: #001e33cc;
+  color: #00ffff;
+  margin-bottom: 16px;
+  transition: border-color 0.3s ease;
+}
+textarea#infodoseInput:focus {
+  outline: none;
+  border-color: #ff00ffdd;
+  box-shadow:
+    inset 0 0 12px #ff00ffcc,
+    0 0 20px #ff00ffcc;
+}
+
+/* Botões */
+button {
+  background: linear-gradient(135deg, #00ffffdd 0%, #ff00ffdd 100%);
+  border: none;
+  color: #000011;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+  cursor: pointer;
+  box-shadow:
+    0 0 16px #00ffffbb,
+    0 0 24px #ff00ffbb;
+  user-select: none;
+  transition: filter 0.3s ease, transform 0.2s ease;
+}
+button:hover,
+button:focus {
+  filter: brightness(1.3);
+  outline: none;
+  transform: scale(1.05);
+}
+
+/* Botão Arquétipo com destaque */
+#btnArq {
+  margin-top: auto;
+  font-size: 1.3rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #00ffff, #ff00ff);
+  color: #000011;
+  box-shadow:
+    0 0 20px #00ffffff,
+    0 0 26px #ff00ffff;
+}
+
+/* Wrapper editor */
+#editorWrapper {
+  flex: 2;
+  background: rgba(0, 15, 31, 0.95);
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  color: #00ffff;
+  border-left: 3px solid #00ffff;
+  overflow: hidden;
+  box-shadow: inset 0 0 12px #00ffffaa;
+}
+
+/* Busca no editor */
+#searchInput {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 1rem;
+  border-radius: 14px;
+  border: 2px solid #00ffffaa;
+  background: #001e33cc;
+  color: #00ffff;
+  margin-bottom: 14px;
+  outline-offset: 2px;
+  box-shadow:
+    inset 0 0 10px #00ffffaa;
+  transition: border-color 0.3s ease;
+}
+#searchInput:focus {
+  outline: none;
+  border-color: #ff00ffdd;
+  box-shadow:
+    inset 0 0 14px #ff00ffcc;
+}
+
+/* CodeMirror */
+.cm-editor {
+  height: 320px;
+  border-radius: 14px;
+  box-shadow:
+    0 0 20px #00ffffbb,
+    0 0 28px #ff00ffbb;
+  font-family: monospace;
+  font-size: 15px;
+  background: #001e33cc;
+  color: #0ff;
+  overflow: auto;
+  line-height: 1.5;
+  caret-color: #ff00ff;
+}
+
+/* Arquétipo texto */
+#arqText {
+  font-weight: 900;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #00ffff;
+  text-shadow:
+    0 0 16px #00ffff,
+    0 0 28px #ff00ff;
+  user-select: none;
+}
+
+/* Toggle Som */
+#toggleSound {
+  width: 100%;
+  margin-top: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 14px;
+}
+
+/* Preview */
+#previewWrapper {
+  flex: 1;
+  border-left: 3px solid #00ffff;
+  background: rgba(0, 15, 31, 0.95);
+  margin-left: 14px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 0 20px #00ffffaa,
+    0 0 30px #ff00ffaa;
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+}
+
+#previewFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #000011;
+}
+
+/* Canvas background */
+#bgParticles {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Scrollbar personalizada e fina */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #00ffff88;
+  border-radius: 3px;
+}
+
+/* Responsivo mobile */
+@media (max-width: 960px){
+  #app {
+    flex-direction: column;
+  }
+  #sidepanel {
+    width: 100%;
+    height: 280px;
+    border-right: none;
+    border-bottom: 3px solid #00ffff;
+    padding-bottom: 8px;
+  }
+  #editorWrapper {
+    flex: none;
+    height: 340px;
+    border-left: none;
+  }
+  #previewWrapper {
+    flex: none;
+    height: 280px;
+    margin-left: 0;
+    border-left: none;
+    margin-top: 12px;
+  }
+}
+</style>
 </body>
 </html>
