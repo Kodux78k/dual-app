@@ -269,7 +269,7 @@
       opacity: 0;
       transition: opacity 0.6s ease;
       position: absolute;
-      z-index: 1;
+      z-index: 3;
     }
 
     iframe.active {
@@ -452,7 +452,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
 }</style>
 <style>#advancedToggleOptions input,
 #advancedToggleOptions select {
-  font-family: monospace;
+
   font-size: 0.9em;
   backdrop-filter: blur(4px);
 }
@@ -490,7 +490,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
 <button class="symbol-button button-standard" onclick="loadPage('Solashss.html')">◑</button>
 <button class="symbol-button button-standard" onclick="loadPage('dual-tube-25-0.html')">◘</button>
 </div>
-<button class="lock-button button-standard" onclick="loadPage('index-full-with-toggle.html')"></button>
+<button class="lock-button button-standard" onclick="loadPage('index.html')"></button>
 <!-- Botões -->
 <input accept=".html" id="uploadHTML" style="display:none" type="file"/>
 <button class="button-standard" id="uploadComponentBtn">⧉</button>
@@ -1178,7 +1178,7 @@ outline: none !important;
 </div>
 <div class="pagination">
 <button class="button-standard" data-action="prev">⟵</button>
-<span id="pageIndicator">1 / 1</span>
+<span id="pageIndicator">1 /1</span>
 <button class="button-standard" data-action="next">⟶</button>
 </div>
 </div>
@@ -1290,7 +1290,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/manifesto_infinity_v3_9kb.txt',
+            TRAINING_FILE:'data/manifesto_infinity_v3_19kb.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
