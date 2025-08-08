@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Carrossel Infodose ASCII</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: monospace, sans-serif;
+    background: #121212;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .carousel-wrapper {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    width: 100%;
+    padding: 20px;
+  }
+  .block {
+    flex: 0 0 85%;
+    background: linear-gradient(145deg, #1a1a1a, #1f1f1f);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 4px 20px rgba(0,255,255,0.1), 0 0 40px rgba(255,0,255,0.05);
+    margin: 30px auto;
+    max-width: 500px;
+    width: 90%;
+    scroll-snap-align: center;
+  }
+  .name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    animation: glow 1.5s infinite alternate;
+    text-align: center;
+    cursor: pointer;
+  }
+  pre {
+    background: #111;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 1rem;
+    white-space: pre-wrap;
+    text-align: center;
+  }
+  .desc {
+    margin: 10px 0;
+    font-size: 1rem;
+    text-align: center;
+  }
+  .btns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    background: #111;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  button {
+    padding: 8px 10px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 24px;
+    color: white;
+    cursor: pointer;
+    background: linear-gradient(45deg, #f0f, #0ff);
+    -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 10px rgba(255,255,255,0.2);
+    transition: transform 0.2s;
+  }
+  button:hover {
+    transform: scale(1.05);
+  }
+  h1 {
+    margin: 20px 0;
+    font-size: 1.8rem;
+    background: linear-gradient(45deg, #f0f, #0ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  nav a {
+    color: white;
+    padding: 10px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    background: linear-gradient(45deg, #f0f, #0ff);
+    -webkit-mask-image: radial-gradient(white 80%, transparent 100%);
+    transition: transform 0.2s;
+  }
+  nav a:hover {
+    transform: scale(1.05);
+  }
+  @keyframes glow {
+    0% { text-shadow: 0 0 5px #fff; }
+    100% { text-shadow: 0 0 15px #0ff, 0 0 25px #f0f; }
+  }
+  .block code {
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+<h1>🌟 Infodose - Ativação Arquétipos ASCII</h1>
+<div class="carousel-wrapper">
+
+  <div class="block">
+    <div class="name" onclick="fala('Nova (Inspira)')">Nova (Inspira)</div>
+    <pre><code>
+.-.
+(o o)
+ |=|
+__|__
+/     \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+INSPIRA]')">📋</button>
+      <button onclick="goTo('opposite', 'Nova (Inspira)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Nova (Inspira)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Vitalis (Momentum)')">Vitalis (Momentum)</div>
+    <pre><code>
+\o/
+ |
+/ \
+/   \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+MOMENTUM]')">📋</button>
+      <button onclick="goTo('opposite', 'Vitalis (Momentum)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Vitalis (Momentum)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Pulse (Resona)')">Pulse (Resona)</div>
+    <pre><code>
+♪♫
+( ^_^ )
+/| |\
+ | |
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+RESONA]')">📋</button>
+      <button onclick="goTo('opposite', 'Pulse (Resona)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Pulse (Resona)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Artemis (Naviga)')">Artemis (Naviga)</div>
+    <pre><code>
+/^\
+(o_o)
+/ | \
+/  |  \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+NAVIGA]')">📋</button>
+      <button onclick="goTo('opposite', 'Artemis (Naviga)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Artemis (Naviga)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Serena (Ampara)')">Serena (Ampara)</div>
+    <pre><code>
+( . . )
+ (   )
+ / | \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+AMPARA]')">📋</button>
+      <button onclick="goTo('opposite', 'Serena (Ampara)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Serena (Ampara)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Kaos (Disruptor)')">Kaos (Disruptor)</div>
+    <pre><code>
+\_O_/
+ /|\
+ / \
+BOOM!
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+DISRUPTOR]')">📋</button>
+      <button onclick="goTo('opposite', 'Kaos (Disruptor)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Kaos (Disruptor)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Genus (Fabricus)')">Genus (Fabricus)</div>
+    <pre><code>
+|||||
+[===]
+| o |
+/|___|\
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+FABRICUS]')">📋</button>
+      <button onclick="goTo('opposite', 'Genus (Fabricus)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Genus (Fabricus)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Lumine (Brilhare)')">Lumine (Brilhare)</div>
+    <pre><code>
+\ ^_^ /
+ (   )
+ / | \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+BRILLHARE]')">📋</button>
+      <button onclick="goTo('opposite', 'Lumine (Brilhare)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Lumine (Brilhare)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Rhea (Guardiã)')">Rhea (Guardiã)</div>
+    <pre><code>
+( -_- )
+ /|_|\
+  / \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+RHEA]')">📋</button>
+      <button onclick="goTo('opposite', 'Rhea (Guardiã)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Rhea (Guardiã)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Solus (Mago)')">Solus (Mago)</div>
+    <pre><code>
+*
+ /|\
+(o_o)
+ / | \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+SOLUS]')">📋</button>
+      <button onclick="goTo('opposite', 'Solus (Mago)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Solus (Mago)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Atlas (Cartesius)')">Atlas (Cartesius)</div>
+    <pre><code>
+[][][]
+|  o  |
+| /|\ |
+| / \ |
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+CARTESIUS]')">📋</button>
+      <button onclick="goTo('opposite', 'Atlas (Cartesius)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Atlas (Cartesius)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="name" onclick="fala('Horus (Guardião)')">Horus (Guardião)</div>
+    <pre><code>
+\|||/
+( o_o )
+ / | \
+    </code></pre>
+    <div class="btns">
+      <button onclick="copyToClipboard('[1+HORUS]')">📋</button>
+      <button onclick="goTo('opposite', 'Horus (Guardião)')">Oposto ↔</button>
+      <button onclick="goTo('complementar', 'Horus (Guardião)')">Complementar ⊕</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function fala(texto) {
+  const msg = new SpeechSynthesisUtterance(texto);
+  msg.lang = "pt-BR";
+  msg.rate = 1;
+  speechSynthesis.speak(msg);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    alert("Ativação copiada: " + text);
+  });
+}
+
+const opposites = {
+  "Nova (Inspira)": "Kaos (Disruptor)",
+  "Vitalis (Momentum)": "Serena (Ampara)",
+  "Pulse (Resona)": "Atlas (Cartesius)",
+  "Artemis (Naviga)": "Rhea (Guardiã)",
+  "Serena (Ampara)": "Vitalis (Momentum)",
+  "Kaos (Disruptor)": "Nova (Inspira)",
+  "Genus (Fabricus)": "Solus (Mago)",
+  "Lumine (Brilhare)": "Horus (Guardião)",
+  "Rhea (Guardiã)": "Artemis (Naviga)",
+  "Solus (Mago)": "Genus (Fabricus)",
+  "Atlas (Cartesius)": "Pulse (Resona)",
+  "Horus (Guardião)": "Lumine (Brilhare)"
+};
+
+const complementars = {
+  "Nova (Inspira)": "Pulse (Resona)",
+  "Vitalis (Momentum)": "Artemis (Naviga)",
+  "Pulse (Resona)": "Nova (Inspira)",
+  "Artemis (Naviga)": "Vitalis (Momentum)",
+  "Serena (Ampara)": "Rhea (Guardiã)",
+  "Kaos (Disruptor)": "Lumine (Brilhare)",
+  "Genus (Fabricus)": "Atlas (Cartesius)",
+  "Lumine (Brilhare)": "Kaos (Disruptor)",
+  "Rhea (Guardiã)": "Serena (Ampara)",
+  "Solus (Mago)": "Horus (Guardião)",
+  "Atlas (Cartesius)": "Genus (Fabricus)",
+  "Horus (Guardião)": "Solus (Mago)"
+};
+
+function goTo(type, currentName) {
+  const target = type === 'opposite' ? opposites[currentName] : complementars[currentName];
+  const blocks = document.querySelectorAll(".block");
+  blocks.forEach((block) => {
+    const name = block.querySelector(".name").textContent.trim();
+    if (name === target) {
+      block.scrollIntoView({ behavior: "smooth", inline: "center" });
+    }
+  });
+}
+
+const wrapper = document.querySelector('.carousel-wrapper');
+
+let scrollTimeout;
+wrapper.addEventListener('scroll', () => {
+  clearTimeout(scrollTimeout);
+  scrollTimeout = setTimeout(() => {
+    const blocks = document.querySelectorAll('.block');
+    const centerX = wrapper.scrollLeft + wrapper.clientWidth / 2;
+
+    let closestBlock = null;
+    let closestDistance = Infinity;
+
+    blocks.forEach(block => {
+      const blockCenter = block.offsetLeft + block.offsetWidth / 2;
+      const distance = Math.abs(blockCenter - centerX);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestBlock = block;
+      }
+    });
+
+    if (closestBlock) {
+      closestBlock.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    }
+  }, 150);
+});
+
+window.addEventListener("load", () => {
+  const firstBlock = document.querySelector(".block");
+  if (firstBlock) {
+    firstBlock.scrollIntoView({ behavior: "auto", inline: "center" });
+  }
+});
+</script>
+</body>
+</html>

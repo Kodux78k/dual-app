@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Container de Ativações & LocalStorage</title>
+  <style>
+    body {
+      margin: 0; padding: 0;
+      font-family: monospace, sans-serif;
+      background: #121212;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    button#pillBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(45deg, #8e2de2, #4a00e0);
+      border: none;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      color: white;
+      font-size: 28px;
+      cursor: pointer;
+      box-shadow: 0 0 12px #8e2de2aa;
+      transition: transform 0.2s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    button#pillBtn:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 20px #8e2de2ff;
+    }
+
+    /* Modal */
+    #activationModal {
+      position: fixed;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      width: 90%;
+      max-width: 700px;
+      max-height: 80vh;
+      background: #222;
+      border-radius: 16px;
+      box-shadow: 0 0 25px #0ff;
+      color: #ddd;
+      overflow-y: auto;
+      padding: 20px 30px;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      font-size: 0.95rem;
+      user-select: text;
+    }
+    #activationModal.active {
+      transform: translateX(-50%) scale(1);
+    }
+    #activationModal h2 {
+      margin: 0 0 10px 0;
+      font-weight: 700;
+      color: #0ff;
+      border-bottom: 1px solid #0ff;
+      padding-bottom: 6px;
+    }
+    #activationModal pre {
+      background: #111;
+      padding: 12px 15px;
+      border-radius: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      box-shadow: inset 0 0 8px #0ff33aa;
+      font-size: 0.9rem;
+    }
+    #activationModal button.closeBtn {
+      align-self: flex-end;
+      background: transparent;
+      border: none;
+      color: #0ff;
+      font-size: 1.6rem;
+      cursor: pointer;
+      font-weight: 700;
+      padding: 0;
+      margin-bottom: 10px;
+    }
+    #activationModal .section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    #activationModal .section small {
+      color: #66ffffaa;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Botão pílula -->
+  <button id="pillBtn" title="Mostrar Ativações">💊</button>
+
+  <!-- Modal / Container -->
+  <div id="activationModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="closeBtn" aria-label="Fechar">×</button>
+
+    <h2 id="modalTitle">Container de Ativações & LocalStorage</h2>
+
+    <section class="section" id="localStorageSection">
+      <h3>🌐 LocalStorage Atual</h3>
+      <pre id="localStorageContent">Carregando...</pre>
+    </section>
+
+    <section class="section" id="logsSection">
+      <h3>📜 Logs Correlacionados</h3>
+      <pre id="logsContent">Nenhum log registrado.</pre>
+      <small>* Logs simulados para demonstração</small>
+    </section>
+
+    <section class="section" id="fetchSection">
+      <h3>🌐 Fetch em Uso</h3>
+      <pre id="fetchContent">Nenhuma requisição fetch detectada.</pre>
+    </section>
+
+    <section class="section" id="iaSection">
+      <h3>🤖 IA Acionada no Fetch</h3>
+      <pre id="iaContent">Nenhuma IA detectada.</pre>
+    </section>
+
+  </div>
+
+  <script>
+    // Elementos
+    const pillBtn = document.getElementById('pillBtn');
+    const modal = document.getElementById('activationModal');
+    const closeBtn = modal.querySelector('.closeBtn');
+
+    // Abrir e fechar modal
+    pillBtn.addEventListener('click', () => {
+      updateLocalStorageDisplay();
+      updateLogsDisplay();
+      updateFetchDisplay();
+      updateIaDisplay();
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+    });
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
+    });
+
+    // Atualizar LocalStorage
+    function updateLocalStorageDisplay() {
+      const contentEl = document.getElementById('localStorageContent');
+      if (!window.localStorage) {
+        contentEl.textContent = 'LocalStorage não suportado neste navegador.';
+        return;
+      }
+      if (localStorage.length === 0) {
+        contentEl.textContent = 'LocalStorage está vazio.';
+        return;
+      }
+      let output = '';
+      for(let i=0; i<localStorage.length; i++) {
+        const key = localStorage.key(i);
+        let value = localStorage.getItem(key);
+        // Tenta formatar JSON
+        try {
+          const obj = JSON.parse(value);
+          value = JSON.stringify(obj, null, 2);
+        } catch {}
+        output += `${key}:\n${value}\n\n`;
+      }
+      contentEl.textContent = output.trim();
+    }
+
+    // Logs (simulados para demo)
+    const logs = [
+      '[2025-08-08 00:05] Ativação Nova (Inspira) usada',
+      '[2025-08-08 00:10] Fetch para https://api.ia.exemplo/v1/processar iniciada',
+      '[2025-08-08 00:11] Resposta da IA recebida',
+      '[2025-08-08 00:15] Ativação Kaos (Disruptor) usada',
+    ];
+    function updateLogsDisplay() {
+      const logsEl = document.getElementById('logsContent');
+      if (logs.length === 0) {
+        logsEl.textContent = 'Nenhum log registrado.';
+      } else {
+        logsEl.textContent = logs.join('\n');
+      }
+    }
+
+    // Fetch (simulado)
+    const fetchRequests = [
+      { url: 'https://api.ia.exemplo/v1/processar', status: 200, timestamp: '2025-08-08 00:10' }
+    ];
+    function updateFetchDisplay() {
+      const fetchEl = document.getElementById('fetchContent');
+      if (fetchRequests.length === 0) {
+        fetchEl.textContent = 'Nenhuma requisição fetch detectada.';
+      } else {
+        const lines = fetchRequests.map(req => {
+          return `${req.timestamp} - ${req.url} [status: ${req.status}]`;
+        });
+        fetchEl.textContent = lines.join('\n');
+      }
+    }
+
+    // IA acionada (simulado)
+    const iaInUse = "ChatGPT-4.0";
+
+    function updateIaDisplay() {
+      const iaEl = document.getElementById('iaContent');
+      iaEl.textContent = iaInUse ? iaInUse : "Nenhuma IA detectada.";
+    }
+
+
+    // Opcional: fechar modal com ESC
+    window.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+  </script>
+
+</body>
+</html>
