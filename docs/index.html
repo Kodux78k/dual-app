@@ -300,63 +300,255 @@ Position: fixed;
   background-blend-mode: lighten;
 }cósmico */
 
-
+<style>
+  }
+  #miniPlayerContainer {
+    position: fixed;
+    top: 89px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 90vw;
+    max-width: 480px;
+    font-size: 0.9rem;
+  }
+  #toggleMiniPlayer {
+    background: linear-gradient(90deg, #8882f8, #c277f2);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 0 12px rgba(140, 102, 255, 0.8);
+    cursor: pointer;
+    font-weight: 700;
+    user-select: none;
+    transition: transform 0.2s ease;
+    width: 48px;
+    height: 48px;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #toggleMiniPlayer:hover {
+    transform: scale(1.1);
+  }
+  #panel {
+    margin-top: 12px;
+    background: rgba(25, 25, 35, 0.9);
+    border-radius: 18px;
+    box-shadow: 0 0 15px #7f52ff88;
+    padding: 16px;
+    max-height: 360px;
+    overflow-y: auto;
+    display: none;
+    backdrop-filter: blur(6px);
+  }
+  h2 {
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #d8b9ff;
+    border-bottom: 1px solid #6e4de7;
+    padding-bottom: 4px;
+  }
+  pre {
+    background: #222;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.85rem;
+    max-height: 100px;
+    overflow-y: auto;
+  }
+  button.actionBtn {
+    background: linear-gradient(45deg, #d97aff, #60e3ff);
+    border: none;
+    border-radius: 12px;
+    padding: 6px 14px;
+    color: #121212;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    user-select: none;
+    transition: background-color 0.25s ease;
+  }
+  button.actionBtn:hover {
+    background: linear-gradient(45deg, #e0b8ff, #94f0ff);
+  }
+  .section {
+    margin-bottom: 18px;
+  }
+  .small-info {
+    color: #bbb;
+    font-size: 0.8rem;
+    margin-top: -12px;
+    margin-bottom: 8px;
+  }
+  /* Scrollbar dark style */
+  #panel::-webkit-scrollbar {
+    width: 8px;
+  }
+  #panel::-webkit-scrollbar-thumb {
+    background: #7f52ffcc;
+    border-radius: 6px;
+  }
+  #panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+</style>
 
   </style>
       <!-- body {background: transparent !important; !-->
 </head>
 <body>
 
-  <!-- <div id="particles-js"></div> !-->
-<!-- <div id="particles-js"></div> !-->
-<!-- 🎥 MINI PLAYER TOGGLE -->
-<div id="miniPlayerContainer" style="
-  position: fixed;
-  top: 73px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Montserrat', sans-serif;
-">
 
-  <button id="toggleMiniPlayer" style="
-    background: linear-gradient(90deg, #8882f8, #c277f2);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 0 8px rgba(140, 102, 255, 0.7);
-    margin-bottom: 10px;
-    cursor: pointer;
-    font-weight: 600;
-  ">💊</button>
+<div id="miniPlayerContainer" role="region" aria-label="Painel de Ativações">
+  <button id="toggleMiniPlayer" aria-expanded="false" aria-controls="panel" title="Abrir painel de ativações">💊</button>
 
- <div id="iframeWrapper" style="
-  width: 88vw;
-  max-width: 399px;
-  height: 199px;
-  border-radius: 14px;
-  overflow: auto; /* 👈 evita scroll molenga externo */
-  backdrop-filter: blur(8px);
-  background: rgba(0, 0, 0, 0.25);
-  box-shadow: 0 0 8px rgba(199, 122, 255, 0.5);
-  display: none;
-  opacity: 0.8;
-  transition: all 0.4s ease-in-out;
-  overscroll-behavior-x: contain; /* 👈 bloqueia bounce lateral */
-  /* touch-action: pan-y; *//* 👈 só scroll vertical no container externo */
-">
-  <iframe src="Boas-vindas-0.html" style="
-    width: 100%;
-    height: 100%;
-    border: none;
-    overflow: auto; /* 👈 segurança extra pra evitar scroll interno */
-  "></iframe>
+  <div id="panel" tabindex="0">
+    <div class="section" id="localStorageSection">
+      <h2>🗄️ LocalStorage</h2>
+      <pre id="localStorageContent">Carregando...</pre>
+      <button class="actionBtn" id="clearLocalStorageBtn" title="Limpar LocalStorage">Limpar LocalStorage</button>
+    </div>
+
+    <div class="section" id="logsSection">
+      <h2>📜 Logs Recentes</h2>
+      <pre id="logsContent">Nenhum log registrado.</pre>
+      <button class="actionBtn" id="clearLogsBtn" title="Limpar logs">Limpar Logs</button>
+    </div>
+
+    <div class="section" id="fetchSection">
+      <h2>🌐 Fetch & IA Acionada</h2>
+      <pre id="fetchContent">Nenhum fetch recente.</pre>
+      <div class="small-info" id="iaUsedInfo">IA atual: Nenhuma</div>
+      <button class="actionBtn" id="clearFetchBtn" title="Limpar dados fetch">Limpar Dados Fetch</button>
+    </div>
+  </div>
 </div>
-</div>
+
+<script>
+  // Toggle painel
+  const toggleBtn = document.getElementById('toggleMiniPlayer');
+  const panel = document.getElementById('panel');
+  toggleBtn.addEventListener('click', () => {
+    const isVisible = panel.style.display === 'block';
+    if (isVisible) {
+      panel.style.display = 'none';
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    } else {
+      panel.style.display = 'block';
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      loadLocalStorage();
+      loadLogs();
+      loadFetch();
+    }
+  });
+
+  // === LocalStorage ===
+  const localStorageContent = document.getElementById('localStorageContent');
+  const clearLocalStorageBtn = document.getElementById('clearLocalStorageBtn');
+
+  function loadLocalStorage() {
+    if (localStorage.length === 0) {
+      localStorageContent.textContent = 'LocalStorage vazio.';
+      return;
+    }
+    let content = '';
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      let value = localStorage.getItem(key);
+      try {
+        // tenta formatar JSON para melhor visualização
+        value = JSON.stringify(JSON.parse(value), null, 2);
+      } catch {
+        // valor normal
+      }
+      content += `${key}: ${value}\n\n`;
+    }
+    localStorageContent.textContent = content.trim();
+  }
+  clearLocalStorageBtn.addEventListener('click', () => {
+    if (confirm('Confirma limpar todo o LocalStorage?')) {
+      localStorage.clear();
+      loadLocalStorage();
+      addLog('LocalStorage limpo pelo usuário.');
+    }
+  });
+
+  // === Logs simples (exemplo) ===
+  // Simulando um log armazenado na memória local do script
+  let logs = [];
+
+  function addLog(text) {
+    const now = new Date().toLocaleTimeString();
+    logs.push(`[${now}] ${text}`);
+    if (logs.length > 30) logs.shift(); // mantém só os últimos 30 logs
+    if (panel.style.display === 'block') loadLogs();
+  }
+
+  const logsContent = document.getElementById('logsContent');
+  const clearLogsBtn = document.getElementById('clearLogsBtn');
+
+  function loadLogs() {
+    if (logs.length === 0) {
+      logsContent.textContent = 'Nenhum log registrado.';
+      return;
+    }
+    logsContent.textContent = logs.join('\n');
+  }
+  clearLogsBtn.addEventListener('click', () => {
+    if (confirm('Limpar todos os logs?')) {
+      logs = [];
+      loadLogs();
+    }
+  });
+
+  // === Fetch & IA usada (exemplo) ===
+  // Simulação de dados fetch e IA para demo
+  let fetchData = [];
+  let iaAtual = 'Nenhuma';
+
+  function addFetchData(url, iaName, responseSample) {
+    iaAtual = iaName;
+    const now = new Date().toLocaleTimeString();
+    fetchData.push(`[${now}] URL: ${url}\nIA: ${iaName}\nResposta: ${responseSample}`);
+    if (fetchData.length > 10) fetchData.shift();
+    if (panel.style.display === 'block') loadFetch();
+  }
+
+  const fetchContent = document.getElementById('fetchContent');
+  const iaUsedInfo = document.getElementById('iaUsedInfo');
+  const clearFetchBtn = document.getElementById('clearFetchBtn');
+
+  function loadFetch() {
+    if (fetchData.length === 0) {
+      fetchContent.textContent = 'Nenhum fetch recente.';
+      iaUsedInfo.textContent = 'IA atual: Nenhuma';
+      return;
+    }
+    fetchContent.textContent = fetchData.join('\n\n');
+    iaUsedInfo.textContent = 'IA atual: ' + iaAtual;
+  }
+  clearFetchBtn.addEventListener('click', () => {
+    if (confirm('Limpar dados de fetch?')) {
+      fetchData = [];
+      iaAtual = 'Nenhuma';
+      loadFetch();
+    }
+  });
+
+  // Exemplo de uso para testar (pode remover/editar)
+  addLog('Painel carregado.');
+  addFetchData('https://api.exemplo.com/gpt4', 'GPT-4', '{"result":"ok"}');
+
+  // Você pode criar funções para capturar seus fetch reais e IA em uso, e adicionar aqui
+  // Por exemplo, sobrescrever fetch para logar automaticamente, se quiser
+</script>
   <div class="center-group">
     <div class="logo-container" id="logoDual">
       <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
