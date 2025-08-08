@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editor Dual COBLUX + Preview + IA Mock</title>
+
+  <!-- CodeMirror 6 básica via CDN (modular) -->
+  <script src="https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.19.1/dist/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-html@0.19.1/dist/index.min.js"></script>
+
+  <style>
+    /* Reset e base */
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      user-select: none;
+    }
+    html, body {
+      height: 100%;
+      background: #000011;
+      color: #00ffff;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    #app {
+      display: flex;
+      flex: 1;
+      height: 100vh;
+      width: 100vw;
+      min-width: 320px;
+      min-height: 480px;
+      background: #000011;
+    }
+
+    /* Painel lateral */
+    #sidepanel {
+      width: 280px;
+      background: linear-gradient(135deg, #00ffffcc 0%, #ff00ffcc 100%);
+      border-right: 2px solid #0ff;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      color: #000011;
+      overflow-y: auto;
+    }
+
+    #sidepanel label {
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      display: block;
+      color: #000011dd;
+      text-shadow: 0 0 4px #00ffffbb;
+    }
+
+    #promptBase {
+      flex-grow: 1;
+      background: #001122dd;
+      color: #00ffff;
+      border-radius: 8px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      user-select: text;
+      margin-bottom: 12px;
+      max-height: 130px;
+    }
+
+    textarea#infodoseInput {
+      width: 100%;
+      height: 70px;
+      border-radius: 8px;
+      border: 1.5px solid #000011cc;
+      padding: 6px 8px;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 0.85rem;
+      box-shadow:
+        inset 0 0 4px #00ffffaa,
+        0 0 6px #ff00ff44;
+      background: #001122cc;
+      color: #00ffff;
+      margin-bottom: 12px;
+    }
+
+    button {
+      background: linear-gradient(135deg, #00ffffdd 0%, #ff00ffdd 100%);
+      border: none;
+      color: #000011;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 8px;
+      cursor: pointer;
+      box-shadow:
+        0 0 8px #00ffffbb,
+        0 0 12px #ff00ffbb;
+      user-select: none;
+      transition: filter 0.25s ease;
+    }
+    button:hover,
+    button:focus {
+      filter: brightness(1.2);
+      outline: none;
+    }
+
+    #btnArq {
+      margin-top: auto;
+    }
+
+    /* Editor principal */
+    #editorWrapper {
+      flex: 2;
+      background: #000011;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      color: #00ffff;
+      border-left: 2px solid #0ff;
+      overflow: hidden;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      border: 1.5px solid #00ffffaa;
+      background: #001122cc;
+      color: #00ffff;
+      margin-bottom: 10px;
+      outline-offset: 2px;
+    }
+
+    /* CodeMirror básico styles */
+    .cm-editor {
+      height: 300px;
+      border-radius: 10px;
+      box-shadow:
+        0 0 12px #00ffffbb,
+        0 0 20px #ff00ffbb;
+      font-family: monospace;
+      font-size: 14px;
+      background: #001122cc;
+      color: #0ff;
+      overflow: auto;
+    }
+
+    /* Navegação arquétipos */
+    #arqText {
+      font-weight: 900;
+      font-size: 1.3rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #00ffff;
+      text-shadow:
+        0 0 12px #00ffff,
+        0 0 20px #ff00ff;
+      user-select: none;
+    }
+
+    /* Player som ambiente */
+    #toggleSound {
+      width: 100%;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    /* Preview iframe */
+    #previewWrapper {
+      flex: 1;
+      border-left: 2px solid #0ff;
+      background: #001122cc;
+      margin-left: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow:
+        0 0 12px #00ffffaa,
+        0 0 20px #ff00ffaa;
+    }
+
+    #previewFrame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000011;
+    }
+
+    /* Fundo canvas */
+    #bgParticles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Scrollbar minimal */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #00ffff66;
+      border-radius: 3px;
+    }
+
+    /* Responsivo mobile */
+    @media (max-width: 960px){
+      #app {
+        flex-direction: column;
+      }
+      #sidepanel {
+        width: 100%;
+        height: 280px;
+        border-right: none;
+        border-bottom: 2px solid #0ff;
+        padding-bottom: 8px;
+      }
+      #editorWrapper {
+        flex: none;
+        height: 320px;
+        border-left: none;
+      }
+      #previewWrapper {
+        flex: none;
+        height: 250px;
+        margin-left: 0;
+        border-left: none;
+        margin-top: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bgParticles" aria-hidden="true"></canvas>
+
+<div id="app" role="application" aria-label="Editor HTML Dual COBLUX com painel de prompt e Infodose">
+
+  <aside id="sidepanel" role="region" aria-label="Painel lateral de prompt e configurações">
+
+    <label for="promptBase">Prompt Base Codex Uno 3|6|9</label>
+    <pre id="promptBase" tabindex="0" aria-readonly="true">
+Crie uma aplicação web SPA para editor HTML avançado, com painel lateral de prompts, usando a narrativa 3|6|9 e a Fórmula Dopamina Sex.
+Incorpore fundo animado de partículas e player de som ambiente.
+Permita upload/download e busca no editor com syntax highlight real.
+Forneça personalização via inputs externos, incluindo cores e bases Infodose, que se fundem dinamicamente ao prompt principal para customização máxima.
+Use a paleta COBLUX (cyan, magenta, azul), com efeitos e animações suaves, mantendo acessibilidade ARIA e responsividade mobile-first.
+    </pre>
+
+    <label for="infodoseInput">Base Infodose para mesclar</label>
+    <textarea id="infodoseInput" placeholder="Cole sua base Infodose aqui..." aria-label="Campo para colar base Infodose"></textarea>
+
+    <button id="btnUpload" aria-label="Carregar arquivo HTML para editor">Upload HTML</button>
+    <input type="file" id="fileInput" accept=".html" style="display:none" aria-hidden="true" />
+
+    <button id="btnDownloadHTML" aria-label="Baixar arquivo HTML editado">Download HTML</button>
+    <button id="btnDownloadPrompt" aria-label="Baixar prompt base atual">Download Prompt</button>
+
+    <button id="btnReescrever" aria-label="Reescrever prompt com IA">Reescrever Prompt (IA)</button>
+
+    <button id="btnReset" aria-label="Resetar editor para template inicial">Resetar Editor</button>
+
+    <button id="btnArq" aria-label="Navegar arquétipos 3, 6 e 9">Arquétipo: <span id="arqText">3</span></button>
+
+    <button id="toggleSound" aria-pressed="false" aria-label="Ativar ou desativar som ambiente">Som: OFF</button>
+
+  </aside>
+
+  <section id="editorWrapper" role="main" aria-label="Editor HTML avançado com syntax highlight">
+
+    <input type="search" id="searchInput" aria-label="Busca no editor" placeholder="Buscar texto no editor..." />
+
+    <div id="editor"></div>
+
+  </section>
+
+  <section id="previewWrapper" role="region" aria-label="Visualização do HTML editado">
+
+    <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin" title="Preview do HTML editado"></iframe>
+
+  </section>
+
+</div>
+
+<script type="module">
+  import { EditorState, EditorView, basicSetup } from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.19.1/dist/index.es.js";
+  import { html } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-html@0.19.1/dist/index.es.js";
+
+  // --- Editor Setup ---
+  const editorParent = document.getElementById('editor');
+  const initialDoc = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Documento HTML</title>
+  <style>
+    body { background:#000011; color:#00ffff; font-family: monospace; padding: 1rem;}
+  </style>
+</head>
+<body>
+  <h1>Seu HTML aqui</h1>
+  <p>Edite e veja o preview abaixo.</p>
+</body>
+</html>`;
+
+  let state = EditorState.create({
+    doc: initialDoc,
+    extensions: [basicSetup, html()]
+  });
+
+  const view = new EditorView({
+    state,
+    parent: editorParent
+  });
+
+  // --- Elementos DOM ---
+  const promptBaseElem = document.getElementById('promptBase');
+  const infodoseInput = document.getElementById('infodoseInput');
+  const searchInput = document.getElementById('searchInput');
+  const fileInput = document.getElementById('fileInput');
+  const btnUpload = document.getElementById('btnUpload');
+  const btnDownloadHTML = document.getElementById('btnDownloadHTML');
+  const btnDownloadPrompt = document.getElementById('btnDownloadPrompt');
+  const btnArq = document.getElementById('btnArq');
+  const arqText = document.getElementById('arqText');
+  const toggleSoundBtn = document.getElementById('toggleSound');
+  const previewFrame = document.getElementById('previewFrame');
+  const btnReescrever = document.getElementById('btnReescrever');
+  const btnReset = document.getElementById('btnReset');
+
+  // --- Prompt full (base + infodose) ---
+  function getFullPrompt(){
+    const base = promptBaseElem.textContent.trim();
+    const extra = infodoseInput.value.trim();
+    return base + (extra ? "\n\nBase Infodose adicional:\n" + extra : "");
+  }
+
+  // --- Upload HTML ---
+  btnUpload.onclick = () => fileInput.click();
+
+  fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: ev.target.result }
+      });
+      searchInput.value = "";
+      updatePreview();
+    };
+    reader.readAsText(file);
+  };
+
+  // --- Download HTML ---
+  btnDownloadHTML.onclick = () => {
+    const blob = new Blob([view.state.doc.toString()], {type: 'text/html;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "editado.html";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  // --- Download Prompt ---
+  btnDownloadPrompt.onclick = () => {
+    const fullPrompt = getFullPrompt();
+    const blob = new Blob([fullPrompt], {type: 'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "prompt_infodose.txt";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  // --- Busca no editor ---
+  searchInput.addEventListener('input', e => {
+    const query = e.target.value.toLowerCase();
+    if(!query) {
+      // Restaurar conteúdo completo
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: view.state.doc.toString() }
+      });
+      updatePreview();
+      return;
+    }
+    const lines = view.state.doc.toString().split('\n');
+    const filtered = lines.filter(l => l.toLowerCase().includes(query));
+    const newContent = filtered.join('\n');
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: newContent }
+    });
+    updatePreview(newContent);
+  });
+
+  // --- Navegação arquétipos ---
+  const arquetipos = ['3','6','9'];
+  let arqIndex = 0;
+
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function playClickSound(){
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(600 + arqIndex * 100, audioCtx.currentTime);
+    g.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    o.connect(g);
+    g.connect(audioCtx.destination);
+    o.start();
+    o.stop(audioCtx.currentTime + 0.1);
+  }
+
+  btnArq.addEventListener('click', () => {
+    playClickSound();
+    arqIndex = (arqIndex + 1) % arquetipos.length;
+    arqText.textContent = arquetipos[arqIndex];
+    arqText.style.transition = 'none';
+    arqText.style.transform = 'scale(1.3)';
+    arqText.style.color = ['#00ffff','#ff00ff','#0ff'][arqIndex];
+    setTimeout(() => {
+      arqText.style.transition = 'transform 0.3s ease,color 0.5s ease';
+      arqText.style.transform = 'scale(1)';
+      arqText.style.color = '#00ffff';
+    }, 150);
+  });
+
+  btnArq.addEventListener('mouseenter', playClickSound);
+
+  // --- Player som ambiente Dopamina Sex ---
+  let isPlaying = false;
+  let gainNode = null;
+  let oscillator = null;
+
+  function startAmbientSound(){
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    oscillator = audioCtx.createOscillator();
+    gainNode = audioCtx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 220 + arqIndex * 40;
+    gainNode.gain.value = 0.08;
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+  }
+  function stopAmbientSound(){
+    if(oscillator){
+      oscillator.stop();
+      oscillator.disconnect();
+      gainNode.disconnect();
+      oscillator = null;
+      gainNode = null;
+    }
+  }
+
+  toggleSoundBtn.addEventListener('click', () => {
+    playClickSound();
+    if(!isPlaying){
+      startAmbientSound();
+      toggleSoundBtn.textContent = 'Som: ON';
+      toggleSoundBtn.setAttribute('aria-pressed', 'true');
+    } else {
+      stopAmbientSound();
+      toggleSoundBtn.textContent = 'Som: OFF';
+      toggleSoundBtn.setAttribute('aria-pressed', 'false');
+    }
+    isPlaying = !isPlaying;
+  });
+  toggleSoundBtn.addEventListener('mouseenter', playClickSound);
+
+  // --- Fundo animado partículas ---
+  const canvas = document.getElementById('bgParticles');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resizeCanvas(){
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class Particle {
+    constructor(){
+      this.reset();
+    }
+    reset(){
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.radius = 1 + Math.random()*1.5;
+      this.speedX = (Math.random()-0.5)*0.15;
+      this.speedY = (Math.random()-0.5)*0.15;
+      this.alpha = 0.1 + Math.random()*0.3;
+      this.color = `rgba(0,255,255,${this.alpha})`;
+    }
+    update(){
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if(this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.shadowColor = '#0ff';
+      ctx.shadowBlur = 6;
+      ctx.fillStyle = this.color;
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  let particles = [];
+  const PARTICLE_COUNT = 80;
+
+  function initParticles(){
+    particles = [];
+    for(let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle());
+  }
+  initParticles();
+
+  function animate(){
+    ctx.clearRect(0,0,W,H);
+    for(let p of particles){
+      p.update();
+      p.draw();
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // --- Atualizar preview iframe ---
+  function updatePreview(content){
+    const htmlToRender = content || view.state.doc.toString();
+    const blob = new Blob([htmlToRender], {type: "text/html"});
+    const url = URL.createObjectURL(blob);
+    previewFrame.src = url;
+
+    // Liberar URL antigo depois para não vazar memória
+    if(previewFrame._lastUrl) URL.revokeObjectURL(previewFrame._lastUrl);
+    previewFrame._lastUrl = url;
+  }
+
+  // Atualiza preview ao iniciar
+  updatePreview();
+
+  // Atualiza preview ao mudar editor
+  view.dispatch = new Proxy(view.dispatch, {
+    apply(target, thisArg, args) {
+      const result = Reflect.apply(target, thisArg, args);
+      updatePreview();
+      return result;
+    }
+  });
+
+  // --- Botão Reset ---
+  btnReset.onclick = () => {
+    view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: initialDoc }
+    });
+    searchInput.value = "";
+    infodoseInput.value = "";
+    updatePreview();
+  };
+
+  // --- Botão Reescrever Prompt (Mock IA) ---
+  btnReescrever.onclick = () => {
+    btnReescrever.disabled = true;
+    btnReescrever.textContent = "Reescrevendo...";
+
+    // Simula uma chamada IA com delay
+    setTimeout(() => {
+      const original = getFullPrompt();
+      // Mock "reescrita" simplificada:
+      const rewritten = original
+        .replace(/aplicação web SPA/g, "app SPA ultraavançada")
+        .replace(/editor HTML avançado/g, "editor HTML top")
+        .replace(/narrativa 3\|6\|9/g, "narrativa 3-6-9 sagrada")
+        .replace(/Fórmula Dopamina Sex/g, "Fórmula Dopamina SEXXX")
+        .replace(/fundo animado de partículas/g, "fundo mágico com partículas")
+        .replace(/player de som ambiente/g, "player sonoro ambientador");
+
+      // Atualiza prompt base e infodose concatenado (em pre)
+      promptBaseElem.textContent = rewritten;
+
+      btnReescrever.textContent = "Reescrever Prompt (IA)";
+      btnReescrever.disabled = false;
+    }, 1500);
+  };
+
+</script>
+</body>
+</html>
