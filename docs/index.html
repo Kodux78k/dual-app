@@ -1008,93 +1008,184 @@ Position: fixed;
   <img id="bgImage" class="fake-bg" src="about:blank" alt="" />
 
 
-  <script>
-    function trocarImagem(event) {
-  const file = event.target.files[0];
-  if (!file) return;
+ <!-- botão que abre o painel de opções -->
+<button id="openBgOptionsBtn" style="display:none; flex-direction:column; gap:8px; background:rgba(0,0,0,0.8); padding:10px; border-radius:8px;" title="Opções de BG">௵</button>
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = document.getElementById('bgImage');
-    img.src = e.target.result;
+<!-- painel de opções -->
+<div id="userBgOptions" style="display:none; flex-direction:column; gap:8px; background:rgba(0,0,0,0.8); padding:10px; border-radius:8px; max-width:320px;">
+  <!-- SEU botão (exatamente como pediu) -->
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
+  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)" style="display:none;">
 
-    // ✅ Salvar no localStorage
-    localStorage.setItem("bgImageSource", e.target.result);
+  <button id="cycleBtn">🔁 Ciclar</button>
+  <button id="clearHistoryBtn" style="background:#c00; color:#fff;">🗑 Limpar histórico</button>
 
-    console.log("◉ Imagem substituída com sucesso!");
-    if (window.logMistico) window.logMistico("Imagem BG atualizada 🌀");
-  };
-  reader.readAsDataURL(file);
-}
-    
-  </script>
+  <div id="bgHistory" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+</div>
+
+<!-- elemento de fundo (seu bg) -->
+
+
 <script>
-// 🎛️ BG Personalizado
-const bg = document.getElementById('bgImage');
-const imgUpload = document.getElementById('imgUpload');
-const cycleBtn = document.getElementById('cycleBtn');
-const userBgOptions = document.getElementById('userBgOptions');
+/* --- Keys --- */
 const BG_KEY = "bgImageSource";
+const BG_HISTORY_KEY = "bgImageHistory";
 const FILTER_KEY = "bgImageFilter";
-const imagens = [
+
+/* --- Imagens fixas --- */
+const imagensFixas = [
   'assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG',
   'assets/styles/themes/bgs/Nebula-Galaxy.png',
   'assets/styles/themes/bgs/Circuit-Spirit.jpg',
   'assets/styles/themes/bgs/Temple-Net.png'
 ];
+
 let indexAtual = 0;
 
+/* --- DOM --- */
+const bg = document.getElementById('bgImage');
+const cycleBtn = document.getElementById('cycleBtn');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const bgHistoryContainer = document.getElementById('bgHistory');
+const userBgOptions = document.getElementById('userBgOptions');
+const openBgOptionsBtn = document.getElementById('openBgOptionsBtn');
+
+/* --- util --- */
+function logMistico(msg) {
+  if (window.logMistico) window.logMistico(msg);
+  else console.log("◉", msg);
+}
+
+/* --- toggle painel --- */
 function toggleUserOptions() {
-  userBgOptions.style.display = userBgOptions.style.display === 'none' ? 'flex' : 'none';
+  userBgOptions.style.display = (userBgOptions.style.display === 'flex') ? 'none' : 'flex';
 }
+openBgOptionsBtn.addEventListener('click', toggleUserOptions);
 
-function loadUserBG() {
-  const savedSrc = localStorage.getItem(BG_KEY) || 'about:blank';
-  const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
-  bg.src = savedSrc;
-  bg.style.filter = savedFilter;
-}
-
-function setBG(src) {
-  bg.src = src;
-  localStorage.setItem(BG_KEY, src);
-  logMistico("📷 BG set via thumbnail");
-}
-
-function applyFilter(filter) {
-  bg.style.filter = filter;
-  localStorage.setItem(FILTER_KEY, filter);
-  logMistico("🎨 Filtro aplicado: " + filter);
-}
-
-imgUpload.addEventListener('change', event => {
+/* -------------------------
+   Função de upload (vinda sua)
+   ------------------------- */
+function trocarImagem(event) {
   const file = event.target.files[0];
   if (!file) return;
+
   const reader = new FileReader();
   reader.onload = function(e) {
     const dataURL = e.target.result;
-    bg.src = dataURL;
-    localStorage.setItem(BG_KEY, dataURL);
-    logMistico("🖼️ BG set via upload");
+
+    // usa setBG para salvar e adicionar ao histórico
+    setBG(dataURL, true);
+
+    logMistico("Imagem BG atualizada 🖼️ (via trocarImagem)");
+    // limpa input para permitir re-upload do mesmo arquivo depois
+    event.target.value = "";
   };
   reader.readAsDataURL(file);
-});
+}
 
+/* --- Carregar usuário / histórico --- */
+function loadUserBG() {
+  const savedSrc = localStorage.getItem(BG_KEY) || imagensFixas[0];
+  const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
+  bg.src = savedSrc;
+  bg.style.filter = savedFilter;
+  renderHistory();
+}
+
+/* --- Ciclar fixas --- */
 cycleBtn.addEventListener('click', () => {
-  indexAtual = (indexAtual + 1) % imagens.length;
-  const nextSrc = imagens[indexAtual];
-  setBG(nextSrc);
+  indexAtual = (indexAtual + 1) % imagensFixas.length;
+  setBG(imagensFixas[indexAtual], true); // também salva no histórico
   logMistico("🔁 BG ciclado");
 });
 
-function logMistico(msg) {
-  if (window.logMistico) {
-    window.logMistico(msg);
-  } else {
-    console.log("◉", msg);
+/* --- Limpar histórico --- */
+clearHistoryBtn.addEventListener('click', () => {
+  if (!confirm("Tem certeza que deseja apagar todo o histórico de imagens?")) return;
+  localStorage.removeItem(BG_HISTORY_KEY);
+  // resetar para a primeira fixa (opcional)
+  localStorage.setItem(BG_KEY, imagensFixas[0]);
+  bg.src = imagensFixas[0];
+  renderHistory();
+  logMistico("🗑 Histórico de BG apagado");
+});
+
+/* --- Definir BG e salvar no histórico --- */
+function setBG(src, salvarHistorico = false) {
+  bg.src = src;
+  localStorage.setItem(BG_KEY, src);
+
+  if (salvarHistorico) {
+    let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+    // evita duplicatas
+    if (!history.includes(src)) {
+      history.push(src);
+      localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history));
+    }
+    renderHistory();
   }
 }
 
+/* --- Renderizar miniaturas do histórico --- */
+function renderHistory() {
+  bgHistoryContainer.innerHTML = "";
+  const history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+
+  history.forEach(src => {
+    const thumb = document.createElement("img");
+    thumb.src = src;
+    thumb.style.width = "58px";
+    thumb.style.height = "38px";
+    thumb.style.objectFit = "cover";
+    thumb.style.cursor = "pointer";
+    thumb.style.border = "2px solid transparent";
+    thumb.style.borderRadius = "4px";
+
+    thumb.addEventListener("click", () => {
+      setBG(src, false); // não duplica no histórico ao escolher
+      logMistico("📷 BG trocado via histórico");
+    });
+
+    // botão de remover miniatura individual (opcional)
+    const wrap = document.createElement("div");
+    wrap.style.position = "relative";
+    wrap.style.display = "inline-block";
+    wrap.appendChild(thumb);
+
+    const rm = document.createElement("button");
+    rm.textContent = "✕";
+    rm.title = "Remover";
+    rm.style.position = "absolute";
+    rm.style.top = "-6px";
+    rm.style.right = "-6px";
+    rm.style.width = "18px";
+    rm.style.height = "18px";
+    rm.style.border = "none";
+    rm.style.borderRadius = "50%";
+    rm.style.fontSize = "11px";
+    rm.style.cursor = "pointer";
+    rm.style.background = "rgba(0,0,0,0.6)";
+    rm.style.color = "#fff";
+    rm.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      removeFromHistory(src);
+    });
+
+    wrap.appendChild(rm);
+    bgHistoryContainer.appendChild(wrap);
+  });
+}
+
+/* --- Remover item do histórico --- */
+function removeFromHistory(src) {
+  let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+  history = history.filter(s => s !== src);
+  localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history));
+  renderHistory();
+  logMistico("🗑 Miniatura removida do histórico");
+}
+
+/* --- init --- */
 window.addEventListener('load', loadUserBG);
 </script>
 <script>
