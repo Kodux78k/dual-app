@@ -128,7 +128,7 @@
     .ending{background:linear-gradient(135deg,rgba(255,0,255,.2),rgba(100,0,100,.1));border-left:4px solid #f0f}
     .input-container{
       position:fixed;left:20px;right:20px;bottom:90px;
-      display:flex;gap:6px;z-index:2;
+      display:flex;gap:6px;z-index:999;
     }
     .input-container input{
       flex:1;padding:10px;border:none;border-radius:20px;
@@ -463,12 +463,15 @@ background:linear-gradient(42deg,#0ff,#f0f);
 <style>
 .button-standard {
   border-radius: 10px;
-  background: rgba(0,0,0,0.0);
-  color: cyan; /* cor do texto */
-  border: 1px solid;
-  border-image: linear-gradient(90deg, cyan, magenta) 1;
-  box-shadow: 0 0 10px rgba(0,255,255,0.2);
-  font-size: 1.1rem;
+  opacity: var(--slow);
+  border: 1px solid transparent;
+  border-image: linear-gradient(45deg, #F0F, #0FF);
+  border-image-slice: 1;
+
+  -webkit-mask-image: radial-gradient(white, black); /* força máscara arredondada no Safari */
+  mask-image: radial-gradient(white, black);
+
+  overflow: hidden;  font-size: 1.1rem;
   padding: 6px 10px;
   cursor: pointer;
   transition: all 0.3s ease;
