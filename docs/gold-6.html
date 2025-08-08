@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=no" />
+<title>Game of Life Dual Ultimato - 2D + Hiperbólico + Esfera 3D</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  :root {
+    --color-bg: rgba(0,0,0,0.3);
+    --color-alive: #0f0;
+    --color-cell-border: #222;
+    --color-button-bg: #111;
+    --color-button-hover-bg: #0f0;
+    --color-button-text: #0f0;
+    --color-button-hover-text: #000;
+  }
+  /* Reset & base */
+  html, body {
+    margin:0; padding:0;
+    background: var(--color-bg);
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--color-button-text);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    user-select:none;
+  }
+  body {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  h1 {
+    font-weight: 400;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    letter-spacing: 0.1em;
+    user-select:none;
+  }
+  #counter {
+    font-size: 1rem;
+    margin: 5px 0 15px 0;
+    cursor: pointer;
+    user-select:none;
+    letter-spacing: 0.15em;
+  }
+  /* Grid container */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12px, 1fr));
+    gap: 1px;
+    max-width: 100vw;
+    max-height: 60vh;
+    width: 100%;
+    background: #0008;
+    border-radius: 8px;
+    overflow: hidden;
+    user-select:none;
+  }
+  /* Cells */
+  .cell {
+    width: 12px;
+    height: 12px;
+    background-color: #111;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background-color 0.1s ease, box-shadow 0.3s ease;
+    border: none;
+  }
+  .cell.alive {
+    background-color: var(--color-alive);
+    box-shadow: 0 0 8px var(--color-alive);
+  }
+  /* Controls container */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    max-width: 600px;
+    width: 100%;
+  }
+  /* Buttons style */
+  button {
+    background-color: var(--color-button-bg);
+    color: var(--color-button-text);
+    border: 2px solid transparent;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.1em;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 70px;
+    user-select:none;
+    transition: 
+      background-color 0.3s ease, 
+      color 0.3s ease,
+      box-shadow 0.6s ease;
+    -webkit-mask-image: linear-gradient(45deg, #F0F, #0FF);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+  }
+  button:hover:not(:disabled) {
+    background-color: var(--color-button-hover-bg);
+    color: var(--color-button-hover-text);
+    box-shadow: 0 0 12px var(--color-alive);
+  }
+  button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  /* Sound toggle */
+  #soundToggle {
+    min-width: 100px;
+  }
+  /* Mode toggle button */
+  #modeToggle {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 33px;
+    height: 33px;
+    border-radius: 50%;
+    border: 2px solid var(--color-button-text);
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+    user-select:none;
+  }
+  #modeToggle:hover {
+    opacity: 1;
+  }
+  /* Mode toggle label (ASCII icons) */
+  #modeIcon {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--color-button-text);
+    line-height: 28px;
+    user-select:none;
+    display: block;
+    text-align: center;
+    margin-top: 0;
+    padding-top: 0;
+  }
+  /* Log box */
+  #logContainer {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px;
+    background: #111;
+    color: var(--color-alive);
+    font-family: monospace;
+    font-size: 0.8rem;
+    max-height: 160px;
+    overflow-y: auto;
+    padding: 12px 15px;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    user-select:text;
+    box-shadow: 0 0 12px #0f0 inset;
+  }
+  /* Scrollbar for log */
+  #logContainer::-webkit-scrollbar {
+    width: 8px;
+  }
+  #logContainer::-webkit-scrollbar-track {
+    background: #111;
+  }
+  #logContainer::-webkit-scrollbar-thumb {
+    background: var(--color-alive);
+    border-radius: 4px;
+  }
+  /* Responsive tweaks */
+  @media (max-width: 480px) {
+    body {
+      padding: 20px;
+    }
+    #grid {
+      max-height: 50vh;
+    }
+    button {
+      min-width: 55px;
+      font-size: 0.75rem;
+      padding: 6px 8px;
+    }
+  }
+  /* Hiperbólico mode styling (distortion) */
+  #grid.hiperbolic .cell {
+    transform-origin: center;
+    transition: transform 0.3s ease;
+  }
+  /* Apply slight scale based on distance from center */
+  #grid.hiperbolic .cell[data-row][data-col] {
+    /* will be updated dynamically via JS */
+  }
+  /* 3D canvas styles */
+  #threeContainer {
+    width: 100vw;
+    height: 60vh;
+    margin-top: 10px;
+    border-radius: 8px;
+    display: none; /* visible only in 3D mode */
+  }
+</style>
+</head>
+<body>
+
+<h1>Game of Life Dual Ultimato</h1>
+<div id="counter" title="Clique para resetar contador">⏱️ Tempo: 0</div>
+
+<button id="modeToggle" aria-label="Alternar modo do grid" title="Alternar modo do grid">
+  <span id="modeIcon">▢</span>
+</button>
+
+<div id="grid" role="grid" aria-label="Grid do Jogo da Vida" tabindex="0" aria-live="polite"></div>
+<div id="threeContainer" aria-hidden="true"></div>
+
+<div class="controls" role="region" aria-label="Controles do Jogo da Vida">
+  <button id="startBtn" aria-pressed="false" title="▶ Iniciar Simulação">▶</button>
+  <button id="stopBtn" aria-pressed="false" title="⏸️ Parar Simulação" disabled>⏸️</button>
+  <button id="clearBtn" title="🧹 Limpar Grid">🧹</button>
+  <button id="randomBtn" title="🎲 Aleatório">🎲</button>
+  <button id="nextBtn" title="⏭ Próxima Geração">⏭</button>
+  <button id="gliderBtn" title="🛸 Gerar Glider">🛸</button>
+  <button id="spaceshipBtn" title="🚀 Gerar Nave Espacial">🚀</button>
+  <button id="pulsarBtn" title="⚡ Gerar Pulsar">⚡</button>
+  <button id="gosperBtn" title="🎯 Gerar Gosper Glider Gun">🎯</button>
+  <button id="soundToggle" aria-pressed="true" title="🔊 Ativar/Desativar Som">🔊</button>
+</div>
+
+<div id="logContainer" aria-live="polite" role="log" aria-atomic="true" tabindex="0">
+  Bem-vindo de volta ao jogo da vida!
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.155.0/build/three.min.js"></script>
+
+<script>
+(() => {
+  'use strict';
+
+  // Configurações iniciais do grid
+  const ROWS = 30;
+  const COLS = 40;
+  let grid = [];
+  let intervalId = null;
+  let generation = 0;
+  let isRunning = false;
+  let mode = 'plane'; // 'plane', 'hiperbolic', 'sphere'
+  let soundEnabled = true;
+  let startTimestamp = null;
+  let counterInterval = null;
+
+  // Sons UI - caminhos corretos
+  const uiSounds = {
+    click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+    confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+    back: new Audio('assets/sounds/uiSamples/back.wav'),
+    temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+    temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+  };
+  const uiBL = {
+    toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+    kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+    ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+    nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+  };
+
+  // Log e falas
+  const logContainer = document.getElementById('logContainer');
+  function log(msg) {
+    const time = new Date().toLocaleTimeString();
+    const prefix = `[${time}]`;
+    const newEntry = `${prefix} ${msg}\n`;
+    logContainer.textContent += newEntry;
+    logContainer.scrollTop = logContainer.scrollHeight;
+    // Save log in localStorage
+    localStorage.setItem('gameOfLifeLog', logContainer.textContent);
+  }
+  // Load log
+  const savedLog = localStorage.getItem('gameOfLifeLog');
+  if (savedLog) logContainer.textContent = savedLog;
+
+  // Fala com síntese de voz
+  function speak(text) {
+    if (!soundEnabled) return;
+    if (!window.speechSynthesis) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pt-BR';
+    utter.rate = 1;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+  }
+
+  // Elementos DOM
+  const gridEl = document.getElementById('grid');
+  const threeContainer = document.getElementById('threeContainer');
+  const counterEl = document.getElementById('counter');
+  const modeToggleBtn = document.getElementById('modeToggle');
+  const modeIcon = document.getElementById('modeIcon');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const randomBtn = document.getElementById('randomBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const gliderBtn = document.getElementById('gliderBtn');
+  const spaceshipBtn = document.getElementById('spaceshipBtn');
+  const pulsarBtn = document.getElementById('pulsarBtn');
+  const gosperBtn = document.getElementById('gosperBtn');
+  const soundToggleBtn = document.getElementById('soundToggle');
+
+  // Carrega preferência som
+  soundEnabled = localStorage.getItem('gameOfLifeSoundEnabled') === 'false' ? false : true;
+  updateSoundButton();
+
+  // Inicializa grid vazio
+  function initializeGrid() {
+    grid = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
+    gridEl.innerHTML = '';
+    gridEl.classList.remove('hiperbolic');
+    if (mode === 'hiperbolic') {
+      gridEl.classList.add('hiperbolic');
+    }
+    gridEl.style.gridTemplateColumns = `repeat(${COLS}, 12px)`;
+    for (let r=0; r<ROWS; r++) {
+      for (let c=0; c<COLS; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.setAttribute('role', 'gridcell');
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.tabIndex = -1;
+        cell.addEventListener('click', () => {
+          grid[r][c] = grid[r][c] ? 0 : 1;
+          updateGridUI();
+          playSound('click');
+          log(`Célula em (${r},${c}) ${grid[r][c] ? 'ativada' : 'desativada'}`);
+        });
+        gridEl.appendChild(cell);
+      }
+    }
+  }
+
+  // Atualiza UI do grid
+  function updateGridUI() {
+    for (let r=0; r<ROWS; r++) {
+      for (let c=0; c<COLS; c++) {
+        const idx = r*COLS + c;
+        const cell = gridEl.children[idx];
+        if(grid[r][c]) cell.classList.add('alive');
+        else cell.classList.remove('alive');
+      }
+    }
+    if(mode === 'hiperbolic'){
+      applyHiperbolicDistortion();
+    }
+  }
+
+  // Aplica distorção hiperbolica nos cells via escala
+  function applyHiperbolicDistortion(){
+    const centerR = ROWS/2 - 0.5;
+    const centerC = COLS/2 - 0.5;
+    for(let r=0; r<ROWS; r++){
+      for(let c=0; c<COLS; c++){
+        const idx = r*COLS + c;
+        const cell = gridEl.children[idx];
+        // distância euclidiana do centro
+        const dist = Math.sqrt((r - centerR)**2 + (c - centerC)**2);
+        // escala decresce conforme a distância para efeito hiperbólico
+        const scale = Math.max(0.4, 1 - dist/25);
+        cell.style.transform = `scale(${scale.toFixed(2)})`;
+        cell.style.opacity = scale < 0.5 ? 0.25 : 1;
+      }
+    }
+  }
+
+  // Função para calcular próxima geração
+  function nextGeneration() {
+    const next = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
+    for(let r=0; r<ROWS; r++) {
+      for(let c=0; c<COLS; c++) {
+        const aliveNeighbors = countAliveNeighbors(r, c);
+        if(grid[r][c]) {
+          if(aliveNeighbors === 2 || aliveNeighbors === 3) next[r][c] = 1;
+          else next[r][c] = 0;
+        } else {
+          if(aliveNeighbors === 3) next[r][c] = 1;
+          else next[r][c] = 0;
+        }
+      }
+    }
+    grid = next;
+    generation++;
+    updateGridUI();
+    log(`Geração ${generation} processada.`);
+    speakCycleMessage();
+  }
+
+  // Conta vizinhos vivos
+  function countAliveNeighbors(r,c) {
+    let count = 0;
+    for(let dr = -1; dr <=1; dr++){
+      for(let dc = -1; dc <=1; dc++){
+        if(dr === 0 && dc === 0) continue;
+        const nr = r + dr;
+        const nc = c + dc;
+        if(nr >=0 && nr < ROWS && nc >=0 && nc < COLS) {
+          if(grid[nr][nc]) count++;
+        }
+      }
+    }
+    return count;
+  }
+
+  // Sons player
+  function playSound(name) {
+    if(!soundEnabled) return;
+    const sound = uiSounds[name] || uiBL[name];
+    if(sound) {
+      sound.currentTime = 0;
+      sound.play().catch(()=>{});
+    }
+  }
+
+  // Contador de tempo desde play
+  function startCounter() {
+    if(startTimestamp === null) startTimestamp = Date.now();
+    counterInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTimestamp)/1000);
+      counterEl.textContent = `⏱️ Tempo: ${elapsed}s`;
+    }, 1000);
+  }
+  function stopCounter() {
+    clearInterval(counterInterval);
+  }
+  function resetCounter() {
+    startTimestamp = Date.now();
+    counterEl.textContent = `⏱️ Tempo: 0s`;
+  }
+
+  // Mensagens de fala a cada múltiplos de 3, 36, 144, 1728... progressão 3 * 12^n
+  const speechPhrases = [
+    "A vida começa em três.",
+    "Seis é o equilíbrio da expansão.",
+    "Nove é a conclusão cíclica.",
+    "Doze ciclos formam o primeiro ciclo completo.",
+    "Trinta e seis ciclos despertam a consciência.",
+    "Cento e quarenta e quatro representam o universo em miniatura.",
+    "Mil setecentos e vinte e oito ciclos trazem a transformação profunda."
+  ];
+  // Função que calcula o próximo múltiplo de 3 * 12^n >= generation e fala a frase
+  function speakCycleMessage() {
+    if(generation === 0) return;
+    let n = 0;
+    let threshold = 3 * Math.pow(12, n);
+    while(threshold < generation) {
+      n++;
+      threshold = 3 * Math.pow(12, n);
+    }
+    if(generation === threshold) {
+      const phrase = speechPhrases[n] || "O ciclo continua, a vida se transforma.";
+      speak(phrase);
+      log(`🌀 [Ciclo ${generation}] ${phrase}`);
+    }
+  }
+
+  // Função que gera aleatório no grid
+  function randomGrid() {
+    for(let r=0; r<ROWS; r++) {
+      for(let c=0; c<COLS; c++) {
+        grid[r][c] = Math.random() < 0.15 ? 1 : 0;
+      }
+    }
+    generation = 0;
+    updateGridUI();
+    log('Grid aleatório gerado.');
+    speak('Grid aleatório gerado.');
+  }
+
+  // Limpa grid
+  function clearGrid() {
+    for(let r=0; r<ROWS; r++) {
+      for(let c=0; c<COLS; c++) {
+        grid[r][c] = 0;
+      }
+    }
+    generation = 0;
+    updateGridUI();
+    log('Grid limpo.');
+    speak('Grid limpo.');
+  }
+
+  // Inserir padrão no grid em posição aleatória (exemplo Glider)
+  function placePattern(pattern) {
+    // Padrões definidos
+    // Cada padrão: array de [row, col]
+    const patterns = {
+      glider: [[0,1],[1,2],[2,0],[2,1],[2,2]],
+      spaceship: [[0,1],[0,2],[1,0],[2,0],[3,0],[3,2],[4,0],[4,1]],
+      pulsar: [
+        [2,4],[2,5],[2,6],[2,10],[2,11],[2,12],
+        [4,2],[5,2],[6,2],[4,7],[5,7],[6,7],
+        [4,9],[5,9],[6,9],[4,14],[5,14],[6,14],
+        [7,4],[7,5],[7,6],[7,10],[7,11],[7,12],
+        [9,4],[9,5],[9,6],[9,10],[9,11],[9,12],
+        [10,2],[11,2],[12,2],[10,7],[11,7],[12,7],
+        [10,9],[11,9],[12,9],[10,14],[11,14],[12,14],
+        [14,4],[14,5],[14,6],[14,10],[14,11],[14,12]
+      ],
+      gosper: [
+        [5,1],[5,2],[6,1],[6,2],
+        [3,13],[3,14],[4,12],[4,16],[5,11],[5,17],[6,11],[6,15],[6,17],[6,18],[7,11],[7,17],[8,12],[8,16],[9,13],[9,14],
+        [1,25],[2,23],[2,25],[3,21],[3,22],[4,21],[4,22],[5,21],[5,22],[6,23],[6,25],[7,25],
+        [3,35],[3,36],[4,35],[4,36]
+      ]
+    };
+    const pts = patterns[pattern];
+    if(!pts) return;
+    // Posição aleatória válida (dentro do grid)
+    const maxR = ROWS - 15;
+    const maxC = COLS - 20;
+    const startR = Math.floor(Math.random() * maxR);
+    const startC = Math.floor(Math.random() * maxC);
+    for(const [pr, pc] of pts) {
+      const rr = startR + pr;
+      const cc = startC + pc;
+      if(rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS) {
+        grid[rr][cc] = 1;
+      }
+    }
+    updateGridUI();
+    log(`Padrão "${pattern}" inserido na posição (${startR},${startC}).`);
+    speak(`Padrão ${pattern} gerado.`);
+  }
+
+  // Atualiza botão som
+  function updateSoundButton() {
+    soundToggleBtn.textContent = soundEnabled ? '🔊' : '🔈';
+    soundToggleBtn.setAttribute('aria-pressed', soundEnabled);
+  }
+
+  // Muda modo e atualiza UI
+  function updateModeUI() {
+    switch(mode) {
+      case 'plane':
+        modeIcon.textContent = '▢';
+        gridEl.style.display = 'grid';
+        threeContainer.style.display = 'none';
+        gridEl.classList.remove('hiperbolic');
+        updateGridUI();
+        break;
+      case 'hiperbolic':
+        modeIcon.textContent = '🌀';
+        gridEl.style.display = 'grid';
+        threeContainer.style.display = 'none';
+        gridEl.classList.add('hiperbolic');
+        updateGridUI();
+        break;
+      case 'sphere':
+        modeIcon.textContent = '⚫';
+        gridEl.style.display = 'none';
+        threeContainer.style.display = 'block';
+        break;
+    }
+  }
+
+  // Muda modo para próximo no array
+  function toggleMode() {
+    const modes = ['plane','hiperbolic','sphere'];
+    const idx = modes.indexOf(mode);
+    mode = modes[(idx + 1) % modes.length];
+    updateModeUI();
+    log(`Modo alterado para: ${mode}.`);
+    speak(`Modo alterado para: ${mode}.`);
+    playSound('toggle');
+  }
+
+  // Three.js Sphere grid (placeholder estático)
+  let scene, camera, renderer, controls, spheres = [];
+  function setupThreeJS() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(45, threeContainer.clientWidth / threeContainer.clientHeight, 0.1, 1000);
+    camera.position.z = 40;
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha:true });
+    renderer.setSize(threeContainer.clientWidth, threeContainer.clientHeight);
+    threeContainer.appendChild(renderer.domElement);
+
+    // Luz
+    const ambientLight = new THREE.AmbientLight(0x00ff00, 0.5);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5,10,7);
+    scene.add(directionalLight);
+
+    // Criar esfera de "células"
+    const geometry = new THREE.SphereGeometry(0.6, 6, 6);
+    const materialAlive = new THREE.MeshPhongMaterial({ color: 0x00ff00, emissive: 0x00ff00 });
+    const materialDead = new THREE.MeshPhongMaterial({ color: 0x003300, emissive: 0x001100 });
+
+    const radius = 15;
+    spheres = [];
+
+    // Distribuir pontos na esfera usando fórmula de Fibonacci (golden spiral)
+    for(let i=0; i<ROWS*COLS; i++){
+      const phi = Math.acos(1 - 2*(i+0.5)/(ROWS*COLS));
+      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+
+      const x = radius * Math.cos(theta) * Math.sin(phi);
+      const y = radius * Math.sin(theta) * Math.sin(phi);
+      const z = radius * Math.cos(phi);
+
+      const sphere = new THREE.Mesh(geometry, materialDead.clone());
+      sphere.position.set(x,y,z);
+      scene.add(sphere);
+      spheres.push(sphere);
+    }
+
+    // Animação simples
+    function animate() {
+      requestAnimationFrame(animate);
+      scene.rotation.y += 0.001;
+      renderer.render(scene, camera);
+    }
+    animate();
+  }
+
+  // Atualiza visual esfera com base no grid (flatten para 2D)
+  function updateSphereFromGrid() {
+    if(!spheres.length) return;
+    for(let i=0; i<spheres.length; i++){
+      const r = Math.floor(i / COLS);
+      const c = i % COLS;
+      const alive = grid[r] && grid[r][c];
+      spheres[i].material.color.set(alive ? 0x00ff00 : 0x003300);
+      spheres[i].material.emissive.set(alive ? 0x00ff00 : 0x001100);
+    }
+  }
+
+  // Controladores - eventos botões
+  startBtn.addEventListener('click', () => {
+    if(isRunning) return;
+    isRunning = true;
+    intervalId = setInterval(() => {
+      nextGeneration();
+      if(mode === 'sphere') updateSphereFromGrid();
+    }, 200);
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    log('Simulação iniciada.');
+    speak('Simulação iniciada.');
+    startCounter();
+    playSound('confirm');
+  });
+  stopBtn.addEventListener('click', () => {
+    if(!isRunning) return;
+    isRunning = false;
+    clearInterval(intervalId);
+    intervalId = null;
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    log('Simulação pausada.');
+    speak('Simulação pausada.');
+    stopCounter();
+    playSound('back');
+  });
+  clearBtn.addEventListener('click', () => {
+    clearGrid();
+    playSound('temaDown');
+  });
+  randomBtn.addEventListener('click', () => {
+    randomGrid();
+    playSound('temaUp');
+  });
+  nextBtn.addEventListener('click', () => {
+    nextGeneration();
+    if(mode === 'sphere') updateSphereFromGrid();
+    playSound('nav');
+  });
+  gliderBtn.addEventListener('click', () => {
+    placePattern('glider');
+    playSound('kitty');
+  });
+  spaceshipBtn.addEventListener('click', () => {
+    placePattern('spaceship');
+    playSound('kitty');
+  });
+  pulsarBtn.addEventListener('click', () => {
+    placePattern('pulsar');
+    playSound('kitty');
+  });
+  gosperBtn.addEventListener('click', () => {
+    placePattern('gosper');
+    playSound('kitty');
+  });
+  soundToggleBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('gameOfLifeSoundEnabled', soundEnabled);
+    updateSoundButton();
+    log(`Som ${soundEnabled ? 'ativado' : 'desativado'}.`);
+    speak(`Som ${soundEnabled ? 'ativado' : 'desativado'}.`);
+    playSound('toggle');
+  });
+
+  modeToggleBtn.addEventListener('click', () => {
+    toggleMode();
+  });
+
+  counterEl.addEventListener('click', () => {
+    resetCounter();
+    log('Contador de tempo resetado.');
+    speak('Contador de tempo resetado.');
+  });
+
+  // Previne seleção e toques longos no botão start para evitar múltiplos clicks rápidos
+  startBtn.addEventListener('touchstart', e => e.preventDefault());
+  stopBtn.addEventListener('touchstart', e => e.preventDefault());
+  clearBtn.addEventListener('touchstart', e => e.preventDefault());
+  randomBtn.addEventListener('touchstart', e => e.preventDefault());
+
+  // Inicialização geral
+  function init() {
+    initializeGrid();
+    updateGridUI();
+    setupThreeJS();
+    updateModeUI();
+    // Mensagem inicial
+    log("Bem-vindo de volta ao jogo da vida!");
+    speak("Bem-vindo de volta ao jogo da vida!");
+    resetCounter();
+  }
+
+  init();
+
+  // Manter log scroll no fim ao focar
+  logContainer.addEventListener('focus', () => {
+    logContainer.scrollTop = logContainer.scrollHeight;
+  });
+
+  // Ajuste responsivo canvas threejs
+  window.addEventListener('resize', () => {
+    if(renderer && camera){
+      const w = threeContainer.clientWidth;
+      const h = threeContainer.clientHeight;
+      renderer.setSize(w, h);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+  });
+
+})();
+</script>
+</body>
+</html>

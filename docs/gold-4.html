@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Jogo da Vida Dual - Com Narração e Geração Aleatória</title>
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3);
+    overflow-x: hidden;
+    font-family: 'Courier New', Courier, monospace;
+    color: #0ff;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    box-sizing: border-box;
+  }
+  #grid {
+    display: grid;
+    grid-template-rows: repeat(40, 14px);
+    grid-template-columns: repeat(60, 14px);
+    gap: 1px;
+    background: transparent;
+    user-select: none;
+    touch-action: manipulation;
+    max-width: 100vw;
+    max-height: 80vh;
+  }
+  .cell {
+    width: 14px;
+    height: 14px;
+    background-color: #111;
+    border-radius: 3px;
+    transition: background-color 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+  }
+  .cell.alive {
+    background-color: #0ff;
+    box-shadow: 0 0 8px #0ff, inset 0 0 4px #0ff;
+  }
+  #controls {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+  button {
+    background: transparent;
+    border: 2px solid #0ff;
+    color: #0ff;
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    letter-spacing: 0.12em;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+  }
+  button:hover, button:focus {
+    background-color: #0ff;
+    color: #000;
+    outline: none;
+    box-shadow: 0 0 12px #0ff, inset 0 0 14px #0ff;
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  #generationCounter {
+    margin-top: 16px;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.15em;
+    user-select: text;
+  }
+  /* Webkit mask linear-gradient border nos botões */
+  button {
+    position: relative;
+    overflow: hidden;
+  }
+  button::before {
+    content: '';
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    padding: 2px;
+    -webkit-mask: linear-gradient(45deg, #F0F, #0FF) content-box, linear-gradient(45deg, #F0F, #0FF);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    transition: opacity 0.3s ease;
+    opacity: 0.8;
+  }
+  button:hover::before, button:focus::before {
+    opacity: 1;
+  }
+
+  /* Responsividade */
+  @media (max-width: 480px) {
+    #grid {
+      grid-template-rows: repeat(30, 11px);
+      grid-template-columns: repeat(45, 11px);
+      max-height: 65vh;
+    }
+    .cell {
+      width: 11px;
+      height: 11px;
+      border-radius: 2px;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 0.7rem;
+      min-width: 48px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="grid" aria-label="Grade do Jogo da Vida" role="grid"></div>
+
+<div id="controls" role="region" aria-label="Controles do jogo">
+  <button id="start" title="Iniciar (▶)">▶</button>
+  <button id="stop" title="Parar (■)" disabled>■</button>
+  <button id="next" title="Próxima geração (→)">→</button>
+  <button id="clear" title="Limpar (×)">×</button>
+  <button id="random" title="Aleatório (¤)">¤</button>
+  <button id="glider" title="Adicionar Glider (G)">G</button>
+  <button id="spaceship" title="Adicionar Nave (S)">S</button>
+  <button id="pulsar" title="Adicionar Pulsar (P)">P</button>
+  <button id="gosper" title="Adicionar Gosper (X)">X</button>
+  <button id="toggleSound" aria-pressed="true" title="Som ligado/desligado">♪</button>
+</div>
+
+<div id="generationCounter" aria-live="polite" aria-atomic="true">Geração: 0</div>
+
+<script>
+(() => {
+  const ROWS = window.innerWidth < 480 ? 30 : 40;
+  const COLS = window.innerWidth < 480 ? 45 : 60;
+
+  const gridElement = document.getElementById('grid');
+  const startBtn = document.getElementById('start');
+  const stopBtn = document.getElementById('stop');
+  const nextBtn = document.getElementById('next');
+  const clearBtn = document.getElementById('clear');
+  const randomBtn = document.getElementById('random');
+  const gliderBtn = document.getElementById('glider');
+  const spaceshipBtn = document.getElementById('spaceship');
+  const pulsarBtn = document.getElementById('pulsar');
+  const gosperBtn = document.getElementById('gosper');
+  const toggleSoundBtn = document.getElementById('toggleSound');
+  const generationCounter = document.getElementById('generationCounter');
+
+  // Sons (mesmos da última versão)
+  const uiSounds = {
+    click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+    confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+    back: new Audio('assets/sounds/uiSamples/back.wav'),
+    temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+    temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+  };
+  const uiBL = {
+    toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+    kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+    ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+    nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+  };
+
+  let soundEnabled = true;
+  function saveSoundPreference(enabled) {
+    localStorage.setItem('gameOfLifeSound', enabled ? 'on' : 'off');
+  }
+  function loadSoundPreference() {
+    const val = localStorage.getItem('gameOfLifeSound');
+    return val === 'off' ? false : true;
+  }
+  function playSound(sound) {
+    if(soundEnabled && sound){
+      try { sound.currentTime = 0; sound.play(); } catch {}
+    }
+  }
+
+  const synth = window.speechSynthesis;
+  function speak(text) {
+    if (!soundEnabled) return;
+    if (synth.speaking) synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pt-BR';
+    synth.speak(utter);
+  }
+
+  let grid = [];
+  let intervalId = null;
+  let generation = 0;
+
+  function initializeGrid() {
+    gridElement.innerHTML = '';
+    grid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    for(let r = 0; r < ROWS; r++) {
+      for(let c = 0; c < COLS; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.tabIndex = 0;
+        cell.setAttribute('role', 'gridcell');
+        cell.setAttribute('aria-label', `Linha ${r+1} Coluna ${c+1} - Morta`);
+        cell.addEventListener('click', () => {
+          grid[r][c] = grid[r][c] ? 0 : 1;
+          updateGrid();
+          playSound(uiSounds.click);
+          speak(`Célula ${r+1} por ${c+1} ${grid[r][c] ? 'viva' : 'morta'}`);
+        });
+        cell.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            grid[r][c] = grid[r][c] ? 0 : 1;
+            updateGrid();
+            playSound(uiSounds.click);
+            speak(`Célula ${r+1} por ${c+1} ${grid[r][c] ? 'viva' : 'morta'}`);
+          }
+        });
+        gridElement.appendChild(cell);
+      }
+    }
+    updateGrid();
+  }
+  function updateGrid() {
+    const cells = gridElement.querySelectorAll('.cell');
+    cells.forEach(cell => {
+      const r = Number(cell.dataset.row);
+      const c = Number(cell.dataset.col);
+      const alive = grid[r][c] === 1;
+      cell.classList.toggle('alive', alive);
+      cell.setAttribute('aria-label', `Linha ${r+1} Coluna ${c+1} - ${alive ? 'Viva' : 'Morta'}`);
+    });
+    generationCounter.textContent = `Geração: ${generation}`;
+  }
+  function countNeighbors(r, c) {
+    let count = 0;
+    for(let dr = -1; dr <= 1; dr++) {
+      for(let dc = -1; dc <= 1; dc++) {
+        if(dr === 0 && dc === 0) continue;
+        const nr = (r + dr + ROWS) % ROWS;
+        const nc = (c + dc + COLS) % COLS;
+        count += grid[nr][nc];
+      }
+    }
+    return count;
+  }
+  function nextGeneration() {
+    const newGrid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    for(let r = 0; r < ROWS; r++) {
+      for(let c = 0; c < COLS; c++) {
+        const neighbors = countNeighbors(r, c);
+        if(grid[r][c] === 1) {
+          newGrid[r][c] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+        } else {
+          newGrid[r][c] = (neighbors === 3) ? 1 : 0;
+        }
+      }
+    }
+    grid = newGrid;
+    generation++;
+    updateGrid();
+    maybeSpeakStory();
+  }
+
+  function startSimulation() {
+    if(!intervalId) {
+      intervalId = setInterval(() => {
+        nextGeneration();
+        playSound(uiBL.nav);
+      }, 200);
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      playSound(uiBL.ativar);
+      speak("Simulação iniciada");
+    }
+  }
+  function stopSimulation() {
+    if(intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      playSound(uiBL.cancel);
+      speak("Simulação parada");
+    }
+  }
+  function clearGrid() {
+    stopSimulation();
+    grid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    generation = 0;
+    updateGrid();
+    playSound(uiSounds.confirm);
+    speak("Grade limpa");
+  }
+  function randomGrid() {
+    grid = grid.map(row => row.map(() => (Math.random() > 0.7 ? 1 : 0)));
+    generation = 0;
+    updateGrid();
+    playSound(uiSounds.confirm);
+    speak("Grade aleatória gerada");
+  }
+
+  // Gera um ponto aleatório dentro do grid para padrões
+  function randomPoint(patternRows, patternCols) {
+    const r = Math.floor(Math.random() * (ROWS - patternRows));
+    const c = Math.floor(Math.random() * (COLS - patternCols));
+    return {r, c};
+  }
+
+  // Adiciona padrões em posições aleatórias (somando à grid)
+  function addPattern(pattern, name) {
+    const {r, c} = randomPoint(pattern.length, pattern[0].length);
+    for(let i=0; i<pattern.length; i++) {
+      for(let j=0; j<pattern[i].length; j++) {
+        const rr = r + i;
+        const cc = c + j;
+        if(rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS) {
+          grid[rr][cc] = grid[rr][cc] || pattern[i][j];
+        }
+      }
+    }
+    updateGrid();
+    playSound(uiBL.toggle);
+    speak(`${name} adicionada`);
+  }
+  function addGlider() {
+    addPattern([
+      [0,1,0],
+      [0,0,1],
+      [1,1,1],
+    ], "Glider");
+  }
+  function addSpaceship() {
+    addPattern([
+      [0,1,1,1,1],
+      [1,0,0,0,1],
+      [0,0,0,0,1],
+      [1,0,0,1,0]
+    ], "Nave");
+  }
+  function addPulsar() {
+    addPattern([
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0]
+    ], "Pulsar");
+  }
+  function addGosperGun() {
+    addPattern([
+      // Padrão reduzido do Gosper Gun para não sair da tela
+      [0,0,0,0,1,1,0,0,0,0],
+      [0,0,0,1,0,0,1,0,0,0],
+      [1,1,0,0,0,0,0,1,1,0],
+      [1,0,0,0,0,0,0,0,1,0],
+      [0,1,1,1,1,1,1,1,0,0]
+    ], "Gosper");
+  }
+
+  // Controle de som toggle
+  toggleSoundBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    saveSoundPreference(soundEnabled);
+    toggleSoundBtn.textContent = soundEnabled ? '♪' : '✕';
+    toggleSoundBtn.setAttribute('aria-pressed', soundEnabled.toString());
+    playSound(uiBL.toggle);
+  });
+
+  // Previne seleção longa no botão Start e permite "pressionar rápido" para adiantar gerações
+  startBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+  }, {passive: false});
+  startBtn.addEventListener('mousedown', e => {
+    e.preventDefault();
+  });
+
+  // Start e Stop
+  startBtn.addEventListener('click', () => {
+    startSimulation();
+  });
+  stopBtn.addEventListener('click', () => {
+    stopSimulation();
+  });
+  nextBtn.addEventListener('click', () => {
+    stopSimulation();
+    nextGeneration();
+    playSound(uiSounds.confirm);
+    speak("Próxima geração");
+  });
+  clearBtn.addEventListener('click', () => {
+    clearGrid();
+  });
+  randomBtn.addEventListener('click', () => {
+    randomGrid();
+  });
+  gliderBtn.addEventListener('click', () => {
+    addGlider();
+  });
+  spaceshipBtn.addEventListener('click', () => {
+    addSpaceship();
+  });
+  pulsarBtn.addEventListener('click', () => {
+    addPulsar();
+  });
+  gosperBtn.addEventListener('click', () => {
+    addGosperGun();
+  });
+
+  // Função que fala uma frase a cada 12 gerações com variação para ciclos 3,6,9
+  const storyCycles = {
+    3: [
+      "Início, organização e o despertar das células.",
+      "A água da manifestação começa a fluir.",
+      "O pai revela a ordem e a estrutura."
+    ],
+    6: [
+      "Expansão e movimento, a energia cresce.",
+      "O filho revela o caminho e o equilíbrio.",
+      "O pulso do universo pulsa forte."
+    ],
+    9: [
+      "Conclusão e renovação, ciclo se fecha.",
+      "O espírito guia a transformação final.",
+      "A verdade que liberta ressoa eternamente."
+    ]
+  };
+  let storyIndex = 0;
+
+  function maybeSpeakStory() {
+    if(generation > 0 && generation % 12 === 0) {
+      const cycle = generation % 9;
+      let cycleKey = cycle === 0 ? 9 : cycle;
+      let phrases = storyCycles[cycleKey];
+      if(!phrases) return;
+      const phrase = phrases[storyIndex % phrases.length];
+      speak(`Ciclo ${cycleKey}: ${phrase}`);
+      storyIndex++;
+    }
+  }
+
+  // Inicialização
+  function init() {
+    soundEnabled = loadSoundPreference();
+    toggleSoundBtn.textContent = soundEnabled ? '♪' : '✕';
+    toggleSoundBtn.setAttribute('aria-pressed', soundEnabled.toString());
+    initializeGrid();
+    speak("Bem-vindo ao jogo do seu jeito, sempre único, sempre seu");
+  }
+
+  init();
+
+})();
+</script>
+
+</body>
+</html>

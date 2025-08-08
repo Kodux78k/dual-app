@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="pt-BR" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Jogo da Vida Dual - Log Simbólico 369</title>
+  <style>
+    :root {
+      --color-3: #ff5f7e;
+      --color-6: #0ff;
+      --color-9: #a0ff8e;
+      --color-bg: rgba(0,0,0,0.3);
+      --color-text: #0ff;
+      --color-log-bg: rgba(10,10,30,0.8);
+      --color-log-border: #0ff;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      background: var(--color-bg);
+      overflow-x: hidden;
+      font-family: 'Verdana', Geneva, Tahoma, sans-serif;
+      color: var(--color-text);
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 30px;
+    }
+    #grid {
+      display: grid;
+      grid-template-rows: repeat(40, 14px);
+      grid-template-columns: repeat(60, 14px);
+      gap: 1px;
+      max-width: 100vw;
+      max-height: 70vh;
+      user-select: none;
+      touch-action: manipulation;
+      margin-bottom: 15px;
+    }
+    .cell {
+      width: 14px;
+      height: 14px;
+      background-color: #111;
+      border-radius: 3px;
+      transition: background-color 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+    .cell.alive {
+      background-color: var(--color-text);
+      box-shadow: 0 0 8px var(--color-text), inset 0 0 4px var(--color-text);
+    }
+    #controls {
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      user-select: none;
+    }
+    button {
+      background: transparent;
+      border: 2px solid var(--color-text);
+      color: var(--color-text);
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 1.2rem;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.15em;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+      position: relative;
+      overflow: hidden;
+      width: 44px;
+      height: 44px;
+      line-height: 40px;
+      text-align: center;
+    }
+    button::before {
+      content: '';
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: 10px;
+      padding: 2px;
+      -webkit-mask: linear-gradient(45deg, #F0F, #0FF) content-box, linear-gradient(45deg, #F0F, #0FF);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      transition: opacity 0.3s ease;
+      opacity: 0.8;
+      z-index: 1;
+    }
+    button:hover::before, button:focus::before {
+      opacity: 1;
+    }
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    #generationCounter {
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      user-select: text;
+      margin-bottom: 10px;
+      min-height: 28px;
+    }
+    #logContainer {
+      background: var(--color-log-bg);
+      border: 2px solid var(--color-log-border);
+      border-radius: 12px;
+      max-width: 90vw;
+      max-height: 170px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.8rem;
+      padding: 12px;
+      color: var(--color-text);
+      white-space: pre-wrap;
+      user-select: text;
+      box-shadow: inset 0 0 20px rgba(0,255,255,0.2);
+      line-height: 1.25em;
+      letter-spacing: 0.05em;
+    }
+    /* Scrollbar */
+    #logContainer::-webkit-scrollbar {
+      width: 8px;
+    }
+    #logContainer::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    #logContainer::-webkit-scrollbar-thumb {
+      background: var(--color-text);
+      border-radius: 4px;
+    }
+    /* Responsividade */
+    @media (max-width: 480px) {
+      #grid {
+        grid-template-rows: repeat(30, 11px);
+        grid-template-columns: repeat(45, 11px);
+        max-height: 55vh;
+      }
+      .cell {
+        width: 11px;
+        height: 11px;
+        border-radius: 2px;
+      }
+      button {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+        padding: 6px 8px;
+      }
+      #logContainer {
+        max-height: 140px;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="grid" aria-label="Grade do Jogo da Vida" role="grid"></div>
+
+  <div id="controls" role="region" aria-label="Controles do jogo">
+    <button id="start" title="Iniciar">▶</button>
+    <button id="stop" title="Parar" disabled>■</button>
+    <button id="next" title="Próxima geração">→</button>
+    <button id="clear" title="Limpar">×</button>
+    <button id="random" title="Aleatório">¤</button>
+    <button id="glider" title="Adicionar Glider">🐞</button>
+    <button id="spaceship" title="Adicionar Nave">🚀</button>
+    <button id="pulsar" title="Adicionar Pulsar">🌟</button>
+    <button id="gosper" title="Adicionar Gosper">🐙</button>
+    <button id="toggleSound" aria-pressed="true" title="Som ligado/desligado">🔊</button>
+  </div>
+
+  <div id="generationCounter" aria-live="polite" aria-atomic="true">Geração: 0</div>
+
+  <pre id="logContainer" aria-live="polite" aria-atomic="false" tabindex="0"></pre>
+
+<script>
+(() => {
+  const ROWS = window.innerWidth < 480 ? 30 : 40;
+  const COLS = window.innerWidth < 480 ? 45 : 60;
+
+  const gridElement = document.getElementById('grid');
+  const startBtn = document.getElementById('start');
+  const stopBtn = document.getElementById('stop');
+  const nextBtn = document.getElementById('next');
+  const clearBtn = document.getElementById('clear');
+  const randomBtn = document.getElementById('random');
+  const gliderBtn = document.getElementById('glider');
+  const spaceshipBtn = document.getElementById('spaceship');
+  const pulsarBtn = document.getElementById('pulsar');
+  const gosperBtn = document.getElementById('gosper');
+  const toggleSoundBtn = document.getElementById('toggleSound');
+  const generationCounter = document.getElementById('generationCounter');
+  const logContainer = document.getElementById('logContainer');
+
+  // Sons
+  const uiSounds = {
+    click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+    confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+    back: new Audio('assets/sounds/uiSamples/back.wav'),
+    temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+    temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+  };
+  const uiBL = {
+    toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+    kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+    ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+    nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+  };
+
+  let soundEnabled = true;
+  function saveSoundPreference(enabled) {
+    localStorage.setItem('gameOfLifeSound', enabled ? 'on' : 'off');
+  }
+  function loadSoundPreference() {
+    const val = localStorage.getItem('gameOfLifeSound');
+    return val === 'off' ? false : true;
+  }
+  function playSound(sound) {
+    if(soundEnabled && sound){
+      try { sound.currentTime = 0; sound.play(); } catch {}
+    }
+  }
+
+  const synth = window.speechSynthesis;
+  function speak(text) {
+    if (!soundEnabled) return;
+    if (synth.speaking) synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'pt-BR';
+    synth.speak(utter);
+  }
+
+  // Log simbólico e histórico
+  let logLines = [];
+  function addLogLine(text, type = "info") {
+    const face = {
+      info: "✦",
+      user: "☯",
+      cycle3: "①",
+      cycle6: "②",
+      cycle9: "③",
+      error: "⚠",
+      system: "♾",
+    }[type] || "✦";
+    const time = new Date().toLocaleTimeString();
+    const line = `${face} [${time}] ${text}`;
+    logLines.push(line);
+    if(logLines.length > 200) logLines.shift(); // limita o log a 200 linhas
+    updateLog();
+    saveLog();
+  }
+  function updateLog() {
+    logContainer.textContent = logLines.join("\n");
+    logContainer.scrollTop = logContainer.scrollHeight;
+  }
+  function saveLog() {
+    try {
+      localStorage.setItem('gameOfLifeLog', JSON.stringify(logLines));
+    } catch {}
+  }
+  function loadLog() {
+    try {
+      const saved = localStorage.getItem('gameOfLifeLog');
+      if(saved){
+        logLines = JSON.parse(saved);
+        updateLog();
+      }
+    } catch {}
+  }
+
+  let grid = [];
+  let intervalId = null;
+  let generation = 0;
+
+  function initializeGrid() {
+    gridElement.innerHTML = '';
+    grid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    for(let r = 0; r < ROWS; r++) {
+      for(let c = 0; c < COLS; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.tabIndex = 0;
+        cell.setAttribute('role', 'gridcell');
+        cell.setAttribute('aria-label', `Linha ${r+1} Coluna ${c+1} - Morta`);
+        cell.addEventListener('click', () => {
+          grid[r][c] = grid[r][c] ? 0 : 1;
+          updateGrid();
+          playSound(uiSounds.click);
+          speak(`Célula ${r+1} por ${c+1} ${grid[r][c] ? 'viva' : 'morta'}`);
+          addLogLine(`Usuário ${grid[r][c] ? 'ativou' : 'desativou'} célula [${r+1},${c+1}]`, "user");
+        });
+        cell.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            grid[r][c] = grid[r][c] ? 0 : 1;
+            updateGrid();
+            playSound(uiSounds.click);
+            speak(`Célula ${r+1} por ${c+1} ${grid[r][c] ? 'viva' : 'morta'}`);
+            addLogLine(`Usuário ${grid[r][c] ? 'ativou' : 'desativou'} célula [${r+1},${c+1}]`, "user");
+          }
+        });
+        gridElement.appendChild(cell);
+      }
+    }
+    updateGrid();
+  }
+  function updateGrid() {
+    const cells = gridElement.querySelectorAll('.cell');
+    cells.forEach(cell => {
+      const r = Number(cell.dataset.row);
+      const c = Number(cell.dataset.col);
+      const alive = grid[r][c] === 1;
+      cell.classList.toggle('alive', alive);
+      cell.setAttribute('aria-label', `Linha ${r+1} Coluna ${c+1} - ${alive ? 'Viva' : 'Morta'}`);
+    });
+    generationCounter.textContent = `Geração: ${generation}`;
+  }
+  function countNeighbors(r, c) {
+    let count = 0;
+    for(let dr = -1; dr <= 1; dr++) {
+      for(let dc = -1; dc <= 1; dc++) {
+        if(dr === 0 && dc === 0) continue;
+        const nr = (r + dr + ROWS) % ROWS;
+        const nc = (c + dc + COLS) % COLS;
+        count += grid[nr][nc];
+      }
+    }
+    return count;
+  }
+  function nextGeneration() {
+    const newGrid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    for(let r = 0; r < ROWS; r++) {
+      for(let c = 0; c < COLS; c++) {
+        const neighbors = countNeighbors(r, c);
+        if(grid[r][c] === 1) {
+          newGrid[r][c] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+        } else {
+          newGrid[r][c] = (neighbors === 3) ? 1 : 0;
+        }
+      }
+    }
+    grid = newGrid;
+    generation++;
+    updateGrid();
+    maybeSpeakStory();
+  }
+
+  function startSimulation() {
+    if(!intervalId) {
+      intervalId = setInterval(() => {
+        nextGeneration();
+        playSound(uiBL.nav);
+      }, 200);
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      playSound(uiBL.ativar);
+      speak("Simulação iniciada");
+      addLogLine("▶ Simulação iniciada", "system");
+    }
+  }
+  function stopSimulation() {
+    if(intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      playSound(uiBL.cancel);
+      speak("Simulação parada");
+      addLogLine("■ Simulação parada", "system");
+    }
+  }
+  function clearGrid() {
+    stopSimulation();
+    grid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    generation = 0;
+    updateGrid();
+    playSound(uiSounds.confirm);
+    speak("Grade limpa");
+    addLogLine("× Grade limpa", "system");
+  }
+  function randomGrid() {
+    grid = grid.map(row => row.map(() => (Math.random() > 0.7 ? 1 : 0)));
+    generation = 0;
+    updateGrid();
+    playSound(uiSounds.confirm);
+    speak("Grade aleatória gerada");
+    addLogLine("¤ Grade aleatória gerada", "system");
+  }
+
+  // Padrões com pontos aleatórios
+  function randomPoint(patternRows, patternCols) {
+    const r = Math.floor(Math.random() * (ROWS - patternRows));
+    const c = Math.floor(Math.random() * (COLS - patternCols));
+    return {r, c};
+  }
+  function addPattern(pattern, name) {
+    const {r, c} = randomPoint(pattern.length, pattern[0].length);
+    for(let i=0; i<pattern.length; i++) {
+      for(let j=0; j<pattern[i].length; j++) {
+        const rr = r + i;
+        const cc = c + j;
+        if(rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS) {
+          grid[rr][cc] = grid[rr][cc] || pattern[i][j];
+        }
+      }
+    }
+    updateGrid();
+    playSound(uiBL.toggle);
+    speak(`${name} adicionada`);
+    addLogLine(`${name} adicionada na posição [${r+1},${c+1}]`, "system");
+  }
+  function addGlider() {
+    addPattern([
+      [0,1,0],
+      [0,0,1],
+      [1,1,1],
+    ], "Glider");
+  }
+  function addSpaceship() {
+    addPattern([
+      [0,1,1,1,1],
+      [1,0,0,0,1],
+      [0,0,0,0,1],
+      [1,0,0,1,0]
+    ], "Spaceship");
+  }
+  function addPulsar() {
+    addPattern([
+      [0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0],
+      [1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1],
+      [1,0,0,0,0,0,1],
+      [0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0]
+    ], "Pulsar");
+  }
+  function addGosperGun() {
+    addPattern([
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0],
+      [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]
+    ], "Gosper");
+  }
+
+  // Som toggle e salvar preferência
+  toggleSoundBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    saveSoundPreference(soundEnabled);
+    toggleSoundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+    toggleSoundBtn.setAttribute('aria-pressed', soundEnabled.toString());
+    playSound(uiBL.toggle);
+    addLogLine(`Som ${soundEnabled ? 'ligado' : 'desligado'}`, "system");
+  });
+
+  // Previne seleção longa e ativa click rápido no start
+  startBtn.addEventListener('touchstart', e => e.preventDefault(), {passive:false});
+  startBtn.addEventListener('mousedown', e => e.preventDefault());
+
+  startBtn.addEventListener('click', () => startSimulation());
+  stopBtn.addEventListener('click', () => stopSimulation());
+  nextBtn.addEventListener('click', () => {
+    stopSimulation();
+    nextGeneration();
+    playSound(uiSounds.confirm);
+    speak("Próxima geração");
+    addLogLine("▶ Avançou uma geração", "system");
+  });
+  clearBtn.addEventListener('click', () => clearGrid());
+  randomBtn.addEventListener('click', () => randomGrid());
+  gliderBtn.addEventListener('click', () => addGlider());
+  spaceshipBtn.addEventListener('click', () => addSpaceship());
+  pulsarBtn.addEventListener('click', () => addPulsar());
+  gosperBtn.addEventListener('click', () => addGosperGun());
+
+  // Ajuste da fala para ciclos 3,6,9 a cada 12 ciclos
+  const storyCycles = {
+    3: [
+      "Início, organização e o despertar das células.",
+      "A água da manifestação começa a fluir.",
+      "O pai revela a ordem e a estrutura."
+    ],
+    6: [
+      "Expansão e movimento, a energia cresce.",
+      "O filho revela o caminho e o equilíbrio.",
+      "O pulso do universo pulsa forte."
+    ],
+    9: [
+      "Conclusão e renovação, ciclo se fecha.",
+      "O espírito guia a transformação final.",
+      "A verdade que liberta ressoa eternamente."
+    ]
+  };
+  let storyIndex = 0;
+
+  function maybeSpeakStory() {
+    if(generation > 0) {
+      const mod12 = generation % 12;
+      if(mod12 === 3 || mod12 === 6 || mod12 === 9) {
+        const cycleKey = mod12;
+        const phrases = storyCycles[cycleKey];
+        if(!phrases) return;
+        const phrase = phrases[storyIndex % phrases.length];
+        const cycleName = cycleKey === 3 ? "3" : cycleKey === 6 ? "6" : "9";
+        const fullPhrase = `Ciclo ${cycleName}: ${phrase}`;
+        speak(fullPhrase);
+        addLogLine(fullPhrase, `cycle${cycleName}`);
+        storyIndex++;
+        updateCycleColor(cycleName);
+      } else {
+        updateCycleColor(null);
+      }
+    }
+  }
+
+  // Atualiza cor do texto e efeitos baseados no ciclo atual
+  function updateCycleColor(cycle) {
+    if(cycle === "3") {
+      document.documentElement.style.setProperty('--color-text', 'var(--color-3)');
+      document.documentElement.style.setProperty('--color-log-border', 'var(--color-3)');
+    } else if(cycle === "6") {
+      document.documentElement.style.setProperty('--color-text', 'var(--color-6)');
+      document.documentElement.style.setProperty('--color-log-border', 'var(--color-6)');
+    } else if(cycle === "9") {
+      document.documentElement.style.setProperty('--color-text', 'var(--color-9)');
+      document.documentElement.style.setProperty('--color-log-border', 'var(--color-9)');
+    } else {
+      document.documentElement.style.setProperty('--color-text', '#0ff');
+      document.documentElement.style.setProperty('--color-log-border', '#0ff');
+    }
+  }
+
+  // Inicialização
+  function init() {
+    soundEnabled = loadSoundPreference();
+    toggleSoundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+    toggleSoundBtn.setAttribute('aria-pressed', soundEnabled.toString());
+    initializeGrid();
+    loadLog();
+    addLogLine("♾ Bem vindo de volta ao jogo da vida");
+    speak("Bem vindo de volta ao jogo da vida");
+  }
+  init();
+
+})();
+</script>
+
+</body>
+</html>

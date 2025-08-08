@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Game of Life Dual - Coblux UI</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    overflow-x: hidden;
+    font-family: 'Comic Neue', cursive, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: none;
+    color: #0ff;
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+  }
+  #appContainer {
+    padding: 30px 20px 40px;
+    max-width: 100vw;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+  h1 {
+    margin: 0 0 14px 0;
+    font-weight: 700;
+    font-size: 1.7rem;
+    text-align: center;
+    color: #0ff;
+    text-shadow: 0 0 8px cyan;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+  #grid {
+    display: grid;
+    grid-template-rows: repeat(30, 13px);
+    grid-template-columns: repeat(40, 13px);
+    background: transparent;
+    user-select: none;
+    max-width: 100vw;
+    touch-action: manipulation;
+  }
+  .cell {
+    width: 13px;
+    height: 13px;
+    background-color: #111;
+    border-radius: 3px;
+    transition: background-color 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+    border: none;
+  }
+  .cell.alive {
+    background-color: #0ff;
+    box-shadow: 0 0 7px #0ff, inset 0 0 4px #0ff;
+  }
+  .controls {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 420px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+  }
+  button {
+    background: transparent;
+    border: 3px solid transparent;
+    color: #0ff;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    flex: 1 1 120px;
+    max-width: 170px;
+    white-space: pre-line;
+    text-align: center;
+    user-select: none;
+    position: relative;
+    -webkit-mask-image: linear-gradient(45deg, #F0F, #0FF);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(45deg, #F0F, #0FF);
+    mask-composite: intersect;
+    box-shadow:
+      0 0 6px #0ff,
+      inset 0 0 10px #f0f,
+      inset 0 0 18px #0ff;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease,
+      transform 0.2s ease,
+      box-shadow 0.3s ease;
+  }
+  button:hover,
+  button:focus {
+    background-color: #0ff;
+    color: #000;
+    outline: none;
+    box-shadow:
+      0 0 15px #0ff,
+      inset 0 0 20px #f0f,
+      inset 0 0 30px #0ff;
+    transform: scale(1.05);
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  #generationCounter {
+    margin-top: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0ff;
+    text-align: center;
+    text-shadow: 0 0 10px cyan;
+    min-height: 28px;
+    user-select: text;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+
+  /* Ajuste para mobile */
+  @media (max-width: 480px) {
+    #grid {
+      grid-template-rows: repeat(30, 11px);
+      grid-template-columns: repeat(40, 11px);
+    }
+    .cell {
+      width: 11px;
+      height: 11px;
+      border-radius: 2px;
+    }
+    button {
+      flex: 1 1 100%;
+      max-width: 100%;
+      font-size: 0.8rem;
+      padding: 6px 8px;
+    }
+    h1 {
+      font-size: 1.4rem;
+      padding: 0 8px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="appContainer" role="main" aria-label="Jogo da Vida Dual">
+    <h1>Jogo da Vida - Dual Mode</h1>
+    <div id="grid" aria-label="Grade do Jogo da Vida" role="grid"></div>
+
+    <div class="controls" role="region" aria-label="Controles do jogo">
+      <button id="start" aria-pressed="false" aria-label="▶️ Iniciar Simulação">▶️\nStart</button>
+      <button id="stop" aria-label="⏸️ Parar Simulação" disabled>⏸️\nStop</button>
+      <button id="next" aria-label="⏭️ Próxima Geração">⏭️\nNext</button>
+      <button id="clear" aria-label="🧹 Limpar Grade">🧹\nClear</button>
+      <button id="random" aria-label="🎲 Aleatório">🎲\nRndm</button>
+      <button id="glider" aria-label="🛸 Adicionar Padrão Glider">🛸\nGlider</button>
+      <button id="spaceship" aria-label="🚀 Adicionar Padrão Nave Espacial">🚀\nShip</button>
+      <button id="pulsar" aria-label="✨ Adicionar Padrão Pulsar">✨\nPulsar</button>
+      <button id="gosper" aria-label="🔫 Adicionar Padrão Gosper Gun">🔫\nGosper</button>
+      <button id="toggleSound" aria-pressed="true" aria-label="Alternar Som On/Off">🔊\nSound</button>
+    </div>
+
+    <div id="generationCounter" aria-live="polite" aria-atomic="true">Geração: 0</div>
+  </div>
+
+<script>
+(() => {
+  // Configurações do grid
+  const ROWS = 30;
+  const COLS = 40;
+
+  // Elementos DOM
+  const gridElement = document.getElementById('grid');
+  const startBtn = document.getElementById('start');
+  const stopBtn = document.getElementById('stop');
+  const nextBtn = document.getElementById('next');
+  const clearBtn = document.getElementById('clear');
+  const randomBtn = document.getElementById('random');
+  const gliderBtn = document.getElementById('glider');
+  const spaceshipBtn = document.getElementById('spaceship');
+  const pulsarBtn = document.getElementById('pulsar');
+  const gosperBtn = document.getElementById('gosper');
+  const toggleSoundBtn = document.getElementById('toggleSound');
+  const generationCounter = document.getElementById('generationCounter');
+
+  // Sons de interface - Coblux UI Samples
+  const uiSounds = {
+    click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+    confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+    back: new Audio('assets/sounds/uiSamples/back.wav'),
+    temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+    temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+  };
+
+  // Novos sons com base em IDs
+  const uiBL = {
+    toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+    kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+    ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+    nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+  };
+
+  // Controle do áudio
+  let soundEnabled = true;
+  function saveSoundPreference(enabled) {
+    localStorage.setItem('gameOfLifeSound', enabled ? 'on' : 'off');
+  }
+  function loadSoundPreference() {
+    const val = localStorage.getItem('gameOfLifeSound');
+    return val === 'off' ? false : true; // padrão true
+  }
+  function playSound(sound) {
+    if (soundEnabled && sound) {
+      try {
+        sound.currentTime = 0;
+        sound.play();
+      } catch {}
+    }
+  }
+
+  // Estado da simulação
+  let grid = [];
+  let intervalId = null;
+  let generation = 0;
+
+  // Inicializa o grid vazio e DOM
+  function initializeGrid() {
+    gridElement.innerHTML = '';
+    grid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    for(let r = 0; r < ROWS; r++) {
+      for(let c = 0; c < COLS; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        cell.tabIndex = 0;
+        cell.setAttribute('role', 'gridcell');
+        cell.setAttribute('aria-label', `Linha ${r+1} Coluna ${c+1} - Morta`);
+        cell.addEventListener('click', () => {
+          grid[r][c] = grid[r][c] ? 0 : 1;
+          updateGrid();
+          playSound(uiSounds.click);
+        });
+        cell.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            grid[r][c] = grid[r][c] ? 0 : 1;
+            updateGrid();
+            playSound(uiSounds.click);
+          }
+        });
+        gridElement.appendChild(cell);
+      }
+    }
+    updateGrid();
+  }
+
+  // Atualiza visual do grid e aria-labels
+  function updateGrid() {
+    const cells = gridElement.querySelectorAll('.cell');
+    cells.forEach(cell => {
+      const r = Number(cell.dataset.row);
+      const c = Number(cell.dataset.col);
+      const alive = grid[r][c] === 1;
+      cell.classList.toggle('alive', alive);
+      cell.setAttribute('aria-label', `Linha ${r+1} Coluna ${c+1} - ${alive ? 'Viva' : 'Morta'}`);
+    });
+    generationCounter.textContent = `Geração: ${generation}`;
+  }
+
+  // Conta vizinhos vivos com borda toroidal
+  function countNeighbors(r, c) {
+    let count = 0;
+    for(let dr = -1; dr <= 1; dr++) {
+      for(let dc = -1; dc <= 1; dc++) {
+        if(dr === 0 && dc === 0) continue;
+        const nr = (r + dr + ROWS) % ROWS;
+        const nc = (c + dc + COLS) % COLS;
+        count += grid[nr][nc];
+      }
+    }
+    return count;
+  }
+
+  // Calcula próxima geração
+  function nextGeneration() {
+    const newGrid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    for(let r = 0; r < ROWS; r++) {
+      for(let c = 0; c < COLS; c++) {
+        const neighbors = countNeighbors(r, c);
+        if(grid[r][c] === 1) {
+          newGrid[r][c] = (neighbors === 2 || neighbors === 3) ? 1 : 0;
+        } else {
+          newGrid[r][c] = (neighbors === 3) ? 1 : 0;
+        }
+      }
+    }
+    grid = newGrid;
+    generation++;
+    updateGrid();
+  }
+
+  // Start simulação
+  function startSimulation() {
+    if(!intervalId) {
+      intervalId = setInterval(() => {
+        nextGeneration();
+        playSound(uiBL.nav);
+      }, 200);
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      playSound(uiBL.ativar);
+      startBtn.setAttribute('aria-pressed', 'true');
+      toggleSoundBtn.disabled = true;
+    }
+  }
+  // Stop simulação
+  function stopSimulation() {
+    if(intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      playSound(uiBL.cancel);
+      startBtn.setAttribute('aria-pressed', 'false');
+      toggleSoundBtn.disabled = false;
+    }
+  }
+
+  // Limpa grid
+  function clearGrid() {
+    stopSimulation();
+    grid = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+    generation = 0;
+    updateGrid();
+    playSound(uiSounds.confirm);
+  }
+
+  // Gera grid aleatório
+  function randomGrid() {
+    stopSimulation();
+    grid = Array.from({length: ROWS}, () => 
+      Array.from({length: COLS}, () => (Math.random() > 0.7 ? 1 : 0))
+    );
+    generation = 0;
+    updateGrid();
+    playSound(uiSounds.confirm);
+  }
+
+  // Adiciona padrão Glider
+  function addGlider() {
+    clearGrid();
+    const r = Math.floor(ROWS/2);
+    const c = Math.floor(COLS/2);
+    const pattern = [
+      [0,1,0],
+      [0,0,1],
+      [1,1,1],
+    ];
+    for(let i=0; i<3; i++) {
+      for(let j=0; j<3; j++) {
+        if(r-1+i >= 0 && r-1+i < ROWS && c-1+j >=0 && c-1+j < COLS) {
+          grid[r-1+i][c-1+j] = pattern[i][j];
+        }
+      }
+    }
+    generation = 0;
+    updateGrid();
+    playSound(uiBL.toggle);
+  }
+
+  // Adiciona padrão Spaceship (Lightweight spaceship)
+  function addSpaceship() {
+    clearGrid();
+    const r = Math.floor(ROWS/2);
+    const c = Math.floor(COLS/2);
+    const pattern = [
+      [0,1,1,1,1],
+      [1,0,0,0,1],
+      [0,0,0,0,1],
+      [1,0,0,1,0]
+    ];
+    for(let i=0; i<4; i++) {
+      for(let j=0; j<5; j++) {
+        if(r-2+i >= 0 && r-2+i < ROWS && c-2+j >=0 && c-2+j < COLS) {
+          grid[r-2+i][c-2+j] = pattern[i][j];
+        }
+      }
+    }
+    generation = 0;
+    updateGrid();
+    playSound(uiBL.toggle);
+  }
+
+  // Adiciona padrão Pulsar (Oscilador)
+  function addPulsar() {
+    clearGrid();
+    const r = Math.floor(ROWS/2)-6;
+    const c = Math.floor(COLS/2)-6;
+    const pattern = [
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0]
+    ];
+    for(let i=0; i<pattern.length; i++) {
+      for(let j=0; j<pattern[i].length; j++) {
+        const rr = r+i;
+        const cc = c+j;
+        if(rr >= 0 && rr < ROWS && cc >=0 && cc < COLS) {
+          grid[rr][cc] = pattern[i][j];
+        }
+      }
+    }
+    generation = 0;
+    updateGrid();
+    playSound(uiBL.toggle);
+  }
+
+  // Adiciona padrão Gosper Glider Gun
+  function addGosperGun() {
+    clearGrid();
+    const r = 5;
+    const c = 5;
+    const pattern = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    ];
+    for(let i=0; i<pattern.length; i++) {
+      for(let j=0; j<pattern[i].length; j++) {
+        const rr = r+i;
+        const cc = c+j;
+        if(rr >= 0 && rr < ROWS && cc >=0 && cc < COLS) {
+          grid[rr][cc] = pattern[i][j];
+        }
+      }
+    }
+    generation = 0;
+    updateGrid();
+    playSound(uiBL.toggle);
+  }
+
+  // Eventos dos botões
+  startBtn.addEventListener('click', () => startSimulation());
+  stopBtn.addEventListener('click', () => stopSimulation());
+  nextBtn.addEventListener('click', () => {
+    stopSimulation();
+    nextGeneration();
+    playSound(uiSounds.confirm);
+  });
+  clearBtn.addEventListener('click', () => clearGrid());
+  randomBtn.addEventListener('click', () => randomGrid());
+  gliderBtn.addEventListener('click', () => addGlider());
+  spaceshipBtn.addEventListener('click', () => addSpaceship());
+  pulsarBtn.addEventListener('click', () => addPulsar());
+  gosperBtn.addEventListener('click', () => addGosperGun());
+
+  toggleSoundBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    saveSoundPreference(soundEnabled);
+    toggleSoundBtn.textContent = soundEnabled ? '🔊\nSound' : '🔇\nMute';
+    toggleSoundBtn.setAttribute('aria-pressed', soundEnabled.toString());
+    playSound(uiBL.toggle);
+  });
+
+  // Inicialização
+  function init() {
+    soundEnabled = loadSoundPreference();
+    toggleSoundBtn.textContent = soundEnabled ? '🔊\nSound' : '🔇\nMute';
+    toggleSoundBtn.setAttribute('aria-pressed', soundEnabled.toString());
+
+    initializeGrid();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
