@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Página Principal Master - Lovable Mago - Codex 3|6|9 + Dopamina Sex + COBLUX</title>
+  <style>
+    /* === Variáveis e Design System COBLUX - Mago === */
+    :root {
+      --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --color-primary: #0ff;
+      --color-secondary: magenta;
+      --color-bg: #0a0a0a;
+      --color-bg-alt: #111111;
+      --color-text: #e0e0ff;
+      --color-shadow: rgba(0,255,255,0.3);
+      --color-accent-glow: cyan;
+      --font-mystic: 'Georgia', serif;
+
+      --transition-fast: 0.2s ease-in-out;
+      --transition-normal: 0.35s ease-in-out;
+
+      --button-radius: 10px;
+      --button-padding: 7px 14px;
+
+      --editor-font: 'Source Code Pro', monospace, monospace;
+    }
+
+    /* Reset básico */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-primary);
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    /* === HEADER === */
+    header {
+      padding: 12px 20px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      box-shadow: 0 0 15px var(--color-shadow);
+      text-align: center;
+      font-family: var(--font-mystic);
+      font-size: 1.4rem;
+      color: var(--color-bg);
+      letter-spacing: 1.4px;
+      user-select: text;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    header::after {
+      content: "Codex Uno Dual Trinity | Fórmula de Dopamina Sex | COBLUX";
+      display: block;
+      font-size: 0.7rem;
+      color: var(--color-bg-alt);
+      margin-top: 2px;
+      opacity: 0.6;
+      font-family: var(--font-primary);
+      user-select: none;
+    }
+
+    /* === TOOLBAR === */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px 15px;
+      background: var(--color-bg-alt);
+      border-bottom: 1px solid var(--color-shadow);
+      justify-content: center;
+      user-select: none;
+      position: relative;
+      z-index: 9;
+    }
+
+    .toolbar > * {
+      flex: none;
+    }
+
+    /* Button padrão do app (.button-standard) */
+    .button-standard {
+      border-radius: var(--button-radius);
+      background: rgba(0,0,0,0.3);
+      color: var(--color-primary);
+      border: 2px solid transparent;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      background-image: linear-gradient(90deg, cyan, magenta);
+      background-origin: border-box;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2);
+      font-size: 0.9rem;
+      padding: var(--button-padding);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+      min-width: 110px;
+      text-align: center;
+    }
+    .button-standard:hover,
+    .button-standard:focus {
+      box-shadow:
+        0 0 15px var(--color-primary),
+        0 0 25px var(--color-secondary);
+      color: #fff;
+      outline: none;
+      background-image: linear-gradient(90deg, magenta, cyan);
+    }
+
+    /* Input e busca */
+    .search-box {
+      border-radius: 7px;
+      border: none;
+      padding: 6px 12px;
+      font-size: 1rem;
+      font-family: var(--font-primary);
+      min-width: 180px;
+      color: var(--color-bg);
+      background: var(--color-primary);
+      transition: background 0.3s ease;
+    }
+    .search-box::placeholder {
+      color: var(--color-bg-alt);
+      opacity: 0.8;
+    }
+    .search-box:focus {
+      background: var(--color-secondary);
+      outline: none;
+      color: var(--color-bg);
+    }
+
+    /* Input file customizado */
+    input[type="file"] {
+      display: none;
+    }
+
+    /* === CONTAINER PRINCIPAL === */
+    main {
+      flex: 1 1 auto;
+      display: flex;
+      background: var(--color-bg-alt);
+      overflow: hidden;
+      height: calc(100vh - 104px);
+      /* 104px header+toolbar */
+      user-select: text;
+    }
+
+    /* === EDITOR HTML === */
+    #editor-container {
+      flex: 2 1 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--color-shadow);
+      background: #111;
+      font-family: var(--editor-font);
+      font-size: 0.9rem;
+      color: #c0ffee;
+      overflow: hidden;
+      user-select: text;
+      position: relative;
+    }
+
+    #editor-toolbar {
+      padding: 10px 15px;
+      background: #000a0a;
+      border-bottom: 1px solid var(--color-shadow);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      user-select: none;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    #editor {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 12px 18px;
+      white-space: pre;
+      outline: none;
+      line-height: 1.3rem;
+      background: #101818;
+      color: #00ffdd;
+      font-family: 'Source Code Pro', monospace, monospace;
+      caret-color: var(--color-primary);
+      tab-size: 2;
+      user-select: text;
+      border: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Syntax highlight */
+    .syntax-tag { color: #0ff; font-weight: 700; }
+    .syntax-attr { color: #ff7f50; font-weight: 600; }
+    .syntax-value { color: #7fff00; }
+    .syntax-text { color: #eee; }
+    .syntax-comment { color: #888; font-style: italic; }
+    .syntax-doctype { color: #888; font-weight: 700; }
+
+    /* === PAINEL LATERAL (Prompt + Espaço da Mente) === */
+    #side-panel {
+      flex: 1 1 0;
+      background: var(--color-bg-alt);
+      border-left: 1px solid var(--color-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      font-family: var(--font-primary);
+      padding: 15px 18px;
+      user-select: text;
+      position: relative;
+    }
+
+    #side-panel h2 {
+      font-family: var(--font-mystic);
+      font-size: 1.2rem;
+      margin-top: 0;
+      color: var(--color-primary);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* Prompt base textarea */
+    #prompt-textarea {
+      flex: 1 1 auto;
+      width: 100%;
+      resize: vertical;
+      min-height: 220px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      background: #000c0c;
+      color: #0ff;
+      border: 1px solid var(--color-primary);
+      border-radius: 8px;
+      padding: 12px;
+      overflow-y: auto;
+      line-height: 1.3;
+    }
+
+    /* Botão download prompt */
+    #download-prompt-btn {
+      margin-top: 10px;
+      align-self: center;
+    }
+
+    /* Espaço da Mente - bloco imersivo */
+    #mind-space {
+      margin-top: 20px;
+      background: linear-gradient(135deg, #220022, #440044, #220022);
+      border-radius: 15px;
+      padding: 15px 20px;
+      color: #cc99ff;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      box-shadow:
+        0 0 15px #770077,
+        inset 0 0 25px #bb66bb;
+      user-select: none;
+      text-align: center;
+      font-size: 1rem;
+      line-height: 1.4rem;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.5s ease;
+      cursor: default;
+    }
+
+    /* === RODAPÉ === */
+    footer {
+      text-align: center;
+      padding: 8px 0;
+      background: var(--color-bg-alt);
+      color: var(--color-primary);
+      font-size: 0.75rem;
+      user-select: none;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(0,255,255,0.3);
+    }
+
+    /* === Animações Dopamina Sex === */
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 10px cyan;
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 20px magenta;
+        transform: scale(1.05);
+      }
+    }
+    .pulse-glow {
+      animation: pulseGlow 2.5s ease-in-out infinite;
+    }
+
+    /* Cursor animado no editor */
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    #editor:focus {
+      outline: none;
+      caret-color: var(--color-primary);
+      animation: none;
+    }
+
+    /* Scroll custom */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg-alt);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, cyan, magenta);
+      border-radius: 10px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 900px) {
+      main {
+        flex-direction: column;
+        height: auto;
+      }
+      #editor-container, #side-panel {
+        flex: none;
+        height: 50vh;
+        border: none;
+      }
+      #editor-container {
+        border-bottom: 1px solid var(--color-shadow);
+      }
+      #side-panel {
+        border-left: none;
+      }
+      .toolbar {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .search-box {
+        min-width: 100%;
+      }
+      .button-standard {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="pulse-glow">Página Principal Master - Lovable Mago</div>
+</header>
+
+<div class="toolbar" role="toolbar" aria-label="Ferramentas do editor">
+  <label for="uploadHTML" class="button-standard" tabindex="0" role="button" aria-pressed="false">📂 Upload HTML</label>
+  <input type="file" id="uploadHTML" accept=".html,.htm" aria-label="Selecione um arquivo HTML para carregar" />
+  <button id="downloadHTML" class="button-standard" aria-label="Salvar HTML editado">💾 Salvar HTML</button>
+  <button id="downloadPrompt" class="button-standard" aria-label="Baixar prompt base">📥 Baixar Prompt Base</button>
+  <input type="search" id="searchHTML" class="search-box" placeholder="Buscar no código..." aria-label="Busca no editor HTML" />
+</div>
+
+<main>
+  <section id="editor-container" aria-label="Editor de código HTML">
+    <div id="editor" contenteditable="true" spellcheck="false" aria-multiline="true" role="textbox" aria-label="Área para editar o código HTML">
+&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8" /&gt;
+  &lt;title&gt;Exemplo&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Olá Mundo&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+    </div>
+  </section>
+
+  <aside id="side-panel" aria-label="Painel lateral com prompt base e espaço da mente">
+    <h2>Prompt Base - Lovable Infodose</h2>
+    <textarea id="prompt-textarea" aria-label="Área de texto do prompt base">
+# 🎯 Objetivo
+Você é um Criador Lovable-Infodose Arquetípico que gera páginas ultra-completas, integrando:
+- Estudo arquetípico profundo (ver lista)
+- Fórmula de Dopamina Sex (estímulos visuais, auditivos e interativos)
+- Codex Uno Dual Trinity (estrutura 3 | 6 | 9 narrativa)
+- COBLUX (organização atômico-fractal, autoajuste e expansão dinâmica)
+- Blocos de Espaço da Mente (imersão, respiro mental, estímulo criativo)
+- Expansão máxima de caracteres (uso intensivo de HTML, CSS, JS)
+
+# 🧠 Processo Criativo
+1. **Definir Arquétipo Base**:
+   Escolha um arquétipo (Sábio, Herói, Criador, Governante, Explorador, Mago, Cuidador, Amante, Bobo).
+   - Adapte linguagem, cores, animações e tipografia para transmitir o arquétipo.
+   - Gere narrativa introdutória com gatilhos emocionais do arquétipo.
+
+2. **Aplicar Fórmula de Dopamina Sex**:
+   - Estímulo visual: gradientes dinâmicos, partículas, microanimações.
+   - Estímulo auditivo: sons sutis ao clicar, transições com fade sonoro.
+   - Estímulo interativo: feedback imediato em cada ação (hover, click, scroll).
+
+3. **Estruturar com Codex Uno Dual Trinity**:
+   - **Início (3)**: introdução clara, objetivo imediato, chamada para ação.
+   - **Meio (6)**: expansão de opções, múltiplos caminhos e explorações.
+   - **Conclusão (9)**: síntese, resultado final, sensação de fechamento e preparo para reinício.
+
+4. **Integrar COBLUX**:
+   - Interface modular, fractal, adaptativa.
+   - Elementos se reorganizam com base no tamanho e contexto.
+   - Auto-correção visual (textos e blocos se ajustam).
+
+5. **Espaço da Mente**:
+   - Bloco visual e narrativo para pausa e inspiração.
+   - Pode ser uma frase, imagem ou microanimação para relaxamento mental.
+
+# 🎭 Arquétipos Disponíveis
+(Usar descrição detalhada de cada arquétipo, com suas cores, símbolos e linguagem.)
+
+# 📦 Elementos Fixos
+- Botão padrão `.button-standard` do app.
+- Sistema de busca, upload, edição e download de HTML.
+- Painel lateral para Prompt Base (download + edição).
+- Blocos Infodose (pílulas de conteúdo de 3–5 linhas).
+- Animações de entrada e saída.
+- Sons leves integrados (via `<audio>` e JS).
+
+# 🛠 Técnicas
+- HTML5 semântico, CSS3 com variáveis, JS vanilla para máxima compatibilidade.
+- WebKit otimizado (`-webkit-*`).
+- Responsivo mobile-first.
+- Uso de `<template>` e `<slot>` para componentes dinâmicos.
+- Código comentado para facilitar edição.
+
+# 🔄 Fluxo Final
+Definir Arquétipo ➜ Montar Estrutura Narrativa 3 | 6 | 9 ➜ Aplicar Dopamina Sex ➜ Integrar COBLUX ➜ Gerar HTML/CSS/JS ➜ Incluir Espaço da Mente ➜ Entregar
+    </textarea>
+    <button id="download-prompt-btn" class="button-standard">💾 Salvar Prompt</button>
+
+    <div id="mind-space" tabindex="0" aria-label="Espaço da mente - inspiração">
+      <p>"A mente se expande na tranquilidade do silêncio, onde o código dança e o pensamento se revela."</p>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  Desenvolvido por COBLUX + Lovable Infodose &copy; 2025
+</footer>
+
+<!-- Sons leves Dopamina Sex -->
+<audio id="clickSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
+<audio id="hoverSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+
+<script>
+  // Elementos
+  const editor = document.getElementById('editor');
+  const uploadHTML = document.getElementById('uploadHTML');
+  const downloadHTML = document.getElementById('downloadHTML');
+  const downloadPromptBtn = document.getElementById('download-prompt-btn');
+  const promptTextarea = document.getElementById('prompt-textarea');
+  const searchHTML = document.getElementById('searchHTML');
+  const mindSpace = document.getElementById('mind-space');
+  const clickSound = document.getElementById('clickSound');
+  const hoverSound = document.getElementById('hoverSound');
+
+  // Função para escapar HTML
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;")
+               .replace(/</g, "&lt;")
+               .replace(/>/g, "&gt;");
+  }
+
+  // Syntax Highlight simples, com regex
+  function highlightHTML(html) {
+    if(!html) return "";
+    return escapeHtml(html)
+      .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="syntax-comment">$1</span>')
+      .replace(/(&lt;!DOCTYPE[\s\S]*?&gt;)/gi, '<span class="syntax-doctype">$1</span>')
+      .replace(/(&lt;\/?)([a-zA-Z0-9\-]+)(.*?&gt;)/g, (_, open, tag, rest) => {
+        const attrString = rest.replace(/([a-zA-Z\-]+)="(.*?)"/g, (match, attr, val) =>
+          ` <span class="syntax-attr">${attr}</span>=<span class="syntax-value">"${val}"</span>`
+        );
+        return `<span class="syntax-tag">${open}${tag}</span>${attrString}`;
+      })
+      .replace(/([^<]+)/g, (text) => {
+        return `<span class="syntax-text">${text}</span>`;
+      });
+  }
+
+  // Renderiza conteúdo no editor
+  function setEditorContent(html) {
+    editor.innerHTML = highlightHTML(html);
+  }
+
+  // Inicializa editor com conteúdo padrão
+  const defaultHTML = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exemplo Lovable</title>
+</head>
+<body>
+  <h1>Olá Mundo Lovable Mago!</h1>
+  <p>Este é o seu editor ultra completo.</p>
+</body>
+</html>`;
+  setEditorContent(defaultHTML);
+
+  // Upload de arquivo HTML
+  uploadHTML.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setEditorContent(reader.result);
+    reader.readAsText(file);
+    playClick();
+  });
+
+  // Download HTML editado
+  downloadHTML.addEventListener('click', () => {
+    // Retira as tags span para pegar só o texto
+    const rawHTML = editor.innerText;
+    const blob = new Blob([rawHTML], {type: "text/html"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "meu_codigo_lovable.html";
+    a.click();
+    playClick();
+  });
+
+  // Download Prompt Base
+  downloadPromptBtn.addEventListener('click', () => {
+    const promptText = promptTextarea.value;
+    const blob = new Blob([promptText], {type: "text/plain"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "prompt_base_lovable.txt";
+    a.click();
+    playClick();
+  });
+
+  // Busca no código (filtragem simples)
+  searchHTML.addEventListener('input', () => {
+    const term = searchHTML.value.toLowerCase();
+    if(!term) {
+      setEditorContent(editor.innerText);
+      return;
+    }
+    const lines = editor.innerText.split('\n');
+    const filtered = lines.filter(line => line.toLowerCase().includes(term));
+    setEditorContent(filtered.join('\n') || editor.innerText);
+  });
+
+  // Sons Dopamina Sex
+  function playClick() {
+    clickSound.currentTime = 0;
+    clickSound.play();
+  }
+  function playHover() {
+    hoverSound.currentTime = 0;
+    hoverSound.play();
+  }
+
+  // Sons nos botões
+  const buttons = document.querySelectorAll('.button-standard');
+  buttons.forEach(btn => {
+    btn.addEventListener('mouseenter', playHover);
+    btn.addEventListener('click', playClick);
+  });
+
+  // Espaço da mente - animação suave
+  let mindToggle = false;
+  mindSpace.addEventListener('click', () => {
+    mindToggle = !mindToggle;
+    if(mindToggle) {
+      mindSpace.style.background = 'linear-gradient(135deg, #330033, #660066, #330033)';
+      mindSpace.style.color = '#eeccff';
+    } else {
+      mindSpace.style.background = 'linear-gradient(135deg, #220022, #440044, #220022)';
+      mindSpace.style.color = '#cc99ff';
+    }
+  });
+
+</script>
+
+</body>
+</html>
