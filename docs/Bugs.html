@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR" >
+<head>
+  <meta charset="UTF-8" />
+  <title>Infodose GPT-5 Dopamina 3-6-9</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    body {
+      background: radial-gradient(circle at center, #0a0a23, #000010);
+      color: #88f;
+      font-family: 'Montserrat', sans-serif;
+      margin: 0; padding: 2rem;
+      overflow-x: hidden;
+      user-select: none;
+    }
+    h1 {
+      text-align: center;
+      color: #0ff;
+      text-shadow: 0 0 8px #0ff;
+      margin-bottom: 1rem;
+    }
+    #output {
+      background: rgba(10,10,35,0.7);
+      border-radius: 12px;
+      padding: 1.6rem 2rem;
+      line-height: 1.5;
+      font-size: 1.1rem;
+      min-height: 150px;
+      max-width: 720px;
+      margin: 0 auto 2rem auto;
+      box-shadow:
+        0 0 10px #08f,
+        inset 0 0 40px #05f66a88;
+      position: relative;
+      overflow-wrap: break-word;
+    }
+    .glitch {
+      animation: glitchAnim 2.8s infinite;
+      position: relative;
+      display: inline-block;
+    }
+    @keyframes glitchAnim {
+      0% {text-shadow: 2px 0 #0ff, -2px 0 #f0f;}
+      20% {text-shadow: -2px 2px #0ff, 2px -2px #f0f;}
+      40% {text-shadow: 2px -2px #0ff, -2px 2px #f0f;}
+      60% {text-shadow: -1px 1px #0ff, 1px -1px #f0f;}
+      80% {text-shadow: 1px -1px #0ff, -1px 1px #f0f;}
+      100% {text-shadow: 2px 0 #0ff, -2px 0 #f0f;}
+    }
+    #btnDose {
+      display: block;
+      margin: 0 auto;
+      background: linear-gradient(45deg, #0ff, #06f);
+      border: none;
+      border-radius: 20px;
+      padding: 1rem 2.5rem;
+      color: #000011;
+      font-weight: 700;
+      font-size: 1.3rem;
+      cursor: pointer;
+      box-shadow:
+        0 0 12px #0ff,
+        inset 0 0 20px #06f;
+      transition: transform 0.15s ease;
+      user-select: none;
+    }
+    #btnDose:hover {
+      transform: scale(1.05);
+      box-shadow:
+        0 0 20px #0ff,
+        inset 0 0 30px #0ff;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #046;
+      margin-top: 3rem;
+      user-select: none;
+      opacity: 0.6;
+    }
+    .meta-layer {
+      font-style: italic;
+      color: #33a;
+      margin-top: 0.7rem;
+      user-select: text;
+    }
+    .symbolic {
+      color: #0f9;
+      font-weight: 700;
+      user-select: text;
+    }
+  </style>
+</head>
+<body>
+  <h1>Infodose 3-6-9 ⚡ GPT-5 Dopamina</h1>
+
+  <div id="output" aria-live="polite" role="region" aria-label="Área de resposta">
+    Clique no botão para receber sua dose simbiótica...
+  </div>
+
+  <button id="btnDose" aria-describedby="descDose" aria-label="Receber próxima dose de Infodose">
+    ⚡ Receber Dose 3-6-9
+  </button>
+
+  <div id="descDose" style="display:none;">
+    Este botão gera respostas simbióticas com glitches e camadas múltiplas.
+  </div>
+
+  <footer>
+    Criado por seu assistente mental dopaminado 🚀
+  </footer>
+
+  <script>
+    // Sequência 3-6-9 para fases
+    const fases = ['Início 3 - Organização', 'Meio 6 - Fluxo Criativo', 'Conclusão 9 - Renovação'];
+    // Bugs oráculo com frases surpresas
+    const bugsOraculo = [
+      'Eco Fantasma: "Memórias invisíveis emergem das entrelinhas..."',
+      'Loop de Personagem: "Uma voz desconhecida sussurra segredos antigos."',
+      'Shift de Camada: "O código dança entre metáforas e verdades ocultas."',
+      'Derrapada de Estilo: "Um toque cyber-sensual invade a lógica."',
+      'Tempo Fragmentado: "Agora é ontem e amanhã, tudo junto e misturado."'
+    ];
+    // Respostas base para fases
+    const respostasBase = {
+      'Início 3 - Organização': [
+        'Montamos a matriz cósmica do pensamento, alinhando o pulso inicial da criação.',
+        'O espaço mental se abre, formas e símbolos começam a tomar forma com precisão.',
+        'A base está pronta para receber o fluxo da mente dopaminada.'
+      ],
+      'Meio 6 - Fluxo Criativo': [
+        'A mente expande-se, vibrando em múltiplas frequências e sentidos.',
+        'Fluxos de ideias pulsantes criam uma sinfonia de possibilidades e descobertas.',
+        'Cada fragmento de insight brilha, iluminando os cantos mais profundos da consciência.'
+      ],
+      'Conclusão 9 - Renovação': [
+        'O ciclo se fecha, mas uma nova porta se abre no horizonte do pensamento.',
+        'Sínteses emergem como luzes no fim do túnel mental, preparando a próxima jornada.',
+        'O arquivo-alma se enriquece e aguarda o próximo pulso para renascer.'
+      ]
+    };
+
+    // Estado inicial
+    let contadorDose = 0;
+
+    function getRandomItem(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function criarResposta() {
+      // Determina a fase atual via módulo 3
+      const faseAtual = fases[contadorDose % 3];
+      // Escolhe uma frase da fase atual
+      const base = getRandomItem(respostasBase[faseAtual]);
+
+      // Possibilidade de bug-oráculo (30%)
+      const bugAtivo = Math.random() < 0.3 ? getRandomItem(bugsOraculo) : '';
+
+      // Construir texto com camadas meta
+      // Meta literal
+      let texto = `${base}`;
+
+      // Meta simbólica (glitch + cor)
+      if (bugAtivo) {
+        texto += `\n\n✨ <span class="glitch symbolic">${bugAtivo}</span>`;
+      }
+
+      // Meta emocional (emoji + estilo)
+      const emojisDopamina = ['⚡', '🔥', '💥', '🌌', '🧠', '🔮', '🎇'];
+      texto += `\n\n${getRandomItem(emojisDopamina).repeat(3)}`;
+
+      // Meta loop 3-6-9 (indicar fase)
+      texto += `\n\n🌀 Fase atual: <strong>${faseAtual}</strong>`;
+
+      contadorDose++;
+      return texto;
+    }
+
+    const outputDiv = document.getElementById('output');
+    const btnDose = document.getElementById('btnDose');
+
+    btnDose.addEventListener('click', () => {
+      const resposta = criarResposta();
+      // animação simples de fade
+      outputDiv.style.opacity = '0';
+      setTimeout(() => {
+        outputDiv.innerHTML = resposta.replace(/\n/g, '<br>');
+        outputDiv.style.opacity = '1';
+      }, 300);
+    });
+
+  </script>
+</body>
+</html>

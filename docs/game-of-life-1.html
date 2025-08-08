@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Jogo da Vida — Dual App Simbiótico (Mobile Optimized)</title>
+<style>
+  :root{
+    --bg: transparent;
+    --panel: rgba(10,8,20,0.76);
+    --glass: rgba(255,255,255,0.02);
+    --accent1: #00f5ff;
+    --accent2: #ff00d0;
+    --accent3: #7b61ff;
+    --muted: #9bdc9b;
+    --cell-size: 12px; /* will be adapted on mobile */
+    --gap: 1px;
+    --radius: 12px;
+    --ui-sound-vol: 0.9;
+  }
+
+  /* Body must be transparent as requested */
+  html,body{
+    height:100%;
+    margin:0;
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    font-family: Inter, "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    color:#e6f7ff;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* App layout */
+  .app{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    padding:12px;
+    align-items:center;
+    justify-content:flex-start;
+    box-sizing:border-box;
+  }
+
+  header.topbar{
+    width:100%;
+    max-width:1100px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding:10px;
+    border-radius:10px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));
+    border:1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+  }
+  .logo{
+    width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#020202;
+    background:linear-gradient(135deg,var(--accent1),var(--accent2));
+    box-shadow: 0 6px 20px rgba(123,97,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06);
+    flex-shrink:0;
+  }
+  .title{
+    display:flex;flex-direction:column;
+  }
+  .title h1{margin:0;font-size:1rem}
+  .title .sub{font-size:0.78rem;color:rgba(255,255,255,0.6)}
+
+  /* Main area */
+  .main{
+    width:100%;
+    max-width:1100px;
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+    justify-content:center;
+    box-sizing:border-box;
+  }
+
+  /* Stage */
+  .stage{
+    flex:1;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    border-radius:14px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,0.03);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    align-items:center;
+    min-width:220px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  }
+
+  .hud{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  }
+
+  /* Board wrapper */
+  .board-wrap{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:6px;
+    background: rgba(255,255,255,0.01);
+    border-radius:10px;
+  }
+
+  /* Grid */
+  #grid{
+    display:grid;
+    touch-action:none;
+    border-radius:8px;
+    overflow:hidden;
+    will-change:transform;
+    background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.7));
+  }
+  .cell{
+    width:var(--cell-size);
+    height:var(--cell-size);
+    background:#0b0b0d;
+    border:var(--gap) solid rgba(255,255,255,0.01);
+    transition: background 120ms, box-shadow 120ms, transform 100ms;
+  }
+  .cell.alive{
+    background: linear-gradient(180deg, rgba(0,245,255,0.14), rgba(255,0,208,0.06));
+    box-shadow: 0 0 8px rgba(0,245,255,0.12), 0 0 18px rgba(255,0,208,0.05);
+    transform: scale(1.03);
+  }
+
+  /* Controls */
+  .controls{
+    display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;
+    width:100%;
+  }
+  .btn{
+    appearance:none;border:0;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.02);color:var(--accent1);font-weight:700;
+    cursor:pointer;font-family:inherit;box-shadow:0 8px 26px rgba(0,0,0,0.45);
+    display:inline-flex;gap:8px;align-items:center;justify-content:center;
+    min-width:90px;
+  }
+  .btn.primary{background:linear-gradient(90deg,var(--accent1),var(--accent3));color:#020202}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:rgba(255,255,255,0.9)}
+
+  .controls .small{font-size:0.82rem;color:rgba(255,255,255,0.7)}
+
+  /* Side panel */
+  aside.panel{
+    width:360px;
+    max-width:40%;
+    min-width:240px;
+    background:var(--panel);
+    border-radius:14px;
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .panel .editor{background:rgba(0,0,0,0.12);padding:8px;border-radius:10px}
+  textarea#code{width:100%;min-height:120px;background:transparent;border:0;color:#dff7ff;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;resize:vertical;padding:6px;outline:none}
+
+  /* small responsive tweaks */
+  @media (max-width:980px){
+    .main{flex-direction:column;align-items:stretch}
+    aside.panel{width:100%;order:2;max-width:none}
+    .stage{order:1}
+  }
+  @media (max-width:600px){
+    :root{--cell-size:10px}
+    .btn{min-width:72px;padding:9px 10px;font-size:0.92rem}
+    header.topbar{padding:8px;border-radius:10px}
+  }
+
+  /* dual-active animation */
+  .dual-active{animation:pulse 1.8s infinite}
+  @keyframes pulse{
+    0%{box-shadow:0 0 6px rgba(0,245,255,0.12)}
+    50%{box-shadow:0 0 20px rgba(123,97,255,0.12)}
+    100%{box-shadow:0 0 6px rgba(255,0,208,0.06)}
+  }
+
+  footer{margin-top:6px;color:rgba(255,255,255,0.45);font-size:0.82rem;text-align:center}
+  .muted{color:rgba(255,255,255,0.55);font-size:0.9rem}
+
+  /* accessibility focus */
+  .cell:focus{outline:2px solid rgba(0,245,255,0.12);outline-offset:-2px;border-radius:3px}
+  .btn:focus{outline:2px solid rgba(0,245,255,0.06);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Jogo da Vida COBLUX - modo Dual">
+  <header class="topbar" role="banner">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div class="logo" aria-hidden="true">C☼</div>
+      <div class="title">
+        <h1 style="font-size:1rem;margin:0">Jogo da Vida — Dual Mode</h1>
+        <div class="sub">COBLUX · Trinity · 3|6|9</div>
+      </div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
+      <div class="muted">Geração: <span id="generationBadge">0</span></div>
+      <div class="muted">Vel: <span id="speedLabel">200ms</span></div>
+    </div>
+  </header>
+
+  <main class="main" role="main">
+    <!-- Stage / Board -->
+    <section class="stage" aria-labelledby="boardTitle" role="region">
+      <div class="hud" style="width:100%">
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="muted" for="rowsInput">Linhas</label>
+          <input id="rowsInput" type="number" min="8" max="120" value="40" style="width:76px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:#e6f7ff">
+          <label class="muted" for="colsInput">Colunas</label>
+          <input id="colsInput" type="number" min="8" max="160" value="60" style="width:76px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:#e6f7ff">
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-end">
+          <div class="muted" style="font-size:0.86rem">Arquetipos: 🌀 ⚡ 🌌 ♾️ 🔮</div>
+        </div>
+      </div>
+
+      <div class="board-wrap" role="region" aria-label="Tabuleiro do Jogo da Vida" style="width:100%">
+        <div id="grid" role="grid" aria-label="Grid de células"></div>
+      </div>
+
+      <div style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <div class="controls" role="group" aria-label="Controles principais">
+          <button id="startBtn" class="btn primary" aria-pressed="false" title="Iniciar (Espaço)">▶ Iniciar</button>
+          <button id="stopBtn" class="btn ghost" title="Parar">■ Parar</button>
+          <button id="nextBtn" class="btn" title="Próxima (N)">→ Próxima</button>
+          <button id="randomBtn" class="btn" title="Aleatório">🎲 Aleatório</button>
+          <button id="clearBtn" class="btn" title="Limpar">🧼 Limpar</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px">
+          <label class="muted">Vel</label>
+          <input id="speed" type="range" min="50" max="800" value="200" step="10" aria-label="Velocidade">
+        </div>
+      </div>
+
+      <div style="width:100%;display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div class="controls" role="group" aria-label="Presets">
+          <button id="glider" class="btn">Glider</button>
+          <button id="spaceship" class="btn">Nave</button>
+          <button id="pulsar" class="btn">Pulsar</button>
+          <button id="gosper" class="btn">Gosper Gun</button>
+        </div>
+        <div class="muted">Status: <span id="statusLabel">Parado</span></div>
+      </div>
+    </section>
+
+    <!-- Side panel -->
+    <aside class="panel" role="complementary" aria-labelledby="panelTitle">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2 id="panelTitle" style="margin:0;font-size:0.98rem">Editor • Infodose & Coblux</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="downloadHtml" class="btn" title="Baixar HTML">⬇ Export</button>
+        </div>
+      </div>
+
+      <div class="editor" role="region" aria-label="Editor de prompt">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div class="muted">Prompt / Código</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <label for="fileUpload" class="btn">📂 Upload</label>
+            <input id="fileUpload" type="file" accept=".html,text/html,.txt,audio/*" style="display:none">
+            <button id="applyCode" class="btn">Aplicar</button>
+          </div>
+        </div>
+        <textarea id="code" spellcheck="false">// Edite: "glider", "spaceship", "pulsar", "gosper" ou cole matriz 0/1</textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+          <div class="muted">Busca no editor</div>
+          <input id="searchEditor" placeholder="Buscar..." style="padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:#e6f7ff">
+        </div>
+      </div>
+
+      <div>
+        <h3 style="margin:6px 0 4px 0">Arquétipos Ativados</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">🌀 O Criador</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">⚡ O Transformador</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">🌌 O Observador</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">♾️ O Eterno</div>
+          <div style="padding:8px;border-radius:8px;background:rgba(255,255,255,0.02)">🔮 O Arquiteto</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+        <div class="muted">Player ambiente</div>
+        <audio id="bgAudio" controls loop preload="none" style="width:170px" aria-label="Player ambiente">
+          <source src="" />
+        </audio>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+        <div class="muted">Som</div>
+        <div>
+          <button id="soundToggle" class="btn">🔊 On</button>
+        </div>
+      </div>
+
+      <div class="muted" style="font-size:0.86rem">Atalhos: Espaço = iniciar/pausar · N = próxima · Enter/Space nas células para ativar</div>
+    </aside>
+  </main>
+
+  <footer>COBLUX • Trinity • 3|6|9 — Jogo da Vida Simbiótico</footer>
+</div>
+
+<script>
+/* ==============================
+   Game of Life Dual - Mobile optimized + Audio (uiSounds + uiBL)
+   - body background already transparent
+   - sound on/off persisted in localStorage (key: coblux_sound_on)
+   - sounds triggered on relevant UI events
+   ============================== */
+
+(() => {
+  // ------------------------------
+  // Audio configuration (paths you provided)
+  // ------------------------------
+  const uiSounds = {
+    click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+    confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+    back: new Audio('assets/sounds/uiSamples/back.wav'),
+    temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+    temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+  };
+
+  const uiBL = {
+    toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+    kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+    ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+    nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+    cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+  };
+
+  // Set sensible volumes (can be adjusted)
+  Object.values(uiSounds).forEach(a => { a.volume = 0.85; a.preload = 'auto'; });
+  Object.values(uiBL).forEach(a => { a.volume = 0.95; a.preload = 'auto'; });
+
+  // central audio helper with global mute control
+  const SOUND_KEY = 'coblux_sound_on';
+  let soundOn = localStorage.getItem(SOUND_KEY);
+  soundOn = (soundOn === null) ? true : (soundOn === 'true');
+
+  const soundToggleBtn = document.getElementById('soundToggle');
+  function updateSoundButtonUI(){
+    soundToggleBtn.textContent = soundOn ? '🔊 On' : '🔈 Off';
+    soundToggleBtn.setAttribute('aria-pressed', String(soundOn));
+  }
+  updateSoundButtonUI();
+
+  function playSound(audioObj){
+    if (!soundOn) return;
+    if (!audioObj) return;
+    try {
+      audioObj.currentTime = 0;
+      const p = audioObj.play();
+      if (p && typeof p.catch === 'function') p.catch(()=>{/* ignore */});
+    } catch(e){/* ignore */ }
+  }
+
+  function toggleSoundPersist(){
+    soundOn = !soundOn;
+    localStorage.setItem(SOUND_KEY, String(soundOn));
+    updateSoundButtonUI();
+    // Play a small feedback if turning on
+    if (soundOn) playSound(uiSounds.confirm);
+    else playSound(uiBL.cancel); // will be suppressed if just turned off, but keeps UX consistent if allowed
+  }
+
+  soundToggleBtn.addEventListener('click', () => {
+    toggleSoundPersist();
+  });
+
+  // optional: vibrate on toggle (if available)
+  function vibrate(pattern){
+    if (navigator.vibrate) navigator.vibrate(pattern);
+  }
+
+  // throttle hover sound to avoid spam
+  let lastHover = 0;
+  function maybeHoverSound(){
+    const now = Date.now();
+    if (now - lastHover > 220) {
+      lastHover = now;
+      playSound(uiSounds.hover);
+    }
+  }
+
+  // ------------------------------
+  // Core Game of Life logic (responsive grid)
+  // ------------------------------
+  let ROWS = Math.max(8, Math.min(120, Number(document.getElementById('rowsInput').value || 40)));
+  let COLS = Math.max(8, Math.min(160, Number(document.getElementById('colsInput').value || 60)));
+  let grid = [];
+  let intervalId = null;
+  let generation = 0;
+  const gridEl = document.getElementById('grid');
+  const generationBadge = document.getElementById('generationBadge');
+  const statusLabel = document.getElementById('statusLabel');
+
+  // Controls
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const randomBtn = document.getElementById('randomBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const gliderBtn = document.getElementById('glider');
+  const spaceshipBtn = document.getElementById('spaceship');
+  const pulsarBtn = document.getElementById('pulsar');
+  const gosperBtn = document.getElementById('gosper');
+  const speedRange = document.getElementById('speed');
+  const speedLabel = document.getElementById('speedLabel');
+  const rowsInput = document.getElementById('rowsInput');
+  const colsInput = document.getElementById('colsInput');
+
+  // Editor & file
+  const codeArea = document.getElementById('code');
+  const applyCode = document.getElementById('applyCode');
+  const downloadHtml = document.getElementById('downloadHtml');
+  const fileUpload = document.getElementById('fileUpload');
+  const searchEditor = document.getElementById('searchEditor');
+  const bgAudio = document.getElementById('bgAudio');
+
+  // grid sizing adaptation for mobile (reduce cell size visually if too many columns)
+  function computeCellSize(cols){
+    // guideline: fit grid width in viewport minus paddings; but we use CSS var fallback
+    if (cols <= 40) return 14;
+    if (cols <= 60) return 12;
+    if (cols <= 90) return 10;
+    return 8;
+  }
+
+  function getSpeed(){ return Number(speedRange.value); }
+  speedLabel.textContent = getSpeed() + 'ms';
+  speedRange.addEventListener('input', () => {
+    speedLabel.textContent = getSpeed() + 'ms';
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = setInterval(nextGeneration, getSpeed());
+    }
+    playSound(uiSounds.click);
+  });
+
+  function setGridSize(r, c){
+    ROWS = Math.max(8, Math.min(120, Number(r)));
+    COLS = Math.max(8, Math.min(160, Number(c)));
+    document.getElementById('rowsInput').value = ROWS;
+    document.getElementById('colsInput').value = COLS;
+    // update CSS variable for cell size
+    const size = computeCellSize(COLS);
+    document.documentElement.style.setProperty('--cell-size', size + 'px');
+    initializeGrid();
+    playSound(uiBL.nav);
+  }
+
+  rowsInput.addEventListener('change', () => setGridSize(rowsInput.value, COLS));
+  colsInput.addEventListener('change', () => setGridSize(ROWS, colsInput.value));
+
+  function initializeGrid(){
+    grid = Array.from({length: ROWS}, () => Array.from({length: COLS}, () => 0));
+    generation = 0;
+    generationBadge.textContent = '0';
+    // build DOM
+    gridEl.innerHTML = '';
+    gridEl.style.gridTemplateColumns = `repeat(${COLS}, var(--cell-size))`;
+    // limit grid display width for small devices
+    const totalW = (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--cell-size')) + 1) * COLS;
+    gridEl.style.width = Math.min(totalW, window.innerWidth - 56) + 'px';
+
+    for (let i=0;i<ROWS;i++){
+      for (let j=0;j<COLS;j++){
+        const d = document.createElement('div');
+        d.className = 'cell';
+        d.setAttribute('role','gridcell');
+        d.setAttribute('aria-label', `Célula ${i+1}x${j+1} morta`);
+        d.dataset.row = i;
+        d.dataset.col = j;
+        d.tabIndex = 0;
+        // click toggles cell
+        d.addEventListener('click', (ev) => {
+          grid[i][j] = grid[i][j] ? 0 : 1;
+          updateCellDOM(i,j);
+          playSound(uiSounds.click);
+          vibrate(8);
+        });
+        // keyboard toggle
+        d.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            grid[i][j] = grid[i][j] ? 0 : 1;
+            updateCellDOM(i,j);
+            playSound(uiSounds.click);
+            vibrate(8);
+          }
+        });
+        // hover/adaptive - on touch devices this won't spam
+        d.addEventListener('mouseenter', maybeHoverSound);
+
+        gridEl.appendChild(d);
+      }
+    }
+    updateGrid();
+  }
+
+  function updateGrid(){
+    const cells = gridEl.children;
+    for (let i=0;i<cells.length;i++){
+      const cell = cells[i];
+      const row = Number(cell.dataset.row);
+      const col = Number(cell.dataset.col);
+      const alive = grid[row][col] === 1;
+      cell.classList.toggle('alive', alive);
+      cell.setAttribute('aria-label', `Célula ${row+1}x${col+1} ${alive ? 'viva' : 'morta'}`);
+    }
+    generationBadge.textContent = String(generation);
+  }
+
+  function updateCellDOM(r,c){
+    const idx = r * COLS + c;
+    const cell = gridEl.children[idx];
+    if (cell) {
+      cell.classList.toggle('alive', grid[r][c] === 1);
+      cell.setAttribute('aria-label', `Célula ${r+1}x${c+1} ${grid[r][c]===1 ? 'viva' : 'morta'}`);
+    }
+  }
+
+  function countNeighbors(row, col){
+    let cnt = 0;
+    for (let i=-1;i<=1;i++){
+      for (let j=-1;j<=1;j++){
+        if (i===0 && j===0) continue;
+        const r = (row + i + ROWS) % ROWS;
+        const c = (col + j + COLS) % COLS;
+        cnt += grid[r][c];
+      }
+    }
+    return cnt;
+  }
+
+  function nextGeneration(){
+    const newGrid = Array.from({length: ROWS}, () => Array.from({length: COLS}, () => 0));
+    for (let i=0;i<ROWS;i++){
+      for (let j=0;j<COLS;j++){
+        const n = countNeighbors(i,j);
+        if (grid[i][j] === 1){
+          newGrid[i][j] = (n === 2 || n === 3) ? 1 : 0;
+        } else {
+          newGrid[i][j] = (n === 3) ? 1 : 0;
+        }
+      }
+    }
+    grid = newGrid;
+    generation++;
+    updateGrid();
+  }
+
+  function startSimulation(){
+    if (!intervalId){
+      intervalId = setInterval(nextGeneration, getSpeed());
+      statusLabel.textContent = 'Executando';
+      startBtn.classList.add('dual-active');
+      startBtn.setAttribute('aria-pressed','true');
+      playSound(uiBL.ativar); // ativar sound on start
+      vibrate([12]);
+    }
+  }
+  function stopSimulation(){
+    if (intervalId){
+      clearInterval(intervalId);
+      intervalId = null;
+      statusLabel.textContent = 'Parado';
+      startBtn.classList.remove('dual-active');
+      startBtn.setAttribute('aria-pressed','false');
+      playSound(uiBL.cancel); // cancel/back sound
+      vibrate(6);
+    }
+  }
+  function clearGrid(){
+    stopSimulation();
+    grid = Array.from({length: ROWS}, () => Array.from({length: COLS}, () => 0));
+    generation = 0;
+    updateGrid();
+    playSound(uiSounds.back);
+  }
+  function randomGrid(){
+    stopSimulation();
+    grid = Array.from({length: ROWS}, () => Array.from({length: COLS}, () => Math.random() > 0.7 ? 1 : 0));
+    generation = 0;
+    updateGrid();
+    playSound(uiBL.kitty); // playful sound on random
+  }
+
+  // Presets
+  function addGlider(){
+    clearGrid();
+    const r = Math.floor(ROWS/2);
+    const c = Math.floor(COLS/2);
+    const coords = [[0,1],[1,2],[2,0],[2,1],[2,2]];
+    coords.forEach(([dr,dc]) => { grid[(r+dr+ROWS)%ROWS][(c+dc+COLS)%COLS] = 1; });
+    updateGrid();
+    playSound(uiSounds.confirm);
+  }
+
+  function addSpaceship(){
+    clearGrid();
+    const r = Math.floor(ROWS/2);
+    const c = Math.floor(COLS/2);
+    const coords = [
+      [0,1],[0,4],
+      [1,5],
+      [2,1],[2,5],
+      [3,2],[3,3],[3,4],[3,5]
+    ];
+    coords.forEach(([dr,dc]) => { grid[(r+dr+ROWS)%ROWS][(c+dc+COLS)%COLS] = 1; });
+    updateGrid();
+    playSound(uiSounds.confirm);
+  }
+
+  function addPulsar(){
+    clearGrid();
+    const pattern = [
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [1,0,0,0,0,1,0,1,0,0,0,0,1],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,1,0,0,0,1,1,1,0,0]
+    ];
+    const r0 = Math.floor(ROWS/2) - 6;
+    const c0 = Math.floor(COLS/2) - 6;
+    for (let i=0;i<pattern.length;i++){
+      for (let j=0;j<pattern[i].length;j++){
+        const rr = r0 + i;
+        const cc = c0 + j;
+        if (rr>=0 && rr<ROWS && cc>=0 && cc<COLS) grid[rr][cc] = pattern[i][j];
+      }
+    }
+    updateGrid();
+    playSound(uiSounds.confirm);
+  }
+
+  function addGosperGun(){
+    clearGrid();
+    const pattern = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+      [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+      [1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    ];
+    const r0 = Math.floor(ROWS/2) - 4;
+    const c0 = Math.floor(COLS/2) - 18;
+    for (let i=0;i<pattern.length;i++){
+      for (let j=0;j<pattern[i].length;j++){
+        const rr = r0 + i;
+        const cc = c0 + j;
+        if (rr>=0 && rr<ROWS && cc>=0 && cc<COLS) grid[rr][cc] = pattern[i][j];
+      }
+    }
+    updateGrid();
+    playSound(uiSounds.confirm);
+  }
+
+  // Button wiring
+  startBtn.addEventListener('click', () => {
+    if (!intervalId) startSimulation(); else stopSimulation();
+    playSound(uiBL.toggle);
+    vibrate(10);
+  });
+  stopBtn.addEventListener('click', () => { stopSimulation(); playSound(uiSounds.back); vibrate(6); });
+  nextBtn.addEventListener('click', () => { nextGeneration(); playSound(uiSounds.click); vibrate(6); });
+  randomBtn.addEventListener('click', () => { randomGrid(); vibrate(18); });
+  clearBtn.addEventListener('click', () => { clearGrid(); vibrate(12); });
+
+  gliderBtn.addEventListener('click', () => { addGlider(); playSound(uiBL.toggle); });
+  spaceshipBtn.addEventListener('click', () => { addSpaceship(); playSound(uiBL.toggle); });
+  pulsarBtn.addEventListener('click', () => { addPulsar(); playSound(uiBL.toggle); });
+  gosperBtn.addEventListener('click', () => { addGosperGun(); playSound(uiBL.toggle); });
+
+  // keyboard shortcuts
+  window.addEventListener('keydown', (ev) => {
+    if (ev.target && (ev.target.tagName === 'INPUT' || ev.target.tagName === 'TEXTAREA')) return;
+    if (ev.code === 'Space') { ev.preventDefault(); if (intervalId) stopSimulation(); else startSimulation(); playSound(uiSounds.click); }
+    if (ev.key.toLowerCase() === 'n') { nextGeneration(); playSound(uiSounds.click); }
+  });
+
+  // Editor interactions
+  applyCode.addEventListener('click', () => {
+    const text = codeArea.value.toLowerCase().trim();
+    if (!text) { playSound(uiBL.cancel); return alert('Cole "glider", "gosper", "random" ou matriz 0/1 no editor.'); }
+    if (text.includes('glider')) { addGlider(); return; }
+    if (text.includes('spaceship') || text.includes('nave')) { addSpaceship(); return; }
+    if (text.includes('pulsar')) { addPulsar(); return; }
+    if (text.includes('gosper')) { addGosperGun(); return; }
+    if (text.includes('random')) { randomGrid(); return; }
+
+    // try parse simple grid
+    const lines = codeArea.value.trim().split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    const parsed = lines.map(l => l.split(/[\s,]+/).map(ch => (ch==='1' || ch==='*' || ch==='█') ? 1 : 0));
+    if (parsed.length && parsed[0].length){
+      setGridSize(parsed.length, parsed[0].length);
+      grid = parsed.map(row => row.slice(0,COLS));
+      generation = 0;
+      updateGrid();
+      playSound(uiSounds.confirm);
+    } else {
+      playSound(uiBL.cancel);
+      alert('Não reconheci instrução. Use presets (glider/gosper/random) ou cole matriz 0/1.');
+    }
+  });
+
+  // file upload
+  fileUpload.addEventListener('change', (ev) => {
+    const f = ev.target.files && ev.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const txt = reader.result.toString();
+      // if audio file -> set audio player source
+      if (f.type && f.type.startsWith('audio/')) {
+        const src = URL.createObjectURL(f);
+        bgAudio.src = src;
+        bgAudio.play().catch(()=>{});
+        playSound(uiSounds.confirm);
+        return;
+      }
+      codeArea.value = txt;
+      playSound(uiSounds.confirm);
+    };
+    reader.readAsText(f);
+  });
+
+  // search editor
+  searchEditor.addEventListener('input', () => {
+    const q = searchEditor.value.trim();
+    if (!q) return;
+    const idx = codeArea.value.toLowerCase().indexOf(q.toLowerCase());
+    if (idx >= 0){ codeArea.focus(); codeArea.setSelectionRange(idx, idx + q.length); playSound(uiSounds.click); }
+  });
+
+  // export HTML
+  downloadHtml.addEventListener('click', () => {
+    const state = grid.map(r => r.join('')).join('\n');
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>game-of-life-export</title></head><body><pre id="s" style="display:none">${state}</pre><script>(function(){const s=document.getElementById('s').textContent.trim().split('\\n').map(r=>r.split('').map(c=>c==='1'?1:0));const rows=s.length,cols=s[0].length;document.body.innerHTML='<div id=board style="display:grid;grid-template-columns:repeat('+cols+',12px)"></div>';const b=document.getElementById('board');for(let i=0;i<rows;i++)for(let j=0;j<cols;j++){const d=document.createElement('div');d.style.width='12px';d.style.height='12px';d.style.background=s[i][j]?'#0f0':'#111';d.style.border='1px solid #222';b.appendChild(d);} })()</script></body></html>`;
+    const blob = new Blob([html], {type:'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `game-of-life-export-${Date.now()}.html`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    playSound(uiSounds.confirm);
+  });
+
+  // small API
+  window.COBLUX = {
+    start: startSimulation, stop: stopSimulation, next: nextGeneration,
+    random: randomGrid, clear: clearGrid, glider: addGlider, gosper: addGosperGun,
+    setGridSize: setGridSize, getState: () => grid.map(r => r.slice()), applyState: (s) => { if (Array.isArray(s)) { setGridSize(s.length, s[0].length); grid = s.map(r=>r.slice()); updateGrid(); } }
+  };
+
+  // particles background (lightweight)
+  (function particles(){
+    const canvas = document.createElement('canvas');
+    canvas.id = 'particles';
+    canvas.setAttribute('aria-hidden','true');
+    canvas.style.position = 'fixed';
+    canvas.style.inset = '0';
+    canvas.style.zIndex = '-1';
+    canvas.style.pointerEvents = 'none';
+    document.body.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    let W = canvas.width = innerWidth;
+    let H = canvas.height = innerHeight;
+    const particles = [];
+    function make(n){
+      particles.length = 0;
+      for (let i=0;i<n;i++) particles.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.2,vy:(Math.random()-0.5)*0.2,r:1+Math.random()*2,hue:Math.random()*360});
+    }
+    function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; make(Math.max(24, Math.floor((W*H)/90000))); }
+    window.addEventListener('resize', resize);
+    resize();
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      for (let p of particles){
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < -10) p.x = W+10; if (p.x > W+10) p.x = -10;
+        if (p.y < -10) p.y = H+10; if (p.y > H+10) p.y = -10;
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(${p.hue},90%,60%,0.04)`;
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // initial size & sample
+  setGridSize(ROWS, COLS);
+  addGosperGun();
+
+  // initial sound button setup (use persisted state)
+  // If localstorage value was saved as 'false' it will be respected.
+  updateSoundButtonUI();
+
+  // ensure mobile friendly: prevent double-tap zoom on some browsers (meta tags already set)
+  document.addEventListener('touchstart', function() {}, {passive:true});
+
+  // small helper: vibrate
+  function vibrate(ms){ try{ if ('vibrate' in navigator && soundOn) navigator.vibrate(ms); }catch(e){} }
+
+  // onboarding text
+  codeArea.value = `# COBLUX • Infodose
+# Use "glider", "spaceship", "pulsar", "gosper" to apply presets
+# Or cole uma matriz de 0/1 linhas (ex: 00100)
+glider
+`;
+
+})();
+</script>
+</body>
+</html>
