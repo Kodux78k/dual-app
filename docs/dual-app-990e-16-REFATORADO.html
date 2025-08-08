@@ -39,7 +39,7 @@
       z-index:10;
     }
     #themeToggle:hover{opacity:.8}
-   /* #particles-js{position:absolute;inset:0;z-index:0} */
+    #particles-js{position:absolute;inset:0;z-index:0} 
     .svg-container{
       position:absolute;top:220px;left:50%;width:180px;height:180px;
       transform:translateX(-50%);z-index:1;
@@ -465,16 +465,17 @@ background:linear-gradient(42deg,#0ff,#f0f);
   border-radius: 10px;
   background: rgba(0,0,0,0.3);
   color: #0ff;
-  border: 1px solid rgba(0,255,255,0.2);
+  border: 2px solid transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  background-image: linear-gradient(90deg, cyan, magenta);
+  background-origin: border-box;
   box-shadow: 0 0 10px rgba(0,255,255,0.2);
   font-size: 0.9rem;
   padding: 6px 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-.button-standard:hover {
-  background: rgba(0,255,255,0.1);
-  transform: scale(1.05);
 }
 </style></head>
 <body>
@@ -1178,7 +1179,7 @@ outline: none !important;
 </div>
 <div class="pagination">
 <button class="button-standard" data-action="prev">⟵</button>
-<span id="pageIndicator">1 /1</span>
+<span id="pageIndicator">1|1</span>
 <button class="button-standard" data-action="next">⟶</button>
 </div>
 </div>
@@ -1290,7 +1291,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/manifesto_infinity_v3_19kb.txt',
+            TRAINING_FILE:'data/codex/mtlx-oo-4.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
@@ -1839,10 +1840,13 @@ uiBL.cancel.play().catch(()=>{});
 </div>
 <!-- Botão simbiótico do usuário -->
 <button class="button-standard" id="userButton">☯ UserButton</button>
-<script>// Toggle do painel de controle
+<script>
+// Toggle do painel de controle
 document.getElementById('togglePanelBtn').addEventListener('click', function () {
   const panel = document.getElementById('layoutTogglePanel');
-  panel.style.display = (panel.style.display === 'none' || getComputedStyle(panel).display === 'none') ? 'flex' : 'none';
+  const isHidden = (panel.style.display === 'none' || getComputedStyle(panel).display === 'none');
+  panel.style.display = isHidden ? 'flex' : 'none';
+  salvarEstadoUI();
 });
 
 // Funções básicas de mostrar/ocultar
@@ -1852,14 +1856,19 @@ function toggleElement(selector, input) {
       el.style.display = input.checked ? '' : 'none';
     });
   });
+  salvarEstadoUI();
 }
+
 function ocultarTodos() {
-  ['#response', '.svg-container', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.symbol-bar']
-    .forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = 'none'));
+  const selectors = ['#response', '.svg-container', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.symbol-bar', '#particles-js'];
+  selectors.forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = 'none'));
+  salvarEstadoUI();
 }
+
 function mostrarTodos() {
-  ['#response', '.svg-container', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.symbol-bar']
-    .forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = ''));
+  const selectors = ['#response', '.svg-container', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.symbol-bar', '#particles-js'];
+  selectors.forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = ''));
+  salvarEstadoUI();
 }
 
 // LocalStorage
@@ -1869,15 +1878,19 @@ function salvarEstadoUI() {
     svg: getDisplayState('.svg-container'),
     player: getDisplayState('#koblluxPlayer'),
     botoes: getDisplayState('#uploadComponentBtn,#remoteComponentBtn,#toggleDecoderBtn'),
-    bar: getDisplayState('.symbol-bar')
+    bar: getDisplayState('.symbol-bar'),
+    particles: getDisplayState('#particles-js'),
+    painel: getDisplayState('#layoutTogglePanel')
   };
   localStorage.setItem('layoutConfig', JSON.stringify(estado));
   logMistico?.("🎛️ Preferência de layout salva.");
 }
+
 function getDisplayState(selector) {
   const el = document.querySelector(selector.split(',')[0]);
-  return el?.style.display !== 'none';
+  return el && getComputedStyle(el).display !== 'none';
 }
+
 function carregarEstadoUI() {
   const saved = JSON.parse(localStorage.getItem('layoutConfig') || '{}');
   Object.entries(saved).forEach(([key, visible]) => {
@@ -1887,6 +1900,8 @@ function carregarEstadoUI() {
     if (key === 'player') sel = '#koblluxPlayer';
     if (key === 'botoes') sel = '#uploadComponentBtn,#remoteComponentBtn,#toggleDecoderBtn';
     if (key === 'bar') sel = '.symbol-bar';
+    if (key === 'particles') sel = '#particles-js';
+    if (key === 'painel') sel = '#layoutTogglePanel';
     sel && document.querySelectorAll(sel).forEach(el => el.style.display = visible ? '' : 'none');
   });
 }
@@ -1898,18 +1913,20 @@ function ativarModo(modo) {
     pulse: ['#koblluxPlayer'],
     happyHour: ['#response', '.symbol-bar'],
     ritual: ['#response', '#koblluxPlayer'],
-    exploracao: ['#response', '.symbol-bar', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.svg-container']
+    exploracao: ['#response', '.symbol-bar', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.svg-container', '#particles-js']
   };
   (modos[modo] || []).forEach(sel => {
     document.querySelectorAll(sel).forEach(el => el.style.display = '');
   });
+  salvarEstadoUI();
   logMistico?.("⚙️ Modo ativado: " + modo);
 }
 
 // Carregar config ao iniciar
 document.addEventListener("DOMContentLoaded", () => {
   carregarEstadoUI();
-});</script>
+});
+</script>
 <script>// ========= Markdown simbiótico =========
 function renderMarkdown(raw) {
   return raw
@@ -1927,12 +1944,19 @@ function renderMarkdown(raw) {
 
 // ========= Separador de parágrafos robusto =========
 function splitText(t) {
-  return t
-    .split(/\n\s*\n|(?<!\d)\. |! |\? /)
+  // Regex atualizado:
+  // - Mantém frases entre aspas "..." ou “...”
+  // - Mantém listas numeradas como "3." juntas
+  // - Quebra só em ponto final, ?, ! seguidos de espaço ou quebra dupla de linha
+  const regex = /(?:(?:"[^"]+"|“[^”]+”)|(?:\d+\.)[^\n]*|[^.!?]+[.!?])/g;
+
+  const matches = t.match(regex) || [];
+
+  return matches
     .map(p => p.trim())
     .filter(Boolean)
     .reduce((acc, cur, i) => {
-      const index = Math.floor(i / 3);
+      const index = Math.floor(i / 3); // Agrupa de 3 em 3
       acc[index] = acc[index] || [];
       acc[index].push(cur);
       return acc;
