@@ -300,8 +300,8 @@ Position: fixed;
   background-blend-mode: lighten;
 }cósmico */
 
-<style>
-  }
+
+  
   #miniPlayerContainer {
     position: fixed;
     top: 89px;
@@ -310,7 +310,9 @@ Position: fixed;
     z-index: 9999;
     width: 90vw;
     max-width: 480px;
+    min-widht: auto;
     font-size: 0.9rem;
+    opacity:0.8;
   }
   #toggleMiniPlayer {
     background: linear-gradient(90deg, #8882f8, #c277f2);
@@ -341,7 +343,7 @@ Position: fixed;
     padding: 16px;
     max-height: 360px;
     overflow-y: auto;
-    display: none;
+    display: none;!important
     backdrop-filter: blur(6px);
   }
   h2 {
@@ -399,8 +401,6 @@ Position: fixed;
     background: transparent;
   }
 </style>
-
-  </style>
       <!-- body {background: transparent !important; !-->
 </head>
 <body>
@@ -421,6 +421,7 @@ Position: fixed;
   user-select: none;
   z-index: 9999;
   padding: 10px 14px;
+
 ">
 
   <button id="toggleMiniPlayer" aria-expanded="false" aria-controls="panel" title="Abrir painel de ativações" style="
