@@ -1,0 +1,73 @@
+{
+  "user": {
+    "name": "Raphael Costa",
+    "persona": "Lovable Mago",
+    "emotionalState": "focado, inspirado",
+    "favoriteColors": {
+      "primary": "#00ffff",
+      "secondary": "#ff00ff",
+      "background": "#000011"
+    },
+    "preferredSounds": {
+      "ambientVolume": 0.07,
+      "effectsVolume": 0.15,
+      "soundTheme": "Fórmula Dopamina Sex"
+    }
+  },
+
+  "infodose": {
+    "basePrompt": "Base mestre Lovable expandida com arquétipos 3|6|9, Dopamina Sex, Codex Uno Dual Trinity, Coblux e Brava integrados...",
+    "customPromptAdditions": [
+      "Adicionar foco no espaço mental e ativação cognitiva",
+      "Incluir narrativa de expansão interdimensional e evolução fractal",
+      "Conectar tema ao design responsivo e UX fluida mobile-first"
+    ],
+    "preferredNarratives": ["3", "6", "9"],
+    "keywords": [
+      "arquétipos",
+      "dopamina",
+      "estética visual",
+      "sons ambientes",
+      "partículas místicas",
+      "personalização avançada",
+      "interatividade real"
+    ]
+  },
+
+  "designSystem": {
+    "palette": {
+      "cyan": "#00ffff",
+      "magenta": "#ff00ff",
+      "blueNeon": "#0ff",
+      "backgroundDark": "#000011"
+    },
+    "font": "Inter, system-ui, sans-serif",
+    "buttonStyle": {
+      "borderRadius": "10px",
+      "background": "rgba(0,0,0,0.3)",
+      "color": "#0ff",
+      "border": "2px solid transparent",
+      "backgroundGradient": "linear-gradient(90deg, cyan, magenta)",
+      "boxShadow": "0 0 10px rgba(0,255,255,0.2)",
+      "transition": "all 0.3s ease"
+    },
+    "animations": {
+      "particles": true,
+      "audioFeedback": true,
+      "hoverEffects": true
+    }
+  },
+
+  "functionality": {
+    "uploadHTML": true,
+    "downloadHTML": true,
+    "downloadPrompt": true,
+    "searchInEditor": true,
+    "narrativeNavigation": true,
+    "mindSpaceInteractivity": true,
+    "audioPlayer": true,
+    "realTimeSyntaxHighlight": true
+  },
+
+  "outputPromptTemplate": "### PROMPT FINAL PARA MOTOR IA:\n\nVocê é um assistente ultra avançado que deve criar páginas HTML funcionais e estéticas baseadas em:\n\n- Arquétipos 3|6|9 (${infodose.preferredNarratives.join(', ')})\n- Fórmula Dopamina Sex para engajamento visual e sonoro\n- Codex Uno Dual Trinity, Coblux e Brava\n- Personalização conforme preferências do usuário ${user.name}, incluindo cores ${user.favoriteColors.primary}, ${user.favoriteColors.secondary}\n\nAlém disso, inclua narrativa:\n${infodose.customPromptAdditions.join('; ')}\n\nUse design responsivo mobile-first, fundo animado, editor HTML com realce, busca, upload/download, sons ambiente e efeitos interativos.\n\nForneça saída acessível, clara e otimizada para performance e experiência do usuário.\n\nGaranta que as funções estejam todas integradas e em tempo real.\n\n---\n\nGere uma página HTML completa e estilizada seguindo estas diretrizes."
+}

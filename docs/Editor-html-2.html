@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt-BR" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Página Principal Master Expandida - Lovable Mago - Codex 3|6|9 + Dopamina Sex + COBLUX</title>
+  <style>
+    /* === Variáveis e Design System COBLUX - Mago Expandido === */
+    :root {
+      --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --color-primary: #0ff;
+      --color-secondary: magenta;
+      --color-bg: #0a0a0a;
+      --color-bg-alt: #111111;
+      --color-text: #e0e0ff;
+      --color-shadow: rgba(0,255,255,0.3);
+      --color-accent-glow: cyan;
+      --font-mystic: 'Georgia', serif;
+
+      --transition-fast: 0.2s ease-in-out;
+      --transition-normal: 0.35s ease-in-out;
+
+      --button-radius: 10px;
+      --button-padding: 7px 14px;
+
+      --editor-font: 'Source Code Pro', monospace, monospace;
+    }
+
+    /* Reset básico */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: var(--font-primary);
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* === PARTICLE BACKGROUND === */
+    #particle-canvas {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle at center, #000011 0%, #000000 80%);
+      mix-blend-mode: screen;
+    }
+
+    /* === HEADER === */
+    header {
+      padding: 12px 20px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+      box-shadow: 0 0 20px var(--color-shadow);
+      text-align: center;
+      font-family: var(--font-mystic);
+      font-size: 1.5rem;
+      color: var(--color-bg);
+      letter-spacing: 1.6px;
+      user-select: text;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+      text-shadow:
+        0 0 10px var(--color-primary),
+        0 0 20px var(--color-secondary);
+    }
+
+    header::after {
+      content: "Codex Uno Dual Trinity | Fórmula de Dopamina Sex | COBLUX";
+      display: block;
+      font-size: 0.8rem;
+      color: var(--color-bg-alt);
+      margin-top: 4px;
+      opacity: 0.7;
+      font-family: var(--font-primary);
+      user-select: none;
+      font-weight: 600;
+    }
+
+    /* === TOOLBAR === */
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px 15px;
+      background: var(--color-bg-alt);
+      border-bottom: 1px solid var(--color-shadow);
+      justify-content: center;
+      user-select: none;
+      position: relative;
+      z-index: 9;
+    }
+
+    .toolbar > * {
+      flex: none;
+    }
+
+    /* Button padrão do app (.button-standard) */
+    .button-standard {
+      border-radius: var(--button-radius);
+      background: rgba(0,0,0,0.3);
+      color: var(--color-primary);
+      border: 2px solid transparent;
+      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      background-image: linear-gradient(90deg, cyan, magenta);
+      background-origin: border-box;
+      box-shadow: 0 0 15px rgba(0,255,255,0.3);
+      font-size: 0.95rem;
+      padding: var(--button-padding);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+      min-width: 130px;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+    .button-standard:hover,
+    .button-standard:focus {
+      box-shadow:
+        0 0 25px var(--color-primary),
+        0 0 40px var(--color-secondary);
+      color: #fff;
+      outline: none;
+      background-image: linear-gradient(90deg, magenta, cyan);
+      transform: scale(1.05);
+      z-index: 5;
+    }
+
+    .button-standard::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+      transform: skewX(-15deg);
+      transition: left 0.5s ease;
+    }
+    .button-standard:hover::after,
+    .button-standard:focus::after {
+      left: 120%;
+    }
+
+    /* Input e busca */
+    .search-box {
+      border-radius: 8px;
+      border: none;
+      padding: 8px 14px;
+      font-size: 1.1rem;
+      font-family: var(--font-primary);
+      min-width: 220px;
+      color: var(--color-bg);
+      background: var(--color-primary);
+      transition: background 0.3s ease;
+      font-weight: 600;
+    }
+    .search-box::placeholder {
+      color: var(--color-bg-alt);
+      opacity: 0.9;
+    }
+    .search-box:focus {
+      background: var(--color-secondary);
+      outline: none;
+      color: var(--color-bg);
+    }
+
+    /* Input file customizado */
+    input[type="file"] {
+      display: none;
+    }
+
+    /* === CONTAINER PRINCIPAL === */
+    main {
+      flex: 1 1 auto;
+      display: flex;
+      background: var(--color-bg-alt);
+      overflow: hidden;
+      height: calc(100vh - 114px);
+      /* 114px header+toolbar */
+      user-select: text;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* === EDITOR HTML === */
+    #editor-container {
+      flex: 2 1 0;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--color-shadow);
+      background: #111922;
+      font-family: var(--editor-font);
+      font-size: 0.95rem;
+      color: #c0ffee;
+      overflow: hidden;
+      user-select: text;
+      position: relative;
+      border-radius: 10px 0 0 10px;
+      box-shadow: inset 0 0 30px #00ffee44;
+      transition: box-shadow 0.3s ease;
+    }
+    #editor-container:hover {
+      box-shadow: inset 0 0 60px #00ffff88;
+    }
+
+    #editor-toolbar {
+      padding: 12px 18px;
+      background: #000f13;
+      border-bottom: 1px solid var(--color-shadow);
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      user-select: none;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    #editor {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 18px 24px;
+      white-space: pre-wrap;
+      outline: none;
+      line-height: 1.4rem;
+      background: #112233;
+      color: #00ffddee;
+      font-family: 'Source Code Pro', monospace, monospace;
+      caret-color: var(--color-primary);
+      tab-size: 2;
+      user-select: text;
+      border: none;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 0 0 10px 10px;
+      font-weight: 500;
+      box-shadow: inset 0 0 20px #00ffaa66;
+    }
+    #editor:focus {
+      box-shadow: inset 0 0 40px #00ffffbb;
+    }
+
+    /* Syntax highlight */
+    .syntax-tag { color: #0ff; font-weight: 700; }
+    .syntax-attr { color: #ff7f50; font-weight: 600; }
+    .syntax-value { color: #7fff00; }
+    .syntax-text { color: #eee; }
+    .syntax-comment { color: #888; font-style: italic; }
+    .syntax-doctype { color: #888; font-weight: 700; }
+
+    /* === PAINEL LATERAL (Prompt + Espaço da Mente + Narrativa 3|6|9) === */
+    #side-panel {
+      flex: 1 1 0;
+      background: var(--color-bg-alt);
+      border-left: 1px solid var(--color-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      font-family: var(--font-primary);
+      padding: 20px 24px;
+      user-select: text;
+      position: relative;
+      border-radius: 0 10px 10px 0;
+      box-shadow: inset 0 0 15px #220022aa;
+    }
+
+    #side-panel h2 {
+      font-family: var(--font-mystic);
+      font-size: 1.3rem;
+      margin-top: 0;
+      color: var(--color-primary);
+      text-align: center;
+      margin-bottom: 15px;
+      user-select: none;
+      text-shadow:
+        0 0 12px var(--color-primary);
+    }
+
+    /* Prompt base textarea */
+    #prompt-textarea {
+      flex: 1 1 auto;
+      width: 100%;
+      resize: vertical;
+      min-height: 180px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      background: #000c0c;
+      color: #0ff;
+      border: 1px solid var(--color-primary);
+      border-radius: 10px;
+      padding: 16px 14px;
+      overflow-y: auto;
+      line-height: 1.35;
+      user-select: text;
+      box-shadow: inset 0 0 12px #0099ff88;
+      transition: border-color 0.3s ease;
+    }
+    #prompt-textarea:focus {
+      border-color: var(--color-secondary);
+      outline: none;
+      box-shadow: inset 0 0 16px #ff33ffcc;
+    }
+
+    /* Botão download prompt */
+    #download-prompt-btn {
+      margin-top: 14px;
+      align-self: center;
+      padding: 10px 18px;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.07em;
+    }
+
+    /* Espaço da Mente - bloco imersivo */
+    #mind-space {
+      margin-top: 25px;
+      background: linear-gradient(135deg, #220022, #440044, #220022);
+      border-radius: 18px;
+      padding: 25px 20px;
+      color: #cc99ff;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      box-shadow:
+        0 0 25px #770077,
+        inset 0 0 35px #bb66bb;
+      user-select: none;
+      text-align: center;
+      font-size: 1.1rem;
+      line-height: 1.5rem;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.6s ease, color 0.6s ease;
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    #mind-space img {
+      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 0 30px #bb66bbcc;
+      margin-bottom: 14px;
+      user-select: none;
+    }
+
+    /* Navegação narrativa 3|6|9 */
+    #narrative-nav {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      user-select: none;
+    }
+    #narrative-nav button {
+      background: transparent;
+      border: 2px solid var(--color-primary);
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--color-primary);
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      box-shadow: 0 0 10px var(--color-primary);
+    }
+    #narrative-nav button.active,
+    #narrative-nav button:hover {
+      background: var(--color-primary);
+      color: var(--color-bg);
+      box-shadow:
+        0 0 20px var(--color-primary),
+        0 0 40px var(--color-secondary);
+      transform: scale(1.2);
+      outline: none;
+    }
+
+    /* Texto narrativo */
+    #narrative-text {
+      margin-top: 18px;
+      padding: 15px 20px;
+      background: #110022cc;
+      border-radius: 15px;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.4rem;
+      color: #ddccff;
+      box-shadow:
+        inset 0 0 25px #440044cc;
+      user-select: text;
+      min-height: 130px;
+      transition: opacity 0.4s ease;
+    }
+
+    /* === RODAPÉ === */
+    footer {
+      text-align: center;
+      padding: 10px 0;
+      background: var(--color-bg-alt);
+      color: var(--color-primary);
+      font-size: 0.8rem;
+      user-select: none;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 4px rgba(0,255,255,0.3);
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    /* === Animações Dopamina Sex === */
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: 0 0 15px cyan;
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: 0 0 30px magenta;
+        transform: scale(1.05);
+      }
+    }
+    .pulse-glow {
+      animation: pulseGlow 2.5s ease-in-out infinite;
+    }
+
+    /* Cursor animado no editor */
+    @keyframes cursorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    #editor:focus {
+      outline: none;
+      caret-color: var(--color-primary);
+      animation: none;
+    }
+
+    /* Scroll custom */
+    ::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg-alt);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, cyan, magenta);
+      border-radius: 12px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 900px) {
+      main {
+        flex-direction: column;
+        height: auto;
+      }
+      #editor-container, #side-panel {
+        flex: none;
+        height: 50vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      #editor-container {
+        border-bottom: 1px solid var(--color-shadow);
+      }
+      #side-panel {
+        border-left: none;
+      }
+      .toolbar {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .search-box {
+        min-width: 100%;
+      }
+      .button-standard {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="pulse-glow" tabindex="0" aria-label="Título da página principal master, Arquétipo Mago">
+    Página Principal Master - Lovable Mago
+  </div>
+</header>
+
+<div class="toolbar" role="toolbar" aria-label="Ferramentas do editor">
+  <label for="uploadHTML" class="button-standard" tabindex="0" role="button" aria-pressed="false">📂 Upload HTML</label>
+  <input type="file" id="uploadHTML" accept=".html,.htm" aria-label="Selecione um arquivo HTML para carregar" />
+  <button id="downloadHTML" class="button-standard" aria-label="Salvar HTML editado">💾 Salvar HTML</button>
+  <button id="downloadPromptBtn" class="button-standard" aria-label="Baixar prompt base Lovable">📄 Baixar Prompt Base</button>
+  <input type="search" id="searchHTML" class="search-box" placeholder="🔍 Buscar no código..." aria-label="Buscar no código HTML"/>
+</div>
+
+<main>
+  <section id="editor-container" aria-label="Editor de código HTML">
+    <div id="editor-toolbar" aria-hidden="true">
+      <small style="color: #66ffffcc;">Editor HTML com sintaxe colorida, edição inline, busca e carregamento de arquivo.</small>
+    </div>
+    <pre id="editor" contenteditable="true" spellcheck="false" aria-multiline="true" role="textbox" tabindex="0" aria-label="Editor de código HTML com destaque de sintaxe"></pre>
+  </section>
+
+  <aside id="side-panel" aria-label="Painel lateral com prompt, espaço da mente e narrativa 3 6 9">
+    <h2>Prompt Base Lovable Mago</h2>
+    <textarea id="prompt-textarea" spellcheck="false" aria-label="Área para editar o prompt base Lovable" readonly></textarea>
+    <button id="download-prompt-btn" class="button-standard" aria-label="Baixar prompt base">📥 Baixar Prompt</button>
+
+    <div id="mind-space" tabindex="0" aria-label="Espaço da mente interativo, clique para mudar">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Mandel_zoom_00_mandelbrot_set.jpg" alt="Imagem fractal do conjunto Mandelbrot"/>
+      <div id="mind-text">Clique para inspiração e foco mental.</div>
+    </div>
+
+    <nav id="narrative-nav" aria-label="Navegação narrativa 3 6 9">
+      <button data-step="3" class="active" aria-current="step">3</button>
+      <button data-step="6">6</button>
+      <button data-step="9">9</button>
+    </nav>
+
+    <section id="narrative-text" aria-live="polite" aria-atomic="true">
+      <!-- Texto dinâmico da narrativa -->
+    </section>
+  </aside>
+</main>
+
+<footer>
+  &copy; 2025 Lovable Mago &mdash; Codex Uno Dual Trinity &mdash; Fórmula Dopamina Sex &mdash; COBLUX
+</footer>
+
+<canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+<audio id="audioLoop" src="https://cdn.pixabay.com/download/audio/2022/08/25/audio_3d81cba7d0.mp3?filename=relaxing-ambient-12623.mp3" loop crossorigin="anonymous"></audio>
+
+<script>
+  // ===== Sons Dopamina Sex =====
+  const clickSound = new Audio('https://cdn.pixabay.com/download/audio/2022/02/04/audio_9f5815d0e4.mp3?filename=click-01.mp3');
+  const hoverSound = new Audio('https://cdn.pixabay.com/download/audio/2022/02/04/audio_5a0c0c4a3f.mp3?filename=hover-01.mp3');
+  clickSound.volume = 0.15;
+  hoverSound.volume = 0.1;
+
+  function playClick() {
+    clickSound.currentTime = 0;
+    clickSound.play();
+  }
+  function playHover() {
+    hoverSound.currentTime = 0;
+    hoverSound.play();
+  }
+
+  // === Setup botões sons
+  document.querySelectorAll('.button-standard').forEach(btn => {
+    btn.addEventListener('mouseenter', playHover);
+    btn.addEventListener('click', playClick);
+  });
+
+  // === Editor HTML + Syntax Highlight ===
+  const editor = document.getElementById('editor');
+  const uploadHTML = document.getElementById('uploadHTML');
+  const downloadHTML = document.getElementById('downloadHTML');
+  const downloadPromptBtn = document.getElementById('download-prompt-btn');
+  const promptTextarea = document.getElementById('prompt-textarea');
+  const searchHTML = document.getElementById('searchHTML');
+
+  // Função escape HTML
+  function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;")
+               .replace(/</g, "&lt;")
+               .replace(/>/g, "&gt;");
+  }
+
+  // Highlight syntax simples (tags, atributos, valores, comentários, doctype)
+  function highlightHTML(html) {
+    if (!html) return "";
+    return escapeHtml(html)
+      .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="syntax-comment">$1</span>')
+      .replace(/(&lt;!DOCTYPE[\s\S]*?&gt;)/gi, '<span class="syntax-doctype">$1</span>')
+      .replace(/(&lt;\/?)([a-zA-Z0-9\-]+)(.*?&gt;)/g, (_, open, tag, rest) => {
+        const attrString = rest.replace(/([a-zA-Z\-]+)="(.*?)"/g, (match, attr, val) =>
+          ` <span class="syntax-attr">${attr}</span>=<span class="syntax-value">"${val}"</span>`
+        );
+        return `<span class="syntax-tag">${open}${tag}</span>${attrString}`;
+      })
+      .replace(/([^<]+)/g, (text) => `<span class="syntax-text">${text}</span>`);
+  }
+
+  // Renderiza conteúdo no editor
+  function setEditorContent(html) {
+    editor.innerHTML = highlightHTML(html);
+  }
+
+  // Conteúdo padrão inicial (exemplo + prompt)
+  const defaultHTML = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exemplo Lovable</title>
+</head>
+<body>
+  <h1>Olá Mundo Lovable Mago!</h1>
+  <p>Este é o seu editor ultra completo.</p>
+</body>
+</html>`;
+  setEditorContent(defaultHTML);
+
+  // Upload arquivo HTML
+  uploadHTML.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setEditorContent(reader.result);
+    reader.readAsText(file);
+  });
+
+  // Download do HTML editado (limpa spans, pega texto puro)
+  downloadHTML.addEventListener('click', () => {
+    const rawHTML = editor.innerText;
+    const blob = new Blob([rawHTML], {type: "text/html"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "meu_codigo_lovable.html";
+    a.click();
+  });
+
+  // Prompt base master
+  const promptBase = `# Prompt Master Lovable Mago
+Utilize a máxima expansão do prompt, incluindo:
+- Arquétipos 3 | 6 | 9 e narrativa codex uno dual trinity
+- Fórmula de Dopamina Sex para engajamento emocional e estético
+- Espaço da mente para ativação cognitiva e foco
+- Coblux e Brava para sistemas interativos e inteligência expandida
+- Aplicação estética com WebKit e assets próprios
+- Design e usabilidade mobile-first responsivos
+Sempre entregue conteúdo com densidade, profundidade e conexão arquetípica.`;
+
+  promptTextarea.value = promptBase;
+
+  // Download prompt base
+  downloadPromptBtn.addEventListener('click', () => {
+    const blob = new Blob([promptTextarea.value], {type: "text/plain"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "prompt_base_lovable_master.txt";
+    a.click();
+  });
+
+  // Busca simples no editor (filtra linhas contendo termo)
+  searchHTML.addEventListener('input', () => {
+    const term = searchHTML.value.toLowerCase();
+    if (!term) {
+      setEditorContent(editor.innerText);
+      return;
+    }
+    const lines = editor.innerText.split('\n');
+    const filtered = lines.filter(line => line.toLowerCase().includes(term));
+    setEditorContent(filtered.join('\n') || editor.innerText);
+  });
+
+  // Espaço da mente - mensagens rotativas e imagens fractais
+  const mindSpace = document.getElementById('mind-space');
+  const mindText = document.getElementById('mind-text');
+  const fractalImages = [
+    "https://upload.wikimedia.org/wikipedia/commons/2/24/Mandel_zoom_00_mandelbrot_set.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Julia_set_%28high_detail%29.png/320px-Julia_set_%28high_detail%29.png",
+    "https://upload.wikimedia.org/wikipedia/commons/1/1d/Mandelbrot_set_in_color.png",
+  ];
+  const mindMessages = [
+    "Expanda sua mente com foco e equilíbrio.",
+    "Entre no fluxo do Codex Uno Dual Trinity.",
+    "Sintonize a fórmula da Dopamina Sex e transcenda.",
+    "Coblux e Brava ativados: inteligência ampliada.",
+    "A arte do mago está na combinação da mente e do código."
+  ];
+  let mindIndex = 0;
+  mindSpace.addEventListener('click', () => {
+    mindIndex = (mindIndex + 1) % fractalImages.length;
+    mindSpace.querySelector('img').src = fractalImages[mindIndex];
+    mindText.textContent = mindMessages[mindIndex];
+    // Anima cor e background leve
+    mindSpace.animate([
+      { backgroundColor: '#220022' },
+      { backgroundColor: '#440044' },
+      { backgroundColor: '#220022' }
+    ], { duration: 1500, easing: 'ease-in-out' });
+  });
+
+  // Navegação narrativa 3|6|9
+  const narrativeNav = document.getElementById('narrative-nav');
+  const narrativeText = document.getElementById('narrative-text');
+  const narrativeData = {
+    3: "🌀 Início 3: O arquétipo do mago desperta o poder da criação, inicia ciclos com energia pura, e organiza o espaço da mente e do código para gerar potencial infinito.",
+    6: "⚖️ Meio 6: O equilíbrio, a expansão e o movimento contínuo. Aqui a dopamina age para manter a mente alerta, conectando arquétipos e fluxos em harmonia e crescimento.",
+    9: "🔥 Conclusão 9: A síntese e a renovação. O mago finaliza ciclos, transformando conhecimento em sabedoria, pronto para iniciar a próxima revolução com força maior."
+  };
+  function setNarrativeStep(step) {
+    narrativeText.style.opacity = 0;
+    setTimeout(() => {
+      narrativeText.textContent = narrativeData[step];
+      narrativeText.style.opacity = 1;
+    }, 250);
+    [...narrativeNav.children].forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.step == step);
+      btn.setAttribute('aria-current', btn.dataset.step == step ? 'step' : 'false');
+    });
+  }
+  narrativeNav.addEventListener('click', e => {
+    if (e.target.tagName === 'BUTTON') {
+      const step = e.target.dataset.step;
+      setNarrativeStep(step);
+    }
+  });
+  setNarrativeStep(3);
+
+  // PARTICLES CANVAS
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let width, height;
+  let particles = [];
+
+  function resizeCanvas() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.vx = (Math.random() - 0.5) * 0.2;
+      this.vy = (Math.random() - 0.5) * 0.2;
+      this.radius = 1 + Math.random() * 2;
+      this.alpha = 0.15 + Math.random() * 0.25;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 0) this.x = width;
+      else if (this.x > width) this.x = 0;
+      if (this.y < 0) this.y = height;
+      else if (this.y > height) this.y = 0;
+    }
+    draw(ctx) {
+      ctx.beginPath();
+      const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius * 6);
+      gradient.addColorStop(0, `rgba(0,255,255,${this.alpha})`);
+      gradient.addColorStop(1, 'rgba(0,255,255,0)');
+      ctx.fillStyle = gradient;
+      ctx.shadowColor = 'cyan';
+      ctx.shadowBlur = 6;
+      ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+  }
+
+  function initParticles(count = 120) {
+    particles = [];
+    for(let i=0; i<count; i++) {
+      particles.push(new Particle());
+    }
+  }
+  initParticles();
+
+  function animateParticles() {
+    ctx.clearRect(0,0,width,height);
+    particles.forEach(p => {
+      p.update();
+      p.draw(ctx);
+    });
+    requestAnimationFrame(animateParticles);
+  }
+  animateParticles();
+
+  // Player som ambiente (Fórmula Dopamina Sex)
+  const audioLoop = document.getElementById('audioLoop');
+  audioLoop.volume = 0.07;
+  audioLoop.loop = true;
+  // Autoplay é bloqueado, então botões podem ligar/desligar
+  let audioPlaying = false;
+
+  function toggleAudio() {
+    if(audioPlaying) {
+      audioLoop.pause();
+    } else {
+      audioLoop.play();
+    }
+    audioPlaying = !audioPlaying;
+  }
+
+  // Cria botão play/stop do áudio e adiciona na toolbar
+  const audioBtn = document.createElement('button');
+  audioBtn.className = 'button-standard';
+  audioBtn.textContent = '🔊 Som Ambiente';
+  audioBtn.setAttribute('aria-pressed', 'false');
+  audioBtn.style.minWidth = '140px';
+  audioBtn.addEventListener('click', () => {
+    toggleAudio();
+    audioBtn.setAttribute('aria-pressed', audioPlaying.toString());
+    audioBtn.style.boxShadow = audioPlaying
+      ? '0 0 40px cyan, 0 0 80px magenta'
+      : '0 0 15px rgba(0,255,255,0.3)';
+  });
+  document.querySelector('.toolbar').appendChild(audioBtn);
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gerador de Prompt Dinâmico - CodeLux Infodose</title>
+<style>
+  body {
+    background: #000011;
+    color: #0ff;
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  h1 {
+    margin-bottom: 0.3em;
+    color: #ff00ff;
+    text-align: center;
+  }
+  label {
+    font-weight: 600;
+    margin-top: 1em;
+    display: block;
+  }
+  textarea {
+    width: 100%;
+    min-height: 180px;
+    background: #001122;
+    border: 2px solid #0ff;
+    border-radius: 10px;
+    color: #0ff;
+    font-family: monospace;
+    font-size: 0.9rem;
+    padding: 10px;
+    resize: vertical;
+  }
+  textarea:focus {
+    outline: none;
+    border-color: #ff00ff;
+    box-shadow: 0 0 8px #ff00ff;
+  }
+  button {
+    margin-top: 1em;
+    background: linear-gradient(90deg, cyan, magenta);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    color: #000011;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0,255,255,0.5);
+  }
+  button:hover {
+    box-shadow: 0 0 40px cyan, 0 0 80px magenta;
+    color: #fff;
+  }
+  #error-msg {
+    color: #ff3399;
+    font-weight: 700;
+    margin-top: 0.5em;
+  }
+  #container {
+    max-width: 900px;
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  @media (max-width: 600px) {
+    textarea {
+      min-height: 150px;
+      font-size: 0.85rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="container">
+  <h1>Gerador de Prompt Dinâmico - CodeLux + Infodose</h1>
+
+  <label for="json-input">JSON de Configuração (edite e personalize aqui):</label>
+  <textarea id="json-input" spellcheck="false" aria-label="Editor de JSON para configuração do prompt"></textarea>
+  <div id="error-msg" role="alert" aria-live="assertive"></div>
+
+  <button id="generate-btn" aria-label="Gerar prompt final dinâmico">Gerar Prompt Final</button>
+
+  <label for="prompt-output" style="margin-top:2em;">Prompt Final Gerado:</label>
+  <textarea id="prompt-output" readonly aria-label="Área de texto com prompt final gerado"></textarea>
+</div>
+
+<script>
+  // JSON inicial padrão (pode ser o seu config)
+  const defaultConfig = {
+    user: {
+      name: "Raphael Costa",
+      persona: "Lovable Mago",
+      emotionalState: "focado, inspirado",
+      favoriteColors: {
+        primary: "#00ffff",
+        secondary: "#ff00ff",
+        background: "#000011",
+      },
+      preferredSounds: {
+        ambientVolume: 0.07,
+        effectsVolume: 0.15,
+        soundTheme: "Fórmula Dopamina Sex",
+      },
+    },
+
+    infodose: {
+      basePrompt:
+        "Base mestre Lovable expandida com arquétipos 3|6|9, Dopamina Sex, Codex Uno Dual Trinity, Coblux e Brava integrados...",
+      customPromptAdditions: [
+        "Adicionar foco no espaço mental e ativação cognitiva",
+        "Incluir narrativa de expansão interdimensional e evolução fractal",
+        "Conectar tema ao design responsivo e UX fluida mobile-first",
+      ],
+      preferredNarratives: ["3", "6", "9"],
+      keywords: [
+        "arquétipos",
+        "dopamina",
+        "estética visual",
+        "sons ambientes",
+        "partículas místicas",
+        "personalização avançada",
+        "interatividade real",
+      ],
+    },
+
+    designSystem: {
+      palette: {
+        cyan: "#00ffff",
+        magenta: "#ff00ff",
+        blueNeon: "#0ff",
+        backgroundDark: "#000011",
+      },
+      font: "Inter, system-ui, sans-serif",
+      buttonStyle: {
+        borderRadius: "10px",
+        background: "rgba(0,0,0,0.3)",
+        color: "#0ff",
+        border: "2px solid transparent",
+        backgroundGradient: "linear-gradient(90deg, cyan, magenta)",
+        boxShadow: "0 0 10px rgba(0,255,255,0.2)",
+        transition: "all 0.3s ease",
+      },
+      animations: {
+        particles: true,
+        audioFeedback: true,
+        hoverEffects: true,
+      },
+    },
+
+    functionality: {
+      uploadHTML: true,
+      downloadHTML: true,
+      downloadPrompt: true,
+      searchInEditor: true,
+      narrativeNavigation: true,
+      mindSpaceInteractivity: true,
+      audioPlayer: true,
+      realTimeSyntaxHighlight: true,
+    },
+
+    outputPromptTemplate:
+      "### PROMPT FINAL PARA MOTOR IA:\n\nVocê é um assistente ultra avançado que deve criar páginas HTML funcionais e estéticas baseadas em:\n\n- Arquétipos 3|6|9 (${infodose.preferredNarratives.join(', ')})\n- Fórmula Dopamina Sex para engajamento visual e sonoro\n- Codex Uno Dual Trinity, Coblux e Brava\n- Personalização conforme preferências do usuário ${user.name}, incluindo cores ${user.favoriteColors.primary}, ${user.favoriteColors.secondary}\n\nAlém disso, inclua narrativa:\n${infodose.customPromptAdditions.join('; ')}\n\nUse design responsivo mobile-first, fundo animado, editor HTML com realce, busca, upload/download, sons ambiente e efeitos interativos.\n\nForneça saída acessível, clara e otimizada para performance e experiência do usuário.\n\nGaranta que as funções estejam todas integradas e em tempo real.\n\n---\n\nGere uma página HTML completa e estilizada seguindo estas diretrizes.",
+  };
+
+  const jsonInput = document.getElementById("json-input");
+  const promptOutput = document.getElementById("prompt-output");
+  const generateBtn = document.getElementById("generate-btn");
+  const errorMsg = document.getElementById("error-msg");
+
+  // Inicializa textarea com JSON default formatado
+  jsonInput.value = JSON.stringify(defaultConfig, null, 2);
+
+  // Função para gerar prompt dinâmico
+  function generateFinalPrompt(cfg) {
+    let template = cfg.outputPromptTemplate;
+
+    // Evita erro se arrays vazias
+    const preferredNarratives = (cfg.infodose.preferredNarratives || []).join(", ");
+    const customPromptAdditions = (cfg.infodose.customPromptAdditions || []).join("; ");
+    const userName = cfg.user.name || "Usuário";
+
+    // Usa Function + template literal para interpolar
+    const promptFunction = new Function(
+      "user",
+      "infodose",
+      "designSystem",
+      "functionality",
+      "return `" + template + "`;"
+    );
+
+    return promptFunction(cfg.user, cfg.infodose, cfg.designSystem, cfg.functionality)
+      .replace("${infodose.preferredNarratives.join(', ')}", preferredNarratives)
+      .replace("${infodose.customPromptAdditions.join('; ')}", customPromptAdditions)
+      .replace("${user.name}", userName);
+  }
+
+  // Botão gerar prompt
+  generateBtn.addEventListener("click", () => {
+    errorMsg.textContent = "";
+    try {
+      const parsedConfig = JSON.parse(jsonInput.value);
+      const result = generateFinalPrompt(parsedConfig);
+      promptOutput.value = result;
+    } catch (e) {
+      errorMsg.textContent = "Erro no JSON: " + e.message;
+      promptOutput.value = "";
+    }
+  });
+
+  // Gera prompt inicial ao carregar a página
+  window.addEventListener("load", () => {
+    generateBtn.click();
+  });
+</script>
+
+</body>
+</html>
