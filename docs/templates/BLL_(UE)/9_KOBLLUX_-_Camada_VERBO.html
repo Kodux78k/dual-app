@@ -1,0 +1,116 @@
+𝘭<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBΛLLUX - Camada VERBO</title>
+<style>
+  body {
+    font-family: 'Courier New', monospace;
+    background: #0b0c0f;
+    color: #a6e22e;
+    margin: 2rem;
+    line-height: 1.6;
+  }
+  header {
+    border-bottom: 2px solid #a6e22e;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+  h1 {
+    font-size: 2rem;
+    letter-spacing: 0.2rem;
+    text-align: center;
+    margin-bottom: 0.2rem;
+  }
+  h2 {
+    font-weight: 300;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 0;
+    color: #66d9ef;
+  }
+  section#verbo-container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #1a1b1f;
+    border: 1px solid #66d9ef;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+  }
+  textarea {
+    width: 100%;
+    height: 120px;
+    background: #272822;
+    border: none;
+    color: #f8f8f2;
+    font-family: monospace;
+    font-size: 1rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    resize: vertical;
+    margin-bottom: 1rem;
+  }
+  button {
+    display: block;
+    width: 100%;
+    background: #66d9ef;
+    border: none;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #0b0c0f;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #a6e22e;
+    color: #272822;
+  }
+  #output {
+    margin-top: 1rem;
+    background: #272822;
+    border-radius: 6px;
+    padding: 1rem;
+    color: #f8f8f2;
+    white-space: pre-wrap;
+    min-height: 80px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>KOBΛLLUX</h1>
+  <h2>Camada de Linguagem Filtrada — VERBO</h2>
+</header>
+<section id="verbo-container">
+  <textarea id="input-text" placeholder="Escreva seu pulso, sua verdade, seu VERBO..."></textarea>
+  <button onclick="processVerbo()">Manifestar VERBO</button>
+  <div id="output" aria-live="polite"></div>
+</section>
+
+<script>
+function processVerbo() {
+  const input = document.getElementById('input-text').value.trim();
+  const output = document.getElementById('output');
+
+  if (!input) {
+    output.textContent = '⧝ O VERBO espera sua pulsação... escreva algo e manifeste.';
+    return;
+  }
+
+  // Simples filtro vibracional: transforma texto em pulsos de letras maiúsculas e minúsculas alternadas
+  let filtered = '';
+  for (let i = 0; i < input.length; i++) {
+    filtered += (i % 2 === 0) ? input[i].toUpperCase() : input[i].toLowerCase();
+  }
+
+  // Aplica um efeito de eco fractal com repetição reduzida
+  const echo = filtered.split('').map((ch, i) => ch + (i % 5 === 0 ? ' ∴ ' : '')).join('');
+
+  output.textContent = echo;
+}
+</script>
+</body>
+</html>

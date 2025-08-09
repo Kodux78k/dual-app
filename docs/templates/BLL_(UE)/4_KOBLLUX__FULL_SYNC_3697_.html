@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBLLUX ∴ FULL SYNC 3×6×9×7 ♾️</title>
+  <style>
+    /* ===== Reset básico ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      user-select: text;
+    }
+    html, body {
+      height: 100%;
+      background: #0c0c0f;
+      color: #d0d0d8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1rem;
+      overflow-x: hidden;
+    }
+    h1 {
+      font-weight: 900;
+      font-size: 2.5rem;
+      margin-bottom: 0.25rem;
+      color: #77ccff;
+      text-shadow: 0 0 6px #3db2ff99;
+    }
+    h2 {
+      font-weight: 700;
+      margin: 0.5rem 0 1rem;
+      color: #55aaffcc;
+    }
+    /* Contêiner principal */
+    #app {
+      width: 100%;
+      max-width: 1024px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    /* Entrada e saída */
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      background: #121217;
+      color: #88ccff;
+      border-radius: 8px;
+      border: 1.8px solid #3388ff;
+      padding: 1rem;
+      font-family: 'Consolas', monospace;
+      font-size: 1rem;
+      resize: vertical;
+      outline-offset: 4px;
+      transition: border-color 0.3s ease;
+      box-shadow:
+        0 0 10px #3366ff55,
+        inset 0 0 8px #3388ff99;
+    }
+    textarea:focus {
+      border-color: #55aaff;
+      box-shadow:
+        0 0 18px #55aaffbb,
+        inset 0 0 12px #55aaffee;
+    }
+    /* Botões */
+    .btns {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      background: linear-gradient(135deg, #2266ffdd, #55aaffee);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 0.75rem 1.4rem;
+      border-radius: 12px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow:
+        0 0 12px #3388ffaa,
+        0 0 18px #55aaffdd;
+      transition: background 0.25s ease, transform 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.9rem;
+      filter: drop-shadow(0 0 4px #55aaffcc);
+    }
+    button:hover {
+      background: linear-gradient(135deg, #5599ffee, #88ccffee);
+      transform: scale(1.05);
+    }
+    button:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 8px #3388ffaa;
+    }
+    /* Painel saída */
+    #output {
+      width: 100%;
+      min-height: 260px;
+      background: #101016;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      color: #a0d4ffcc;
+      font-family: 'Segoe UI Mono', monospace;
+      font-size: 1rem;
+      line-height: 1.35;
+      box-shadow: inset 0 0 15px #2277ff44;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 2px solid #3366ff88;
+    }
+    /* Fractal glow pulsante */
+    @keyframes pulseGlow {
+      0%, 100% {
+        text-shadow:
+          0 0 10px #3388ffcc,
+          0 0 20px #55aaffdd,
+          0 0 30px #77ccffdd,
+          0 0 40px #aaddffdd;
+        color: #bbddff;
+      }
+      50% {
+        text-shadow:
+          0 0 5px #2277ccbb,
+          0 0 10px #44aaffcc,
+          0 0 18px #66ccffcc;
+        color: #aaccffcc;
+      }
+    }
+    /* Cabeçalhos com animação */
+    h1 span.glow {
+      animation: pulseGlow 3.8s ease-in-out infinite;
+    }
+    /* Seção conceitos fractais */
+    section.conceitos {
+      background: #11111bdd;
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      box-shadow: inset 0 0 20px #2255ff44;
+      margin-top: 0.75rem;
+    }
+    section.conceitos h3 {
+      margin-bottom: 0.6rem;
+      color: #88bbffcc;
+      font-weight: 700;
+      font-size: 1.2rem;
+      text-shadow: 0 0 6px #55aaff88;
+    }
+    section.conceitos ul {
+      list-style: none;
+      padding-left: 1rem;
+      color: #aaccee;
+      font-size: 1rem;
+      line-height: 1.4;
+      user-select: text;
+    }
+    section.conceitos ul li {
+      margin-bottom: 0.45rem;
+      padding-left: 0.25rem;
+      border-left: 3px solid #4499ff99;
+      cursor: default;
+      transition: border-color 0.3s ease;
+    }
+    section.conceitos ul li:hover {
+      border-color: #77ccffaa;
+    }
+    /* Footer */
+    footer {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: #5588ccaa;
+      user-select: none;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h1><span class="glow">KOBLLUX</span> ∴ FULL SYNC <small>3×6×9×7 ♾️</small></h1>
+  <h2>Algoritmo Vivo • Vocabulário • Mandala Fractal</h2>
+
+  <main id="app">
+    <textarea
+      id="input"
+      spellcheck="false"
+      aria-label="Área de entrada de texto do KOBLLUX"
+      placeholder="Insira seu texto, código, vibração..."></textarea>
+
+    <nav class="btns" role="group" aria-label="Controles do KOBLLUX">
+      <button id="btnPaste" title="Colar do clipboard">📋 Colar</button>
+      <button id="btnClear" title="Limpar entrada">🧹 Limpar</button>
+      <button id="btnProcess" title="Processar texto">⚙️ Processar</button>
+      <button id="btnCopy" title="Copiar saída">📂 Copiar saída</button>
+      <button id="btnExport" title="Exportar saída para arquivo .txt">💾 Exportar</button>
+    </nav>
+
+    <section
+      id="output"
+      aria-live="polite"
+      aria-label="Saída do processamento KOBLLUX"
+      role="region">
+      <em>Aguardando entrada para processamento fractal...</em>
+    </section>
+
+    <section class="conceitos" aria-label="Vocabulário e conceitos do KOBLLUX">
+      <h3>Vocabulário & Conceitos Essenciais</h3>
+      <ul>
+        <li><strong>BLLUE</strong>: Voz Interior, captação primária da consciência.</li>
+        <li><strong>FIT LUX</strong>: Energia do pulso vital, força da luz fractal.</li>
+        <li><strong>KODUX</strong>: Integração física, forma em movimento sagrado.</li>
+        <li><strong>META LUX</strong>: Visão interna, refinamento emocional.</li>
+        <li><strong>HÓRUS</strong>: Olho espiritual, percepção expandida.</li>
+        <li><strong>DUAL APP</strong>: Interface simbiótica entre planos.</li>
+        <li><strong>DNA LUX</strong>: Codificação da vida, padrão divino.</li>
+        <li><strong>NEPHESH ELYON</strong>: Espírito elevado, energia eterna.</li>
+        <li><strong>KOBLLUX</strong>: Algoritmo divino totalizador, mandala viva.</li>
+        <li><strong>3×6×9×7 = ♾️</strong>: Equação viva de Deus, fractal infinito.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 KOBLLUX Codex – Alinhado com DEUS Pai Criador, JESUS o Verbo, Espírito Santo.
+  </footer>
+
+  <script>
+    (() => {
+      const input = document.getElementById('input');
+      const output = document.getElementById('output');
+
+      const btnPaste = document.getElementById('btnPaste');
+      const btnClear = document.getElementById('btnClear');
+      const btnProcess = document.getElementById('btnProcess');
+      const btnCopy = document.getElementById('btnCopy');
+      const btnExport = document.getElementById('btnExport');
+
+      // Função principal de processamento simbólico KOBLLUX
+      function processKobllux(text) {
+        if (!text.trim()) {
+          return '❄️ Insira texto para ativar o Algoritmo Divino KOBLLUX.';
+        }
+
+        const lines = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+        const fractal = [];
+
+        fractal.push('♾️ 𝙀𝙦𝙪𝙖𝙘̧𝙖̃𝙤 𝙫𝙞𝙫𝙖 𝙙𝙚 𝘿𝙚𝙪𝙨: 3 × 6 × 9 × 7 = ♾️');
+        fractal.push('───────');
+        fractal.push(`𝙏𝙤𝙩𝙖𝙡 𝙙𝙚 𝙡𝙞𝙣𝙝𝙖𝙨 𝙚𝙣𝙩𝙧𝙖𝙙𝙖𝙨: ${lines.length}`);
+        fractal.push('───────');
+
+        // Vocabulário-chave para análise
+        const vocab = [
+          'BLLUE', 'FIT LUX', 'KODUX', 'META LUX',
+          'HÓRUS', 'DUAL APP', 'DNA LUX', 'NEPHESH', 'KOBLLUX'
+        ];
+        const counts = vocab.reduce((acc, key) => {
+          acc[key] = 0;
+          return acc;
+        }, {});
+
+        // Contagem simples das ocorrências dos termos no texto
+        for (const line of lines) {
+          for (const key of vocab) {
+            const regex = new RegExp(`\\b${key}\\b`, 'gi');
+            const matches = line.match(regex);
+            if (matches) counts[key] += matches.length;
+          }
+        }
+
+        fractal.push('📡 Frequência de conceitos detectados:');
+        for (const key of vocab) {
+          fractal.push(`  • ${key.padEnd(8, ' ')} → ${counts[key]}x`);
+        }
+        fractal.push('───────');
+
+        fractal.push('✧ Texto transformado em vibração fractal:');
+        lines.forEach((line, i) => {
+          fractal.push(`[${i + 1}] → ${line.toUpperCase()}`);
+        });
+
+        fractal.push('───────');
+        fractal.push('∴ KOBLLUX ACTIVE ∴');
+        return fractal.join('\n');
+      }
+
+      btnPaste.addEventListener('click', async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          input.value = text;
+          output.textContent = '📥 Texto colado com sucesso!';
+        } catch {
+          output.textContent = '⚠️ Falha ao acessar clipboard.';
+        }
+      });
+
+      btnClear.addEventListener('click', () => {
+        input.value = '';
+        output.innerHTML = '<em>Aguardando entrada para processamento fractal...</em>';
+      });
+
+      btnProcess.addEventListener('click', () => {
+        output.textContent = processKobllux(input.value);
+      });
+
+      btnCopy.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(output.textContent);
+          output.textContent = '✅ Saída copiada para clipboard!';
+        } catch {
+          output.textContent = '⚠️ Falha ao copiar saída.';
+        }
+      });
+
+      btnExport.addEventListener('click', () => {
+        const blob = new Blob([output.textContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'kobllux_output.txt';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+      });
+    })();
+  </script>
+</body>
+</html>

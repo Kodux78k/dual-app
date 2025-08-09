@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBLLUX Unified Interface</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+    :root {
+      --color-bg: #0a0a23;
+      --color-primary: #00ffe7;
+      --color-secondary: #ff00c8;
+      --color-accent: #ffbb33;
+      --color-text: #d0f0f9;
+      --color-text-muted: #88b9c9;
+      --gradient-border: linear-gradient(45deg, #00ffe7, #ff00c8, #ffbb33);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Montserrat', sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 2rem;
+      background: #111133cc;
+      border-bottom: 3px solid var(--color-primary);
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+      text-shadow: 0 0 8px #00ffe7cc;
+      user-select: none;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #111133cc;
+      border-bottom: 2px solid var(--color-primary);
+    }
+    nav button {
+      background: none;
+      border: none;
+      color: var(--color-text-muted);
+      padding: 1rem 2rem;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      user-select: none;
+    }
+    nav button.active,
+    nav button:hover {
+      color: var(--color-primary);
+      text-shadow: 0 0 6px var(--color-primary);
+    }
+
+    main {
+      flex-grow: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 2rem;
+    }
+
+    .tab-content {
+      display: none;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1rem 1rem 3rem;
+      height: 100%;
+      overflow-y: auto;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Estilos específicos para o Analisador */
+    .analyzer-section {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+    .analyzer-section > div {
+      background: #111133cc;
+      border-radius: 12px;
+      box-shadow: 0 0 15px 2px var(--color-primary);
+      padding: 1rem 1.5rem;
+      flex: 1 1 30%;
+      min-width: 280px;
+      max-height: 60vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    textarea {
+      flex-grow: 1;
+      resize: none;
+      border-radius: 10px;
+      border: none;
+      background: #0e0e22;
+      color: var(--color-text);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      padding: 1rem;
+      box-shadow: inset 0 0 10px #0077ff66;
+      transition: box-shadow 0.3s ease;
+      min-height: 8rem;
+    }
+    textarea:focus {
+      outline: none;
+      box-shadow: inset 0 0 14px var(--color-primary);
+    }
+    button,
+    select {
+      margin-top: 1rem;
+      border-radius: 50px;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+    button {
+      background: var(--color-primary);
+      border: none;
+      padding: 0.75rem 1.5rem;
+      color: var(--color-bg);
+      box-shadow: 0 0 15px var(--color-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    button:hover:not(:disabled) {
+      background: var(--color-secondary);
+      box-shadow: 0 0 20px var(--color-secondary);
+      color: #fff;
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    select {
+      padding: 0.6rem 1rem;
+      border: none;
+      background: #0e0e22;
+      color: var(--color-text);
+      box-shadow: inset 0 0 8px #0077ff44;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+    ul li {
+      padding: 0.3rem 0.6rem;
+      border-bottom: 1px solid #0077ff33;
+      word-break: break-word;
+    }
+    ul li:last-child {
+      border-bottom: none;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 9px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-bg);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-primary);
+      border-radius: 6px;
+    }
+
+    /* Estilos para o Dual.Infodose */
+    .info-section {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #111133dd;
+      border-radius: 12px;
+      box-shadow: 0 0 15px 2px var(--color-primary);
+      padding: 2rem 2.5rem;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 70vh;
+      overflow: hidden;
+    }
+    .info-section h2 {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--color-secondary);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 6px #ff00c8aa;
+      user-select: none;
+    }
+    .info-section p,
+    .info-section ul,
+    .info-section li {
+      color: var(--color-text);
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+    }
+    .info-section ul {
+      padding-left: 1.4rem;
+    }
+    .highlight {
+      color: var(--color-accent);
+      font-weight: 700;
+    }
+    .cta {
+      text-align: center;
+      margin-top: auto;
+    }
+    .cta button {
+      background: var(--color-primary);
+      color: var(--color-bg);
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--color-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .cta button:hover {
+      background: var(--color-secondary);
+      color: #fff;
+      box-shadow: 0 0 20px var(--color-secondary);
+    }
+
+    /* Adição de área editável para prompt gerado */
+    #generatedPrompt {
+      flex-grow: 1;
+      background: #0e0e22;
+      color: var(--color-text);
+      border-radius: 10px;
+      border: none;
+      padding: 1rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      box-shadow: inset 0 0 10px #0077ff66;
+      resize: none;
+      overflow-y: auto;
+      min-height: 12rem;
+      margin-top: 1rem;
+    }
+
+    /* Responsivo */
+    @media (max-width: 900px) {
+      .analyzer-section {
+        flex-direction: column;
+      }
+      .analyzer-section > div {
+        max-height: 40vh;
+        flex: 1 1 100%;
+        min-width: auto;
+      }
+      main {
+        padding: 0 0.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header role="banner">Dual.Infodose⚡️ KOBLLUX</header>
+
+  <nav role="navigation" aria-label="Navegação principal">
+    <button class="active" data-tab="analyzer" aria-selected="true">Analisador KOBLLUX</button>
+    <button data-tab="infodose" aria-selected="false">Dual.Infodose⚡️</button>
+  </nav>
+
+  <main>
+    <!-- Analisador -->
+    <section id="analyzer" class="tab-content active" aria-label="Analisador de texto KOBLLUX">
+      <div class="analyzer-section">
+        <div>
+          <h2>Entrada de Texto</h2>
+          <textarea id="inputText" placeholder="Cole seu texto aqui..."></textarea>
+          <label for="fileInput" class="file-picker-label" tabindex="0" style="cursor:pointer;display:inline-block;margin-top:0.5rem;">📂 Carregar arquivo (txt)</label>
+          <input type="file" id="fileInput" accept=".txt" style="display:none" />
+          <button id="pasteBtn" type="button">📋 Colar da Área de Transferência</button>
+          <button id="analyzeBtn" type="button" disabled>Analisar Texto</button>
+        </div>
+        <div>
+          <h2>Análise de Texto</h2>
+          <div><strong>Verbos:</strong></div>
+          <ul id="verbsList" aria-live="polite" aria-relevant="additions"></ul>
+          <div><strong>Substantivos:</strong></div>
+          <ul id="nounsList" aria-live="polite" aria-relevant="additions"></ul>
+          <div><strong>Adjetivos:</strong></div>
+          <ul id="adjectivesList" aria-live="polite" aria-relevant="additions"></ul>
+        </div>
+        <div>
+          <h2>Correlação</h2>
+          <label for="correlationType">Selecione tipo de correlação:</label>
+          <select id="correlationType" disabled>
+            <option value="">-- Escolha --</option>
+            <option value="verb-noun">Verbo com Substantivo</option>
+            <option value="class">Classe (Verbo, Subst., Adj.)</option>
+            <option value="objective">Objetivo do Texto</option>
+            <option value="meaning">Sentido do Texto</option>
+            <option value="multiple">Múltiplos tipos</option>
+          </select>
+          <button id="correlateBtn" type="button" disabled>Correlacionar</button>
+          <ul id="correlationResult" aria-live="polite" aria-relevant="additions"></ul>
+
+          <!-- Botão para gerar prompt -->
+          <button id="generatePromptBtn" type="button" style="margin-top:1rem; background: var(--color-accent); box-shadow: 0 0 15px var(--color-accent); color: var(--color-bg);">
+            🚀 Gerar Prompt na Dual.Infodose⚡️
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dual Infodose -->
+    <section id="infodose" class="tab-content" aria-label="Dual Infodose conteúdo">
+      <div class="info-section" role="region" aria-live="polite">
+        <h2>Dual.Infodose⚡️</h2>
+        <p><em>Salve, KODUX e pai-KODUX! 🌟</em><br />
+          Hoje vamos descomplicar duas paradas quentes: <strong>Prompt Base</strong> e a evolução do <strong>ChatGPT</strong>.
+        </p>
+
+        <h3>1. Início Energético</h3>
+        <p>O <span class="highlight">Prompt Base</span> é a planta baixa que você faz antes de começar a construir o app.<br />
+          É o mapa que define o que o app fará, para quem e como.
+        </p>
+
+        <h3>2. Adaptação Contextual</h3>
+        <ul>
+          <li>O que o app faz (ex.: lista de compras)</li>
+          <li>Como faz (ex.: voz, fotos, lembretes)</li>
+          <li>Para quem (ex.: você que esquece o leite toda semana)</li>
+        </ul>
+
+        <h3>3. Micro-Dose</h3>
+        <p>Sabia? 80% dos apps falham por falta de um <span class="highlight">Prompt Base</span> claro.<br />
+          O <strong>GPT-5</strong> já consegue gerar código só com um print da sua tela!
+        </p>
+
+        <h3>4. MetaLoop Médio</h3>
+        <p>Resumo turbo:<br />
+          - <span class="highlight">Prompt Base</span> = GPS do app (sem ele, você se perde).<br />
+          - <strong>GPT-5</strong> = Ferramenta que evolui enquanto você dorme.*</p>
+
+        <h3>5. Conclusão Instigante</h3>
+        <p>Pai, quer testar? Me fala uma ideia de app e a gente cria o <span class="highlight">Prompt Base</span> juntos!<br />
+          KODUX, bora explorar o <strong>GPT-5</strong> para gerar um código só com seu pensamento?
+        </p>
+
+        <h3>6. Loop Final</h3>
+        <p><em>Ah... e tem um segredo:</em> o próximo passo é ensinar o app a aprender <strong>com seus usuários</strong>.<br />
+          Querem adiantar isso?<br />
+          🎯 Recompensa: Clareza imediata + visão do futuro.<br />
+          Energia mantida.<br />
+          Próxima dose quando quiserem.
+        </p>
+
+        <textarea id="generatedPrompt" aria-label="Prompt gerado para Dual Infodose" readonly></textarea>
+
+        <div class="cta">
+          <button onclick="alert('Manda a ideia de app e começamos a criar o Prompt Base! 🚀')">Quero criar meu Prompt Base!</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Navegação entre abas
+    const tabs = document.querySelectorAll('nav button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        tabContents.forEach(content => {
+          content.classList.remove('active');
+        });
+        const target = tab.getAttribute('data-tab');
+        document.getElementById(target).classList.add('active');
+      });
+    });
+
+    // Elementos do Analisador
+    const inputText = document.getElementById('inputText');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const fileInput = document.getElementById('fileInput');
+    const correlationType = document.getElementById('correlationType');
+    const correlateBtn = document.getElementById('correlateBtn');
+    const generatePromptBtn = document.getElementById('generatePromptBtn');
+
+    const verbsList = document.getElementById('verbsList');
+    const nounsList = document.getElementById('nounsList');
+    const adjectivesList = document.getElementById('adjectivesList');
+    const correlationResult = document.getElementById('correlationResult');
+    const generatedPrompt = document.getElementById('generatedPrompt');
+
+    // Heurísticas simples para análise de texto (Português)
+    const verbEndings = ['ar', 'er', 'ir', 'ou', 'eu', 'ei', 'ava', 'ia', 'am', 'em', 'indo', 'ado', 'ido'];
+    const adjectiveEndings = ['oso', 'osa', 'vel', 'al', 'ico', 'ica', 'ente', 'ante', 'ivo', 'iva', 'il'];
+
+    // Função para limpar palavra
+    function cleanWord(word) {
+      return word.toLowerCase().replace(/[.,;:!?"()\-]/g, '');
+    }
+
+    // Analisar texto, classificar palavras
+    function analyzeText(text) {
+      const words = text.split(/\s+/).map(cleanWord).filter(w => w.length > 2);
+      const verbs = new Set();
+      const nouns = new Set();
+      const adjectives = new Set();
+
+      words.forEach(word => {
+        if (verbEndings.some(e => word.endsWith(e))) verbs.add(word);
+        else if (adjectiveEndings.some(e => word.endsWith(e))) adjectives.add(word);
+        else nouns.add(word);
+      });
+
+      return {
+        verbs: Array.from(verbs).sort(),
+        nouns: Array.from(nouns).sort(),
+        adjectives: Array.from(adjectives).sort()
+      };
+    }
+
+    // Renderiza listas
+function renderList(listElement, items) {
+  listElement.innerHTML = '';
+  if (items.length === 0) {
+    listElement.innerHTML = '<li><em>Sem dados</em></li>';
+    return;
+  }
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    listElement.appendChild(li);
+  });
+}
+
+// Atualiza estado dos botões conforme o texto
+function updateButtonsState() {
+  const hasText = inputText.value.trim().length > 0;
+  analyzeBtn.disabled = !hasText;
+  correlationType.disabled = !hasText;
+  correlateBtn.disabled = !hasText;
+  generatePromptBtn.disabled = !hasText;
+}
+
+// Evento para analisar texto
+analyzeBtn.addEventListener('click', () => {
+  const text = inputText.value;
+  const { verbs, nouns, adjectives } = analyzeText(text);
+
+  renderList(verbsList, verbs);
+  renderList(nounsList, nouns);
+  renderList(adjectivesList, adjectives);
+
+  correlationResult.innerHTML = '';
+});
+
+// Evento para colar texto da área de transferência
+pasteBtn.addEventListener('click', async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    inputText.value = text;
+    updateButtonsState();
+  } catch (err) {
+    alert('Não foi possível acessar a área de transferência.');
+  }
+});
+
+// Evento para carregar arquivo txt
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (file.type === "text/plain") {
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      inputText.value = event.target.result;
+      updateButtonsState();
+    };
+    reader.readAsText(file);
+  } else {
+    alert('Por favor, selecione um arquivo de texto (.txt).');
+  }
+});
+
+// Atualizar botões ao digitar no textarea
+inputText.addEventListener('input', updateButtonsState);
+
+// Evento para correlacionar
+correlateBtn.addEventListener('click', () => {
+  const correlation = correlationType.value;
+  correlationResult.innerHTML = '';
+
+  if (!correlation) return;
+
+  const { verbs, nouns, adjectives } = analyzeText(inputText.value);
+
+  if (correlation === 'verb-noun') {
+    // Simples correlação: lista verbos com substantivos em pares
+    if (verbs.length === 0 || nouns.length === 0) {
+      correlationResult.innerHTML = '<li><em>Não há verbos ou substantivos para correlacionar.</em></li>';
+      return;
+    }
+    for (let i = 0; i < Math.min(verbs.length, nouns.length); i++) {
+      const li = document.createElement('li');
+      li.textContent = `${verbs[i]} ↔ ${nouns[i]}`;
+      correlationResult.appendChild(li);
+    }
+  } else if (correlation === 'class') {
+    // Agrupa as palavras por classe em um único texto
+    const li = document.createElement('li');
+    li.textContent = `Verbos: ${verbs.join(', ') || 'Nenhum'} | Substantivos: ${nouns.join(', ') || 'Nenhum'} | Adjetivos: ${adjectives.join(', ') || 'Nenhum'}`;
+    correlationResult.appendChild(li);
+  } else if (correlation === 'objective') {
+    const li = document.createElement('li');
+    li.textContent = 'Objetivo do texto: Análise básica para separar palavras por classe.';
+    correlationResult.appendChild(li);
+  } else if (correlation === 'meaning') {
+    const li = document.createElement('li');
+    li.textContent = 'Sentido do texto: Com base na frequência e tipos de palavras, sugere foco em ações, descrições ou objetos.';
+    correlationResult.appendChild(li);
+  } else if (correlation === 'multiple') {
+    const li1 = document.createElement('li');
+    li1.textContent = `Verbos: ${verbs.join(', ') || 'Nenhum'}`;
+    const li2 = document.createElement('li');
+    li2.textContent = `Substantivos: ${nouns.join(', ') || 'Nenhum'}`;
+    const li3 = document.createElement('li');
+    li3.textContent = `Adjetivos: ${adjectives.join(', ') || 'Nenhum'}`;
+    correlationResult.appendChild(li1);
+    correlationResult.appendChild(li2);
+    correlationResult.appendChild(li3);
+  }
+});
+
+// Geração de prompt para Dual.Infodose
+generatePromptBtn.addEventListener('click', () => {
+  const text = inputText.value.trim();
+  if (!text) {
+    alert('Insira algum texto para gerar o prompt.');
+    return;
+  }
+
+  const prompt = `📜 Prompt KOBLLUX gerado automaticamente:
+
+Texto original:
+${text}
+
+Análise simples:
+- Número de palavras: ${text.split(/\s+/).filter(w => w.length > 0).length}
+- Verbos identificados: ${verbsList.children.length > 0 ? Array.from(verbsList.children).map(li => li.textContent).join(', ') : 'Nenhum'}
+- Substantivos identificados: ${nounsList.children.length > 0 ? Array.from(nounsList.children).map(li => li.textContent).join(', ') : 'Nenhum'}
+- Adjetivos identificados: ${adjectivesList.children.length > 0 ? Array.from(adjectivesList.children).map(li => li.textContent).join(', ') : 'Nenhum'}
+
+Use essa análise para refinar seu desenvolvimento na Dual.Infodose⚡️.`;
+
+  generatedPrompt.value = prompt;
+  // Automaticamente muda para aba Dual.Infodose para exibir o prompt
+  tabs.forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  tabContents.forEach(c => c.classList.remove('active'));
+  document.querySelector('nav button[data-tab="infodose"]').classList.add('active');
+  document.querySelector('nav button[data-tab="infodose"]').setAttribute('aria-selected', 'true');
+  document.getElementById('infodose').classList.add('active');
+});

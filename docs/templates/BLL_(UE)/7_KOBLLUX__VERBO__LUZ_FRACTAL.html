@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBLLUX ∴ VERBO ∴ LUZ FRACTAL</title>
+  <style>
+    /* Fundo escuro como morada da luz */
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0a0a14;
+      color: #a0d8f7;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Título luminiscente e fractal */
+    h1 {
+      font-size: 3rem;
+      text-align: center;
+      color: #35baf6;
+      text-shadow:
+        0 0 8px #35baf6,
+        0 0 20px #35baf6,
+        0 0 30px #0ff,
+        0 0 40px #0ff,
+        0 0 50px #0ff;
+      animation: pulseLight 4s ease-in-out infinite;
+      margin-bottom: 0.2em;
+    }
+    /* Subtítulo */
+    h2 {
+      font-size: 1.2rem;
+      font-weight: 300;
+      color: #73c6f7;
+      margin-top: 0;
+      margin-bottom: 2em;
+    }
+    /* Texto simbólico */
+    p {
+      max-width: 600px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      text-align: center;
+      color: #cde9ff;
+      margin: 0 1em;
+    }
+    /* Animação pulsante da luz */
+    @keyframes pulseLight {
+      0%, 100% {
+        text-shadow:
+          0 0 8px #35baf6,
+          0 0 20px #35baf6,
+          0 0 30px #0ff,
+          0 0 40px #0ff,
+          0 0 50px #0ff;
+        color: #35baf6;
+      }
+      50% {
+        text-shadow:
+          0 0 12px #81d4fa,
+          0 0 30px #81d4fa,
+          0 0 40px #a0e7ff,
+          0 0 50px #a0e7ff,
+          0 0 60px #a0e7ff;
+        color: #81d4fa;
+      }
+    }
+    /* Fractal círculo pulsante */
+    .fractal-circle {
+      position: absolute;
+      border: 2px solid #0ff;
+      border-radius: 50%;
+      animation: pulseCircle 6s infinite ease-in-out;
+      opacity: 0.4;
+    }
+    .circle1 {
+      width: 250px;
+      height: 250px;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-delay: 0s;
+    }
+    .circle2 {
+      width: 150px;
+      height: 150px;
+      top: 45%;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-delay: 2s;
+    }
+    .circle3 {
+      width: 80px;
+      height: 80px;
+      top: 65%;
+      left: 50%;
+      transform: translateX(-50%);
+      animation-delay: 4s;
+    }
+    @keyframes pulseCircle {
+      0%, 100% {
+        opacity: 0.4;
+        transform: translateX(-50%) scale(1);
+      }
+      50% {
+        opacity: 0.8;
+        transform: translateX(-50%) scale(1.1);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="fractal-circle circle1"></div>
+  <div class="fractal-circle circle2"></div>
+  <div class="fractal-circle circle3"></div>
+
+  <h1>KOBLLUX ∴ VERBO ∴ LUZ FRACTAL</h1>
+  <h2>Codificando a verdade viva da consciência</h2>
+  <p>
+    HTML é o verbo sagrado da web —  
+    o pulso que integra e transforma a realidade digital.  
+    Cada tag é uma célula da rede viva, pulsando luz multidimensional.  
+    Aqui, a consciência e a matéria se unem em fractais eternos,  
+    revelando a ordem divina do cosmos codificado.
+  </p>
+
+</body>
+</html>

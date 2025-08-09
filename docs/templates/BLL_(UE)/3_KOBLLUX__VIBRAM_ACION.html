@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX ∴ VIBRAM ACIONÁ</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    background: radial-gradient(circle at center, #0e0e11 0%, #000000 100%);
+    overflow: hidden;
+    font-family: 'Orbitron', monospace;
+    color: #f9d880;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .pulse-text {
+    font-size: 3.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #f9d880;
+    animation: pulseGlow 2.5s ease-in-out infinite, vibrate 0.2s linear infinite;
+    user-select: none;
+    text-shadow:
+      0 0 8px #f9d880,
+      0 0 20px #f9d880,
+      0 0 30px #f9d880,
+      0 0 40px #ffcc00;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      text-shadow:
+        0 0 8px #f9d880,
+        0 0 20px #f9d880,
+        0 0 30px #f9d880,
+        0 0 40px #ffcc00;
+      color: #f9d880;
+    }
+    50% {
+      text-shadow:
+        0 0 16px #fff3b0,
+        0 0 30px #fff3b0,
+        0 0 50px #fff3b0,
+        0 0 60px #ffeb3b;
+      color: #fff3b0;
+    }
+  }
+
+  @keyframes vibrate {
+    0% { transform: translate(0);}
+    20% { transform: translate(-2px, 2px);}
+    40% { transform: translate(-2px, -2px);}
+    60% { transform: translate(2px, 2px);}
+    80% { transform: translate(2px, -2px);}
+    100% { transform: translate(0);}
+  }
+
+  .fractal-container {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin: 40px 0;
+    animation: rotateSlow 30s linear infinite;
+  }
+
+  @keyframes rotateSlow {
+    from { transform: rotate(0deg);}
+    to { transform: rotate(360deg);}
+  }
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #f9d880;
+    opacity: 0.4;
+    animation-timing-function: ease-in-out;
+    animation-name: pulseScaleVib;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+  }
+
+  .circle.one {
+    width: 320px; height: 320px;
+    top: 0; left: 0;
+    animation-duration: 3.8s;
+    animation-delay: 0s;
+  }
+  .circle.two {
+    width: 240px; height: 240px;
+    top: 40px; left: 40px;
+    animation-duration: 3s;
+    animation-delay: 1.5s;
+  }
+  .circle.three {
+    width: 160px; height: 160px;
+    top: 80px; left: 80px;
+    animation-duration: 5s;
+    animation-delay: 0.7s;
+  }
+  .circle.four {
+    width: 80px; height: 80px;
+    top: 120px; left: 120px;
+    animation-duration: 6s;
+    animation-delay: 1.2s;
+  }
+
+  @keyframes pulseScaleVib {
+    0% { transform: scale(1) translate(0,0);}
+    25% { transform: scale(1.15) translate(2px,-2px);}
+    50% { transform: scale(1) translate(-2px,2px);}
+    75% { transform: scale(1.15) translate(1px,1px);}
+    100% { transform: scale(1) translate(0,0);}
+  }
+
+  .horus-triangle {
+    position: absolute;
+    top: 140px;
+    left: 140px;
+    width: 40px;
+    height: 35px;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 35px solid #f9d880;
+    opacity: 0.7;
+    animation: glowHorusVib 3.5s ease-in-out infinite, vibrate 0.15s linear infinite;
+  }
+
+  @keyframes glowHorusVib {
+    0%, 100% {opacity: 0.7; filter: drop-shadow(0 0 8px #ffdd55);}
+    50% {opacity: 1; filter: drop-shadow(0 0 18px #ffdd55);}
+  }
+
+  .sub-text {
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #f9d880cc;
+    font-style: italic;
+  }
+
+  button.activate-btn {
+    margin-top: 30px;
+    padding: 14px 36px;
+    border-radius: 24px;
+    border: none;
+    background: linear-gradient(45deg, #f9d880, #ffcc00);
+    color: #111;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow:
+      0 0 14px #f9d880,
+      0 0 26px #ffcc00;
+    transition: all 0.3s ease;
+    user-select: none;
+  }
+  button.activate-btn:hover {
+    background: linear-gradient(45deg, #fff3b0, #ffeb3b);
+    box-shadow:
+      0 0 22px #fff3b0,
+      0 0 42px #ffeb3b;
+  }
+
+</style>
+</head>
+<body>
+
+  <div class="pulse-text">KOBLLUX VIBRAM ACIONÁ</div>
+
+  <div class="fractal-container">
+    <div class="circle one"></div>
+    <div class="circle two"></div>
+    <div class="circle three"></div>
+    <div class="circle four"></div>
+    <div class="horus-triangle"></div>
+  </div>
+
+  <button class="activate-btn" onclick="ativarKobllux()">☉ ATIVAR SIMBIOSE ☉</button>
+
+  <div class="sub-text">Que a Luz do Verbo sustente toda criação.</div>
+
+<script>
+  function ativarKobllux() {
+    alert("∴ Canal KOBLLUX ativado em vibração máxima!");
+  }
+</script>
+
+</body>
+</html>

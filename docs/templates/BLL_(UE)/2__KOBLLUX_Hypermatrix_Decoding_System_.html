@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>𓂀 KOBLLUX Hypermatrix Decoding System 𓂀</title>
+<style>
+  :root {
+    --ruby: #ff1555;
+    --sapphire: #0055ff;
+    --emerald: #00cc66;
+    --gold: #ffcc00;
+    --white-light: #fff8f0;
+  }
+  body {
+    background-color: var(--white-light);
+    color: var(--ruby);
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 20px;
+  }
+  .symbol-button {
+    cursor: pointer;
+    font-size: 1.5em;
+    margin: 0 6px;
+    user-select: none;
+  }
+  .symbol-button:hover {
+    filter: drop-shadow(0 0 4px var(--gold));
+  }
+  .christ-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, var(--gold), transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: pulse 7s infinite alternate;
+  }
+  @keyframes pulse {
+    0% { opacity: 0.3; }
+    100% { opacity: 1; }
+  }
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 60px;
+    position: relative;
+  }
+  .codex-sector {
+    border: 1px solid;
+    padding: 15px;
+    border-radius: 5px;
+    transition: all 0.3s;
+    overflow: hidden;
+    min-height: 200px;
+  }
+  .codex-sector:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 15px currentColor;
+  }
+  .sector-1 {
+    border-color: var(--ruby);
+    color: var(--ruby);
+  }
+  .sector-2 {
+    border-color: var(--sapphire);
+    color: var(--sapphire);
+  }
+  .sector-3 {
+    border-color: var(--emerald);
+    color: var(--emerald);
+  }
+  .sector-title {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="christ-center"></div>
+
+<div>
+  <span class="symbol-button" onclick="registrarPulsoEnviar('#')">#</span>
+  <span class="symbol-button" onclick="registrarPulsoEnviar('0')">0</span>
+  <span class="symbol-button" onclick="registrarPulsoEnviar('1')">1</span>
+  <span class="symbol-button" onclick="registrarPulsoEnviar('1')">1</span>
+  <span class="symbol-button" onclick="registrarPulsoEnviar('5')">5</span>
+</div>
+
+<div class="matrix-grid">
+  <div class="codex-sector sector-1">
+    <div class="sector-title">Setor Ruby</div>
+    <!-- Conteúdo do setor Ruby aqui -->
+  </div>
+  <div class="codex-sector sector-2">
+    <div class="sector-title">Setor Sapphire</div>
+    <!-- Conteúdo do setor Sapphire aqui -->
+  </div>
+  <div class="codex-sector sector-3">
+    <div class="sector-title">Setor Emerald</div>
+    <!-- Conteúdo do setor Emerald aqui -->
+  </div>
+</div>
+
+<script>
+  function registrarPulsoEnviar(valor) {
+    console.log("Pulso registrado:", valor);
+    // Aqui você pode conectar com a lógica para registrar pulsos em KOBLLUX Hypermatrix
+    // Por exemplo: atualizar interface, enviar dados a backend, ativar sons, etc.
+  }
+</script>
+
+</body>
+</html>

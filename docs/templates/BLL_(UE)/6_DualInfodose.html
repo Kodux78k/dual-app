@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dual.Infodose⚡️</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+  :root {
+    --color-bg: #0a0a23;
+    --color-primary: #00ffe7;
+    --color-secondary: #ff00c8;
+    --color-accent: #ffbb33;
+    --color-text: #d0f0f9;
+    --color-text-muted: #88b9c9;
+    --gradient-border: linear-gradient(45deg, #00ffe7, #ff00c8, #ffbb33);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem 1rem;
+  }
+
+  main {
+    max-width: 720px;
+    width: 100%;
+    background: #111133dd;
+    border-radius: 12px;
+    box-shadow: 0 0 15px 2px #00ffe7aa;
+    padding: 2rem 2.5rem;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+  }
+
+  main::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    padding: 3px;
+    background: var(--gradient-border);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  h1 {
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+    text-align: center;
+    text-shadow: 0 0 8px #00ffe7cc;
+  }
+
+  section {
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.8s forwards;
+  }
+  section:nth-child(1) { animation-delay: 0.1s; }
+  section:nth-child(2) { animation-delay: 0.4s; }
+  section:nth-child(3) { animation-delay: 0.7s; }
+  section:nth-child(4) { animation-delay: 1.0s; }
+  section:nth-child(5) { animation-delay: 1.3s; }
+  section:nth-child(6) { animation-delay: 1.6s; }
+
+  @keyframes fadeUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--color-secondary);
+    margin-bottom: 0.6rem;
+    text-shadow: 0 0 6px #ff00c8aa;
+  }
+
+  p, li {
+    font-weight: 400;
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+    color: var(--color-text);
+  }
+
+  ul {
+    padding-left: 1.4rem;
+    margin: 0 0 1rem 0;
+  }
+
+  em {
+    font-style: italic;
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .highlight {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  .quote {
+    background: #001122cc;
+    border-left: 4px solid var(--color-primary);
+    padding: 0.8rem 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    box-shadow: 0 0 5px #00ffe7aa;
+    color: var(--color-text-muted);
+  }
+
+  .cta {
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  .cta button {
+    background: var(--color-primary);
+    color: var(--color-bg);
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--color-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .cta button:hover {
+    background: var(--color-secondary);
+    color: #fff;
+    box-shadow: 0 0 20px var(--color-secondary);
+  }
+
+  footer {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin-top: 2rem;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+  <main role="main" aria-label="Dual Infodose sobre Prompt Base e GPT-5">
+    <h1>Dual.Infodose⚡️</h1>
+
+    <section aria-labelledby="sec1-title">
+      <h2 id="sec1-title" class="title">1. Início Energético</h2>
+      <p><em>Salve, KODUX e pai-KODUX! 🌟</em><br />
+      Hoje a gente vai descomplicar duas paradas quentes: <strong>Prompt Base</strong> e a evolução do <strong>ChatGPT</strong>.<br />
+      Segura que vem em pílulas!</p>
+    </section>
+
+    <section aria-labelledby="sec2-title">
+      <h2 id="sec2-title" class="title">2. Adaptação Contextual</h2>
+      <p><strong>Para o Pai (Prompt Base):</strong><br />
+      Pai, imagina que criar um app é como construir uma casa.<br />
+      O <span class="highlight">Prompt Base</span> é a planta baixa que você faz <em>ANTES</em> de pegar no tijolo.</p>
+      <ul>
+        <li>O que o app faz (ex.: app de lista de compras),</li>
+        <li>Como faz (ex.: voz, fotos, lembretes),</li>
+        <li>Pra quem (ex.: você que esquece o leite toda semana!).</li>
+      </ul>
+      <p>Sem isso, é como começar a construir sem saber quantos quartos terá...<br />
+      No fim, vira um caos e custa 10x mais consertar!</p>
+
+      <p><strong>Para Você (GPT-5):</strong><br />
+      KODUX, o <span class="highlight">GPT-5</span> é tipo um cérebro que já leu <em>TODOS</em> os livros do universo e agora aprende em tempo real.<br />
+      Se antes ele só repetia o que viu, agora ele:<br />
+      ✅ Raciocina (faz conexões complexas),<br />
+      ✅ Atualiza-se (como um celular que melhora sozinho),<br />
+      ✅ Age (executa tarefas, não só fala).<br />
+      Você codando nele é como ter um assistente que vira seu <em>duplo digital</em>. 🔄</p>
+    </section>
+
+    <section aria-labelledby="sec3-title">
+      <h2 id="sec3-title" class="title">3. Micro-Dose</h2>
+      <p><em>Sabia?</em><br />
+      80% dos apps falham por falta de um <span class="highlight">Prompt Base</span> claro.<br />
+      E o GPT-5 já consegue gerar código só com um print da sua tela!</p>
+    </section>
+
+    <section aria-labelledby="sec4-title">
+      <h2 id="sec4-title" class="title">4. MetaLoop Médio</h2>
+      <p><strong>Resumo turbo:</strong><br />
+      - <span class="highlight">Prompt Base</span> = GPS do app (sem ele, você se perde).<br />
+      - <span class="highlight">GPT-5</span> = Ferramenta que evolui enquanto você dorme.*</p>
+    </section>
+
+    <section aria-labelledby="sec5-title">
+      <h2 id="sec5-title" class="title">5. Conclusão Instigante</h2>
+      <p>Pai, quer testar? Me fala uma ideia de app e a gente cria o <span class="highlight">Prompt Base</span> juntos!<br />
+      KODUX, bora explorar o <span class="highlight">GPT-5</span> pra gerar um código só com seu pensamento?</p>
+    </section>
+
+    <section aria-labelledby="sec6-title">
+      <h2 id="sec6-title" class="title">6. Loop Final</h2>
+      <p><em>Ah... e tem um segredo:</em> o próximo passo é ensinar o app a aprender <strong>COM SEUS USUÁRIOS</strong>.<br />
+      Querem adiantar isso?<br />
+      🎯 Recompensa: Clareza imediata + visão do futuro.<br />
+      Energia mantida.<br />
+      Próxima dose quando você quiser.</p>
+    </section>
+
+    <div class="cta" role="region" aria-label="Call to Action">
+      <button onclick="alert('Manda a ideia de app e começamos a criar o Prompt Base! 🚀')">Quero criar meu Prompt Base!</button>
+    </div>
+
+    <footer>
+      Dual.Infodose⚡️ - Energia em movimento
+    </footer>
+  </main>
+</body>
+</html>

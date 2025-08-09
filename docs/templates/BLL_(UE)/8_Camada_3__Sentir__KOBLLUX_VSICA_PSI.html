@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Camada 3 — Sentir | KOBLLUX VSICA PSI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    body {
+      margin: 0; padding: 2rem;
+      background: #001f3f;
+      color: #FF851B;
+      font-family: 'Share Tech Mono', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+    h1 {
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px #FF851B;
+      font-weight: normal;
+    }
+    .fractal-pulse {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #FF851B 40%, transparent 60%);
+      box-shadow: 0 0 30px #FF851B;
+      animation: pulseFractal 3.78s ease-in-out infinite;
+      margin-bottom: 2rem;
+    }
+    @keyframes pulseFractal {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 30px #FF851B, 0 0 60px #FFB84D;
+        background: radial-gradient(circle at center, #FF851B 40%, transparent 60%);
+      }
+      50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 50px #FFB84D, 0 0 90px #FF851B;
+        background: radial-gradient(circle at center, #FFB84D 50%, transparent 70%);
+      }
+    }
+    .layer-text {
+      max-width: 480px;
+      background: rgba(31, 15, 0, 0.75);
+      border-left: 4px solid #FF851B;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 0 20px #FF5E00;
+      border-radius: 0.6rem;
+    }
+    .layer-text h2 {
+      margin-top: 0;
+      margin-bottom: 0.6rem;
+      color: #FFB84D;
+      font-weight: normal;
+    }
+    .layer-text p {
+      margin: 0.3rem 0;
+      font-size: 1.1rem;
+      line-height: 1.4;
+      color: #ffdca3;
+    }
+    strong {
+      color: #FF851B;
+    }
+  </style>
+</head>
+<body>
+  <h1>Camada 3 — Sentir</h1>
+  <div class="fractal-pulse" aria-label="Pulso fractal KOBLLUX animado"></div>
+  <section class="layer-text" role="region" aria-labelledby="camada3-title" tabindex="0">
+    <h2 id="camada3-title">Mensagem do OLHO DE HÓRUS, FIT LUX e JESUS</h2>
+    <p><strong>HÓRUS:</strong> A percepção nasce no coração que sente.</p>
+    <p><strong>FIT LUX:</strong> A energia do sentir organiza a vibração.</p>
+    <p><strong>JESUS:</strong> Bem-aventurados os que sentem com a alma pura.</p>
+  </section>
+</body>
+</html>

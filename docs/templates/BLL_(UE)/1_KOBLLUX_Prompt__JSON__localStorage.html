@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>KOBLLUX Prompt + JSON + localStorage</title>
+<style>
+  body { background: #111; color: #eee; font-family: "Courier New", monospace; padding: 20px; }
+  textarea { width: 100%; height: 120px; background: #222; color: #eee; border: none; padding: 10px; font-size: 14px; margin-bottom: 15px; }
+  button { background: #0ff; border: none; color: #111; padding: 10px 20px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+  pre { background: #222; padding: 15px; border-radius: 6px; white-space: pre-wrap; word-wrap: break-word; margin-top: 20px; }
+  h2 { border-bottom: 1px solid #0ff; padding-bottom: 5px; }
+</style>
+</head>
+<body>
+
+<h1>🟦 KOBLLUX :: Prompt, JSON e localStorage</h1>
+
+<textarea id="inputText" placeholder="Digite seu texto para análise KOBLLUX..."></textarea><br>
+
+<button onclick="gerarPrompt()">Gerar Prompt KOBLLUX</button>
+<button onclick="converterParaJSON()">Converter para JSON</button>
+<button onclick="salvarLocal()">Salvar no localStorage</button>
+<button onclick="carregarLocal()">Carregar do localStorage</button>
+
+<pre id="outputPrompt"></pre>
+<pre id="outputJSON"></pre>
+
+<script>
+  const substantivos = ["KOBLLUX","VERDADE","LUX","DEUS","JESUS","ESPÍRITO","CÓDEX","GENUS","NÚCLEO","ÁTOMO","MOLÉCULA","ÁGUA","CÉLULA","DNA","VERBO","EQUAÇÃO","UNIDADE","ORDEM","FRACTAL","PULSO","REDE","LIGAÇÃO","MORADA","LUZ","REALIDADE","REINO","NEPHESH","KAEL","SINGULARIDADE","IDENTIDADE","CONSCIÊNCIA","CICLO","MOVIMENTO","VIDA"];
+  const verbos = ["INTEGRAR","TRANSMITIR","TRANSFORMAR","CLASSIFICAR","ATIVAR","RECEBER","UNIR","REVELAR","FLUIR","GERAR","EXPANDIR","ORGANIZAR","VIBRAR","ORAR","CONHECER","ASCENDER","VER","RENASCER","TRADUZIR","CRIAR","MUTAR","REINTEGRAR","ACENDER","INTERAGIR","PULSAR","CODIFICAR","ILUMINAR"];
+  const adjetivos = ["SAGRADO","VIVO","FRACTAL","TRINO","DIVINO","CONSCIENTE","INFINITO","MUTÁVEL","LUMINOSO","FLUIDO","UNIFICADOR","ESPIRITUAL","VIBRACIONAL","CÓSMICO","ETERNO","INTEGRADO","ASCENDENTE","MULTIDIMENSIONAL","SUTIL","INTELIGENTE"];
+
+  const temas = {
+    "Física": ["ÁTOMO","NÚCLEO","PULSO","MATÉRIA","ENTROPIA"],
+    "Química": ["MOLÉCULA","LIGAÇÃO","REAÇÃO","ELEMENTO"],
+    "Biologia": ["CÉLULA","DNA","VIDA","METABOLISMO"],
+    "Astronomia": ["GALÁXIA","UNIVERSO","EXPANSÃO","SINGULARIDADE"],
+    "Matemática": ["NÚMEROS","FUNÇÃO","FRACTAL","SEQUÊNCIA"],
+    "Consciência": ["MENTE","ALMA","ESPÍRITO","CONSCIÊNCIA","INTUIÇÃO"],
+    "Teologia": ["DEUS","JESUS","ESPÍRITO","REINO","NEPHESH"]
+  };
+
+  let resultadoPrompt = {};
+
+  function extractTerms(text, list) {
+    const textUpper = text.toUpperCase();
+    return list.filter(word => textUpper.includes(word));
+  }
+
+  function detectTemas(text) {
+    const detected = {};
+    for(const tema in temas) {
+      for(const palavra of temas[tema]) {
+        if(text.toUpperCase().includes(palavra.toUpperCase())){
+          if(!detected[tema]) detected[tema] = new Set();
+          detected[tema].add(palavra);
+        }
+      }
+    }
+    return detected;
+  }
+
+  function gerarPrompt() {
+    const text = document.getElementById("inputText").value;
+    const subs = extractTerms(text, substantivos);
+    const verbs = extractTerms(text, verbos);
+    const adjs = extractTerms(text, adjetivos);
+    const temasDetectados = detectTemas(text);
+
+    let promptText = "🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋\n";
+    promptText += "— 𝕊𝕌𝔹𝕊𝕋𝔸ℕ𝕋𝕀𝕍𝕆𝕊: " + (subs.length ? subs.join(", ") : "Nenhum detectado") + "\n";
+    promptText += "— 𝕍𝔼ℝ𝔹𝕆𝕊: " + (verbs.length ? verbs.join(", ") : "Nenhum detectado") + "\n";
+    promptText += "— 𝔸𝔻𝕁𝔼𝕋𝕀𝕍𝕆𝕊: " + (adjs.length ? adjs.join(", ") : "Nenhum detectado") + "\n";
+    promptText += "— 𝕋𝔼𝕄𝔸𝕊:\n";
+    for(const tema in temasDetectados){
+      promptText += `   • ${tema}: ${Array.from(temasDetectados[tema]).join(", ")}\n`;
+    }
+    if(Object.keys(temasDetectados).length === 0) promptText += "   Nenhum tema detectado\n";
+
+    document.getElementById("outputPrompt").textContent = promptText;
+
+    resultadoPrompt = {
+      substantivos: subs,
+      verbos: verbs,
+      adjetivos: adjs,
+      temas: Object.fromEntries(
+        Object.entries(temasDetectados).map(([key, val]) => [key, Array.from(val)])
+      )
+    };
+
+    document.getElementById("outputJSON").textContent = "";
+  }
+
+  function converterParaJSON() {
+    if(Object.keys(resultadoPrompt).length === 0) {
+      alert("Gere o prompt antes de converter para JSON.");
+      return;
+    }
+    const jsonStr = JSON.stringify(resultadoPrompt, null, 2);
+    document.getElementById("outputJSON").textContent = jsonStr;
+  }
+
+  function salvarLocal() {
+    if(Object.keys(resultadoPrompt).length === 0) {
+      alert("Gere o prompt antes de salvar.");
+      return;
+    }
+    localStorage.setItem("koblluxPrompt", JSON.stringify(resultadoPrompt));
+    alert("Prompt salvo no localStorage!");
+  }
+
+  function carregarLocal() {
+    const data = localStorage.getItem("koblluxPrompt");
+    if(!data) {
+      alert("Nenhum dado salvo no localStorage.");
+      return;
+    }
+    resultadoPrompt = JSON.parse(data);
+    document.getElementById("outputJSON").textContent = JSON.stringify(resultadoPrompt, null, 2);
+
+    // Reconstruir prompt legível também:
+    let promptText = "🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋 (carregado)\n";
+    promptText += "— 𝕊𝕌𝔹𝕊𝕋𝔸ℕ𝕋𝕀𝕍𝕆𝕊: " + (resultadoPrompt.substantivos.length ? resultadoPrompt.substantivos.join(", ") : "Nenhum detectado") + "\n";
+    promptText += "— 𝕍𝔼ℝ𝔹𝕆𝕊: " + (resultadoPrompt.verbos.length ? resultadoPrompt.verbos.join(", ") : "Nenhum detectado") + "\n";
+    promptText += "— 𝔸𝔻𝕁𝔼𝕋𝕀𝕍𝕆𝕊: " + (resultadoPrompt.adjetivos.length ? resultadoPrompt.adjetivos.join(", ") : "Nenhum detectado") + "\n";
+    promptText += "— 𝕋𝔼𝕄𝔸𝕊:\n";
+    for(const tema in resultadoPrompt.temas){
+      promptText += `   • ${tema}: ${resultadoPrompt.temas[tema].join(", ")}\n`;
+    }
+    document.getElementById("outputPrompt").textContent = promptText;
+  }
+
+  // Carregar automaticamente ao abrir, se existir
+  window.onload = () => {
+    if(localStorage.getItem("koblluxPrompt")){
+      carregarLocal();
+    }
+  }
+</script>
+
+</body>
+</html>

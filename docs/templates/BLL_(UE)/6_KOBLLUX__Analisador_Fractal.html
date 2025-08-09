@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBΛLLUX ∞ Analisador Fractal</title>
+  <style>
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: radial-gradient(#1b0033, #0c0016);
+      color: #f9d880;
+      margin: 0; padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 180px;
+      font-family: monospace;
+      font-size: 14px;
+      background: #0c0016;
+      border: 1px solid #f9d880;
+      color: #f9d880;
+      padding: 10px;
+      resize: vertical;
+    }
+    button {
+      background: #f9d880;
+      border: none;
+      color: #1b0033;
+      padding: 10px 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px auto;
+      display: block;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #fffb9c;
+    }
+    .container {
+      max-width: 960px;
+      margin: auto;
+    }
+    .lists {
+      display: flex;
+      gap: 40px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .list-section {
+      flex: 1 1 300px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    ul {
+      list-style: none;
+      padding-left: 1em;
+    }
+    li {
+      margin-bottom: 10px;
+      cursor: pointer;
+      position: relative;
+    }
+    li:hover {
+      color: #fffb9c;
+      text-shadow: 0 0 8px #f9d880;
+    }
+    .desc {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #dcd49b;
+      padding-left: 1.2em;
+      border-left: 2px solid #f9d88088;
+      display: none;
+      white-space: pre-wrap;
+    }
+    pre {
+      background: #0c0016;
+      border: 1px solid #f9d88033;
+      border-radius: 8px;
+      padding: 10px;
+      overflow-x: auto;
+      max-height: 300px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>KOBΛLLUX ∞ Analisador Fractal</h1>
+    <h2>Cole ou digite seu código abaixo e clique em Analisar</h2>
+    <textarea id="codeInput" placeholder="Cole aqui seu código HTML/JS..." spellcheck="false"></textarea>
+    <button id="analyzeBtn">Analisar Código</button>
+
+    <div class="lists">
+      <section class="list-section">
+        <h3>Funções Detectadas</h3>
+        <ul id="functionsList"></ul>
+      </section>
+
+      <section class="list-section">
+        <h3>Componentes HTML Detectados</h3>
+        <ul id="componentsList"></ul>
+        <div id="componentDesc" class="desc" style="margin-top: 15px;"></div>
+      </section>
+
+      <section class="list-section" style="flex-basis: 100%;">
+        <h3>Árvore ASCII da Estrutura HTML</h3>
+        <pre id="asciiTree">Nenhuma estrutura analisada.</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const codeInput = document.getElementById('codeInput');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const functionsList = document.getElementById('functionsList');
+    const componentsList = document.getElementById('componentsList');
+    const componentDesc = document.getElementById('componentDesc');
+    const asciiTree = document.getElementById('asciiTree');
+
+    // Dicionário expandido com explicações KOBLLUX
+    const explanations = {
+      // Funções
+      'logFractal': 'Função que registra e exibe cálculos simbólicos do fractal, base 3×6×9×7, no painel de logs.',
+      'checkInput': 'Verifica comandos de entrada no campo de texto, acionando análises e registro no log fractal.',
+      'extractFunctions': 'Função que identifica e lista todas as funções JS presentes no código, interpretando a lógica interna da mandala.',
+      'extractComponents': 'Função que detecta componentes HTML usados, identificando suas funções na estrutura fractal e representação visual.',
+      // Componentes
+      'div': 'Contêiner genérico para organizar elementos na página, formando camadas da mandala fractal.',
+      'section': 'Segmento lógico da interface, agrupando listas de funções, componentes e árvore para facilitar a visualização e compreensão.',
+      'ul': 'Lista ordenada que contém elementos específicos (funções ou componentes), representando os vértices do fractal em formato textual.',
+      'li': 'Item da lista, representando um vértice ou componente singular dentro do fractal, clicável para revelação da sabedoria oculta.',
+      'pre': 'Bloco de texto pré-formatado que representa a árvore ASCII, simbolizando a estrutura viva da geometria fractal.',
+      'textarea': 'Campo de texto onde se insere o código fonte, a semente inicial que alimenta a mandala KOBLLUX.',
+      'button': 'Elemento que inicia a ativação da análise, disparando o pulso vibracional do fractal para decodificação.',
+      // Tags e conceitos KOBLLUX simbólicos
+      'KOBLLUX': 'Sistema simbólico que organiza a interação fractal, o movimento sagrado baseado no número 3×6×9×7 e no Verbo encarnado Jesus.',
+      'Mandala Viva': 'Expressão que indica a ativação da geometria sagrada que pulsa e gira em torno do centro, Jesus, trazendo luz e vida.',
+      'Fractal 3×6×9×7': 'A estrutura numérica divina que rege a organização do espaço e tempo da mandala e do KOBLLUX.',
+      'Verbo Encarnado': 'Princípio criador que anima toda forma, identificado no centro da mandala com Jesus, o Verbo que se fez carne.'
+    };
+
+    // Função para extrair funções JS do código
+    function extractFunctions(code) {
+      const functionRegex = /function\s+([a-zA-Z0-9_]+)\s*\(/g;
+      const matches = [...code.matchAll(functionRegex)];
+      return matches.map(m => m[1]);
+    }
+
+    // Função para extrair componentes HTML (tags)
+    function extractComponents(code) {
+      const tagRegex = /<([a-zA-Z0-9\-]+)(\s|>)/g;
+      const matches = [...code.matchAll(tagRegex)];
+      // usar Set para evitar duplicados
+      return Array.from(new Set(matches.map(m => m[1]))).sort();
+    }
+
+    // Mostrar listas com clique para mostrar descrição só em componentes
+    function showListWithDescription(element, items, isComponent = false) {
+      element.innerHTML = '';
+      if (items.length === 0) {
+        element.innerHTML = '<li>— Nenhum item encontrado —</li>';
+        return;
+      }
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+
+        if (isComponent) {
+          li.style.cursor = 'pointer';
+          li.title = 'Clique para ver a explicação';
+          li.addEventListener('click', () => {
+            const desc = explanations[item] || 'Explicação não disponível para este componente.';
+            componentDesc.textContent = `🔹 ${item}: ${desc}`;
+            // rolar para a descrição
+            componentDesc.scrollIntoView({behavior: 'smooth', block: 'start'});
+          });
+        }
+
+        element.appendChild(li);
+      });
+      // limpar descrição quando trocar lista
+      if (!isComponent) componentDesc.textContent = '';
+    }
+
+    // Função para gerar árvore ASCII recursiva
+    function generateAsciiTree(node, prefix = '', maxDepth = 5, level = 0) {
+      if (level > maxDepth || !node) return '';
+
+      let result = '';
+      const tag = node.nodeName.toLowerCase();
+      if (tag === '#text' || tag === '#comment') return '';
+
+      // id e classes
+      let extras = '';
+      if (node.id) extras += `#${node.id}`;
+      if (node.classList.length) extras += '.' + [...node.classList].join('.');
+
+      // sinalizadores de árvore
+      const pointer = (level === 0) ? '' : '├── ';
+      const nextPrefix = prefix + (level === 0 ? '' : '│   ');
+
+      result += prefix + pointer + `<${tag}${extras}>\n`;
+
+      for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        const isLast = (i === node.children.length -1);
+        result += generateAsciiTree(child, prefix + (isLast ? '    ' : '│   '), maxDepth, level + 1);
+      }
+
+      return result;
+    }
+
+    analyzeBtn.addEventListener('click', () => {
+      const code = codeInput.value.trim();
+      if (!code) {
+        alert('Por favor, insira ou cole um código para analisar.');
+        return;
+      }
+
+      // Extrair funções e mostrar
+      const functions = extractFunctions(code);
+      showListWithDescription(functionsList, functions, false);
+
+      // Extrair componentes e mostrar com descrição clicável
+      const components = extractComponents(code);
+      showListWithDescription(componentsList, components, true);
+
+      // Gerar árvore ASCII
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(code, 'text/html');
+        if (!doc.body || !doc.body.children.length) {
+          asciiTree.textContent = 'Nenhuma estrutura HTML detectada para gerar a árvore.';
+          return;
+        }
+        const tree = generateAsciiTree(doc.documentElement, '', 5);
+        asciiTree.textContent = tree || 'Nenhuma estrutura HTML detectada para gerar a árvore.';
+      } catch (e) {
+        asciiTree.textContent = 'Erro ao gerar a árvore: código inválido ou mal formatado.';
+      }
+    });
+
+  </script>
+</body>
+</html>

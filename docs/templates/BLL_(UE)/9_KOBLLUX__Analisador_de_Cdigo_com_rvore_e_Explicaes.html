@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBLLUX ∞ Analisador de Código com Árvore e Explicações</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    body {
+      background: radial-gradient(circle at center, #1b0033, #0c0016);
+      color: #f9d880;
+      font-family: 'Share Tech Mono', monospace;
+      margin: 0;
+      padding: 1rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      margin-bottom: 0.2rem;
+      font-size: 2.5rem;
+      letter-spacing: 0.1em;
+    }
+
+    p {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .btn-group {
+      width: 90%;
+      max-width: 900px;
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+    }
+
+    button {
+      background-color: #f9d880;
+      border: none;
+      color: #1b0033;
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #f9d880cc;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    button:hover {
+      background-color: #fff5b1;
+    }
+
+    textarea {
+      width: 90%;
+      max-width: 900px;
+      height: 200px;
+      background: #0c0016;
+      border: 2px solid #f9d88055;
+      border-radius: 10px;
+      color: #f9d880;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      padding: 10px;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 1rem;
+      white-space: pre-wrap;
+    }
+    textarea:focus {
+      border-color: #f9d880ee;
+      box-shadow: 0 0 10px #f9d880cc;
+    }
+
+    .result-container {
+      width: 90%;
+      max-width: 900px;
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .result-box {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid #f9d88055;
+      border-radius: 10px;
+      padding: 1rem;
+      flex: 1 1 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      box-shadow: 0 0 10px #f9d88088;
+      position: relative;
+    }
+
+    .result-box h3 {
+      margin-top: 0;
+      border-bottom: 1px solid #f9d880aa;
+      padding-bottom: 0.3rem;
+      font-size: 1.3rem;
+      color: #f9d880;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0.5rem 0 0 0;
+    }
+
+    li {
+      padding: 3px 8px;
+      border-bottom: 1px dotted #f9d88055;
+      font-size: 1rem;
+      word-break: break-word;
+      position: relative;
+      cursor: help;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    li.empty {
+      cursor: default;
+      font-style: italic;
+      color: #f9d88055;
+    }
+
+    /* Tooltip styling */
+    li[data-desc]:hover::after {
+      content: attr(data-desc);
+      position: absolute;
+      left: 105%;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #f9d880dd;
+      color: #1b0033;
+      padding: 6px 10px;
+      border-radius: 8px;
+      white-space: normal;
+      width: 240px;
+      font-size: 0.9rem;
+      box-shadow: 0 0 10px #f9d880cc;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    /* ASCII tree styling */
+    pre.ascii-tree {
+      background: #0c0016;
+      border: 1px solid #f9d88055;
+      border-radius: 10px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      max-height: 400px;
+      overflow-y: auto;
+      width: 90%;
+      max-width: 900px;
+      margin-top: 1rem;
+      white-space: pre;
+      color: #f9d880;
+      box-shadow: 0 0 10px #f9d880aa;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>KOBLLUX ⧝</h1>
+  <p>Cole o código HTML/JS abaixo para analisar funções e componentes com árvore e explicações.</p>
+
+  <div class="btn-group">
+    <button id="loadFileBtn">📂 Buscar arquivo</button>
+    <button id="pasteBtn">📋 Colar do Clipboard</button>
+  </div>
+
+  <textarea id="codeInput" placeholder="Cole seu código HTML/JS aqui..."></textarea>
+  <button id="analyzeBtn">Analisar KOBLLUX</button>
+
+  <div class="result-container">
+    <div class="result-box" id="functionsBox">
+      <h3>Funções JS Detectadas</h3>
+      <ul id="functionsList"><li class="empty">Nenhuma função detectada.</li></ul>
+    </div>
+
+    <div class="result-box" id="componentsBox">
+      <h3>Componentes HTML Detectados</h3>
+      <ul id="componentsList"><li class="empty">Nenhum componente detectado.</li></ul>
+    </div>
+  </div>
+
+  <h2>Árvore ASCII da Estrutura HTML</h2>
+  <pre id="asciiTree" class="ascii-tree">Nenhuma estrutura carregada.</pre>
+
+  <input type="file" id="fileInput" accept=".html,.htm,.js,.txt" style="display:none" />
+
+  <script>
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const codeInput = document.getElementById('codeInput');
+    const functionsList = document.getElementById('functionsList');
+    const componentsList = document.getElementById('componentsList');
+    const asciiTree = document.getElementById('asciiTree');
+
+    const loadFileBtn = document.getElementById('loadFileBtn');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const fileInput = document.getElementById('fileInput');
+
+    // Dicionário básico de explicações para funções e tags HTML (pode expandir)
+    const explanations = {
+      // Funções JS comuns
+      "init": "Função geralmente usada para inicializar configurações ou estados.",
+      "render": "Função que renderiza conteúdo visual ou componentes.",
+      "handleClick": "Função acionada ao clicar em elementos, para lidar com eventos.",
+      "logFractal": "Função que registra logs específicos do fractal KOBLLUX.",
+      "checkInput": "Função que verifica comandos ou entradas do usuário.",
+      "extractFunctions": "Função que extrai funções do código para análise.",
+      "extractComponents": "Função que extrai componentes HTML para análise.",
+      "showList": "Função que exibe listas na interface do usuário.",
+      // HTML tags comuns
+      "div": "Elemento de container genérico para agrupar conteúdo.",
+      "span": "Elemento em linha usado para estilizar partes específicas do texto.",
+      "script": "Elemento para incluir código JavaScript.",
+      "style": "Elemento para definir estilos CSS.",
+      "body": "Elemento principal que contém o conteúdo visível da página.",
+      "head": "Elemento que contém metadados e links para recursos.",
+      "html": "Elemento raiz que envolve todo o documento HTML.",
+      "input": "Elemento para entrada de dados do usuário, como texto ou arquivos.",
+      "button": "Elemento para botões interativos.",
+      "textarea": "Área para entrada de texto multilinha.",
+      "ul": "Lista não ordenada de itens.",
+      "li": "Item de lista.",
+      "h1": "Título principal da página.",
+      "h2": "Título secundário da página.",
+      "p": "Parágrafo de texto.",
+    };
+
+    // Abrir diálogo de arquivo ao clicar em "Buscar arquivo"
+    loadFileBtn.addEventListener('click', () => {
+      fileInput.value = null; // reset
+      fileInput.click();
+    });
+
+    // Ler arquivo selecionado e colocar conteúdo no textarea
+    fileInput.addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        codeInput.value = e.target.result;
+      };
+      reader.readAsText(file);
+    });
+
+    // Colar do Clipboard (requer permissão do navegador)
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          codeInput.value = text;
+        } else {
+          alert('Clipboard vazio ou não acessível.');
+        }
+      } catch (err) {
+        alert('Não foi possível acessar o clipboard. Tente colar manualmente (Ctrl+V).');
+      }
+    });
+
+    // Função para extrair funções JS do texto (simples regex para demo)
+    function extractFunctions(code) {
+      const functions = new Set();
+
+      // 1. function declarações: function nome(...) {...}
+      const funcDecl = [...code.matchAll(/function\s+([a-zA-Z_$][\w$]*)\s*/g)];
+      funcDecl.forEach(m => functions.add(m[1]));
+
+      // 2. Arrow functions atribuídas: const nome = (...) => {...}
+      const arrowFunc = [...code.matchAll(/(?:const|let|var)\s+([a-zA-Z_$][\w$]*)\s*=\s*\(?.*??\s*=>/g)];
+      arrowFunc.forEach(m => functions.add(m[1]));
+
+      // 3. Métodos objeto: nome: function(...) {...} ou nome(...) {...} (básico)
+      const objFunc = [...code.matchAll(/([a-zA-Z_$][\w$]*)\s*:\s*function\s*\(/g)];
+      objFunc.forEach(m => functions.add(m[1]));
+
+      return Array.from(functions).sort();
+    }
+
+    // Função para extrair componentes HTML do texto (tags, id, classes)
+    function extractComponents(code) {
+      const parser = new DOMParser();
+      let doc;
+
+      try {
+        doc = parser.parseFromString(code, 'text/html');
+      } catch {
+        return [];
+      }
+
+      const allElements = [...doc.body.querySelectorAll('*')];
+
+      const components = new Set();
+
+      allElements.forEach(el => {
+        // Formatar: <tag id=#id class=.class1.class2>
+        let compName = `<${el.tagName.toLowerCase()}`;
+        if (el.id) compName += ` id="#${el.id}"`;
+        if (el.classList.length) compName += ` class=".${[...el.classList].join('.')}"`;
+        compName += `>`;
+        components.add(compName);
+      });
+
+      return Array.from(components).sort();
+    }
+
+    // Função para gerar árvore ASCII do DOM (limita profundidade)
+    function generateAsciiTree(node, prefix = '', maxDepth = 5, currentDepth = 0) {
+      if (currentDepth > maxDepth || !node) return '';
+
+      let line = prefix + node.tagName.toLowerCase();
+      if (node.id) line += `#${node.id}`;
+      if (node.classList.length) line += `.${[...node.classList].join('.')}`;
+
+      let children = Array.from(node.children).filter(n => n.tagName);
+      if (children.length === 0) return line;
+
+      let treeStr = line + '\n';
+      for (let i = 0; i < children.length; i++) {
+        const isLast = i === children.length -1;
+        const newPrefix = prefix + (isLast ? '    ' : '│   ');
+        const branch = prefix + (isLast ? '└─ ' : '├─ ');
+        treeStr += branch + generateAsciiTree(children[i], newPrefix, maxDepth, currentDepth +1).trimStart() + '\n';
+      }
+      return treeStr.trimEnd();
+    }
+
+    // Exibir lista com explicação ao passar o mouse (tooltip)
+    function showListWithDescription(element, items) {
+      element.innerHTML = '';
+      if (items.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'Nenhum item detectado.';
+        li.classList.add('empty');
+        element.appendChild(li);
+      } else {
+        items.forEach(item => {
+          // Extrair nome limpo para buscar explicação
+          // Para funções JS, nome pode estar como "nome()"
+          // Para componentes, tem formato <tag ...>
+          let cleanName = item;
+          // Remove id/class info para procurar explicação
+          if (item.startsWith('<')) {
+            cleanName = item.match(/^<([a-z0-9]+)/i)?.[1] || item;
+          } else {
+            cleanName = item.replace(/\(.*\)/, '').trim();
+          }
+
+          const li = document.createElement('li');
+          li.textContent = item;
+          if (explanations[cleanName]) {
+            li.setAttribute('data-desc', explanations[cleanName]);
+          }
+          element.appendChild(li);
+        });
+      }
+    }
+
+    analyzeBtn.addEventListener('click', () => {
+      const code = codeInput.value.trim();
+      if (!code) {
+        alert('Por favor, insira ou cole um código para analisar.');
+        return;
+      }
+
+      // Extrair funções
+      const functions = extractFunctions(code);
+      showListWithDescription(functionsList, functions);
+
+      // Extrair componentes HTML
+      const components = extractComponents(code);
+      showListWithDescription(componentsList, components);
+
+      // Gerar árvore ASCII da estrutura HTML
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(code, 'text/html');
+
+        // Caso não exista body, pode ser código só JS, limpar árvore
+        if (!doc.body || !doc.body.children.length) {
+          asciiTree.textContent = 'Nenhuma estrutura HTML detectada para gerar a árvore.';
+          return;
+        }
+
+        const tree = generateAsciiTree(doc.documentElement, '', 5);
+        asciiTree.textContent = tree || 'Nenhuma estrutura HTML detectada para gerar a árvore.';
+      } catch (e) {
+        asciiTree.textContent = 'Erro ao gerar a árvore: código inválido ou mal formatado.';
+      }
+    });
+  </script>
+</body>
+</html>
+            

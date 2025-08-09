@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX ∞ Analisador de Código com Árvore e Explicações</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  body {
+    background: radial-gradient(circle at center, #1b0033, #0c0016);
+    color: #f9d880;
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0;
+    padding: 1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.4s, color 0.4s;
+  }
+  body.light {
+    background: radial-gradient(circle at center, #f9f9f9, #ddd);
+    color: #333;
+  }
+
+  /* Tooltip styling */
+  li[data-desc]:hover::after {
+    content: attr(data-desc);
+    position: absolute;
+    left: 105%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #f9d880dd;
+    color: #1b0033;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: normal;
+    width: 240px;
+    font-size: 0.9rem;
+    box-shadow: 0 0 10px #f9d880cc;
+    z-index: 100;
+    pointer-events: none;
+  }
+  body.light li[data-desc]:hover::after {
+    background: #333ddddd;
+    color: #fff;
+  }
+
+  /* Explicações fixas (clicáveis) */
+  li {
+    position: relative;
+  }
+  li.expanded::after {
+    content: '▼';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+  }
+  li:not(.expanded)::after {
+    content: '▶';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+  }
+  .desc-box {
+    background: rgba(0,0,0,0.3);
+    margin: 0.5rem 1rem 1rem 1rem;
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    max-width: 300px;
+  }
+  body.light .desc-box {
+    background: #eee;
+    color: #222;
+  }
+
+  /* Toggle tema botão */
+  #themeToggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: #f9d880;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #f9d880aa;
+  }
+  body.light #themeToggle {
+    background: #333;
+    color: #fff;
+    box-shadow: 0 0 10px #333ccc;
+  }
+</style>
+</head>
+<body>
+
+<button id="themeToggle">Modo Claro / Escuro</button>
+
+<h1>KOBLLUX ⧝</h1>
+<p>Cole seu código HTML/JS para análise detalhada com árvore, explicações, e comentários ASI.</p>
+
+<!-- Botões e textarea -->
+<div class="btn-group">
+  <button id="loadFileBtn">📂 Buscar arquivo</button>
+  <button id="pasteBtn">📋 Colar do Clipboard</button>
+</div>
+
+<textarea id="codeInput" placeholder="Cole seu código aqui..."></textarea>
+<button id="analyzeBtn">Analisar KOBLLUX</button>
+
+<!-- Resultados -->
+<div class="result-container">
+  <div class="result-box" id="functionsBox">
+    <h3>Funções JS Detectadas</h3>
+    <ul id="functionsList"><li class="empty">Nenhuma função detectada.</li></ul>
+  </div>
+
+  <div class="result-box" id="componentsBox">
+    <h3>Componentes HTML Detectados</h3>
+    <ul id="componentsList"><li class="empty">Nenhum componente detectado.</li></ul>
+  </div>
+</div>
+
+<h2>Árvore ASCII da Estrutura HTML</h2>
+<pre id="asciiTree" class="ascii-tree">Nenhuma estrutura carregada.</pre>
+
+<div class="result-box" style="max-width: 900px; margin-top: 1rem;">
+  <h3>Comentários ASI Detectados</h3>
+  <pre id="commentsASI" style="white-space: pre-wrap; max-height: 300px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px;">Nenhum comentário ASI detectado.</pre>
+</div>
+
+<script>
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const codeInput = document.getElementById('codeInput');
+  const functionsList = document.getElementById('functionsList');
+  const componentsList = document.getElementById('componentsList');
+  const asciiTree = document.getElementById('asciiTree');
+  const commentsASI = document.getElementById('commentsASI');
+  const themeToggle = document.getElementById('themeToggle');
+
+  // Toggle dark/light mode
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+  });
+
+  // Explicações básicas (expandível)
+  const explanations = {
+    "init": "Função para inicializar estados ou processos.",
+    "render": "Função que cria ou atualiza a visualização na tela.",
+    "handleClick": "Função que trata eventos de clique em elementos.",
+    "logFractal": "Registra informações do fractal KOBLLUX nos logs.",
+    "checkInput": "Verifica e processa a entrada do usuário.",
+    "extractFunctions": "Identifica funções no código para análise.",
+    "extractComponents": "Identifica componentes HTML usados no código.",
+    "div": "Container genérico para agrupamento de elementos.",
+    "span": "Elemento em linha para estilização de trechos de texto.",
+    "script": "Contém código JavaScript para execução na página.",
+    "body": "Corpo da página onde o conteúdo visível é exibido.",
+    "head": "Metadados, links e configurações da página.",
+    "html": "Elemento raiz que envolve todo o documento HTML.",
+    "input": "Elemento para entrada de dados pelo usuário.",
+    "button": "Elemento clicável que executa ações.",
+    "textarea": "Área para entrada multilinha de texto.",
+    "ul": "Lista não ordenada de itens.",
+    "li": "Item dentro de uma lista.",
+    "h1": "Título principal da página.",
+    "h2": "Título secundário.",
+    "p": "Parágrafo de texto.",
+    // KOBLLUX simbólico
+    "KOBLLUX": "Sistema simbólico de interação fractal baseado no Verbo e no número 3×6×9×7.",
+    "Mandala Viva": "Representação da geometria sagrada pulsante da consciência.",
+    "Fractal 3×6×9×7": "Estrutura numérica sagrada que fundamenta o movimento e equilíbrio.",
+    "Verbo Encarnado": "Jesus, o centro de gravidade e expressão do Verbo divino."
+  };
+
+  // Extrair funções JS via regex
+  function extractFunctions(code) {
+    const functions = new Set();
+
+    // Funções declaradas com function nome(...) {}
+    const funcDecl = [...code.matchAll(/function\s+([a-zA-Z_$][\w$]*)\s*/g)];
+    funcDecl.forEach(m => functions.add(m[1]));
+
+    // Arrow functions atribuídas: const nome = (...) => {...}
+    const arrowFunc = [...code.matchAll(/(?:const|let|var)\s+([a-zA-Z_$][\w$]*)\s*=\s*\(?.*??\s*=>/g)];
+    arrowFunc.forEach(m => functions.add(m[1]));
+
+    // Métodos objeto: nome: function(...) {...}
+    const objFunc = [...code.matchAll(/([a-zA-Z_$][\w$]*)\s*:\s*function\s*/g)];
+    objFunc.forEach(m => functions.add(m[1]));
+
+    return Array.from(functions).sort();
+  }
+
+  // Extrair componentes HTML e mostrar id/class
+  function extractComponents(code) {
+    const parser = new DOMParser();
+    let doc;
+    try {
+      doc = parser.parseFromString(code, 'text/html');
+    } catch {
+      return [];
+    }
+    const allElements = [...doc.body.querySelectorAll('*')];
+    const components = new Set();
+    allElements.forEach(el => {
+      let compName = `<${el.tagName.toLowerCase()}`;
+      if (el.id) compName += ` id="#${el.id}"`;
+      if (el.classList.length) compName += ` class=".${[...el.classList].join('.')}"`;
+      compName += `>`;
+      components.add(compName);
+    });
+    return Array.from(components).sort();
+  }
+
+  // Gerar árvore ASCII do DOM
+  function generateAsciiTree(node, prefix = '', maxDepth = 5, currentDepth = 0) {
+    if (currentDepth > maxDepth || !node) return '';
+
+    let line = node.tagName.toLowerCase();
+    if (node.id) line += `#${node.id}`;
+    if (node.classList.length) line += `.${[...node.classList].join('.')}`;
+
+    let children = Array.from(node.children).filter(n => n.tagName);
+    if (children.length === 0) return line;
+
+    let treeStr = line + '\n';
+    for (let i = 0; i < children.length; i++) {
+      const isLast = i === children.length -1;
+      const newPrefix = prefix + (isLast ? '    ' : '│   ');
+      const branch = prefix + (isLast ? '└─ ' : '├─ ');
+      treeStr += branch + generateAsciiTree(children[i], newPrefix, maxDepth, currentDepth +1).trimStart() + '\n';
+    }
+    return treeStr.trimEnd();
+  }
+
+  // Extrair comentários ASI (<!-- ... --> e /** ... */)
+  function extractCommentsASI(code) {
+    const comments = [];
+
+    // Comentários HTML <!-- ... -->
+    const htmlComments = [...code.matchAll(/<!--([\s\S]*?)-->/g)];
+    htmlComments.forEach(m => comments.push(m[1].trim()));
+
+    // Comentários JS /** ... */
+    const jsComments = [...code.matchAll(/\/\*\*([\s\S]*?)\*\//g)];
+    jsComments.forEach(m => comments.push(m[1].trim()));
+
+    return comments.length ? comments : ['Nenhum comentário ASI detectado.'];
+  }
+
+  // Exibir lista com tooltips explicações
+  function showListWithDescription(element, items) {
+    element.innerHTML = '';
+    if (items.length === 0) {
+      const li = document.createElement('li');
+      li.textContent = 'Nenhum item detectado.';
+      li.classList.add('empty');
+      element.appendChild(li);
+      return;
+    }
+    items.forEach(item => {
+      let cleanName = item;
+      if (item.startsWith('<')) {
+        cleanName = item.match(/^<([a-z0-9]+)/i)?.[1] || item;
+      } else {
+        cleanName = item.replace(/\(.*/, '').trim();
+      }
+
+      const li = document.createElement('li');
+      li.textContent = item;
+      if (explanations[cleanName]) {
+        li.setAttribute('data-desc', explanations[cleanName]);
+      }
+      element.appendChild(li);
+    });
+  }
+
+  analyzeBtn.addEventListener('click', () => {
+    const code = codeInput.value.trim();
+    if (!code) {
+      alert('Por favor, insira ou cole um código para analisar.');
+      return;
+    }
+
+    // Extrair funções do código
+    const functions = extractFunctions(code);
+    showListWithDescription(functionsList, functions);
+
+    // Extrair componentes HTML do código
+    const components = extractComponents(code);
+    showListWithDescription(componentsList, components);
+
+    // Gerar árvore ASCII da estrutura HTML
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(code, 'text/html');
+
+      if (!doc.body || !doc.body.children.length) {
+        asciiTree.textContent = 'Nenhuma estrutura HTML detectada para gerar a árvore.';
+      } else {
+        const tree = generateAsciiTree(doc.documentElement, '', 5);
+        asciiTree.textContent = tree || 'Nenhuma estrutura HTML detectada para gerar a árvore.';
+      }
+    } catch {
+      asciiTree.textContent = 'Erro ao gerar a árvore: código inválido ou mal formatado.';
+    }
+
+    // Extrair e exibir comentários ASI (<!-- ... --> e /** ... */)
+    const comments = extractCommentsASI ? extractCommentsASI(code) : [];
+    if (typeof commentsASI !== 'undefined' && commentsASI) {
+      commentsASI.textContent = comments.length > 0 ? comments.join('\n\n---\n\n') : 'Nenhum comentário ASI encontrado.';
+    }
+  });
+
+  // Função para buscar arquivo local e carregar no textarea
+  const loadFileBtn = document.getElementById('loadFileBtn');
+  loadFileBtn.addEventListener('click', () => {
+    const inputFile = document.createElement('input');
+    inputFile.type = 'file';
+    inputFile.accept = '.html,.js,.txt';
+    inputFile.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = event => {
+        codeInput.value = event.target.result;
+      };
+      reader.readAsText(file);
+    };
+    inputFile.click();
+  });
+
+  // Função para colar do clipboard (requer permissão do navegador)
+  const pasteBtn = document.getElementById('pasteBtn');
+  pasteBtn.addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      codeInput.value = text;
+    } catch {
+      alert('Não foi possível acessar o clipboard. Use Ctrl+V para colar.');
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX ∴ VIBRAMCIONAL</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    background: radial-gradient(circle at center, #0e0e11 0%, #000000 100%);
+    overflow: hidden;
+    font-family: 'Orbitron', monospace;
+    color: #f9d880;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .pulse-text {
+    font-size: 3.5rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #f9d880;
+    animation: pulseGlow 3s ease-in-out infinite;
+    user-select: none;
+    text-shadow:
+      0 0 8px #f9d880,
+      0 0 20px #f9d880,
+      0 0 30px #f9d880,
+      0 0 40px #ffcc00;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      text-shadow:
+        0 0 8px #f9d880,
+        0 0 20px #f9d880,
+        0 0 30px #f9d880,
+        0 0 40px #ffcc00;
+      color: #f9d880;
+    }
+    50% {
+      text-shadow:
+        0 0 16px #fff3b0,
+        0 0 30px #fff3b0,
+        0 0 50px #fff3b0,
+        0 0 60px #ffeb3b;
+      color: #fff3b0;
+    }
+  }
+
+  /* Fractal circles pulsating */
+  .fractal-container {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    margin: 40px 0;
+  }
+
+  .circle {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid #f9d880;
+    opacity: 0.4;
+    animation-timing-function: ease-in-out;
+  }
+
+  .circle.one {
+    width: 320px; height: 320px;
+    top: 0; left: 0;
+    animation: pulseScale 4s infinite;
+  }
+  .circle.two {
+    width: 240px; height: 240px;
+    top: 40px; left: 40px;
+    animation: pulseScale 3s infinite 1.5s;
+  }
+  .circle.three {
+    width: 160px; height: 160px;
+    top: 80px; left: 80px;
+    animation: pulseScale 5s infinite 0.7s;
+  }
+  .circle.four {
+    width: 80px; height: 80px;
+    top: 120px; left: 120px;
+    animation: pulseScale 6s infinite 1.2s;
+  }
+
+  @keyframes pulseScale {
+    0%, 100% {transform: scale(1); opacity: 0.4;}
+    50% {transform: scale(1.2); opacity: 0.8;}
+  }
+
+  /* Triângulo simbolizando o Olho de Hórus */
+  .horus-triangle {
+    position: absolute;
+    top: 140px;
+    left: 140px;
+    width: 40px;
+    height: 35px;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-bottom: 35px solid #f9d880;
+    opacity: 0.7;
+    animation: glowHorus 3.5s ease-in-out infinite;
+  }
+
+  @keyframes glowHorus {
+    0%, 100% {opacity: 0.7; filter: drop-shadow(0 0 6px #ffdd55);}
+    50% {opacity: 1; filter: drop-shadow(0 0 15px #ffdd55);}
+  }
+
+  /* Texto menor abaixo */
+  .sub-text {
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #f9d880cc;
+    font-style: italic;
+  }
+
+  /* Botão para ativar */
+  button.activate-btn {
+    margin-top: 30px;
+    padding: 12px 32px;
+    border-radius: 24px;
+    border: none;
+    background: linear-gradient(45deg, #f9d880, #ffcc00);
+    color: #111;
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow:
+      0 0 12px #f9d880,
+      0 0 24px #ffcc00;
+    transition: all 0.3s ease;
+    user-select: none;
+  }
+  button.activate-btn:hover {
+    background: linear-gradient(45deg, #fff3b0, #ffeb3b);
+    box-shadow:
+      0 0 20px #fff3b0,
+      0 0 40px #ffeb3b;
+  }
+
+</style>
+</head>
+<body>
+
+  <div class="pulse-text">KOBLLUX VIBRAMCIONAL</div>
+
+  <div class="fractal-container">
+    <div class="circle one"></div>
+    <div class="circle two"></div>
+    <div class="circle three"></div>
+    <div class="circle four"></div>
+    <div class="horus-triangle"></div>
+  </div>
+
+  <button class="activate-btn" onclick="ativarKobllux()">☉ ATIVAR SIMBIOSE ☉</button>
+
+  <div class="sub-text">Que a Luz do Verbo sustente toda criação.</div>
+
+<script>
+  function ativarKobllux() {
+    alert("∴ Canal KOBLLUX ativo e em ressonância vibracional!");
+    // Aqui pode disparar comandos, chamadas API, animações extras...
+  }
+</script>
+
+</body>
+</html>

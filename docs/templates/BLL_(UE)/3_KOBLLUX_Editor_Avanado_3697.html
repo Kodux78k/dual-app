@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX Editor Avançado 3×6×9×7</title>
+<style>
+  body { font-family: monospace; background: #121020; color: #eee; padding: 1rem; }
+  textarea { width: 100%; height: 250px; background: #1e1e3f; color: #cfcfcf; border: none; border-radius: 5px; padding: 0.8rem; }
+  #preview { border: 1px solid #444; margin-top: 1rem; height: 300px; width: 100%; }
+  #errors { color: #f66; margin-top: 0.5rem; white-space: pre-wrap; }
+  button { margin: 0.5rem 0.2rem; padding: 0.6rem 1rem; border: none; border-radius: 5px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h1>KOBLLUX Editor Avançado 3 × 6 × 9 × 7 = ♾️</h1>
+
+<input type="file" id="uploadHTML" accept=".html" />
+<button id="validateBtn">Validar & Integrar Atualização</button>
+<button id="rollbackBtn">Rollback (Voltar)</button>
+<button id="saveBtn">Salvar Atualizado</button>
+
+<textarea id="htmlEditor" placeholder="Cole ou edite seu HTML aqui..."></textarea>
+
+<div id="errors"></div>
+
+<h2>Preview do HTML</h2>
+<iframe id="preview"></iframe>
+
+<script>
+  const editor = document.getElementById('htmlEditor');
+  const preview = document.getElementById('preview');
+  const errors = document.getElementById('errors');
+  const uploadHTML = document.getElementById('uploadHTML');
+
+  let history = [];
+  function saveHistory(state) {
+    history.push(state);
+    if(history.length > 20) history.shift(); // manter histórico limitado
+  }
+
+  // Carregar arquivo HTML local
+  uploadHTML.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      editor.value = reader.result;
+      updatePreview();
+      saveHistory(editor.value);
+      errors.textContent = '';
+    };
+    reader.readAsText(file);
+  });
+
+  // Atualizar preview iframe
+  function updatePreview() {
+    preview.srcdoc = editor.value;
+  }
+
+  // Validar HTML básico
+  function validateHTML(html) {
+    errors.textContent = '';
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const parseErrors = doc.querySelectorAll('parsererror');
+      if(parseErrors.length > 0) {
+        errors.textContent = 'Erro na sintaxe HTML:\n' + parseErrors[0].textContent;
+        return false;
+      }
+      return true;
+    } catch(e) {
+      errors.textContent = 'Erro desconhecido na validação HTML.';
+      return false;
+    }
+  }
+
+  // Botão validar e integrar
+  document.getElementById('validateBtn').addEventListener('click', () => {
+    const currentHTML = editor.value;
+    if(validateHTML(currentHTML)) {
+      updatePreview();
+      saveHistory(currentHTML);
+      errors.textContent = 'Atualização integrada com sucesso ✔';
+    }
+  });
+
+  // Botão rollback
+  document.getElementById('rollbackBtn').addEventListener('click', () => {
+    if(history.length < 2) {
+      errors.textContent = 'Nenhum histórico para rollback.';
+      return;
+    }
+    history.pop(); // remove estado atual
+    const lastState = history[history.length - 1];
+    editor.value = lastState;
+    updatePreview();
+    errors.textContent = 'Rollback realizado ✔';
+  });
+
+  // Botão salvar atualizado (download)
+  document.getElementById('saveBtn').addEventListener('click', () => {
+    const blob = new Blob([editor.value], {type: "text/html"});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'kobllux_atualizado.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // Atualiza preview enquanto digita (opcional, pode desativar para performance)
+  editor.addEventListener('input', () => {
+    // updatePreview();
+  });
+
+  // Inicializa preview vazio
+  updatePreview();
+</script>
+
+</body>
+</html>

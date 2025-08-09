@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOBLLUX ∴ FRACTAL LOGGER</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #0e0e11;
+      color: #d1f7ff;
+      font-family: 'Courier New', monospace;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      background: #1b1b1e;
+      border: none;
+      color: #ffffff;
+      padding: 1rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      resize: vertical;
+    }
+    button {
+      background: #50c878;
+      color: #000;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 10px #50c878;
+    }
+    .log-output {
+      margin-top: 2rem;
+      white-space: pre-wrap;
+      background: #151517;
+      padding: 1rem;
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>KOBLLUX ∴ FRACTAL LOGGER</h1>
+    <p>Digite sua frase abaixo para análise simbólico-fractal:</p>
+    <textarea id="inputText"></textarea>
+    <button onclick="analisarTexto()">Gerar Log Fractal</button>
+    <div class="log-output" id="logOutput">∴ Aguardando entrada simbólica ∴</div>
+  </div>
+
+  <script>
+    const fractalizar = (texto) => {
+      const palavras = texto.split(/\s+/);
+      let log = `∴ FRACTALIDADE DA LINGUAGEM ∴\n\nTotal de palavras: ${palavras.length}\n`;
+      palavras.forEach((palavra, i) => {
+        let tipo = '∵ VIBRAÇÃO';
+        if (/ar$|er$|ir$/.test(palavra)) tipo = '∵ VERBO';
+        else if (/ão$|ez$|dade$|ção$/.test(palavra)) tipo = '∵ SUBSTANTIVO';
+        else if (/vel$|al$|ico$|osa$/.test(palavra)) tipo = '∵ ADJETIVO';
+        else if (palavra.length <= 2) tipo = '∵ ARTICULAÇÃO';
+        log += `(${i + 1}) ${palavra} → ${tipo}\n`;
+      });
+      log += `\nFractal 3×6×9×7 = ♾️  |  Palavra-Código: VERBO ∴ Centro: Garganta`
+      return log;
+    };
+
+    function analisarTexto() {
+      const input = document.getElementById('inputText').value;
+      const output = fractalizar(input);
+      document.getElementById('logOutput').innerText = output;
+    }
+  </script>
+</body>
+</html>

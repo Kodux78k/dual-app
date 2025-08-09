@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gravador de Áudio | KOBLLUX</title>
+</head>
+<body>
+  <h2>🎙️ Gravador de Áudio - KOBLLUX</h2>
+  <button id="startBtn">🔴 Iniciar Gravação</button>
+  <button id="stopBtn" disabled>⏹️ Parar Gravação</button>
+  <br><br>
+  <audio id="audioPlayback" controls></audio>
+  <br><br>
+  <a id="downloadLink" download="audio.wav">⬇️ Baixar Áudio</a>
+
+  <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    document.getElementById("startBtn").onclick = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder = new MediaRecorder(stream);
+
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        document.getElementById("audioPlayback").src = audioUrl;
+        document.getElementById("downloadLink").href = audioUrl;
+        audioChunks = [];
+      };
+
+      mediaRecorder.start();
+      document.getElementById("startBtn").disabled = true;
+      document.getElementById("stopBtn").disabled = false;
+    };
+
+    document.getElementById("stopBtn").onclick = () => {
+      mediaRecorder.stop();
+      document.getElementById("startBtn").disabled = false;
+      document.getElementById("stopBtn").disabled = true;
+    };
+  </script>
+</body>
+</html>

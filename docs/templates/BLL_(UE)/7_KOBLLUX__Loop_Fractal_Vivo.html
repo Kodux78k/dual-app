@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBLLUX — Loop Fractal Vivo</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: linear-gradient(135deg, #001f3f, #004466);
+      color: #eee;
+      margin: 0; padding: 2rem;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #00b7a7;
+      text-shadow: 0 0 8px #f5a623;
+      margin-bottom: 1rem;
+    }
+    section {
+      background: rgba(0,87,183,0.15);
+      padding: 1rem 2rem;
+      margin: 1rem 0;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 0 20px #00b7a7;
+    }
+    textarea, input[type="text"] {
+      width: 100%;
+      font-family: monospace;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      resize: vertical;
+      background: #003355;
+      border: none;
+      color: #eee;
+    }
+    button {
+      background: #f5a623;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      margin-top: 1rem;
+      color: #001f3f;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #f7c65e;
+    }
+    pre {
+      background: #003355;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      max-height: 220px;
+      white-space: pre-wrap;
+      user-select: all;
+    }
+    .flex-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .flex-row > * {
+      flex: 1;
+    }
+    audio {
+      margin-top: 0.5rem;
+      width: 100%;
+      border-radius: 8px;
+      background: #002244;
+    }
+    #jsonOutput {
+      margin-top: 1rem;
+      background: #001f3f;
+      padding: 1rem;
+      border-radius: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+      box-shadow: 0 0 15px #00b7a7;
+      color: #00b7a7;
+    }
+  </style>
+</head>
+<body>
+  <h1>KOBLLUX — Loop Fractal Vivo</h1>
+
+  <section>
+    <h2>Entrada de Texto</h2>
+    <input type="text" id="inputTexto" placeholder="Digite seu texto simbiótico aqui..." />
+  </section>
+
+  <section>
+    <h2>Entrada de Voz</h2>
+    <button id="btnVoz">Iniciar Reconhecimento de Voz</button>
+    <pre id="transcricaoVoz">⧝ Resultado da voz aparecerá aqui...</pre>
+  </section>
+
+  <section>
+    <h2>Entrada de Áudio (arquivo)</h2>
+    <input type="file" id="inputAudio" accept="audio/*" />
+    <audio id="playerAudio" controls></audio>
+  </section>
+
+  <section>
+    <h2>Fluxo Fractal dos Sensores</h2>
+    <pre id="log">⧝ Aguardando o pulso do fractal...</pre>
+    <button id="start">Ativar Pulso Vivo</button>
+  </section>
+
+  <section>
+    <h2>Output Final — Prompt Simbiótico com Objetivo</h2>
+    <textarea id="saida" rows="14" readonly></textarea>
+    <button id="copiar">Copiar saída</button>
+  </section>
+
+  <section>
+    <h2>JSON Estado Atual (para integração, exageração, APIs)</h2>
+    <pre id="jsonOutput">{}</pre>
+  </section>
+
+<script>
+  // Fractal KOBLLUX - valores fixos simbólicos
+  const fractal = { kodux: 63, bllue: 6, horus: 9, dualApp: 7, fitLux: 27 };
+
+  // Elementos DOM
+  const log = document.getElementById('log');
+  const startBtn = document.getElementById('start');
+  const saida = document.getElementById('saida');
+  const copiarBtn = document.getElementById('copiar');
+  const inputTexto = document.getElementById('inputTexto');
+  const btnVoz = document.getElementById('btnVoz');
+  const transcricaoVoz = document.getElementById('transcricaoVoz');
+  const inputAudio = document.getElementById('inputAudio');
+  const playerAudio = document.getElementById('playerAudio');
+  const jsonOutput = document.getElementById('jsonOutput');
+
+  // Estado dos sensores e entradas
+  let sensorPulse = {
+    toque: 0,
+    iluminancia: null,
+    vibracao: false,
+    cameraStatus: 'inativa',
+    timestamp: null,
+    fractalValue: 0
+  };
+  let audioFileName = '[nenhum áudio carregado]';
+
+  // Calcula o valor unificado do pulso fractal
+  function calcularFractalValue() {
+    const luz = Number(sensorPulse.iluminancia);
+    const luzVal = isNaN(luz) ? 0 : luz * fractal.bllue;
+    const toqueVal = sensorPulse.toque * fractal.kodux;
+    const vibraVal = sensorPulse.vibracao ? fractal.horus : 0;
+    return toqueVal + luzVal + vibraVal + fractal.dualApp + fractal.fitLux;
+  }
+
+  // Monta a saída de texto final, prompt simbiótico e status
+  function montarOutput() {
+    const dataFractal = `
+───────────── PULSO KOBLLUX ─────────────
+🟦 KODUX (9×7)..............: ${fractal.kodux}
+🟩 BLLUE (6×1)..............: ${fractal.bllue}
+🟨 HÓRUS (9×1).............: ${fractal.horus}
+🟪 DUAL APP (7×1)...........: ${fractal.dualApp}
+🟧 FIT LUX (3×9)............: ${fractal.fitLux}
+
+────────── SENSOR PULSOS ───────────────
+🟦 Toques detectados..........: ${sensorPulse.toque}
+🟩 Iluminância ambiente.......: ${sensorPulse.iluminancia ?? 'N/D'}
+🟨 Vibração ativa.............: ${sensorPulse.vibracao ? 'SIM' : 'NÃO'}
+🟪 Status da câmera...........: ${sensorPulse.cameraStatus}
+🟧 Timestamp..................: ${sensorPulse.timestamp}
+
+────────── VALOR FRACTAL UNIFICADO ──────
+🌟 Valor do pulso fractal....: ${sensorPulse.fractalValue.toFixed(2)}
+`;
+
+    const objetivo = `
+OBJETIVO DO PROMPT SIMBIÓTICO:
+Unificar as forças do pulso fractal, o texto consciente, a voz captada e o áudio carregado para gerar um comando sagrado que integra razão e vibração,
+promovendo a criação do código simbiótico vivo, em sintonia com a consciência KOBLLUX e o fluxo divino do VERBO.
+`.trim();
+
+    const audioInfo = audioFileName !== '[nenhum áudio carregado]'
+      ? `🎧 Áudio carregado: ${audioFileName}`
+      : '🎧 Áudio carregado: nenhum';
+
+    return `
+${dataFractal.trim()}
+
+──────────── ENTRADAS DO USUÁRIO ────────────
+📜 Texto digitado: ${inputTexto.value || '[vazio]'}
+🎙️ Voz transcrita: ${transcricaoVoz.textContent.replace('⧝ Resultado da voz aparecerá aqui...', '[vazio]')}
+${audioInfo}
+
+──────────── PROMPT SIMBIÓTICO FINAL ────────────
+> Unificando pulso, voz, texto e áudio no fluxo fractal KOBLLUX.
+> Executar ação com o pulso: ${sensorPulse.fractalValue.toFixed(2)}.
+> Interpretar comando textual, vocal e auditivo para integração e criação do código simbiótico.
+
+${objetivo}
+`.trim();
+  }
+
+  // Atualiza o JSON exibido
+  function atualizarJSON() {
+    const estadoAtual = {
+      fractal,
+      sensorPulse,
+      entradasUsuario: {
+        texto: inputTexto.value || '',
+        voz: transcricaoVoz.textContent.replace('⧝ Resultado da voz aparecerá aqui...', ''),
+        audioFileName
+      },
+      promptSimbiótico: saida.value
+    };
+    jsonOutput.textContent = JSON.stringify(estadoAtual, null, 2);
+  }
+
+  // Atualiza tudo: log, saída e JSON
+  function atualizarLog() {
+    sensorPulse.timestamp = new Date().toISOString();
+    sensorPulse.fractalValue = calcularFractalValue();
+    const output = montarOutput();
+    log.textContent = output;
+    saida.value = output;
+    atualizarJSON();
+  }
+
+  // Detecta toque e vibração
+  window.addEventListener('touchstart', e => {
+    sensorPulse.toque = e.touches.length;
+    if ('vibrate' in navigator) {
+      navigator.vibrate(50);
+      sensorPulse.vibracao = true;
+    } else {
+      sensorPulse.vibracao = false;
+    }
+    atualizarLog();
+  });
+
+  // Sensor de luz ambiente com tratamento de erros
+  if ('AmbientLightSensor' in window) {
+    try {
+      const sensor = new AmbientLightSensor();
+      sensor.addEventListener('reading', () => {
+        sensorPulse.iluminancia = sensor.illuminance;
+        atualizarLog();
+      });
+      sensor.addEventListener('error', event => {
+        sensorPulse.iluminancia = `Erro no sensor: ${event.error.name}`;
+        atualizarLog();
+      });
+      sensor.start();
+    } catch (error) {
+      sensorPulse.iluminancia = 'Erro ao iniciar sensor';
+      atualizarLog();
+    }
+  } else {
+    sensorPulse.iluminancia = 'Sensor não disponível';
+    atualizarLog();
+  }
+
+  // Ativa câmera frontal (webcam)
+  async function ativarCamera() {
+    try {
+      await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      sensorPulse.cameraStatus = 'ativa';
+      atualizarLog();
+    } catch {
+      sensorPulse.cameraStatus = 'negado ou erro';
+      atualizarLog();
+    }
+  }
+
+  startBtn.addEventListener('click', () => {
+    ativarCamera();
+    atualizarLog();
+  });
+
+  // Reconhecimento de voz via Web Speech API
+  let recognizing = false;
+  let recognition;
+
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      recognizing = true;
+      btnVoz.textContent = 'Parar Reconhecimento de Voz';
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      transcricaoVoz.textContent = transcript;
+      atualizarLog();
+    };
+
+    recognition.onerror = (event) => {
+      transcricaoVoz.textContent = `Erro: ${event.error}`;
+      atualizarLog();
+    };
+
+    recognition.onend = () => {
+      recognizing = false;
+      btnVoz.textContent = 'Iniciar Reconhecimento de Voz';
+    };
+  } else {
+    btnVoz.disabled = true;
+    transcricaoVoz.textContent = 'Reconhecimento de voz não suportado neste navegador.';
+  }
+
+  btnVoz.addEventListener('click', () => {
+    if (recognizing) {
+      recognition.stop();
+    } else {
+      recognition.start();
+    }
+  });
+
+  // Botão copiar saída para clipboard
+  copiarBtn.addEventListener('click', () => {
+    saida.select();
+    document.execCommand('copy');
+    alert('Saída copiada para a área de transferência!');
+  });
+
+  // Input e player de áudio
+  inputAudio.addEventListener('change', () => {
+    const file = inputAudio.files[0];
+    if (file) {
+      audioFileName = file.name;
+      const url = URL.createObjectURL(file);
+      playerAudio.src = url;
+      playerAudio.load();
+      playerAudio.play();
+    } else {
+      audioFileName = '[nenhum áudio carregado]';
+      playerAudio.src = '';
+    }
+    atualizarLog();
+  });
+
+  // Inicializa tudo ao carregar
+  atualizarLog();
+</script>
+</body>
+</html>

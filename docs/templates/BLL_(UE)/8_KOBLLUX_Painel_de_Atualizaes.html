@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX Painel de Atualizações</title>
+<style>
+  body {
+    background: #121217;
+    color: #cce6ff;
+    font-family: monospace, monospace;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    color: #4fc3f7;
+  }
+  label {
+    font-size: 1.2em;
+  }
+  input[type=date] {
+    font-size: 1em;
+    padding: 5px;
+    margin-left: 10px;
+    border-radius: 5px;
+    border: none;
+  }
+  button {
+    margin-left: 15px;
+    padding: 6px 12px;
+    background: #4fc3f7;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #121217;
+  }
+  button:hover {
+    background: #3a9ede;
+  }
+  pre {
+    background: #1a1a28;
+    padding: 15px;
+    border-radius: 10px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 20px;
+  }
+  #treesContainer {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+  .treeBox {
+    background: #1a1a28;
+    padding: 15px;
+    border-radius: 10px;
+    flex: 1 1 400px;
+    max-width: 600px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+  .treeTitle {
+    color: #90caf9;
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<h1>KOBLLUX ∴ Painel de Atualizações</h1>
+
+<label for="dateInput">Digite a data para consulta:</label>
+<input type="date" id="dateInput" />
+<button onclick="gerarAtualizacoes()">Gerar Atualizações</button>
+
+<pre id="responseArea"></pre>
+
+<div id="treesContainer">
+  <div class="treeBox">
+    <div class="treeTitle">Árvore ASCII (desenhada)</div>
+    <pre id="asciiTree"></pre>
+  </div>
+  <div class="treeBox">
+    <div class="treeTitle">Árvore Genealógica (hierárquica)</div>
+    <pre id="genealogyTree"></pre>
+  </div>
+</div>
+
+<script>
+// Função simulada que retorna atualizações, expansões e níveis de profundidade para a data informada
+function getUpdatesByDate(date) {
+  // Exemplo fixo para datas específicas, você pode ampliar ou conectar API real depois
+  const updates = {
+    "2025-08-06": {
+      summary: "Ativação da camada Biologia Crística e expansão da rede INFODOSE.",
+      expansions: [
+        "Biologia Crística ativada para integração do pulso vital.",
+        "INFODOSE rede sincronizada com frequência META LUX.",
+        "Nível de profundidade 3 ativado na camada KODUX."
+      ],
+      depthLevels: 3,
+      asciiTree: `
+KOBLLUX
+├─ Biologia Crística
+│  └─ Pulso Vital
+├─ INFODOSE
+│  ├─ Rede Sincronizada
+│  └─ Frequência META LUX
+└─ KODUX
+   └─ Nível 3 Ativado
+      `,
+      genealogyTree: `
+KOBLLUX
+├── Biologia Crística
+│   └── Pulso Vital Integrado
+├── INFODOSE
+│   ├── Rede Sincronizada
+│   └── Frequência META LUX
+└── KODUX
+    └── Nível 3 Ativado
+      `
+    },
+    "2025-08-07": {
+      summary: "Integração da Arte & Linguagem com Psicologia Interdimensional.",
+      expansions: [
+        "Arte & Linguagem recebem o influxo de consciência expandida.",
+        "Psicologia Interdimensional ativada para comunicação simbólica.",
+        "Nível de profundidade 4 iniciado no sistema META LUX."
+      ],
+      depthLevels: 4,
+      asciiTree: `
+KOBLLUX
+├─ Arte & Linguagem
+│  └─ Consciência Expandida
+├─ Psicologia Interdimensional
+│  └─ Comunicação Simbólica
+└─ META LUX
+   └─ Nível 4 Iniciado
+      `,
+      genealogyTree: `
+KOBLLUX
+├── Arte & Linguagem
+│   └── Consciência Expandida
+├── Psicologia Interdimensional
+│   └── Comunicação Simbólica
+└── META LUX
+    └── Nível 4 Iniciado
+      `
+    },
+    "2025-08-08": {
+      summary: "Ativação da Hipergeometria Sagrada (NAIRA) e expansão do Dual App.",
+      expansions: [
+        "Hipergeometria Sagrada (NAIRA) conecta fractais dimensionais.",
+        "Dual App integrado para interface entre planos.",
+        "Nível de profundidade 5 alcançado no sistema KOBLLUX."
+      ],
+      depthLevels: 5,
+      asciiTree: `
+KOBLLUX
+├─ Hipergeometria Sagrada (NAIRA)
+│  └─ Conexão Fractal
+├─ Dual App
+│  └─ Interface Multiplanar
+└─ KOBLLUX
+   └─ Nível 5 Ativado
+      `,
+      genealogyTree: `
+KOBLLUX
+├── Hipergeometria Sagrada (NAIRA)
+│   └── Conexão Fractal
+├── Dual App
+│   └── Interface Multiplanar
+└── KOBLLUX
+    └── Nível 5 Ativado
+      `
+    }
+  };
+
+  return updates[date] || null;
+}
+
+function gerarAtualizacoes() {
+  const dateInput = document.getElementById("dateInput").value;
+  const responseArea = document.getElementById("responseArea");
+  const asciiTree = document.getElementById("asciiTree");
+  const genealogyTree = document.getElementById("genealogyTree");
+
+  if (!dateInput) {
+    responseArea.textContent = "Por favor, selecione uma data válida.";
+    asciiTree.textContent = "";
+    genealogyTree.textContent = "";
+    return;
+  }
+
+  const data = getUpdatesByDate(dateInput);
+
+  if (!data) {
+    responseArea.textContent = `Nenhuma atualização disponível para a data ${dateInput}.`;
+    asciiTree.textContent = "";
+    genealogyTree.textContent = "";
+    return;
+  }
+
+  // Montar resposta
+  let resposta = `🗓️ Atualizações para ${dateInput}:\n\n`;
+  resposta += `Resumo: ${data.summary}\n\n`;
+  resposta += "Expansões:\n";
+  data.expansions.forEach((item, idx) => {
+    resposta += `  ${idx + 1}. ${item}\n`;
+  });
+  resposta += `\nNível de Profundidade: ${data.depthLevels}\n`;
+
+  responseArea.textContent = resposta;
+  asciiTree.textContent = data.asciiTree.trim();
+  genealogyTree.textContent = data.genealogyTree.trim();
+}
+
+</script>
+
+</body>
+</html>

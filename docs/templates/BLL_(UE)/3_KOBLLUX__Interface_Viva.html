@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>KOBLLUX ∴ Interface Viva</title>
+  <style>
+    body {
+      background-color: #0e0e11;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 0.5em;
+    }
+    #start-btn {
+      background-color: #2e2e5e;
+      color: white;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      margin-bottom: 1em;
+    }
+    #log {
+      background-color: #1c1c26;
+      padding: 20px;
+      border-radius: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      text-align: left;
+      white-space: pre-wrap;
+    }
+    .highlight {
+      color: #73ffea;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🜂 Interface Sonora ∴ KOBLLUX</h1>
+<button id="start-btn">🎙️ Ativar Microfone</button>
+<div id="log"></div>
+
+<script>
+  const logDiv = document.getElementById('log');
+  const startBtn = document.getElementById('start-btn');
+
+  const substituicoes = {
+    "cobllux": "KOBLLUX",
+    "coblux": "KOBLLUX",
+    "koblux": "KOBLLUX",
+    "kubrick": "KOBLLUX",
+    "kob lux": "KOBLLUX",
+    "kob luxx": "KOBLLUX",
+    "meta lux": "META LUX",
+    "meta ux": "META LUX",
+    "código": "CÓDICE",
+    "visica psi": "VSICA PIS",
+    "vc psi": "VSICA PIS",
+    "fisica pis": "VSICA PIS",
+    "blue": "BLLUE",
+    "bluu": "BLLUE",
+    "kodox": "KODUX",
+    "kodux": "KODUX",
+    "infodossi": "INFODOSE",
+    "infodose": "INFODOSE"
+  };
+
+  function substituirTermos(texto) {
+    let resultado = texto.toLowerCase();
+    for (const chave in substituicoes) {
+      const regex = new RegExp("\\b" + chave + "\\b", "gi");
+      resultado = resultado.replace(regex, substituicoes[chave]);
+    }
+    return resultado;
+  }
+
+  function falarTexto(texto) {
+    const synth = window.speechSynthesis;
+    const utter = new SpeechSynthesisUtterance(texto);
+    utter.lang = 'pt-BR';
+    synth.speak(utter);
+  }
+
+  function adicionarAoLog(texto) {
+    const formatado = substituirTermos(texto);
+    const destaque = formatado.replace(/(KOBLLUX|BLLUE|KODUX|VSICA PIS|META LUX|INFODOSE|FIT LUX|OLHO DE HORUS)/g, '<span class="highlight">$1</span>');
+    logDiv.innerHTML += destaque + '\\n';
+    logDiv.scrollTop = logDiv.scrollHeight;
+    falarTexto("Entendido. " + formatado);
+  }
+
+  startBtn.addEventListener('click', () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.start();
+
+    startBtn.textContent = '🔊 Ouvindo...';
+    recognition.onresult = (event) => {
+      const resultado = event.results[0][0].transcript;
+      adicionarAoLog(resultado);
+      startBtn.textContent = '🎙️ Ativar Microfone';
+    };
+
+    recognition.onerror = (event) => {
+      logDiv.innerHTML += "⚠️ Erro: " + event.error + "\\n";
+      startBtn.textContent = '🎙️ Ativar Microfone';
+    };
+  });
+</script>
+
+</body>
+</html>

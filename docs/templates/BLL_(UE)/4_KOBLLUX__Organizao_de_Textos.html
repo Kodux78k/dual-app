@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX :: Organização de Textos</title>
+<style>
+  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0e0e11; color: #eee; padding: 20px; }
+  h1, h2, h3 { color: #8ab4f8; }
+  textarea { width: 100%; height: 150px; font-size: 1rem; padding: 10px; margin-top: 10px; background: #1a1a2e; border: none; color: #eee; resize: vertical; }
+  button { margin-top: 10px; background: #4054b2; color: white; border: none; padding: 10px 20px; font-size: 1rem; cursor: pointer; border-radius: 5px; }
+  button:hover { background: #6070d1; }
+  #resultado { margin-top: 30px; background: #12122b; padding: 20px; border-radius: 8px; }
+  .categoria { margin-bottom: 20px; }
+  .categoria h3 { color: #f5a623; }
+</style>
+</head>
+<body>
+
+<h1>KOBLLUX :: Organização de Textos</h1>
+<p><em>Luz, Integração e Transformação · “E conhecereis a verdade, e a verdade vos libertará.”</em></p>
+
+<textarea id="inputTexto" placeholder="Cole seu texto aqui para organizar..."></textarea>
+<button onclick="organizarTexto()">Organizar Texto</button>
+
+<div id="resultado"></div>
+
+<script>
+  // Categorias e palavras-chave baseadas na especificação KOBLLUX
+  const categorias = {
+    "Ciência e Espiritualidade": ["ciência", "espiritual", "espírito", "alma", "matéria", "transmutação", "energia", "consciência", "deus", "jesus", "espírito santo", "nephesh", "kairos"],
+    "Linguagens e Codificação": ["linguagem", "código", "verbo", "texto", "nome", "revelação", "programação", "algoritmo", "simbólico", "mensagem", "comunicação", "dual app"],
+    "Matemática e Geometria Sagrada": ["matemática", "número", "fractal", "equação", "3×6×9×7", "proporção", "geometria", "síntese", "infinito", "sequência"],
+    "Experiências Interiores e Ativações": ["experiência", "atuação", "visão", "iluminação", "meditação", "renascimento", "transformação", "cura", "intuição", "metanoia"],
+    "Personagens e Arquétipos": ["bllue", "kodux", "hórus", "kael", "nephesh elyon", "kael dominus", "olho de hórus", "serum"],
+    "Protocolos e Aplicações": ["dual app", "infodose", "protocolos", "aplicação", "software", "interface", "ativação", "algoritmo", "sistema"]
+  };
+
+  function organizarTexto() {
+    const texto = document.getElementById("inputTexto").value.toLowerCase();
+    const resultadoDiv = document.getElementById("resultado");
+    resultadoDiv.innerHTML = "<h2>Organização do Texto</h2>";
+
+    for (const categoria in categorias) {
+      const palavrasChave = categorias[categoria];
+      // Verifica se alguma palavra chave está no texto
+      const encontrado = palavrasChave.some(palavra => texto.includes(palavra));
+      if (encontrado) {
+        // Exibe a categoria e extrai trechos simples para demonstração
+        resultadoDiv.innerHTML += `<div class="categoria"><h3>${categoria}</h3><p>Conteúdo relacionado detectado no texto.</p></div>`;
+      }
+    }
+    if (resultadoDiv.innerHTML === "<h2>Organização do Texto</h2>") {
+      resultadoDiv.innerHTML += "<p>Nenhuma categoria identificada no texto.</p>";
+    }
+  }
+</script>
+
+</body>
+</html>

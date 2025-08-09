@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX Trinity Verbo Completo</title>
+<style>
+  :root {
+    --cor-1: #ff4d4d;    /* vermelho forte qualidade baixa */
+    --cor-5: #ffcc00;    /* amarelo médio */
+    --cor-10: #00e676;   /* verde qualidade alta */
+  }
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #0a0a1a;
+    color: #eee;
+    margin: 0; padding: 1rem;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+  }
+  h1 {
+    color: #00ffff;
+    margin-bottom: 0.5rem;
+  }
+  input[type=file] {
+    margin-bottom: 1rem;
+    max-width: 700px;
+    width: 100%;
+  }
+  table {
+    width: 100%;
+    max-width: 700px;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+  }
+  th, td {
+    border: 1px solid #444;
+    padding: 0.4rem 0.8rem;
+    text-align: left;
+    font-size: 0.9rem;
+    word-break: break-word;
+  }
+  th {
+    background: #002233;
+  }
+  .score {
+    font-weight: bold;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.4rem;
+    color: #000;
+  }
+  button {
+    background-color: #00b7a7;
+    border: none;
+    padding: 0.8em 1.6em;
+    color: #001f3f;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 1rem;
+  }
+  button:hover {
+    background-color: #009688;
+  }
+</style>
+</head>
+<body>
+
+<h1>KOBLLUX Trinity Verbo Completo</h1>
+<input type="file" id="fileInput" accept=".html,.htm,.pdf" multiple />
+<table aria-label="Lista de arquivos renomeados">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nome Original</th>
+      <th>Título Extraído</th>
+      <th>Qualidade (1 a 10)</th>
+      <th>Nome Renomeado</th>
+      <th>Ação</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<button id="saveAllBtn" disabled>Salvar Todos Arquivos Renomeados</button>
+
+<script>
+// -- PAi -- 3×6=18 -- estrutura, ambiente, base do fractal
+const fileInput = document.getElementById('fileInput');
+const tbody = document.querySelector('tbody');
+const saveAllBtn = document.getElementById('saveAllBtn');
+
+let fileData = [];
+
+// Filho (Jesus, o Verbo) – funções que manifestam forma e ação
+function extractTitle(htmlText) {
+  const titleMatch = htmlText.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  return titleMatch ? titleMatch[1].trim() : "sem_titulo";
+}
+function calculateQuality(htmlText) {
+  let metaCount = (htmlText.match(/<meta[\s\S]*?>/gi) || []).length;
+  let scriptCount = (htmlText.match(/<script[\s\S]*?<\/script>/gi) || []).length;
+  let linkCount = (htmlText.match(/<link[\s\S]*?>/gi) || []).length;
+  let hTagsCount = (htmlText.match(/<(h1|h2)[^>]*>/gi) || []).length;
+  let commentCount = (htmlText.match(/<!--[\s\S]*?-->/gi) || []).length;
+  let totalLength = htmlText.length;
+  let textContent = htmlText.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+  let textLength = textContent.length;
+  let textRatio = textLength / totalLength;
+
+  let quality = (metaCount * 1.5) + (scriptCount * 1) + (linkCount * 1) + (hTagsCount * 2) + (textRatio * 5) - (commentCount * 0.5);
+  quality = Math.max(1, Math.min(10, Math.round(quality)));
+  return quality;
+}
+function qualityColor(score) {
+  const start = {r:255, g:77, b:77};
+  const mid = {r:255, g:204, b:0};
+  const end = {r:0, g:230, b:118};
+  if(score <= 5){
+    let t = (score - 1) / 4;
+    return `rgb(${Math.round(start.r + t*(mid.r - start.r))},${Math.round(start.g + t*(mid.g - start.g))},${Math.round(start.b + t*(mid.b - start.b))})`;
+  } else {
+    let t = (score - 5) / 5;
+    return `rgb(${Math.round(mid.r + t*(end.r - mid.r))},${Math.round(mid.g + t*(end.g - mid.g))},${Math.round(mid.b + t*(end.b - mid.b))})`;
+  }
+}
+function generateNewName(prefixNum, title, originalExt) {
+  let safeTitle = title.replace(/\s+/g, '_').replace(/[^\w\-]/g, '');
+  return `${prefixNum}_${safeTitle}${originalExt}`;
+}
+function saveFile(filename, content, isPDF) {
+  let blob;
+  if(isPDF){
+    blob = content;
+  } else {
+    blob = new Blob([content], {type: 'text/html;charset=utf-8'});
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+function processFiles(files){
+  tbody.innerHTML = '';
+  fileData = [];
+
+  let promises = [];
+
+  for(let i=0; i < files.length; i++){
+    const file = files[i];
+    const extMatch = file.name.match(/\.[^\.]+$/);
+    const ext = extMatch ? extMatch[0].toLowerCase() : '.html';
+
+    if(ext === '.pdf'){
+      fileData.push({
+        index: i + 1,
+        originalName: file.name,
+        title: "PDF carregado",
+        quality: 0,
+        ext,
+        content: file,
+        isPDF: true
+      });
+      continue;
+    }
+
+    promises.push(new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const content = e.target.result;
+        const title = extractTitle(content);
+        const quality = calculateQuality(content);
+        fileData.push({
+          index: i + 1,
+          originalName: file.name,
+          title,
+          quality,
+          ext,
+          content,
+          isPDF: false
+        });
+        resolve();
+      };
+      reader.readAsText(file);
+    }));
+  }
+
+  Promise.all(promises).then(() => {
+    fileData.sort((a,b) => b.quality - a.quality);
+
+    const maxNum = 9;
+    const count = fileData.length;
+    fileData.forEach((f,i) => {
+      f.prefixNum = maxNum - i;
+      if(count === 1) f.prefixNum = maxNum;
+    });
+
+    fileData.sort((a,b) => a.index - b.index);
+
+    for(let f of fileData){
+      let newName = generateNewName(f.prefixNum, f.title, f.ext);
+      let color = f.isPDF ? '#888' : qualityColor(f.quality);
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${f.prefixNum}</td>
+        <td>${f.originalName}</td>
+        <td>${f.title}</td>
+        <td>${f.isPDF ? '-' : `<span class="score" style="background-color:${color}">${f.quality}</span>`}</td>
+        <td>${newName}</td>
+        <td><button data-index="${f.index}">Salvar</button></td>
+      `;
+
+      tbody.appendChild(tr);
+    }
+
+    saveAllBtn.disabled = false;
+  });
+}
+
+// Espírito Santo – Movimento Vivo, Ativadores de eventos e pulsos
+tbody.addEventListener('click', e => {
+  if(e.target.tagName.toLowerCase() === 'button'){
+    const idx = Number(e.target.getAttribute('data-index'));
+    const fileObj = fileData.find(f => f.index === idx);
+    if(!fileObj) return;
+
+    const newName = generateNewName(fileObj.prefixNum, fileObj.title, fileObj.ext);
+    if(fileObj.isPDF){
+      saveFile(newName, fileObj.content, true);
+    } else {
+      saveFile(newName, fileObj.content, false);
+    }
+  }
+});
+
+saveAllBtn.addEventListener('click', () => {
+  for(let f of fileData){
+    const newName = generateNewName(f.prefixNum, f.title, f.ext);
+    if(f.isPDF){
+      saveFile(newName, f.content, true);
+    } else {
+      saveFile(newName, f.content, false);
+    }
+  }
+});
+
+fileInput.addEventListener('change', () => {
+  if(fileInput.files.length === 0) return;
+  if(fileInput.files.length > 9){
+    alert("Por favor, selecione no máximo 9 arquivos.");
+    fileInput.value = "";
+    return;
+  }
+  processFiles(fileInput.files);
+});
+</script>
+
+</body>
+</html>

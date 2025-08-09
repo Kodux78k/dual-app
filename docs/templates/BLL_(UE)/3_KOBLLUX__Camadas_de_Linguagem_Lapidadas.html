@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBLLUX ∴ Camadas de Linguagem Lapidadas</title>
+  <style>
+    /* Reset e base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background: #0e0e11;
+      color: #e0e0e0;
+      font-family: 'Consolas', monospace;
+      margin: 0;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 100vh;
+    }
+    .balloon {
+      background: linear-gradient(135deg, #121214, #1a1a1f);
+      border-radius: 1rem;
+      padding: 1rem;
+      box-shadow:
+        0 0 15px 3px #2a9df4cc,
+        inset 0 0 10px #0f70ff88;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      min-height: 35vh;
+      max-height: 50vh;
+      flex: 1 1 auto;
+    }
+    h2 {
+      margin: 0 0 0.5rem 0;
+      font-weight: 600;
+      text-align: center;
+      text-shadow: 0 0 8px #2a9df4cc;
+      user-select: none;
+      font-size: 1.3rem;
+    }
+    /* Menu de botões das camadas */
+    #layerMenu {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1rem;
+      user-select: none;
+      flex-wrap: wrap;
+    }
+    #layerMenu button {
+      background: #101018;
+      border: 1.5px solid #2a9df4cc;
+      border-radius: 0.5rem;
+      color: #62dafb;
+      padding: 0.4rem 0.8rem;
+      font-family: 'Consolas', monospace;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      box-shadow: 0 0 6px #2a9df4cc;
+      min-width: 60px;
+      text-align: center;
+    }
+    #layerMenu button.active,
+    #layerMenu button:hover {
+      background: #2a9df4f0;
+      color: #0af;
+      box-shadow: 0 0 15px 3px #0af;
+    }
+    /* Textarea geral */
+    #inputArea {
+      flex: 1;
+      background: #0b0b0f;
+      border: none;
+      border-radius: 0.5rem;
+      color: #c0d8f8;
+      font-family: 'Consolas', monospace;
+      font-size: 0.95rem;
+      padding: 1rem;
+      resize: none;
+      box-shadow: inset 0 0 10px #0f70ff88;
+      outline: none;
+      transition: box-shadow 0.3s ease;
+      min-height: 120px;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+    #inputArea:focus {
+      box-shadow: inset 0 0 18px #1a9dffcc;
+      background: #101018;
+    }
+    /* Saída */
+    #outputArea {
+      flex: 1;
+      background: #101018;
+      border-radius: 0.5rem;
+      overflow-y: auto;
+      padding: 1rem;
+      font-size: 0.9rem;
+      user-select: text;
+      min-height: 120px;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+    /* Estrutura visual da árvore HTML */
+    .node {
+      margin-left: 1rem;
+      border-left: 1px dotted #2a9df4aa;
+      padding-left: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+    .tag {
+      color: #62dafb;
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+    .attributes {
+      color: #ffb86c;
+      font-style: italic;
+    }
+    .text-node {
+      color: #f8f8f2;
+      font-style: normal;
+      margin-left: 1.5rem;
+      white-space: pre-wrap;
+    }
+    /* Cores categorias texto KOBLLUX */
+    .verbo {
+      color: #f57c00; /* laranja */
+      font-weight: 600;
+    }
+    .substantivo {
+      color: #2979ff; /* azul */
+      font-weight: 600;
+    }
+    .adjetivo {
+      color: #388e3c; /* verde */
+      font-weight: 600;
+    }
+    /* Títulos internos da lapidação texto */
+    #outputArea h3 {
+      margin: 0 0 0.3rem 0;
+      border-bottom: 1px solid #2a9df4cc;
+      color: #72c7ff;
+      user-select: none;
+      font-size: 1.1rem;
+    }
+    #outputArea strong {
+      color: #88d8ff;
+      user-select: none;
+      margin-right: 0.3rem;
+      font-weight: 700;
+    }
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a9df4cc;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0e0e11;
+    }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+      body {
+        padding: 0.5rem;
+      }
+      .balloon {
+        min-height: 30vh;
+        max-height: 45vh;
+        padding: 0.7rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+      }
+      #layerMenu button {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+        min-width: 50px;
+      }
+      #inputArea, #outputArea {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <section class="balloon" aria-label="Balão de entrada">
+    <h2>Entrada</h2>
+    <nav id="layerMenu" aria-label="Selecionar camada de linguagem">
+      <button data-layer="text" class="active" type="button">Texto</button>
+      <button data-layer="html" type="button">HTML</button>
+      <button data-layer="python" type="button">Python</button>
+      <button data-layer="json" type="button">JSON</button>
+      <button data-layer="java" type="button">Java</button>
+      <button data-layer="note" type="button">𝙣𝙤𝙩𝙚</button>
+    </nav>
+    <textarea id="inputArea" spellcheck="false" placeholder="Digite ou cole seu texto aqui..."></textarea>
+  </section>
+
+  <section class="balloon" aria-label="Balão de saída">
+    <h2>Saída Estruturada</h2>
+    <div id="outputArea" role="region" aria-live="polite"></div>
+  </section>
+
+<script>
+  const layerButtons = document.querySelectorAll('#layerMenu button');
+  const inputArea = document.getElementById('inputArea');
+  const outputArea = document.getElementById('outputArea');
+
+  let currentLayer = 'text';
+
+  // Palavras exemplos para categoria (expandir conforme necessário)
+  const verbos = ['é', 'ser', 'estar', 'fazer', 'ter', 'poder', 'dizer', 'ir', 'ver', 'dar', 'gira', 'integra'];
+  const substantivos = ['nome', 'mandala', 'verdade', 'integração', 'centro', 'resto', 'texto', 'frase', 'verso', 'estrofe'];
+  const adjetivos = ['vivo', 'grande', 'fractal', 'sagrado', 'primeiro', 'interior', 'livre', 'claro'];
+
+  // Função para categorizar palavra
+  function categorizarPalavra(palavra) {
+    const p = palavra.toLowerCase().replace(/[.,;:!?]/g, '');
+    if (verbos.includes(p)) return 'verbo';
+    if (substantivos.includes(p)) return 'substantivo';
+    if (adjetivos.includes(p)) return 'adjetivo';
+    return 'neutro';
+  }
+
+  function clearOutput() {
+    outputArea.innerHTML = '';
+  }
+
+  // Cria visual árvore para HTML
+  function createNodeElement(node) {
+    const el = document.createElement('div');
+    el.classList.add('node');
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const tagName = document.createElement('span');
+      tagName.textContent = '<' + node.tagName.toLowerCase() + '>';
+      tagName.classList.add('tag');
+      el.appendChild(tagName);
+
+      if (node.attributes.length > 0) {
+        const attrSpan = document.createElement('span');
+        attrSpan.classList.add('attributes');
+        let attrText = ' [';
+        for (let attr of node.attributes) {
+          attrText += `${attr.name}="${attr.value}" `;
+        }
+        attrText = attrText.trim() + ']';
+        attrSpan.textContent = attrText;
+        el.appendChild(attrSpan);
+      }
+
+      if (node.childNodes.length > 0) {
+        for (let child of node.childNodes) {
+          el.appendChild(createNodeElement(child));
+        }
+      }
+    } else if (node.nodeType === Node.TEXT_NODE) {
+      const trimmedText = node.textContent.trim();
+      if (trimmedText.length > 0) {
+        const textSpan = document.createElement('div');
+        textSpan.classList.add('text-node');
+        textSpan.textContent = trimmedText;
+        el.appendChild(textSpan);
+      } else {
+        return document.createDocumentFragment();
+      }
+    } else if (node.nodeType === Node.COMMENT_NODE) {
+      const commentSpan = document.createElement('div');
+      commentSpan.style.color = '#6272a4';
+      commentSpan.style.fontStyle = 'italic';
+      commentSpan.textContent = `<!-- ${node.textContent.trim()} -->`;
+      el.appendChild(commentSpan);
+    } else {
+      const otherSpan = document.createElement('div');
+      otherSpan.textContent = `[Node type ${node.nodeType} não exibido]`;
+      el.appendChild(otherSpan);
+    }
+
+    return el;
+  }
+
+  // Lapidação texto puro (camada text)
+  function processTextLayer(text) {
+    clearOutput();
+
+    if (!text.trim()) return;
+
+    // Estrofes = quebra dupla de linha
+    const estrofes = text.split(/\n\s*\n/);
+
+    estrofes.forEach((estrofe, i) => {
+      const estrofeDiv = document.createElement('div');
+      estrofeDiv.style.marginBottom = '1rem';
+
+      const estrofeTitle = document.createElement('h3');
+      estrofeTitle.textContent = `Estrofe ${i + 1}`;
+      estrofeDiv.appendChild(estrofeTitle);
+
+      // Versos = quebra simples de linha
+      const versos = estrofe.split(/\n/);
+
+      versos.forEach((verso, j) => {
+        const versoDiv = document.createElement('div');
+        versoDiv.style.marginLeft = '1rem';
+        versoDiv.style.marginBottom = '0.6rem';
+
+        const versoTitle = document.createElement('strong');
+        versoTitle.textContent = `Verso ${j + 1}: `;
+        versoDiv.appendChild(versoTitle);
+
+        // Frases = separar por .,;
+        const frases = verso.split(/([.,;])/).filter(s => s.trim() !== '');
+
+        frases.forEach((frase) => {
+          if (['.', ',', ';'].includes(frase)) {
+            const pont = document.createElement('span');
+            pont.textContent = frase;
+            pont.style.color = '#f9d71c';
+            versoDiv.appendChild(pont);
+            return;
+          }
+
+          const fraseSpan = document.createElement('span');
+          fraseSpan.style.color = '#d0e7ff';
+
+          // Tokenizar e categorizar palavras
+          const palavras = frase.split(/\s+/).filter(w => w.trim() !== '');
+
+          palavras.forEach((palavra) => {
+            const cat = categorizarPalavra(palavra);
+            const pSpan = document.createElement('span');
+            pSpan.textContent = palavra;
+            pSpan.style.marginRight = '0.3rem';
+
+            switch (cat) {
+              case 'verbo':
+                pSpan.classList.add('verbo');
+                break;
+              case 'substantivo':
+                pSpan.classList.add('substantivo');
+                break;
+              case 'adjetivo':
+                pSpan.classList.add('adjetivo');
+                break;
+              default:
+                pSpan.style.color = '#ccc';
+            }
+            fraseSpan.appendChild(pSpan);
+          });
+
+          versoDiv.appendChild(fraseSpan);
+        });
+
+        estrofeDiv.appendChild(versoDiv);
+      });
+
+      outputArea.appendChild(estrofeDiv);
+    });
+  }
+
+  // Função para processar entrada conforme camada
+  function processInput(input) {
+    clearOutput();
+
+    if (!input.trim()) return;
+
+    switch (currentLayer) {
+      case 'text':
+        processTextLayer(input);
+        break;
+      case 'html':
+        try {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(`<div id="wrapper">${input}</div>`, 'text/html');
+          const wrapper = doc.getElementById('wrapper');
+          for (let child of wrapper.childNodes) {
+            outputArea.appendChild(createNodeElement(child));
+          }
+        } catch (e) {
+          outputArea.textContent = 'Erro no parse HTML: ' + e.message;
+        }
+        break;
+      case 'python':
+      case 'json':
+      case 'java':
+      case 'note':
+        // Exibe texto puro por enquanto
+        outputArea.textContent = input;
+        break;
+      default:
+        outputArea.textContent = input;
+    }
+  }
+
+  // Troca de camada
+  layerButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (button.dataset.layer === currentLayer) return;
+
+      layerButtons.forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+      currentLayer = button.dataset.layer;
+      processInput(inputArea.value);
+    });
+  });
+
+  // Processar entrada ao digitar com debounce
+  let debounceTimer = null;
+  inputArea.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      processInput(inputArea.value);
+    }, 300);
+  });
+
+  // Processa conteúdo inicial (vazio)
+  processInput(inputArea.value);
+</script>
+</body>
+</html>

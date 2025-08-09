@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KOBΛLLUX ∞ Interação Fractal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    body {
+      margin: 0;
+      background: radial-gradient(#1b0033, #0c0016);
+      font-family: 'Share Tech Mono', monospace;
+      color: #f9d880;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 3em;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-top: 1.5em;
+      letter-spacing: 0.05em;
+    }
+
+    h2 {
+      font-size: 1.5em;
+      margin-bottom: 1em;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 50px solid transparent;
+      border-right: 50px solid transparent;
+      border-bottom: 90px solid #f9d880;
+      transition: transform 0.3s, filter 0.3s;
+      cursor: pointer;
+    }
+
+    .triangle:hover {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 12px #f9d880);
+    }
+
+    .log-panel {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid #f9d88055;
+      border-radius: 10px;
+      padding: 15px;
+      width: 90%;
+      max-width: 400px;
+      margin-bottom: 20px;
+      font-size: 1em;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    input[type="text"] {
+      background: #00000066;
+      border: 1px solid #f9d88033;
+      border-radius: 8px;
+      color: #f9d880;
+      padding: 8px 12px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1em;
+      width: 90%;
+      max-width: 400px;
+      outline: none;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    input[type="text"]:focus {
+      border-color: #f9d880aa;
+    }
+
+    button#correlateBtn {
+      background: #f9d880;
+      color: #1b0033;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1em;
+      padding: 8px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #f9d880aa;
+      transition: background 0.3s, color 0.3s;
+      max-width: 400px;
+      width: 90%;
+      margin-bottom: 1.5em;
+    }
+
+    button#correlateBtn:hover {
+      background: #fff5b1;
+      color: #0c0016;
+    }
+  </style>
+</head>
+<body>
+  <h1>KOBΛLLUX ⧝</h1>
+  <h2>Interação Fractal</h2>
+
+  <div class="grid">
+    <div class="triangle" onclick="logFractal('T1')"></div>
+    <div class="triangle" onclick="logFractal('T2')"></div>
+    <div class="triangle" onclick="logFractal('T3')"></div>
+    <div class="triangle" onclick="logFractal('T4')"></div>
+    <div class="triangle" onclick="logFractal('T5')"></div>
+    <div class="triangle" onclick="logFractal('T6')"></div>
+    <div class="triangle" onclick="logFractal('T7')"></div>
+    <div class="triangle" onclick="logFractal('T8')"></div>
+    <div class="triangle" onclick="logFractal('T9')"></div>
+  </div>
+
+  <div class="log-panel" id="logPanel">
+    ⧝ Logs Fractais Iniciados...
+  </div>
+
+  <input type="text" id="commandInput" placeholder="Insira um comando, ex: T1 = 3 x 6" onkeydown="checkInput(event)" />
+
+  <button id="correlateBtn" onclick="correlateConcept()">CORRELACIONAR</button>
+
+  <script>
+    const logPanel = document.getElementById("logPanel");
+    const commandInput = document.getElementById("commandInput");
+
+    function logFractal(triangleId) {
+      const formulas = {
+        T1: "3 × 6  = 18",
+        T2: "6 + 9  = 15",
+        T3: "9 ↺ 7  = 4",
+        T6: "6 ↺ 9  = 3"
+      };
+
+      const line = `[${triangleId}] ${formulas[triangleId] || "↯ Não definido"}`;
+      logPanel.textContent += `\n${line}`;
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
+
+    function checkInput(event) {
+      if (event.key === "Enter") {
+        const cmd = event.target.value.trim();
+        if (cmd) {
+          logPanel.textContent += `\n▶ ${cmd}`;
+          event.target.value = "";
+        }
+        logPanel.scrollTop = logPanel.scrollHeight;
+      }
+    }
+
+    function correlateConcept() {
+      const value = commandInput.value.trim();
+      if (!value) {
+        alert("Por favor, insira um comando para correlacionar.");
+        return;
+      }
+      logPanel.textContent += `\n[CORRELACIONAR] ▶ ${value}`;
+      logPanel.scrollTop = logPanel.scrollHeight;
+      commandInput.value = "";
+      commandInput.focus();
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX ∴ Acoplamento Quântico</title>
+<style>
+  /* Reset básico */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #0e0e11;
+    color: #cfd8dc;
+    font-family: "Consolas", monospace;
+    margin: 20px auto;
+    max-width: 900px;
+    line-height: 1.4;
+  }
+
+  h1 {
+    font-weight: 900;
+    color: #55aaff;
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 6px #3388ffcc;
+  }
+
+  label {
+    font-weight: 700;
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    user-select: none;
+  }
+
+  textarea {
+    width: 100%;
+    height: 120px;
+    background: #121619;
+    border: 1px solid #1a77aa;
+    color: #cfd8dc;
+    font-size: 1rem;
+    padding: 10px;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: "Consolas", monospace;
+  }
+
+  input[type="file"],
+  select {
+    width: 100%;
+    max-width: 300px;
+    padding: 6px 10px;
+    margin-top: 4px;
+    border-radius: 6px;
+    border: 1px solid #1a77aa;
+    background: #121619;
+    color: #cfd8dc;
+    font-size: 1rem;
+    font-family: "Consolas", monospace;
+    cursor: pointer;
+  }
+
+  select {
+    user-select: none;
+  }
+
+  div.buttons {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  button {
+    background: #134e6f;
+    border: none;
+    padding: 10px 18px;
+    color: #a2d2ff;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #134e6f88;
+    transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.15s ease;
+    font-family: "Consolas", monospace;
+    user-select: none;
+  }
+
+  button:hover {
+    background: #1a77aa;
+    box-shadow: 0 0 20px #1a77aacc;
+    transform: scale(1.05);
+  }
+
+  button:active {
+    transform: scale(0.95);
+    box-shadow: 0 0 12px #134e6fcc;
+  }
+
+  #output {
+    margin-top: 20px;
+    background: #1c2227;
+    padding: 15px;
+    border-radius: 8px;
+    min-height: 150px;
+    white-space: pre-wrap;
+    font-size: 1rem;
+    font-family: "Consolas", monospace;
+    overflow-y: auto;
+    border: 1px solid #1a77aa;
+  }
+
+  #memoryList {
+    margin-top: 20px;
+    background: #162029;
+    padding: 10px;
+    border-radius: 8px;
+    max-height: 180px;
+    overflow-y: auto;
+    font-family: "Consolas", monospace;
+    font-size: 0.9rem;
+    color: #99bbffcc;
+  }
+
+  #memoryList p {
+    margin: 6px 0;
+    border-left: 3px solid #4499ff88;
+    padding-left: 8px;
+    user-select: text;
+  }
+</style>
+</head>
+<body>
+
+<h1>KOBLLUX ∴ Acoplamento Quântico</h1>
+
+<label for="inputText">Entrada de texto/vibração:</label>
+<textarea id="inputText" placeholder="Digite seu texto aqui..."></textarea>
+
+<label for="fileInput">Ou selecione um arquivo (texto, PDF, imagem):</label>
+<input type="file" id="fileInput" accept=".txt, .pdf, image/*" />
+
+<label for="languageSelect">Selecione linguagem:</label>
+<select id="languageSelect" aria-label="Selecionar linguagem para processamento">
+  <option value="html">HTML</option>
+  <option value="python">Python</option>
+  <option value="java">Java</option>
+  <!-- Adicione outras linguagens conforme necessário -->
+</select>
+
+<div class="buttons">
+  <button id="processBtn" type="button" aria-label="Processar Entrada">Processar Entrada</button>
+  <button id="saveMemoryBtn" type="button" aria-label="Guardar Vocabulário">Guardar Vocabulário</button>
+  <button id="clearMemoryBtn" type="button" aria-label="Limpar Memória">Limpar Memória</button>
+</div>
+
+<h2>Saída KOBLLUX</h2>
+<div id="output" aria-live="polite" role="region" aria-label="Saída do processamento KOBLLUX">
+  <em>Aguardando processamento...</em>
+</div>
+
+<h2>Memória de Vocabulário</h2>
+<div id="memoryList" role="region" aria-label="Lista de vocabulário armazenado"></div>
+
+<script>
+  // Vocabulário ligado a cada nome KOBLLUX
+  const nomes = [
+    "BLLUE",
+    "FIT LUX",
+    "KODUX",
+    "META LUX",
+    "HÓRUS",
+    "DUAL APP",
+    "DNA LUX",
+    "NEPHESH",
+    "KOBLLUX"
+  ];
+
+  // Carrega memória do localStorage ou inicializa vazia
+  let memoriaVoc = JSON.parse(localStorage.getItem("koblluxMemoria")) || {};
+
+  // Atualiza visualização da memória
+  function atualizarListaMemoria() {
+    const div = document.getElementById("memoryList");
+    div.innerHTML = "";
+    for (const nome of nomes) {
+      const texto = memoriaVoc[nome.toUpperCase()] || "(vazio)";
+      const p = document.createElement("p");
+      p.textContent = `${nome}: ${texto}`;
+      div.appendChild(p);
+    }
+  }
+
+  // Leitura de arquivo (texto ou indicação simples para PDFs e imagens)
+  function lerArquivo(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      if (file.type.startsWith("text/")) {
+        reader.onload = () => resolve(reader.result);
+        reader.readAsText(file);
+      } else if (file.type === "application/pdf") {
+        resolve(`Arquivo PDF selecionado: ${file.name}`);
+      } else if (file.type.startsWith("image/")) {
+        resolve(`Imagem selecionada: ${file.name}`);
+      } else {
+        resolve(`Arquivo selecionado: ${file.name}`);
+      }
+    });
+  }
+
+  // Processamento básico - pode ser expandido com lógica KOBLLUX
+  function processarEntrada(text, linguagem) {
+    if (!text.trim()) return "⚠️ Insira texto ou selecione arquivo para processar.";
+    return `=== KOBLLUX OUTPUT (${linguagem.toUpperCase()}) ===\n\n${text}\n\n=== FIM ===`;
+  }
+
+  // Eventos dos botões
+  document.getElementById("processBtn").addEventListener("click", async () => {
+    const inputText = document.getElementById("inputText").value.trim();
+    const linguagem = document.getElementById("languageSelect").value;
+
+    const fileInput = document.getElementById("fileInput");
+    let arquivoTexto = "";
+
+    if (fileInput.files.length > 0) {
+      arquivoTexto = await lerArquivo(fileInput.files[0]);
+    }
+
+    const textoFinal = arquivoTexto || inputText;
+    const saida = processarEntrada(textoFinal, linguagem);
+
+    const outputDiv = document.getElementById("output");
+    outputDiv.textContent = saida;
+  });
+
+  document.getElementById("saveMemoryBtn").addEventListener("click", () => {
+    const texto = document.getElementById("inputText").value.trim();
+    if (!texto) {
+      alert("Digite algo para guardar na memória.");
+      return;
+    }
+
+    const nome = prompt(`Para qual nome do KOBLLUX deseja guardar este vocabulário?\n${nomes.join(", ")}`);
+    if (!nome || !nomes.includes(nome.toUpperCase())) {
+      alert("Nome inválido ou não selecionado.");
+      return;
+    }
+
+    const chave = nome.toUpperCase();
+    memoriaVoc[chave] = memoriaVoc[chave] ? memoriaVoc[chave] + "\n" + texto : texto;
+
+    localStorage.setItem("koblluxMemoria", JSON.stringify(memoriaVoc));
+    atualizarListaMemoria();
+    alert(`Vocabulário salvo para ${chave}.`);
+  });
+
+  document.getElementById("clearMemoryBtn").addEventListener("click", () => {
+    if (confirm("Deseja realmente limpar toda a memória de vocabulário?")) {
+      memoriaVoc = {};
+      localStorage.removeItem("koblluxMemoria");
+      atualizarListaMemoria();
+    }
+  });
+
+  // Inicialização
+  atualizarListaMemoria();
+</script>
+
+</body>
+</html>

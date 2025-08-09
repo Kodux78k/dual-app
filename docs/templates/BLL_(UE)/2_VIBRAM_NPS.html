@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>VIBRAM NPS</title>
+<style>
+  @keyframes vibram {
+    0%, 100% {
+      transform: translate(0, 0) rotate(0deg);
+      filter: drop-shadow(0 0 3px #0af);
+      opacity: 1;
+    }
+    25% {
+      transform: translate(-2px, 2px) rotate(-1deg);
+      filter: drop-shadow(0 0 6px #0af);
+      opacity: 0.85;
+    }
+    50% {
+      transform: translate(2px, -2px) rotate(1deg);
+      filter: drop-shadow(0 0 9px #0af);
+      opacity: 0.7;
+    }
+    75% {
+      transform: translate(-2px, 2px) rotate(-1deg);
+      filter: drop-shadow(0 0 6px #0af);
+      opacity: 0.85;
+    }
+  }
+
+  .vibram-nps {
+    display: inline-block;
+    padding: 2rem 4rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    color: #0af;
+    background: radial-gradient(circle at center, #001022 0%, #000511 80%);
+    border-radius: 20px;
+    animation: vibram 2.5s ease-in-out infinite;
+    user-select: none;
+    cursor: default;
+    box-shadow: 0 0 20px #0af88;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body style="background: #000511; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+
+  <div class="vibram-nps" aria-label="Indicador N P S vibrante">
+    NPS
+  </div>
+
+</body>
+</html>

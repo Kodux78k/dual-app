@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX ∞ Editor e Atualizador de HTML</title>
+<style>
+  body {
+    font-family: 'Share Tech Mono', monospace;
+    background: #0c0016;
+    color: #f9d880;
+    margin: 0; padding: 1rem;
+    display: flex; flex-direction: column; align-items: center;
+    min-height: 100vh;
+  }
+  textarea {
+    width: 90vw; max-width: 900px; height: 120px;
+    background: #1b0033;
+    color: #f9d880;
+    border: 2px solid #f9d880;
+    border-radius: 8px;
+    padding: 0.7rem;
+    resize: vertical;
+    font-size: 1rem;
+  }
+  button {
+    margin: 0.5rem 0 1rem 0;
+    background: #f9d880;
+    color: #0c0016;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 12px #f9d880cc;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #f2c95b;
+  }
+  .section {
+    max-width: 900px;
+    width: 90vw;
+    margin-bottom: 1rem;
+  }
+  label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  select, input[type=text] {
+    font-family: monospace;
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 5px;
+    border: 1px solid #f9d880cc;
+    background: #1b0033;
+    color: #f9d880;
+  }
+  .update-list {
+    margin-top: 0.5rem;
+    background: #1b0033cc;
+    padding: 0.5rem;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+  }
+  .update-item {
+    background: #29004a;
+    margin: 0.3rem 0;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border-left: 4px solid #f9d880;
+  }
+  .valid { border-left-color: #6bf96b; }
+  .invalid { border-left-color: #f96b6b; }
+
+  .result-box {
+    background: #1b0033cc;
+    border-radius: 8px;
+    padding: 1rem;
+    white-space: pre-wrap;
+    max-height: 350px;
+    overflow-y: auto;
+    font-size: 0.9rem;
+  }
+  .info {
+    font-size: 0.85rem;
+    color: #bbb;
+    margin-top: -0.7rem;
+    margin-bottom: 1rem;
+  }
+</style>
+</head>
+<body>
+
+<h1>KOBLLUX ∞ Editor e Atualizador de HTML</h1>
+
+<div class="section">
+  <label for="mainHtmlInput">HTML Principal (Base)</label>
+  <textarea id="mainHtmlInput" placeholder="Cole aqui seu HTML principal..."></textarea>
+  <button id="loadSample">Carregar Exemplo</button>
+</div>
+
+<div class="section">
+  <label for="insertLocation">Local de Inserção da Atualização</label>
+  <select id="insertLocation">
+    <option value="head">Dentro de &lt;head&gt;</option>
+    <option value="body">Dentro de &lt;body&gt;</option>
+    <option value="beforeHtmlClose">&lt;/html&gt; (antes do fechamento)</option>
+  </select>
+</div>
+
+<div class="section">
+  <label for="updateInput">Atualização HTML / JS / CSS</label>
+  <textarea id="updateInput" placeholder="Cole o código de atualização aqui..."></textarea>
+  <button id="addUpdateBtn">Adicionar Atualização</button>
+  <div class="info">Você pode adicionar várias atualizações que serão aplicadas ao HTML principal.</div>
+</div>
+
+<div class="section">
+  <label>Atualizações adicionadas</label>
+  <div id="updatesList" class="update-list">Nenhuma atualização adicionada.</div>
+</div>
+
+<div class="section">
+  <button id="applyUpdatesBtn">Aplicar Atualizações ao HTML Principal</button>
+</div>
+
+<div class="section">
+  <label>HTML Final Atualizado</label>
+  <pre id="finalHtmlOutput" class="result-box">Nenhum resultado ainda.</pre>
+  <button id="copyFinalBtn">Copiar HTML Final</button>
+</div>
+
+<script>
+  const mainHtmlInput = document.getElementById('mainHtmlInput');
+  const updateInput = document.getElementById('updateInput');
+  const addUpdateBtn = document.getElementById('addUpdateBtn');
+  const updatesList = document.getElementById('updatesList');
+  const insertLocation = document.getElementById('insertLocation');
+  const applyUpdatesBtn = document.getElementById('applyUpdatesBtn');
+  const finalHtmlOutput = document.getElementById('finalHtmlOutput');
+  const copyFinalBtn = document.getElementById('copyFinalBtn');
+  const loadSample = document.getElementById('loadSample');
+
+  // Armazena as atualizações como objetos {code: string, location: string, valid: bool}
+  let updates = [];
+
+  // Função simples para validar HTML - verifica se tags abertas tem fechamento
+  // (básico, para dar feedback rápido, não um parser completo)
+  function validateHtmlSnippet(html) {
+    try {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const parserErrors = doc.querySelector('parsererror');
+      if (parserErrors) return false;
+      // adicional: verifica se pelo menos uma tag existe
+      return /<[^>]+>/.test(html.trim());
+    } catch {
+      return false;
+    }
+  }
+
+  // Atualiza a lista visual das atualizações
+  function refreshUpdatesList() {
+    updatesList.innerHTML = '';
+    if (updates.length === 0) {
+      updatesList.textContent = 'Nenhuma atualização adicionada.';
+      return;
+    }
+    updates.forEach((upd, i) => {
+      const div = document.createElement('div');
+      div.className = 'update-item ' + (upd.valid ? 'valid' : 'invalid');
+      div.textContent = `[${upd.location}] ` + (upd.code.length > 60 ? upd.code.slice(0,60) + '...' : upd.code);
+      const btnRemove = document.createElement('button');
+      btnRemove.textContent = '❌ Remover';
+      btnRemove.style.marginLeft = '0.8rem';
+      btnRemove.onclick = () => {
+        updates.splice(i,1);
+        refreshUpdatesList();
+      };
+      div.appendChild(btnRemove);
+      updatesList.appendChild(div);
+    });
+  }
+
+  // Adiciona uma atualização
+  addUpdateBtn.onclick = () => {
+    const code = updateInput.value.trim();
+    if (!code) {
+      alert('Insira o código da atualização antes de adicionar.');
+      return;
+    }
+    const loc = insertLocation.value;
+    const valid = validateHtmlSnippet(code);
+    updates.push({code, location: loc, valid});
+    refreshUpdatesList();
+    updateInput.value = '';
+  };
+
+  // Aplica atualizações no HTML principal e exibe resultado
+  applyUpdatesBtn.onclick = () => {
+    let baseHtml = mainHtmlInput.value;
+    if (!baseHtml.trim()) {
+      alert('Insira o HTML principal antes de aplicar atualizações.');
+      return;
+    }
+
+    // Verifica se o HTML principal tem tags <head>, <body> e <html> para inserir atualizações
+    const hasHead = /<head[^>]*>/i.test(baseHtml);
+    const hasBody = /<body[^>]*>/i.test(baseHtml);
+    const hasHtmlClose = /<\/html>/i.test(baseHtml);
+
+    // Se não tem <head> ou <body>, cria (simples)
+    if (!hasHead) {
+      baseHtml = baseHtml.replace(/<html[^>]*>/i, match => match + '\n<head></head>');
+    }
+    if (!hasBody) {
+      if (/<head[^>]*>/i.test(baseHtml)) {
+        baseHtml = baseHtml.replace(/<\/head>/i, '</head>\n<body></body>');
+      } else {
+        baseHtml = baseHtml.replace(/<html[^>]*>/i, match => match + '\n<body></body>');
+      }
+    }
+
+    // Agora insere as atualizações conforme local selecionado
+    updates.forEach(({code, location}) => {
+      if (location === 'head') {
+        // insere dentro do <head>
+        baseHtml = baseHtml.replace(/<\/head>/i, code + '\n</head>');
+      } else if (location === 'body') {
+        // insere dentro do <body>
+        baseHtml = baseHtml.replace(/<\/body>/i, code + '\n</body>');
+      } else if (location === 'beforeHtmlClose') {
+        // insere antes do </html>
+        baseHtml = baseHtml.replace(/<\/html>/i, code + '\n</html>');
+      }
+    });
+
+    finalHtmlOutput.textContent = baseHtml;
+  };
+
+  // Botão copiar resultado final
+  copyFinalBtn.onclick = () => {
+    const text = finalHtmlOutput.textContent;
+    if (!text.trim()) {
+      alert('Não há HTML final para copiar.');
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      alert('HTML final copiado para área de transferência!');
+      }, () => {
+      alert('Falha ao copiar o HTML final.');
+    });
+  };
+
+  // Exemplo rápido para carregar um HTML base de teste
+  loadSample.onclick = () => {
+    const sampleHtml = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exemplo KOBLLUX</title>
+</head>
+<body>
+  <h1>Bem-vindo ao KOBLLUX</h1>
+  <p>Este é um HTML base para teste.</p>
+</body>
+</html>`;
+    mainHtmlInput.value = sampleHtml;
+  };
+</script>
+
+</body>
+</html>

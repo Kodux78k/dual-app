@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX - Camada Linguagem com filtro VERBO</title>
+<style>
+  body {
+    background: #0b0b1a;
+    color: #d0d0ff;
+    font-family: 'Consolas', monospace;
+    padding: 2rem;
+    line-height: 1.6;
+  }
+  .verb {
+    color: #52aaff;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  .container {
+    max-width: 800px;
+    margin: auto;
+  }
+  input, textarea {
+    width: 100%;
+    font-family: monospace;
+    font-size: 1rem;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #111129;
+    color: #d0d0ff;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Camada Linguagem com filtro VERBO</h1>
+    <p>Digite um texto abaixo para que os verbos sejam destacados.</p>
+    <textarea id="inputText" rows="6" placeholder="Escreva aqui..."></textarea>
+    <button onclick="highlightVerbs()">Filtrar VERBO</button>
+    <h2>Texto filtrado:</h2>
+    <div id="outputText"></div>
+  </div>
+
+<script>
+// Lista simples de verbos comuns em português (exemplo curto)
+const verbos = [
+  "ser", "estar", "ter", "ir", "fazer", "dizer", "poder", "ver", "dar", "saber",
+  "querer", "chegar", "passar", "dever", "ficar", "levar", "começar", "gostar",
+  "falar", "trazer", "ouvir", "esperar", "vir", "sentir", "amar", "trabalhar"
+];
+
+// Função para identificar verbos simples na forma infinitiva e variações básicas
+function highlightVerbs() {
+  const input = document.getElementById('inputText').value.toLowerCase();
+  // Quebra o texto em palavras simples
+  const palavras = input.split(/\s+/);
+  
+  // Destacar palavras que sejam verbos (simplificado)
+  const resultado = palavras.map(palavra => {
+    for(let verbo of verbos) {
+      // Verifica se palavra contém verbo no começo (simplificado)
+      if(palavra.startsWith(verbo)) {
+        return `<span class="verb">${palavra}</span>`;
+      }
+    }
+    return palavra;
+  });
+
+  document.getElementById('outputText').innerHTML = resultado.join(' ');
+}
+</script>
+
+</body>
+</html>

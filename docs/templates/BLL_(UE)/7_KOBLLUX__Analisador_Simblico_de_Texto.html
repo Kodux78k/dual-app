@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX ∞ Analisador Simbólico de Texto</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  body {
+    background: radial-gradient(circle at center, #1b0033, #0c0016);
+    color: #f9d880;
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0;
+    padding: 1rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.4s, color 0.4s;
+  }
+  body.light {
+    background: radial-gradient(circle at center, #f9f9f9, #ddd);
+    color: #333;
+  }
+
+  h1 {
+    margin-bottom: 0.2rem;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  textarea {
+    width: 90vw;
+    max-width: 900px;
+    height: 180px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    background: rgba(249, 216, 128, 0.1);
+    border: 2px solid #f9d880;
+    border-radius: 8px;
+    padding: 0.8rem;
+    color: inherit;
+    resize: vertical;
+    transition: background 0.4s, border-color 0.4s;
+  }
+  body.light textarea {
+    background: #fff9d9;
+    border-color: #333;
+    color: #333;
+  }
+
+  button {
+    margin-top: 1rem;
+    background: #f9d880;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    color: #1b0033;
+    cursor: pointer;
+    box-shadow: 0 0 12px #f9d880cc;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #f2c95b;
+  }
+  body.light button {
+    background: #333;
+    color: #f9d880;
+    box-shadow: 0 0 12px #333ccc;
+  }
+  body.light button:hover {
+    background: #444;
+  }
+
+  pre {
+    white-space: pre-wrap;
+    max-width: 900px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: rgba(0,0,0,0.25);
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    line-height: 1.3;
+    margin-top: 1.5rem;
+    box-shadow: 0 0 15px #f9d880aa inset;
+    position: relative;
+  }
+  body.light pre {
+    background: #f4f3ee;
+    color: #222;
+    box-shadow: 0 0 15px #333ccc inset;
+  }
+
+  /* Botões extra para copiar e salvar no resultado */
+  #resultButtons {
+    margin-top: 0.5rem;
+    max-width: 900px;
+    width: 90vw;
+    display: flex;
+    gap: 1rem;
+  }
+
+  /* Toggle tema botão */
+  #themeToggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    background: #f9d880;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 0 10px #f9d880aa;
+    transition: background 0.3s;
+  }
+  body.light #themeToggle {
+    background: #333;
+    color: #fff;
+    box-shadow: 0 0 10px #333ccc;
+  }
+
+  /* Layout do grupo de botões no input */
+  #inputButtons {
+    margin-top: 0.5rem;
+    max-width: 900px;
+    width: 90vw;
+    display: flex;
+    gap: 1rem;
+  }
+
+</style>
+</head>
+<body>
+
+<button id="themeToggle">Modo Claro / Escuro</button>
+
+<h1>KOBLLUX ⧝</h1>
+<p>Cole seu texto para análise simbólica KOBLLUX detalhada.</p>
+
+<div id="inputButtons">
+  <input type="file" id="fileInput" accept=".txt,.pdf" style="flex-grow:1;" />
+  <button id="pasteBtn">📋 Colar do Clipboard</button>
+</div>
+
+<textarea id="textInput" placeholder="Cole aqui seu texto..."></textarea>
+<button id="analyzeBtn">Analisar Texto KOBLLUX</button>
+
+<pre id="analysisResult">Nenhuma análise realizada ainda.</pre>
+
+<div id="resultButtons" style="display:none;">
+  <button id="copyBtn">📄 Copiar Resultado</button>
+  <button id="saveBtn">💾 Salvar Resultado</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.9.179/pdf.min.js"></script>
+
+<script>
+  const themeToggle = document.getElementById('themeToggle');
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+  });
+
+  const fileInput = document.getElementById('fileInput');
+  const textInput = document.getElementById('textInput');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const analysisResult = document.getElementById('analysisResult');
+  const resultButtons = document.getElementById('resultButtons');
+  const copyBtn = document.getElementById('copyBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const pasteBtn = document.getElementById('pasteBtn');
+
+  // KOBLLUX base de palavras
+  const KOBLLUX = {
+    substantivos: new Set([
+      "KOBLLUX", "VERDADE", "LUX", "DEUS", "JESUS", "ESPÍRITO", "CÓDEX", "GENUS", 
+      "NÚCLEO", "ÁTOMO", "MOLÉCULA", "ÁGUA", "CÉLULA", "DNA", "VERBO", "EQUAÇÃO", 
+      "UNIDADE", "ORDEM", "FRACTAL", "PULSO", "REDE", "LIGAÇÃO", "MORADA", "LUZ", 
+      "REALIDADE", "REINO", "NEPHESH", "KAEL", "SINGULARIDADE", "IDENTIDADE", 
+      "CONSCIÊNCIA", "CICLO", "MOVIMENTO", "VIDA"
+    ]),
+    verbos: new Set([
+      "INTEGRAR", "TRANSMITIR", "TRANSFORMAR", "CLASSIFICAR", "ATIVAR", "RECEBER", 
+      "UNIR", "REVELAR", "FLUIR", "GERAR", "EXPANDIR", "ORGANIZAR", "VIBRAR", "ORAR", 
+      "CONHECER", "ASCENDER", "VER", "RENASCER", "TRADUZIR", "CRIAR", "MUTAR", 
+      "REINTEGRAR", "ACENDER", "INTERAGIR", "PULSAR", "CODIFICAR", "ILUMINAR"
+    ]),
+    adjetivos: new Set([
+      "SAGRADO", "VIVO", "FRACTAL", "TRINO", "DIVINO", "CONSCIENTE", "INFINITO", 
+      "MUTÁVEL", "LUMINOSO", "FLUIDO", "UNIFICADOR", "ESPIRITUAL", "VIBRACIONAL", 
+      "CÓSMICO", "ETERNO", "INTEGRADO", "ASCENDENTE", "MULTIDIMENSIONAL", "SUTIL", 
+      "INTELIGENTE"
+    ]),
+    temas: {
+      "Física": ["ÁTOMO", "NÚCLEO", "PULSO", "MATÉRIA", "ENTROPIA"],
+      "Química": ["MOLÉCULA", "LIGAÇÃO", "REAÇÃO", "ELEMENTO"],
+      "Biologia": ["CÉLULA", "DNA", "VIDA", "METABOLISMO"],
+      "Astronomia": ["GALÁXIA", "UNIVERSO", "EXPANSÃO", "SINGULARIDADE"],
+      "Matemática": ["NÚMEROS", "FUNÇÃO", "FRACTAL", "SEQUÊNCIA"],
+      "Consciência": ["MENTE", "ALMA", "ESPÍRITO", "CONSCIÊNCIA", "INTUIÇÃO"],
+      "Teologia": ["DEUS", "JESUS", "ESPÍRITO", "REINO", "NEPHESH"]
+    }
+  };
+
+  // Função para ler arquivos txt e pdf
+  async function readFileContent(file) {
+    if (file.type === "application/pdf") {
+      // Usa pdf.js para ler PDF
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = "";
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(" ");
+        fullText += pageText + "\n\n";
+      }
+      return fullText;
+    } else {
+      // Txt ou outro texto simples
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = e => reject(e);
+        reader.readAsText(file);
+      });
+    }
+  }
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const content = await readFileContent(file);
+      textInput.value = content;
+      analysisResult.textContent = "Arquivo carregado. Pronto para analisar.";
+      resultButtons.style.display = "none";
+    } catch (err) {
+      alert("Erro ao ler o arquivo: " + err.message);
+    }
+  });
+
+  // Função para análise simbólica
+  function analyzeTextKOBLLUX(text) {
+    const words = text.toUpperCase().match(/\b[\wÀ-ÿ]+\b/g) || [];
+    const counts = {
+      substantivos: {},
+      verbos: {},
+      adjetivos: {},
+      temas: {}
+    };
+
+    for (const tema in KOBLLUX.temas) counts.temas[tema] = 0;
+
+    for (const w of words) {
+      if (KOBLLUX.substantivos.has(w)) counts.substantivos[w] = (counts.substantivos[w] || 0) + 1;
+      if (KOBLLUX.verbos.has(w)) counts.verbos[w] = (counts.verbos[w] || 0) + 1;
+      if (KOBLLUX.adjetivos.has(w)) counts.adjetivos[w] = (counts.adjetivos[w] || 0) + 1;
+
+      for (const [tema, termos] of Object.entries(KOBLLUX.temas)) {
+        if (termos.includes(w)) counts.temas[tema]++;
+      }
+    }
+
+    const reportLines = [];
+
+    reportLines.push("▶ Análise Simbólica KOBLLUX");
+    reportLines.push("  Fórmula Viva: VERDADE × INTEGRAR ÷ ∆");
+    reportLines.push("");
+
+    function listTopWords(type, obj) {
+      const sorted = Object.entries(obj).sort((a,b) => b[1]-a[1]);
+      if (sorted.length === 0) return `  Nenhum ${type} encontrado.`;
+      return `  ${type} (${sorted.length}):\n    ` + sorted.map(([w,c]) => `${w} (${c})`).join(', ');
+    }
+
+    reportLines.push(listTopWords("Substantivos", counts.substantivos));
+    reportLines.push(listTopWords("Verbos", counts.verbos));
+    reportLines.push(listTopWords("Adjetivos", counts.adjetivos));
+    reportLines.push("");
+
+    reportLines.push("  Temas (ocorrências):");
+    for (const [tema, count] of Object.entries(counts.temas)) {
+      reportLines.push(`    • ${tema}: ${count}`);
+    }
+
+    reportLines.push("");
+    reportLines.push(` ✦ Total de palavras analisadas: ${words.length}`);
+    reportLines.push(" ✦ KOBLLUX ∞ Luz, Integração e Transformação");
+
+    return reportLines.join('\n');
+  }
+
+  analyzeBtn.addEventListener('click', () => {
+    const text = textInput.value.trim();
+    if (!text) {
+      alert('Por favor, insira ou cole um texto para analisar.');
+      return;
+    }
+    const analysis = analyzeTextKOBLLUX(text);
+    analysisResult.textContent = analysis;
+    resultButtons.style.display = "flex";
+  });
+
+  // Botão copiar resultado
+  copyBtn.addEventListener('click', () => {
+    const text = analysisResult.textContent;
+    if (!text || text === "Nenhuma análise realizada ainda.") {
+      alert("Não há análise para copiar.");
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Resultado copiado para a área de transferência.");
+    }).catch(() => {
+      alert("Falha ao copiar para a área de transferência.");
+    });
+  });
+
+  // Botão salvar resultado em arquivo .txt
+  saveBtn.addEventListener('click', () => {
+    const text = analysisResult.textContent;
+    if (!text || text === "Nenhuma análise realizada ainda.") {
+      alert("Não há análise para salvar.");
+      return;
+    }
+    const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'analise_kobllux.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  // Botão colar do clipboard para o textarea
+  pasteBtn.addEventListener('click', async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      textInput.value = clipboardText;
+      analysisResult.textContent = "Texto colado do clipboard. Pronto para analisar.";
+      resultButtons.style.display = "none";
+    } catch {
+      alert("Falha ao acessar o clipboard.");
+    }
+  });
+
+</script>
+
+</body>
+</html>
