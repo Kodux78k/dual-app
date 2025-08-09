@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Template Master Avançado - Dual Infodose</title>
+<style>
+  /* Reset e básico */
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121217;
+    color: #ddd;
+    margin: 0; padding: 0; min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  header {
+    background: #1e1e2a;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.3rem;
+    letter-spacing: 1.1px;
+    color: #55ffff;
+    border-bottom: 2px solid #0ff;
+  }
+  main {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.5rem;
+    max-width: 1300px;
+    margin: 0 auto;
+    gap: 1rem;
+  }
+  textarea#htmlInput {
+    width: 100%;
+    min-height: 160px;
+    background: #22222a;
+    border: 2px solid #0ff;
+    color: #eee;
+    padding: 0.7rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    resize: vertical;
+    outline-offset: 2px;
+  }
+  button {
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    border: none;
+    background: #0ff;
+    color: #121217;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+    user-select: none;
+  }
+  button:hover, button:focus {
+    background: #44ffff;
+    outline: none;
+  }
+  .btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    margin: 1rem 0;
+  }
+  .tabs {
+    display: flex;
+    gap: 0.8rem;
+    border-bottom: 2px solid #0ff;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 0.6rem 1.2rem;
+    background: #22222a;
+    border-radius: 5px 5px 0 0;
+    color: #66ffff;
+    font-weight: 600;
+    user-select: none;
+    transition: background-color 0.2s;
+  }
+  .tab[aria-selected="true"] {
+    background: #0ff;
+    color: #121217;
+    font-weight: 700;
+  }
+  .analysis-section {
+    background: #181824;
+    border-radius: 6px;
+    padding: 1rem 1.2rem;
+    max-height: 480px;
+    overflow-y: auto;
+    font-family: monospace, monospace;
+    font-size: 0.9rem;
+    color: #eee;
+    user-select: text;
+  }
+  .analysis-section h2 {
+    margin-top: 0;
+    margin-bottom: 0.6rem;
+    color: #55ffff;
+    font-weight: 700;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.25rem;
+    background: #22222a;
+    border-radius: 4px;
+    padding: 0.8rem 1rem;
+    margin: 0.6rem 0;
+    user-select: text;
+    font-size: 0.85rem;
+  }
+  ul.list-simple {
+    list-style: none;
+    margin: 0.3rem 0 0 1rem;
+    padding: 0;
+  }
+  ul.list-simple li {
+    margin-bottom: 0.3rem;
+    padding-left: 1rem;
+    position: relative;
+  }
+  ul.list-simple li::before {
+    content: "•";
+    color: #0ff;
+    position: absolute;
+    left: 0;
+  }
+  .treeview ul {
+    list-style-type: none;
+    padding-left: 1rem;
+    margin: 0.3rem 0;
+    border-left: 1px dotted #0ff;
+  }
+  .treeview li {
+    margin: 0.15rem 0;
+    padding-left: 0.8rem;
+    position: relative;
+    cursor: default;
+    user-select: none;
+  }
+  .treeview li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 10px;
+    height: 1px;
+    background: #0ff;
+  }
+  .tree-toggle {
+    user-select: none;
+    cursor: pointer;
+    display: inline-block;
+    width: 14px;
+    margin-right: 5px;
+    font-weight: bold;
+    color: #0ff;
+  }
+  .hidden {
+    display: none !important;
+  }
+  .btn-copy-all {
+    background: #2299ff;
+    color: #fff;
+    font-size: 0.85rem;
+    margin-left: 1rem;
+    border-radius: 4px;
+  }
+  .btn-copy-all:hover {
+    background: #44bbff;
+  }
+  .btn-download-report {
+    background: #33cc99;
+    color: #fff;
+  }
+  .btn-download-report:hover {
+    background: #44ddaa;
+  }
+  .editable-area {
+    width: 100%;
+    height: 350px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #eee;
+    background: #22222a;
+    border: 2px solid #0ff;
+    border-radius: 6px;
+    padding: 1rem;
+    resize: vertical;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  footer {
+    background: #1e1e2a;
+    padding: 0.7rem 1.5rem;
+    text-align: center;
+    color: #0ff;
+    font-size: 0.85rem;
+    user-select: none;
+  }
+  /* Scrollbar custom */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #121217;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0ff;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<header>Template Master Avançado - Dual Infodose</header>
+<main>
+  <label for="htmlInput" style="font-weight:700; margin-bottom: 0.3rem; display: block;">Cole seu código HTML COMPLETO aqui:</label>
+  <textarea id="htmlInput" spellcheck="false" placeholder="Cole o HTML para análise, modularização e exportação..."></textarea>
+  <div class="btn-group">
+    <button id="analyzeBtn" title="Analisar Template">Analisar Template</button>
+    <button id="minifyBtn" title="Minificar HTML/JS/CSS">Minificar Tudo</button>
+    <button id="exportJsonBtn" title="Exportar dados em JSON">Exportar JSON</button>
+    <button id="downloadJsonBtn" title="Baixar JSON de dados">Baixar JSON</button>
+  </div>
+  <nav class="tabs" role="tablist" aria-label="Seções da análise">
+    <button class="tab" role="tab" aria-controls="tab-ids" aria-selected="true" id="tabBtn-ids">IDs</button>
+    <button class="tab" role="tab" aria-controls="tab-classes" id="tabBtn-classes">Classes</button>
+    <button class="tab" role="tab" aria-controls="tab-inline-style" id="tabBtn-inline-style">Estilos Inline</button>
+    <button class="tab" role="tab" aria-controls="tab-style-tags" id="tabBtn-style-tags">Estilos &lt;style&gt;</button>
+    <button class="tab" role="tab" aria-controls="tab-scripts-inline" id="tabBtn-scripts-inline">Scripts Inline</button>
+    <button class="tab" role="tab" aria-controls="tab-scripts-external" id="tabBtn-scripts-external">Scripts Externos</button>
+    <button class="tab" role="tab" aria-controls="tab-html-structure" id="tabBtn-html-structure">Estrutura HTML</button>
+    <button class="tab" role="tab" aria-controls="tab-components" id="tabBtn-components">Componentes Modulares</button>
+    <button class="tab" role="tab" aria-controls="tab-deps" id="tabBtn-deps">Dependências CSS/JS</button>
+    <button class="tab" role="tab" aria-controls="tab-edit-html" id="tabBtn-edit-html">Editor & Refatoração</button>
+    <button class="tab" role="tab" aria-controls="tab-report" id="tabBtn-report">Relatórios</button>
+  </nav>
+  <section id="outputContainer" class="analysis-section" tabindex="0" aria-live="polite" aria-atomic="true">
+    <p style="color:#f55;">Cole um HTML válido e clique em Analisar para começar.</p>
+  </section>
+</main>
+<footer>
+  Desenvolvido para Raphael Costa | Dual Infodose © 2025
+</footer>
+
+<script>
+(() => {
+  const htmlInput = document.getElementById('htmlInput');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const outputContainer = document.getElementById('outputContainer');
+  const tabs = Array.from(document.querySelectorAll('.tab'));
+  const minifyBtn = document.getElementById('minifyBtn');
+  const exportJsonBtn = document.getElementById('exportJsonBtn');
+  const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+
+  // Estado global dos dados processados
+  let resultadoGlobal = null;
+  let jsonExport = null;
+
+  // --------- Funções de análise ---------
+
+  // Extração de IDs, Classes, Inline Styles, Scripts, Style tags, Estrutura e etc.
+  function transformarHTMLparaTemplate(html) {
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Coletar IDs e Classes
+      const allElements = [...doc.querySelectorAll('*')];
+      const idsSet = new Set();
+      const classesSet = new Set();
+
+      // Estilos inline
+      const estilosInline = [];
+
+      // Scripts inline e externos
+      const scriptsInline = [];
+      const scriptsExternos = [];
+
+      // Styles em tag <style>
+      const estilosEmStyle = [];
+
+      // Componentes modulares (auto detectados por hierarquia e IDs/classes "mod", "component", "module", "widget")
+      const componentes = [];
+
+      // Map CSS e JS para dependencias
+      const dependenciasCSS = new Set();
+      const dependenciasJS = new Set();
+
+      // Para reconhecer hierarquia de módulos (nested)
+      function detectarComponentes(node) {
+        const keywords = ['mod', 'component', 'module', 'widget', 'section', 'container', 'block', 'part', 'item'];
+        if (!node || node.nodeType !== 1) return null;
+
+        // Verifica se tem id ou classes contendo keywords
+        const idLower = (node.id || '').toLowerCase();
+        const classesLower = Array.from(node.classList).map(c => c.toLowerCase());
+
+        const matchId = keywords.some(k => idLower.includes(k));
+        const matchClass = classesLower.some(c => keywords.some(k => c.includes(k)));
+
+        if (matchId || matchClass) {
+          // Nome sugerido automático, baseado em id/class e hierarquia
+          let nomeSugestao = '';
+          if (node.id) nomeSugestao += `#${node.id}`;
+          if (classesLower.length) nomeSugestao += classesLower.map(c => '.' + c).join('');
+          return {
+            nome: nomeSugestao || `Componente_${componentes.length+1}`,
+            tag: node.tagName.toLowerCase(),
+            children: Array.from(node.children).map(detectarComponentes).filter(c => c !== null)
+          };
+        } else {
+          // Verifica filhos para detectar componentes internos (nested)
+          const childrenComponents = Array.from(node.children).map(detectarComponentes).filter(c => c !== null);
+          if (childrenComponents.length > 0) {
+            return {
+              nome: null,
+              tag: node.tagName.toLowerCase(),
+              children: childrenComponents
+            };
+          }
+          return null;
+        }
+      }
+
+      // Processar para dependências CSS (tags <link rel="stylesheet"> e @import) e JS (script src)
+      const linkTags = [...doc.querySelectorAll('link[rel="stylesheet"][href]')];
+      linkTags.forEach(link => dependenciasCSS.add(link.href));
+      const styleTags = [...doc.querySelectorAll('style')];
+      styleTags.forEach(styleTag => {
+        estilosEmStyle.push(styleTag.textContent.trim());
+        // Tentativa simples de capturar @import
+        const imports = [...styleTag.textContent.matchAll(/@import\s+url\(["']?([^"')]+)["']?\)/gi)];
+        imports.forEach(m => dependenciasCSS.add(m[1]));
+      });
+
+      const scriptTags = [...doc.querySelectorAll('script')];
+      scriptTags.forEach(script => {
+        if (script.src) dependenciasJS.add(script.src);
+        else scriptsInline.push(script.textContent.trim());
+      });
+
+      allElements.forEach(el => {
+        if (el.id) idsSet.add(el.id);
+        if (el.classList.length) el.classList.forEach(c => classesSet.add(c));
+        if (el.hasAttribute('style')) estilosInline.push({
+          tag: el.tagName.toLowerCase(),
+          id: el.id || '',
+          classes: Array.from(el.classList),
+          style: el.getAttribute('style').trim()
+        });
+      });
+
+      // Detectar componentes modulares (a partir do body)
+      const compDetected = detectarComponentes(doc.body);
+      if (compDetected) componentes.push(compDetected);
+
+      return {
+        ids: Array.from(idsSet).sort(),
+        classes: Array.from(classesSet).sort(),
+        estilosInline,
+        estilosEmStyle,
+        scriptsInline,
+        scriptsExternos: Array.from(dependenciasJS).sort(),
+        dependenciasCSS: Array.from(dependenciasCSS).sort(),
+        dependenciasJS: Array.from(dependenciasJS).sort(),
+        componentes,
+        estruturaHTML: doc.body.innerHTML.trim(),
+        docBody: doc.body
+      };
+    } catch(e) {
+      alert('Erro ao processar o HTML: ' + e.message);
+      return null;
+    }
+  }
+
+  // Função para criar lista HTML a partir de array
+  function criarLista(arr) {
+    if (!arr.length) return '<p style="font-style: italic; color:#888;">Nenhum item encontrado.</p>';
+    const ul = document.createElement('ul');
+    ul.className = 'list-simple';
+    arr.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      ul.appendChild(li);
+    });
+    return ul.outerHTML;
+  }
+
+  // Função para formatar estilos inline para exibição
+  function formatarEstilosInline(arr) {
+    if (!arr.length) return '<p style="font-style: italic; color:#888;">Nenhum estilo inline encontrado.</p>';
+    return arr.map(e => {
+      let idStr = e.id ? ` id="${e.id}"` : '';
+      let classesStr = e.classes.length ? ` class="${e.classes.join(' ')}"` : '';
+      return `&lt;${e.tag}${idStr}${classesStr}&gt; { ${e.style} }`;
+    }).join('\n');
+  }
+
+  // Função recursiva para criar árvore interativa da estrutura HTML
+  function criarArvoreInterativa(element) {
+    if (!element || !element.tagName) return null;
+    const li = document.createElement('li');
+    const hasChildren = element.children.length > 0;
+
+    if (hasChildren) {
+      const toggle = document.createElement('span');
+      toggle.className = 'tree-toggle';
+      toggle.textContent = '▶';
+      toggle.tabIndex = 0;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('role', 'button');
+      toggle.addEventListener('click', () => {
+        const ul = li.querySelector('ul');
+        if (ul) {
+          const isHidden = ul.classList.toggle('hidden');
+          toggle.textContent = isHidden ? '▶' : '▼';
+          toggle.setAttribute('aria-expanded', !isHidden);
+        }
+      });
+      toggle.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+      li.appendChild(toggle);
+    } else {
+      const spacer = document.createElement('span');
+      spacer.style.display = 'inline-block';
+      spacer.style.width = '14px';
+      li.appendChild(spacer);
+    }
+
+    const tag = element.tagName.toLowerCase();
+    const id = element.id ? `#${element.id}` : '';
+    const classes = element.classList.length ? '.' + Array.from(element.classList).join('.') : '';
+    const texto = document.createTextNode(`${tag}${id}${classes}`);
+    li.appendChild(texto);
+
+    if (hasChildren) {
+      const ul = document.createElement('ul');
+      ul.className = 'hidden';
+      Array.from(element.children).forEach(child => {
+        const childLi = criarArvoreInterativa(child);
+        if (childLi) ul.appendChild(childLi);
+      });
+      li.appendChild(ul);
+    }
+    return li;
+  }
+
+  // Função copiar texto para clipboard
+  function copyToClipboard(text) {
+    if (!text) return;
+    navigator.clipboard.writeText(text).catch(() => {
+      // fallback
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+    });
+  }
+
+  // Função refatorar / limpar HTML indentado básico (simples)
+  function refatorarHTML(html) {
+    try {
+      // Usar DOMParser para formatar (indenta a estrutura)
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      function format(node, level = 0) {
+        let indentBefore = '\n' + '  '.repeat(level);
+        let indentAfter = '\n' + '  '.repeat(level - 1);
+        let textNodes = Array.from(node.childNodes).filter(n => n.nodeType === 3);
+        // remover nós de texto vazios e espaços
+        textNodes.forEach(tn => {
+          if (!tn.textContent.trim()) tn.parentNode.removeChild(tn);
+        });
+        Array.from(node.children).forEach(child => format(child, level + 1));
+        if (node.children.length) {
+          node.innerHTML = indentBefore + Array.from(node.children).map(c => c.outerHTML).join(indentBefore) + indentAfter;
+        }
+      }
+      format(doc.body, 0);
+      return doc.body.innerHTML.trim();
+    } catch {
+      return html;
+    }
+  }
+
+  // Função para minificar HTML (super simples, remove espaços, quebras e comentários)
+  function minifyHTML(html) {
+    return html
+      .replace(/>\s+</g, '><')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .trim();
+  }
+  // Função minificar CSS simples
+  function minifyCSS(css) {
+    return css
+      .replace(/\s*([{}:;,])\s*/g, '$1')
+      .replace(/;\}/g, '}')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .trim();
+  }
+  // Função minificar JS simples
+  function minifyJS(js) {
+    return js
+      .replace(/\s*([{};,:])\s*/g, '$1')
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  // --------- Função de geração dos relatórios ---------
+
+  function gerarRelatorioVisual(data) {
+    let txt = '=== RELATÓRIO VISUAL DO TEMPLATE ===\n\n';
+    txt += `IDs (${data.ids.length}):\n${data.ids.join(', ') || 'Nenhum'}\n\n`;
+    txt += `Classes (${data.classes.length}):\n${data.classes.join(', ') || 'Nenhuma'}\n\n`;
+    txt += `Estilos Inline (${data.estilosInline.length}):\n`;
+    data.estilosInline.forEach(e => {
+      txt += `- <${e.tag}${e.id ? ` id="${e.id}"` : ''}${e.classes.length ? ` class="${e.classes.join(' ')}"` : ''}> { ${e.style} }\n`;
+    });
+    txt += `\nEstilos em <style> (${data.estilosEmStyle.length} blocos):\n`;
+    data.estilosEmStyle.forEach((css, i) => {
+      txt += `--- Bloco ${i+1} ---\n${css}\n\n`;
+    });
+    txt += '=== FIM DO RELATÓRIO VISUAL ===\n';
+    return txt;
+  }
+
+  function gerarRelatorioFuncional(data) {
+    let txt = '=== RELATÓRIO FUNCIONAL / MODULARIZAÇÃO ===\n\n';
+    txt += `Dependências CSS (${data.dependenciasCSS.length}):\n`;
+    data.dependenciasCSS.forEach(css => {
+      txt += '- ' + css + '\n';
+    });
+    txt += `\nDependências JS (${data.dependenciasJS.length}):\n`;
+    data.dependenciasJS.forEach(js => {
+      txt += '- ' + js + '\n';
+    });
+    txt += '\nComponentes detectados (hierarquia):\n';
+
+    function renderComp(comp, nivel=0) {
+      if (!comp) return '';
+      let indent = '  '.repeat(nivel);
+      let nome = comp.nome || `(tag: ${comp.tag})`;
+      let str = indent + '- ' + nome + '\n';
+      if (comp.children && comp.children.length) {
+        comp.children.forEach(c => { str += renderComp(c, nivel+1); });
+      }
+      return str;
+    }
+
+    if (data.componentes && data.componentes.length) {
+      data.componentes.forEach(c => {
+        txt += renderComp(c);
+      });
+    } else {
+      txt += '(Nenhum componente modular detectado)\n';
+    }
+    txt += '\n=== FIM DO RELATÓRIO FUNCIONAL ===\n';
+    return txt;
+  }
+
+  // --------- Função para exportar JSON dos dados ---------
+  function gerarJSONExport(data) {
+    const jsonObj = {
+      ids: data.ids,
+      classes: data.classes,
+      estilosInline: data.estilosInline,
+      estilosEmStyle: data.estilosEmStyle,
+      scriptsInline: data.scriptsInline,
+      scriptsExternos: data.scriptsExternos,
+      dependenciasCSS: data.dependenciasCSS,
+      dependenciasJS: data.dependenciasJS,
+      componentes: data.componentes,
+      estruturaHTML: data.estruturaHTML,
+    };
+    return JSON.stringify(jsonObj, null, 2);
+  }
+
+  // --------- Renderização das seções ---------
+  function ativarTab(id) {
+    tabs.forEach(t => {
+      const isSelected = t.getAttribute('aria-controls') === id;
+      t.setAttribute('aria-selected', isSelected);
+      if (isSelected) renderizarSecao(id);
+    });
+  }
+
+  function renderizarSecao(id) {
+    if (!resultadoGlobal) {
+      outputContainer.innerHTML = `<p style="color:#f55;">Cole um HTML válido e clique em Analisar para começar.</p>`;
+      return;
+    }
+    const data = resultadoGlobal;
+    switch(id) {
+      case 'tab-ids': {
+        const btnCopy = `<button class="btn-copy-all" title="Copiar todos os IDs" id="copyIDsBtn">Copiar IDs</button>`;
+        outputContainer.innerHTML = `<h2>IDs Encontrados (${data.ids.length})</h2>${criarLista(data.ids)}${btnCopy}`;
+        document.getElementById('copyIDsBtn').onclick = () => {
+          copyToClipboard(data.ids.join('\n'));
+          alert('IDs copiados para área de transferência!');
+        };
+        break;
+      }
+      case 'tab-classes': {
+        const btnCopy = `<button class="btn-copy-all" title="Copiar todas as Classes" id="copyClassesBtn">Copiar Classes</button>`;
+        outputContainer.innerHTML = `<h2>Classes Encontradas (${data.classes.length})</h2>${criarLista(data.classes)}${btnCopy}`;
+        document.getElementById('copyClassesBtn').onclick = () => {
+          copyToClipboard(data.classes.join('\n'));
+          alert('Classes copiadas para área de transferência!');
+        };
+        break;
+      }
+      case 'tab-inline-style': {
+        const texto = formatarEstilosInline(data.estilosInline).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const btnCopy = `<button class="btn-copy-all" title="Copiar estilos inline" id="copyInlineStyleBtn">Copiar Estilos Inline</button>`;
+        outputContainer.innerHTML = `<h2>Estilos Inline Encontrados (${data.estilosInline.length})</h2><pre>${texto}</pre>${btnCopy}`;
+        document.getElementById('copyInlineStyleBtn').onclick = () => {
+          copyToClipboard(formatarEstilosInline(data.estilosInline));
+          alert('Estilos inline copiados para área de transferência!');
+        };
+        break;
+      }
+      case 'tab-style-tags': {
+        const btnCopy = `<button class="btn-copy-all" title="Copiar estilos em &lt;style&gt;" id="copyStyleTagsBtn">Copiar Estilos em &lt;style&gt;</button>`;
+        const blocos = data.estilosEmStyle.length ? data.estilosEmStyle.map((css, i) => `<pre>/* Bloco ${i+1} */\n${css}</pre>`).join('') : '<p style="font-style: italic; color:#888;">Nenhum estilo em &lt;style&gt; encontrado.</p>';
+        outputContainer.innerHTML = `<h2>Estilos em &lt;style&gt; (${data.estilosEmStyle.length} blocos)</h2>${blocos}${btnCopy}`;
+        document.getElementById('copyStyleTagsBtn').onclick = () => {
+          copyToClipboard(data.estilosEmStyle.join('\n\n'));
+          alert('Estilos em &lt;style&gt; copiados para área de transferência!');
+        };
+        break;
+      }
+      case 'tab-scripts-inline': {
+        const btnCopy = `<button class="btn-copy-all" title="Copiar scripts inline" id="copyScriptsInlineBtn">Copiar Scripts Inline</button>`;
+        const blocos = data.scriptsInline.length ? data.scriptsInline.map((js, i) => `<pre>/* Script Inline ${i+1} */\n${js}</pre>`).join('') : '<p style="font-style: italic; color:#888;">Nenhum script inline encontrado.</p>';
+        outputContainer.innerHTML = `<h2>Scripts Inline (${data.scriptsInline.length})</h2>${blocos}${btnCopy}`;
+        document.getElementById('copyScriptsInlineBtn').onclick = () => {
+          copyToClipboard(data.scriptsInline.join('\n\n'));
+          alert('Scripts inline copiados para área de transferência!');
+        };
+        break;
+      }
+      case 'tab-scripts-external': {
+        const btnCopy = `<button class="btn-copy-all" title="Copiar URLs dos scripts externos" id="copyScriptsExternalBtn">Copiar Scripts Externos</button>`;
+        outputContainer.innerHTML = `<h2>Scripts Externos (${data.scriptsExternos.length})</h2>${criarLista(data.scriptsExternos)}${btnCopy}`;
+        document.getElementById('copyScriptsExternalBtn').onclick = () => {
+          copyToClipboard(data.scriptsExternos.join('\n'));
+          alert('URLs de scripts externos copiadas para área de transferência!');
+        };
+        break;
+      }
+      case 'tab-html-structure': {
+        const rootUl = document.createElement('ul');
+        rootUl.className = 'treeview';
+        const rootLi = criarArvoreInterativa(resultadoGlobal.docBody);
+        if (rootLi) rootUl.appendChild(rootLi);
+        outputContainer.innerHTML = '<h2>Estrutura do &lt;body&gt; (Árvore)</h2>';
+        outputContainer.appendChild(rootUl);
+        break;
+      }
+      case 'tab-components': {
+        function renderComp(comp, nivel=0) {
+          if (!comp) return '';
+          let indent = '  '.repeat(nivel);
+          let nome = comp.nome || `(tag: ${comp.tag})`;
+          let html = `<li><strong>${nome}</strong>`;
+          if (comp.children && comp.children.length) {
+            html += `<ul>`;
+            comp.children.forEach(c => { html += renderComp(c, nivel+1); });
+            html += `</ul>`;
+          }
+          html += `</li>`;
+          return html;
+        }
+        let html = '<h2>Componentes Modulares Detectados</h2>';
+        if (resultadoGlobal.componentes && resultadoGlobal.componentes.length) {
+          html += '<ul class="treeview">';
+          resultadoGlobal.componentes.forEach(c => {
+            html += renderComp(c);
+          });
+          html += '</ul>';
+        } else {
+          html += '<p style="font-style: italic; color:#888;">Nenhum componente modular detectado.</p>';
+        }
+        outputContainer.innerHTML = html;
+        break;
+      }
+      case 'tab-deps': {
+        let html = '<h2>Dependências CSS e JS</h2>';
+        html += `<h3>CSS (${resultadoGlobal.dependenciasCSS.length})</h3>`;
+        html += criarLista(resultadoGlobal.dependenciasCSS);
+        html += `<h3>JS (${resultadoGlobal.dependenciasJS.length})</h3>`;
+        html += criarLista(resultadoGlobal.dependenciasJS);
+        outputContainer.innerHTML = html;
+        break;
+      }
+      case 'tab-edit-html': {
+        outputContainer.innerHTML = `<h2>Editor & Refatoração do HTML</h2><textarea id="editorArea" class="editable-area" spellcheck="false">${resultadoGlobal.estruturaHTML}</textarea>
+        <div class="btn-group" style="margin-top:1rem;">
+          <button id="btnReorganizar">Reorganizar/Refatorar HTML</button>
+          <button id="btnBaixarHtml">Baixar HTML Atualizado (.html)</button>
+          <button id="btnCopiarHtml">Copiar HTML Atualizado</button>
+        </div>`;
+        document.getElementById('btnReorganizar').onclick = () => {
+          const txt = document.getElementById('editorArea').value;
+          const ref = refatorarHTML(txt);
+          document.getElementById('editorArea').value = ref;
+          alert('HTML reorganizado/refatorado com indentação simples.');
+        };
+        document.getElementById('btnBaixarHtml').onclick = () => {
+          const txt = document.getElementById('editorArea').value;
+          baixarArquivo('template-refatorado.html', txt, 'text/html');
+        };
+        document.getElementById('btnCopiarHtml').onclick = () => {
+          const txt = document.getElementById('editorArea').value;
+          copyToClipboard(txt);
+          alert('HTML atualizado copiado para a área de transferência!');
+        };
+        break;
+      }
+      case 'tab-report': {
+        const relVis = gerarRelatorioVisual(resultadoGlobal);
+        const relFunc = gerarRelatorioFuncional(resultadoGlobal);
+        outputContainer.innerHTML = `<h2>Relatórios</h2>
+        <div style="margin-bottom:1rem;">
+          <button class="btn-download-report" id="btnCopyRelVis">Copiar Relatório Visual</button>
+          <button class="btn-download-report" id="btnBaixarRelVis">Baixar Relatório Visual (.txt)</button>
+        </div>
+        <pre style="max-height: 200px; overflow-y: auto; background:#22222a; padding:1rem; border-radius:6px;">${relVis.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+        <div style="margin:1rem 0;">
+          <button class="btn-download-report" id="btnCopyRelFunc">Copiar Relatório Funcional</button>
+          <button class="btn-download-report" id="btnBaixarRelFunc">Baixar Relatório Funcional (.txt)</button>
+        </div>
+        <pre style="max-height: 200px; overflow-y: auto; background:#22222a; padding:1rem; border-radius:6px;">${relFunc.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+        `;
+        document.getElementById('btnCopyRelVis').onclick = () => {
+          copyToClipboard(relVis);
+          alert('Relatório visual copiado para a área de transferência!');
+        };
+        document.getElementById('btnBaixarRelVis').onclick = () => {
+          baixarArquivo('relatorio-visual.txt', relVis, 'text/plain');
+        };
+        document.getElementById('btnCopyRelFunc').onclick = () => {
+          copyToClipboard(relFunc);
+          alert('Relatório funcional copiado para a área de transferência!');
+        };
+        document.getElementById('btnBaixarRelFunc').onclick = () => {
+          baixarArquivo('relatorio-funcional.txt', relFunc, 'text/plain');
+        };
+        break;
+      }
+      default:
+        outputContainer.innerHTML = `<p>Seção desconhecida.</p>`;
+    }
+  }
+
+  // Função para baixar arquivo no browser
+  function baixarArquivo(nomeArquivo, conteudo, tipoMime) {
+    const blob = new Blob([conteudo], { type: tipoMime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  // Minificação total do código da textarea e dos blocos CSS/JS detectados
+  function minificarTudo() {
+    if (!resultadoGlobal) {
+      alert('Analise o HTML primeiro para minificar.');
+      return;
+    }
+    let html = htmlInput.value.trim();
+    if (!html) {
+      alert('Cole o HTML antes de minificar.');
+      return;
+    }
+    try {
+      // Minificar HTML bruto
+      let htmlMin = minifyHTML(html);
+
+      // Minificar CSS inline (simples no style tags)
+      resultadoGlobal.estilosEmStyle = resultadoGlobal.estilosEmStyle.map(css => minifyCSS(css));
+
+      // Minificar scripts inline
+      resultadoGlobal.scriptsInline = resultadoGlobal.scriptsInline.map(js => minifyJS(js));
+
+      // Substituir estilo e script no htmlMin
+      // ATENÇÃO: isso é simplificado, pode falhar em casos complexos
+
+      // Substituir blocos <style> com versão minificada
+      resultadoGlobal.estilosEmStyle.forEach((css, i) => {
+        const regex = /<style[^>]*>[\s\S]*?<\/style>/gi;
+        htmlMin = htmlMin.replace(regex, `<style>${css}</style>`);
+      });
+
+      // Substituir scripts inline
+      resultadoGlobal.scriptsInline.forEach((js, i) => {
+        const regexScript = /<script>([\s\S]*?)<\/script>/gi;
+        htmlMin = htmlMin.replace(regexScript, `<script>${js}</script>`);
+      });
+
+      htmlInput.value = htmlMin;
+      alert('Minificação completa aplicada no textarea!');
+    } catch (e) {
+      alert('Erro durante a minificação: ' + e.message);
+    }
+  }
+
+  // --------- Eventos e inicialização ---------
+  analyzeBtn.addEventListener('click', () => {
+    const html = htmlInput.value.trim();
+    if (!html) {
+      alert('Por favor, cole seu código HTML no campo acima antes de analisar.');
+      return;
+    }
+    resultadoGlobal = transformarHTMLparaTemplate(html);
+    jsonExport = gerarJSONExport(resultadoGlobal);
+    ativarTab('tab-ids');
+  });
+
+  minifyBtn.addEventListener('click', () => {
+    minificarTudo();
+  });
+
+  exportJsonBtn.addEventListener('click', () => {
+    if (!jsonExport) {
+      alert('Analise um HTML válido para exportar o JSON.');
+      return;
+    }
+    // Mostrar JSON numa nova aba para copiar/visualizar
+    const win = window.open('', '_blank');
+    win.document.write('<pre style="white-space: pre-wrap; font-family: monospace;">' + jsonExport.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>');
+    win.document.title = 'JSON Exportado do Template';
+  });
+
+  downloadJsonBtn.addEventListener('click', () => {
+    if (!jsonExport) {
+      alert('Analise um HTML válido para baixar o JSON.');
+      return;
+    }
+    baixarArquivo('template-data.json', jsonExport, 'application/json');
+  });
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const id = tab.getAttribute('aria-controls');
+      ativarTab(id);
+    });
+  });
+
+  // Inicialização: aba padrão
+  ativarTab('tab-ids');
+
+})();
+</script>
+</body>
+</html>

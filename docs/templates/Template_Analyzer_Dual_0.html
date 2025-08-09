@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dual App Template Master Analyzer & Modularizer + Super Toolkit</title>
+<style>
+  /* RESET */
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    margin: 0;
+    padding: 16px 20px 60px 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    user-select: text;
+  }
+  h1 {
+    color: #0fa;
+    margin-bottom: 8px;
+    font-weight: 900;
+    font-size: 2.4rem;
+    text-align: center;
+  }
+  h2 {
+    margin: 0;
+    color: #0af;
+    font-weight: 700;
+    font-size: 1.4rem;
+  }
+  h3 {
+    margin: 4px 0 10px 0;
+    font-weight: 600;
+    color: #4fc3f7;
+  }
+  p.description {
+    font-size: 1rem;
+    color: #aaa;
+    margin-top: 0;
+    margin-bottom: 18px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+  textarea#htmlInput {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    max-width: 900px;
+    min-height: 260px;
+    background: #222;
+    border: 2px solid #0fa;
+    border-radius: 12px;
+    color: #eee;
+    font-family: monospace;
+    font-size: 1rem;
+    line-height: 1.4;
+    padding: 18px 20px;
+    resize: vertical;
+    outline-offset: 3px;
+    outline-color: #0fa;
+    transition: border-color 0.3s ease;
+  }
+  textarea#htmlInput:focus {
+    border-color: #4fc3f7;
+  }
+  button#analyzeBtn {
+    margin: 20px auto 10px auto;
+    display: block;
+    background: linear-gradient(90deg, #0fa, #0c8);
+    border: none;
+    padding: 16px 36px;
+    border-radius: 14px;
+    font-size: 1.25rem;
+    font-weight: 900;
+    cursor: pointer;
+    color: #121212;
+    user-select: none;
+    box-shadow: 0 0 12px #0fa9;
+    transition: background 0.3s ease;
+  }
+  button#analyzeBtn:hover, button#analyzeBtn:focus {
+    background: linear-gradient(90deg, #0cf, #08a);
+    color: #fff;
+  }
+  main#outputContainer {
+    margin: 20px auto 40px auto;
+    width: 100%;
+    max-width: 900px;
+    background: #222;
+    border-radius: 14px;
+    padding: 20px 28px;
+    box-shadow: 0 0 16px #0af9;
+    min-height: 480px;
+    overflow-y: auto;
+  }
+  nav#tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  nav#tabs button.tab-btn {
+    background: #333;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #0fa;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    user-select: none;
+    flex-grow: 1;
+    max-width: 180px;
+  }
+  nav#tabs button.tab-btn.active,
+  nav#tabs button.tab-btn:hover,
+  nav#tabs button.tab-btn:focus {
+    background: #0fa;
+    color: #121212;
+    outline: none;
+  }
+  section.analysis-section {
+    display: none;
+    font-size: 0.9rem;
+    color: #ddd;
+  }
+  section.analysis-section.active {
+    display: block;
+  }
+  pre, code {
+    font-family: monospace;
+    background: #111;
+    padding: 14px 18px;
+    border-radius: 10px;
+    overflow-x: auto;
+    color: #afa;
+    max-height: 280px;
+    user-select: text;
+    white-space: pre-wrap;
+  }
+  ul.list-ul {
+    list-style: decimal;
+    margin-left: 22px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 10px;
+    user-select: text;
+  }
+  ul.list-ul li {
+    margin-bottom: 8px;
+    cursor: default;
+    line-height: 1.3;
+  }
+  .copy-button {
+    display: inline-block;
+    margin-left: 12px;
+    background: #0fa;
+    border: none;
+    padding: 5px 11px;
+    border-radius: 7px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    color: #121212;
+    user-select: none;
+    transition: background 0.25s ease;
+  }
+  .copy-button:hover, .copy-button:focus {
+    background: #0cf;
+    color: #fff;
+  }
+  .inline-flex {
+    display: inline-flex;
+    align-items: center;
+  }
+  .section-header {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .filter-input {
+    background: #333;
+    border: none;
+    color: #eee;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    outline-offset: 2px;
+    outline-color: #0fa;
+    min-width: 220px;
+    user-select: text;
+  }
+  .treeview {
+    font-family: monospace;
+    font-size: 0.9rem;
+    max-height: 320px;
+    overflow-y: auto;
+    background: #111;
+    padding: 12px 16px;
+    border-radius: 12px;
+    color: #afa;
+    user-select: text;
+  }
+  .treeview ul {
+    list-style: none;
+    margin-left: 14px;
+    padding-left: 10px;
+    border-left: 1px dashed #0fa7;
+  }
+  .treeview li {
+    margin: 4px 0;
+    cursor: default;
+  }
+  .editable-area {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    width: 100%;
+    max-width: 900px;
+  }
+  textarea#editHTMLArea {
+    width: 100%;
+    min-height: 150px;
+    background: #222;
+    border: 1px solid #0fa;
+    border-radius: 10px;
+    color: #eee;
+    font-family: monospace;
+    padding: 14px 18px;
+    resize: vertical;
+    outline-offset: 3px;
+    outline-color: #0fa;
+  }
+  .export-btn, .btn-refactor, .btn-copy-all, .btn-download-report {
+    background: #0fa;
+    border: none;
+    color: #121212;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 12px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 12px;
+    margin-right: 14px;
+    box-shadow: 0 0 10px #0fa8;
+    transition: background 0.3s ease;
+  }
+  .export-btn:hover, .btn-refactor:hover, .btn-copy-all:hover, .btn-download-report:hover {
+    background: #08c;
+    color: #fff;
+  }
+  .btn-group {
+    margin-top: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  /* Scrollbar custom */
+  ::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0fa;
+    border-radius: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #111;
+  }
+  /* Responsive */
+  @media (max-width: 740px) {
+    button#analyzeBtn {
+      width: 100%;
+    }
+    nav#tabs button.tab-btn {
+      max-width: 100%;
+      flex-grow: 1;
+    }
+    textarea#htmlInput {
+      min-height: 180px;
+    }
+    main#outputContainer {
+      max-height: 60vh;
+      padding: 14px 18px;
+    }
+    pre, code {
+      max-height: 180px;
+    }
+    ul.list-ul {
+      max-height: 180px;
+    }
+    .btn-group {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Dual App Template Master Analyzer & Modularizer + Super Toolkit</h1>
+  <p class="description">
+    Cole seu código HTML completo abaixo e clique em <strong>"Analisar Template"</strong>.<br />
+    Sistema poderoso para extrair, analisar, reorganizar, refatorar e exportar templates unificados para o Dual Infodose App.<br />
+    Inclui editor com refatoração, exportação múltipla e relatórios avançados.
+  </p>
+</header>
+
+<textarea id="htmlInput" placeholder="Cole seu código HTML completo aqui..."></textarea>
+<button id="analyzeBtn" aria-label="Analisar o template do código HTML">Analisar Template</button>
+
+<nav id="tabs" role="tablist" aria-label="Seções do resultado">
+  <button role="tab" class="tab-btn active" aria-selected="true" aria-controls="tab-ids" id="tab-btn-ids">IDs</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-classes" id="tab-btn-classes">Classes</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-inline-style" id="tab-btn-inline-style">Estilos Inline</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-style-tags" id="tab-btn-style-tags">Estilos &lt;style&gt;</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-scripts-inline" id="tab-btn-scripts-inline">Scripts Inline</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-scripts-external" id="tab-btn-scripts-external">Scripts Externos</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-html-structure" id="tab-btn-html-structure">Estrutura HTML</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-edit-html" id="tab-btn-edit-html">Editor & Refatoração</button>
+  <button role="tab" class="tab-btn" aria-selected="false" aria-controls="tab-report" id="tab-btn-report">Relatório Completo</button>
+</nav>
+
+<main id="outputContainer" role="tabpanel" tabindex="0" aria-live="polite" aria-atomic="true">
+  <!-- Conteúdo dinâmico das seções -->
+</main>
+
+<script defer>
+(() => {
+  const htmlInput = document.getElementById('htmlInput');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const outputContainer = document.getElementById('outputContainer');
+  const tabs = Array.from(document.querySelectorAll('#tabs .tab-btn'));
+
+  // Guardar análise global
+  let resultadoGlobal = null;
+
+  // Alterna tabs
+  function ativarTab(id) {
+    tabs.forEach(tab => {
+      const target = tab.getAttribute('aria-controls');
+      const selected = (target === id);
+      tab.classList.toggle('active', selected);
+      tab.setAttribute('aria-selected', selected);
+    });
+    renderizarSecao(id);
+  }
+
+  // Botão copiar para clipboard
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Copiado para a área de transferência!');
+    }).catch(() => {
+      alert('Falha ao copiar. Tente manualmente.');
+    });
+  }
+
+  // Cria botão copiar
+  function criarBotaoCopiar(text) {
+    const btn = document.createElement('button');
+    btn.className = 'copy-button';
+    btn.type = 'button';
+    btn.textContent = 'Copiar';
+    btn.addEventListener('click', () => copyToClipboard(text));
+    return btn;
+  }
+
+  // Cria lista numerada HTML
+  function criarLista(arr) {
+    if (!arr.length) return '<p><em>Nenhum encontrado.</em></p>';
+    const ul = document.createElement('ol');
+    ul.className = 'list-ul';
+    arr.forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      ul.appendChild(li);
+    });
+    return ul.outerHTML;
+  }
+
+  // Formata estilos inline para exibição
+  function formatarEstilosInline(estilos) {
+    if (!estilos.length) return '<p><em>Nenhum encontrado.</em></p>';
+    return estilos.map(e => {
+      const id = e.id ? ` id="${e.id}"` : '';
+      const classes = e.classes.length ? ` class="${e.classes.join(' ')}"` : '';
+      return `<code>&lt;${e.tag}${id}${classes}&gt;</code>\nstyle: <code>${e.style}</code>`;
+    }).join('\n\n');
+  }
+
+  // Criar árvore HTML interativa
+  function criarArvoreInterativa(element) {
+    if (!element || !element.tagName) return null;
+    const li = document.createElement('li');
+    const tag = element.tagName.toLowerCase();
+    const id = element.id ? ` id="${element.id}"` : '';
+    const classes = element.classList.length ? ` class="${Array.from(element.classList).join(' ')}"` : '';
+    li.textContent = `<${tag}${id}${classes}>`;
+
+    const filhos = Array.from(element.children);
+    if (filhos.length > 0) {
+      const ul = document.createElement('ul');
+      filhos.forEach(filho => {
+        ul.appendChild(criarArvoreInterativa(filho));
+      });
+      li.appendChild(ul);
+    }
+    return li;
+  }
+
+  // Função de transformação/análise do HTML
+  function transformarHTMLparaTemplate(htmlBruto) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlBruto, 'text/html');
+
+    const todosElementos = Array.from(doc.body.querySelectorAll('*'));
+    const ids = new Set();
+    const classes = new Set();
+
+    todosElementos.forEach(el => {
+      if (el.id) ids.add(el.id);
+      el.classList.forEach(c => classes.add(c));
+    });
+
+    const estilosInline = [];
+    todosElementos.forEach(el => {
+      if (el.hasAttribute('style')) {
+        estilosInline.push({
+          tag: el.tagName.toLowerCase(),
+          id: el.id || null,
+          classes: Array.from(el.classList),
+          style: el.getAttribute('style'),
+        });
+      }
+    });
+
+    const estilosEmStyle = [];
+    doc.querySelectorAll('style').forEach(styleTag => {
+      estilosEmStyle.push(styleTag.textContent.trim());
+    });
+
+    const scriptsInline = [];
+    const scriptsExternos = [];
+    doc.querySelectorAll('script').forEach(scriptTag => {
+      if (scriptTag.src) {
+        scriptsExternos.push(scriptTag.src);
+      } else {
+        const s = scriptTag.textContent.trim();
+        if (s) scriptsInline.push(s);
+      }
+    });
+
+    const corpoHTML = doc.body.innerHTML.trim();
+
+    return {
+      estruturaHTML: corpoHTML,
+      ids: Array.from(ids).sort(),
+      classes: Array.from(classes).sort(),
+      estilosInline,
+      estilosEmStyle,
+      scriptsInline,
+      scriptsExternos,
+      docBody: doc.body,
+    };
+  }
+
+  // Função simples para indentação e limpeza básica do HTML (refatorar)
+  function refatorarHTML(html) {
+    // Usando DOMParser + XMLSerializer para formatar indentação
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<body>${html}</body>`, 'text/html');
+      // Função recursiva pra indentação
+      function indent(node, level=0) {
+        const indentText = '\n' + '  '.repeat(level);
+        let child = node.firstChild;
+        while(child) {
+          if (child.nodeType === 1) { // Element
+            node.insertBefore(document.createTextNode(indentText + '  '), child);
+            indent(child, level + 1);
+            if (!child.nextSibling || child.nextSibling.nodeType !== 3 || child.nextSibling.textContent.trim() !== '') {
+              node.insertBefore(document.createTextNode(indentText), child.nextSibling);
+            }
+          }
+          child = child.nextSibling;
+        }
+      }
+      indent(doc.body, 0);
+      let htmlFormatado = doc.body.innerHTML.trim();
+      // Limpeza de espaços excessivos
+      htmlFormatado = htmlFormatado.replace(/\n\s*\n/g, '\n');
+      return htmlFormatado;
+    } catch(e) {
+      return html; // fallback
+    }
+  }
+
+  // Gera relatório visual completo (texto grande e formatado)
+  function gerarRelatorioCompleto(resultado) {
+    let rel = '=== Relatório Completo do Template ===\n\n';
+
+    rel += '== IDs encontrados ==\n';
+    if (resultado.ids.length) rel += resultado.ids.join('\n') + '\n\n';
+    else rel += 'Nenhum ID encontrado.\n\n';
+
+    rel += '== Classes encontradas ==\n';
+    if (resultado.classes.length) rel += resultado.classes.join('\n') + '\n\n';
+    else rel += 'Nenhuma classe encontrada.\n\n';
+
+    rel += '== Estilos Inline ==\n';
+    if (resultado.estilosInline.length) {
+      resultado.estilosInline.forEach((e,i) => {
+        rel += `#${i+1}: <${e.tag}${e.id ? ` id="${e.id}"` : ''}${e.classes.length ? ` class="${e.classes.join(' ')}"` : ''}>\n`;
+        rel += `style: ${e.style}\n\n`;
+      });
+    } else rel += 'Nenhum estilo inline encontrado.\n\n';
+
+    rel += '== Estilos em <style> ==\n';
+    if (resultado.estilosEmStyle.length) {
+      resultado.estilosEmStyle.forEach((styleText,i) => {
+        rel += `-- Style Tag #${i+1} --\n`;
+        rel += styleText + '\n\n';
+      });
+    } else rel += 'Nenhum estilo em <style> encontrado.\n\n';
+
+    rel += '== Scripts Inline ==\n';
+    if (resultado.scriptsInline.length) {
+      resultado.scriptsInline.forEach((scriptText,i) => {
+        rel += `-- Script Inline #${i+1} --\n`;
+        rel += scriptText + '\n\n';
+      });
+    } else rel += 'Nenhum script inline encontrado.\n\n';
+
+    rel += '== Scripts Externos ==\n';
+    if (resultado.scriptsExternos.length) rel += resultado.scriptsExternos.join('\n') + '\n\n';
+    else rel += 'Nenhum script externo encontrado.\n\n';
+
+    rel += '== Estrutura HTML (Simplificada) ==\n';
+    rel += simplificarArvoreHTML(resultado.docBody) + '\n\n';
+
+    return rel;
+  }
+
+  // Simplifica a árvore para relatório (string)
+  function simplificarArvoreHTML(element, nivel=0) {
+    if (!element || !element.tagName) return '';
+    const tag = element.tagName.toLowerCase();
+    const id = element.id ? `#${element.id}` : '';
+    const classes = element.classList.length ? `.${Array.from(element.classList).join('.')}` : '';
+    const indent = '  '.repeat(nivel);
+    let texto = `${indent}<${tag}${id}${classes}>\n`;
+    Array.from(element.children).forEach(child => {
+      texto += simplificarArvoreHTML(child, nivel + 1);
+    });
+    return texto;
+  }
+
+  // Gera relatório funcional (dados para integrar e modularizar)
+  function gerarRelatorioFuncional(resultado) {
+    let rel = '=== Relatório Funcional / Modularização ===\n\n';
+
+    rel += '# IDs encontrados:\n';
+    rel += resultado.ids.length ? resultado.ids.join('\n') + '\n\n' : 'Nenhum ID.\n\n';
+
+    rel += '# Classes encontradas:\n';
+    rel += resultado.classes.length ? resultado.classes.join('\n') + '\n\n' : 'Nenhuma classe.\n\n';
+
+    rel += '# Estilos Inline:\n';
+    if (resultado.estilosInline.length) {
+      resultado.estilosInline.forEach(e => {
+        rel += `<${e.tag}${e.id ? ` id="${e.id}"` : ''}${e.classes.length ? ` class="${e.classes.join(' ')}"` : ''}> { ${e.style} }\n`;
+      });
+      rel += '\n';
+    } else rel += 'Nenhum estilo inline.\n\n';
+
+    rel += '# Estilos em <style>:\n';
+    if (resultado.estilosEmStyle.length) {
+      resultado.estilosEmStyle.forEach((styleText, i) => {
+        rel += `/* Style Tag #${i+1} */\n${styleText}\n\n`;
+      });
+    } else rel += 'Nenhum estilo em <style>.\n\n';
+
+    rel += '# Scripts Inline:\n';
+    if (resultado.scriptsInline.length) {
+      resultado.scriptsInline.forEach((s, i) => {
+        rel += `/* Script Inline #${i+1} */\n${s}\n\n`;
+      });
+    } else rel += 'Nenhum script inline.\n\n';
+
+    rel += '# Scripts Externos:\n';
+    rel += resultado.scriptsExternos.length ? resultado.scriptsExternos.join('\n') + '\n\n' : 'Nenhum script externo.\n\n';
+
+    rel += '# Estrutura HTML:\n';
+    rel += simplificarArvoreHTML(resultado.docBody) + '\n';
+
+    return rel;
+  }
+
+  // Renderiza seções de resultado na UI
+  function renderizarSecao(id) {
+    if (!resultadoGlobal) {
+      outputContainer.innerHTML = `<p style="color:#f55;">Cole um HTML válido e clique em Analisar.</p>`;
+      return;
+    }
+    outputContainer.innerHTML = '';
+
+    switch (id) {
+      case 'tab-ids': {
+        const lista = criarLista(resultadoGlobal.ids);
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'IDs encontrados';
+        header.appendChild(h2);
+        const btnCopyAll = document.createElement('button');
+        btnCopyAll.className = 'btn-copy-all';
+        btnCopyAll.textContent = 'Copiar Todos IDs';
+        btnCopyAll.title = 'Copiar todos os IDs encontrados';
+        btnCopyAll.addEventListener('click', () => {
+          if(resultadoGlobal.ids.length) copyToClipboard(resultadoGlobal.ids.join('\n'));
+          else alert('Nenhum ID para copiar.');
+        });
+        header.appendChild(btnCopyAll);
+        sec.appendChild(header);
+        sec.innerHTML += lista;
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-classes': {
+        const lista = criarLista(resultadoGlobal.classes);
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Classes encontradas';
+        header.appendChild(h2);
+        const btnCopyAll = document.createElement('button');
+        btnCopyAll.className = 'btn-copy-all';
+        btnCopyAll.textContent = 'Copiar Todas Classes';
+        btnCopyAll.title = 'Copiar todas as classes encontradas';
+        btnCopyAll.addEventListener('click', () => {
+          if(resultadoGlobal.classes.length) copyToClipboard(resultadoGlobal.classes.join('\n'));
+          else alert('Nenhuma classe para copiar.');
+        });
+        header.appendChild(btnCopyAll);
+        sec.appendChild(header);
+        sec.innerHTML += lista;
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-inline-style': {
+        const stylesText = formatarEstilosInline(resultadoGlobal.estilosInline);
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Estilos Inline encontrados';
+        header.appendChild(h2);
+        const btnCopyAll = criarBotaoCopiar(resultadoGlobal.estilosInline.map(e => e.style).join('\n'));
+        btnCopyAll.textContent = 'Copiar Todos Estilos Inline';
+        btnCopyAll.title = 'Copiar todos os estilos inline';
+        header.appendChild(btnCopyAll);
+        sec.appendChild(header);
+        const pre = document.createElement('pre');
+        pre.innerHTML = stylesText;
+        sec.appendChild(pre);
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-style-tags': {
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Estilos dentro de &lt;style&gt;';
+        header.appendChild(h2);
+        const btnCopyAll = criarBotaoCopiar(resultadoGlobal.estilosEmStyle.join('\n\n'));
+        btnCopyAll.textContent = 'Copiar Todos Estilos em &lt;style&gt;';
+        btnCopyAll.title = 'Copiar todo o conteúdo das tags <style>';
+        header.appendChild(btnCopyAll);
+        sec.appendChild(header);
+
+        if (resultadoGlobal.estilosEmStyle.length) {
+          resultadoGlobal.estilosEmStyle.forEach((styleText, i) => {
+            const h3 = document.createElement('h3');
+            h3.textContent = `Style Tag #${i + 1}`;
+            sec.appendChild(h3);
+
+            const pre = document.createElement('pre');
+            pre.textContent = styleText;
+            sec.appendChild(pre);
+          });
+        } else {
+          const p = document.createElement('p');
+          p.textContent = 'Nenhum estilo em <style> encontrado.';
+          sec.appendChild(p);
+        }
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-scripts-inline': {
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Scripts Inline encontrados';
+        header.appendChild(h2);
+        const btnCopyAll = criarBotaoCopiar(resultadoGlobal.scriptsInline.join('\n\n'));
+        btnCopyAll.textContent = 'Copiar Todos Scripts Inline';
+        btnCopyAll.title = 'Copiar todo conteúdo dos scripts inline';
+        header.appendChild(btnCopyAll);
+        sec.appendChild(header);
+
+        if (resultadoGlobal.scriptsInline.length) {
+          resultadoGlobal.scriptsInline.forEach((scriptText, i) => {
+            const h3 = document.createElement('h3');
+            h3.textContent = `Script Inline #${i + 1}`;
+            sec.appendChild(h3);
+
+            const pre = document.createElement('pre');
+            pre.textContent = scriptText;
+            sec.appendChild(pre);
+          });
+        } else {
+          const p = document.createElement('p');
+          p.textContent = 'Nenhum script inline encontrado.';
+          sec.appendChild(p);
+        }
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-scripts-external': {
+        const lista = criarLista(resultadoGlobal.scriptsExternos);
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const header = document.createElement('div');
+        header.className = 'section-header';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Scripts Externos encontrados';
+        header.appendChild(h2);
+        const btnCopyAll = criarBotaoCopiar(resultadoGlobal.scriptsExternos.join('\n'));
+        btnCopyAll.textContent = 'Copiar Todos Scripts Externos';
+        btnCopyAll.title = 'Copiar todos os links dos scripts externos';
+        header.appendChild(btnCopyAll);
+        sec.appendChild(header);
+
+        sec.innerHTML += lista;
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-html-structure': {
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Estrutura HTML (Árvore do Body)';
+        sec.appendChild(h2);
+
+        const treeDiv = document.createElement('div');
+        treeDiv.className = 'treeview';
+
+        const treeRoot = document.createElement('ul');
+        const rootLi = criarArvoreInterativa(resultadoGlobal.docBody);
+        treeRoot.appendChild(rootLi);
+
+        treeDiv.appendChild(treeRoot);
+        sec.appendChild(treeDiv);
+
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-edit-html': {
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Editor & Refatoração do HTML';
+        sec.appendChild(h2);
+
+        const textareaEdit = document.createElement('textarea');
+        textareaEdit.id = 'editHTMLArea';
+        textareaEdit.className = 'editable-area';
+        textareaEdit.value = resultadoGlobal.estruturaHTML;
+        sec.appendChild(textareaEdit);
+
+        // Botões grupo
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'btn-group';
+
+        // Botão refatorar/reorganizar
+        const btnRefactor = document.createElement('button');
+        btnRefactor.type = 'button';
+        btnRefactor.className = 'btn-refactor';
+        btnRefactor.textContent = 'Refatorar & Reorganizar HTML';
+        btnRefactor.title = 'Limpa e formata o HTML no editor';
+        btnRefactor.addEventListener('click', () => {
+          textareaEdit.value = refatorarHTML(textareaEdit.value);
+          alert('HTML refatorado e reorganizado com sucesso!');
+        });
+        btnGroup.appendChild(btnRefactor);
+
+        // Botão baixar HTML
+        const btnExportHTML = document.createElement('button');
+        btnExportHTML.type = 'button';
+        btnExportHTML.className = 'export-btn';
+        btnExportHTML.textContent = 'Baixar HTML Atualizado';
+        btnExportHTML.title = 'Baixar o HTML do editor para arquivo .html';
+        btnExportHTML.addEventListener('click', () => {
+          const conteudo = textareaEdit.value.trim();
+          if (!conteudo) {
+            alert('O conteúdo do HTML está vazio!');
+            return;
+          }
+          baixarArquivo('template-modificado.html', conteudo, 'text/html');
+        });
+        btnGroup.appendChild(btnExportHTML);
+
+        sec.appendChild(btnGroup);
+        outputContainer.appendChild(sec);
+        break;
+      }
+      case 'tab-report': {
+        const sec = document.createElement('section');
+        sec.className = 'analysis-section active';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'Relatórios Completos';
+        sec.appendChild(h2);
+
+        const btnGroup = document.createElement('div');
+        btnGroup.className = 'btn-group';
+
+        // Botão relatório visual
+        const btnRelVis = document.createElement('button');
+        btnRelVis.type = 'button';
+        btnRelVis.className = 'btn-download-report';
+        btnRelVis.textContent = 'Relatório Visual Completo (Texto)';
+        btnRelVis.title = 'Copiar o relatório visual para a área de transferência';
+        btnRelVis.addEventListener('click', () => {
+          const texto = gerarRelatorioCompleto(resultadoGlobal);
+          copyToClipboard(texto);
+          alert('Relatório visual copiado para a área de transferência!');
+        });
+        btnGroup.appendChild(btnRelVis);
+
+        // Botão baixar relatório visual
+        const btnBaixarRelVis = document.createElement('button');
+        btnBaixarRelVis.type = 'button';
+        btnBaixarRelVis.className = 'btn-download-report';
+        btnBaixarRelVis.textContent = 'Baixar Relatório Visual (.txt)';
+        btnBaixarRelVis.title = 'Baixar relatório visual em arquivo .txt';
+        btnBaixarRelVis.addEventListener('click', () => {
+          const texto = gerarRelatorioCompleto(resultadoGlobal);
+          baixarArquivo('relatorio-visual.txt', texto, 'text/plain');
+        });
+        btnGroup.appendChild(btnBaixarRelVis);
+
+        // Botão relatório funcional
+        const btnRelFunc = document.createElement('button');
+        btnRelFunc.type = 'button';
+        btnRelFunc.className = 'btn-download-report';
+        btnRelFunc.textContent = 'Relatório Funcional / Modularização';
+        btnRelFunc.title = 'Copiar relatório funcional para a área de transferência';
+        btnRelFunc.addEventListener('click', () => {
+          const texto = gerarRelatorioFuncional(resultadoGlobal);
+          copyToClipboard(texto);
+          alert('Relatório funcional copiado para a área de transferência!');
+        });
+        btnGroup.appendChild(btnRelFunc);
+
+        // Botão baixar relatório funcional
+        const btnBaixarRelFunc = document.createElement('button');
+        btnBaixarRelFunc.type = 'button';
+        btnBaixarRelFunc.className = 'btn-download-report';
+        btnBaixarRelFunc.textContent = 'Baixar Relatório Funcional (.txt)';
+        btnBaixarRelFunc.title = 'Baixar relatório funcional em arquivo .txt';
+        btnBaixarRelFunc.addEventListener('click', () => {
+          const texto = gerarRelatorioFuncional(resultadoGlobal);
+          baixarArquivo('relatorio-funcional.txt', texto, 'text/plain');
+        });
+        btnGroup.appendChild(btnBaixarRelFunc);
+
+        sec.appendChild(btnGroup);
+        outputContainer.appendChild(sec);
+        break;
+      }
+      default:
+        outputContainer.innerHTML = `<p>Seção desconhecida.</p>`;
+    }
+  }
+
+  // Função para baixar arquivo no browser
+  function baixarArquivo(nomeArquivo, conteudo, tipoMime) {
+    const blob = new Blob([conteudo], { type: tipoMime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  // Evento clique para analisar
+  analyzeBtn.addEventListener('click', () => {
+    const html = htmlInput.value.trim();
+    if (!html) {
+      alert('Por favor, cole seu código HTML no campo acima antes de analisar.');
+      return;
+    }
+    resultadoGlobal = transformarHTMLparaTemplate(html);
+    ativarTab('tab-ids');
+  });
+
+  // Eventos de clique nas tabs
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      ativarTab(tab.getAttribute('aria-controls'));
+    });
+  });
+
+  // Inicializa conteúdo vazio
+  renderizarSecao('tab-ids');
+})();
+</script>
+
+</body>
+</html>
