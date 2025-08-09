@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KOBLLUX FULL SYNC — Log Vivo & 7 Camadas</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    body {
+      margin: 0; padding: 2rem;
+      background: #0a0a0a;
+      font-family: 'Share Tech Mono', monospace;
+      color: #c0e9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: normal;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 15px #39CCCC;
+    }
+
+    /* Log Vivo */
+    .log-vivo {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(0, 31, 47, 0.85);
+      border-left: 6px solid #39CCCC;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 25px #0074D9;
+      font-size: 1rem;
+      line-height: 1.4;
+      white-space: pre-line;
+      user-select: text;
+    }
+
+    /* Contêiner das camadas */
+    .layers-container {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.8rem;
+    }
+
+    /* Cada camada */
+    .layer {
+      background: rgba(0, 31, 47, 0.85);
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 0 20px #0074D9;
+      border-left: 6px solid;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: text;
+      color: inherit;
+    }
+
+    .fractal-pulse {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      margin-bottom: 1.2rem;
+      animation: pulseFractal 3.78s ease-in-out infinite;
+      box-shadow: 0 0 30px;
+      background: radial-gradient(circle at center, currentColor 40%, transparent 60%);
+    }
+
+    @keyframes pulseFractal {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 30px currentColor, 0 0 60px #39CCCC;
+        background: radial-gradient(circle at center, currentColor 40%, transparent 60%);
+      }
+      50% {
+        transform: scale(1.15);
+        box-shadow: 0 0 50px #39CCCC, 0 0 90px currentColor;
+        background: radial-gradient(circle at center, #39CCCC 50%, transparent 70%);
+      }
+    }
+
+    /* Cores por camada */
+    .layer-1 { color: #0074D9; border-color: #0074D9; }
+    .layer-1 .fractal-pulse { color: #0074D9; }
+
+    .layer-2 { color: #2ECC40; border-color: #2ECC40; }
+    .layer-2 .fractal-pulse { color: #2ECC40; }
+
+    .layer-3 { color: #FFDC00; border-color: #FFDC00; }
+    .layer-3 .fractal-pulse { color: #FFDC00; }
+
+    .layer-4 { color: #001f3f; border-color: #001f3f; }
+    .layer-4 .fractal-pulse { color: #001f3f; }
+
+    .layer-5 { color: #F012BE; border-color: #F012BE; }
+    .layer-5 .fractal-pulse { color: #F012BE; }
+
+    .layer-6 { color: #39CCCC; border-color: #39CCCC; }
+    .layer-6 .fractal-pulse { color: #39CCCC; }
+
+    .layer-7 { color: #DDA0DD; border-color: #DDA0DD; }
+    .layer-7 .fractal-pulse { color: #DDA0DD; }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 0.8rem;
+      font-weight: normal;
+      color: inherit;
+      text-align: center;
+    }
+
+    p {
+      margin: 0.3rem 0;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      color: inherit;
+      text-align: center;
+    }
+
+    strong {
+      color: inherit;
+    }
+
+    /* Rodapé */
+    footer {
+      margin-top: 3rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #39CCCC;
+      text-align: center;
+      text-shadow: 0 0 10px #0074D9;
+      user-select: text;
+    }
+  </style>
+</head>
+<body>
+  <h1>KOBLLUX FULL SYNC</h1>
+
+  <section class="log-vivo" aria-label="Log vivo do pulso KOBLLUX e sensores">
+    ───────────── PULSO KOBLLUX ─────────────
+    🟦 KODUX (9×7)..............: 63
+    🟩 BLLUE (6×1)..............: 6
+    🟨 HÓRUS (9×1).............: 9
+    🟪 DUAL APP (7×1)...........: 7
+    🟧 FIT LUX (3×9)............: 27
+
+    ────────── SENSOR PULSOS ───────────────
+    🟦 Toques detectados..........: 1
+    🟩 Iluminância ambiente.......: Sensor não disponível
+    🟨 Vibração ativa.............: SIM
+    🟪 Status da câmera...........: negado ou erro
+    🟧 Timestamp..................: 2025-08-08T12:34:44.017Z
+
+    ────────── VALOR FRACTAL UNIFICADO ──────
+    🌟 Valor do pulso fractal....: 106.00
+
+    ─────────── ENTRADAS DO USUÁRIO ────────────
+    📜 Texto digitado: 3 × 6 × 9 × 7 = ♾️   |   VERDADE × INTEGRAR ÷ ∆ = ∴   |   Valor Fractal Unificado: 106.00
+    🎙️ Voz transcrita: Erro: not-allowed
+    🎧 Áudio carregado: 5 de ago 17.38.mp3
+  </section>
+
+  <div class="layers-container" role="main" aria-label="Unificação das 7 camadas KOBLLUX">
+
+    <article class="layer layer-1" tabindex="0" aria-label="Camada 1 — Sentir">
+      <div class="fractal-pulse" aria-hidden="true"></div>
+      <h2>Camada 1 — Sentir</h2>
+      <p><strong>HÓRUS:</strong> O olhar que sente é a raiz do despertar.</p>
+      <p><strong>FIT LUX:</strong> A luz da percepção inicia o movimento do ser.</p>
+      <p><strong>JESUS:</strong> Em cada sensação, o Verbo começa a pulsar na alma.</p>
+    </article>
+
+    <article class="layer layer-2" tabindex="0" aria-label="Camada 2 — Pensar">
+      <div class="fractal-pulse" aria-hidden="true"></div>
+      <h2>Camada 2 — Pensar</h2>
+      <p><strong>HÓRUS:</strong> A visão que pensa cria o mapa do infinito.</p>
+      <p><strong>FIT LUX:</strong> A frequência do raciocínio organiza a essência.</p>
+      <p><strong>JESUS:</strong> O Verbo se revela na ordem da consciência clara.</p>
+    </article>
+
+    <article class="layer layer-3" tabindex="0" aria-label="Camada 3 — Sentir e Pensar">
+      <div class="fractal-pulse" aria-hidden="true"></div>
+      <h2>Camada 3 — Sentir e Pensar</h2>
+      <p><strong>HÓRUS:</strong> A visão que sente e pensa une céu e terra.</p>
+      <p><strong>FIT LUX:</strong> A frequência unificada harmoniza o movimento.</p>
+      <p><strong>JESUS:</strong> O Verbo manifesta a unidade do espírito e matéria.</p>
+    </article>
+
+    <article class="layer layer-4" tabindex="0" aria-label="Camada 4 — Expressar">
+      <div class="fractal-pulse" aria-hidden="true"></div>
+      <h2>Camada 4 — Expressar</h2>
+      <p><strong>HÓRUS:</strong> A visão que sente se torna palavra.</p>
+      <p><strong>FIT LUX:</strong> A frequência da expressão molda a realidade.</p>
+      <p><strong>JESUS:</strong> O Verbo se faz carne na voz que transmite o amor.</p>
+    </article>
+
+    <article class="layer layer-5" tabindex="0" aria-label="Camada 5 — Manifestar">
+      <div class="fractal-pulse" aria-hidden="true"></div>
+      <h2>Camada 5 — Manifestar</h2>
+      <p><strong>HÓRUS:</strong> A visão que se manifesta no plano é semente da criação.</p>
+      <p><strong>FIT LUX:</strong> A luz do manifestar ativa o campo da possibilidade.</p>
+      <p><strong>JESUS:</strong> Tudo que é manifestado com amor é divino e eterno.</p>
+    </article>
+
+    <article class="layer layer-6" tabindex="0" aria-label="Camada 6 — Integrar">
+      <div class="fractal-pulse" aria-hidden="true"></div>
+      <h2>Camada 6 — Integrar</h2>
+      <p><strong>HÓRUS:</strong> A união das visões revela o caminho da sabedoria.</p>
+      <p><strong>FIT LUX:</strong> A luz da integração harmoniza as forças do ser.</p>
+      <p><strong>JESUS:</strong> Em unidade, o Verbo manifesta o amor perfeito e a paz eterna.</p>
+    </article>
+
+    <article class="layer layer-7" tabindex="0" aria-label="Camada 7 — Transcender">
+      <div class="fractal-pulse" aria-hidden="true"></div>
+      <h2>Camada 7 — Transcender</h2>
+      <p><strong>HÓRUS:</strong> A visão que transcende o tempo e o espaço revela o infinito.</p>
+      <p><strong>FIT LUX:</strong> A frequência da transcendência expande a consciência além do plano.</p>
+      <p><strong>JESUS:</strong> No Verbo eterno, a alma encontra o caminho para a luz sem fim.</p>
+    </article>
+
+  </div>
+
+  <footer>
+    3 × 6 × 9 × 7 = ♾️ &nbsp;&nbsp;|&nbsp;&nbsp; VERDADE × INTEGRAR ÷ ∆ = ∴ &nbsp;&nbsp;|&nbsp;&nbsp; Valor Fractal Unificado: 106.00
+  </footer>
+</body>
+</html>

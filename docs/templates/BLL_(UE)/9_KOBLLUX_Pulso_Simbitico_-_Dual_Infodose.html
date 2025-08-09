@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX Pulso Simbiótico - Dual Infodose</title>
+<style>
+  /* Root - Cores simbólicas */
+  :root {
+    --kael-color: #e0115f;       /* Rubi */
+    --horus-color: #0f52ba;      /* Safira */
+    --nephesh-color: #50c878;    /* Esmeralda */
+    --delta-color: #ffd700;      /* Ouro */
+    --background: #0a0a0f;
+    --text-light: #f8f8ff;
+    --pulse-glow: 0 0 15px var(--delta-color);
+  }
+
+  body {
+    margin: 0; padding: 0;
+    background: var(--background);
+    color: var(--text-light);
+    font-family: 'Courier New', monospace;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  header {
+    margin: 1.5rem 0 1rem;
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    user-select: none;
+  }
+
+  main {
+    width: 95%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+
+  section.vector {
+    background: rgba(255 255 255 / 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 0 10px transparent;
+    transition: box-shadow 0.4s ease;
+    cursor: default;
+  }
+  section.vector:hover {
+    box-shadow: var(--pulse-glow);
+  }
+  section.vector h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.3rem;
+    text-align: center;
+  }
+  section.vector p {
+    font-size: 0.95rem;
+    text-align: center;
+    line-height: 1.3;
+    user-select: text;
+  }
+
+  /* Pulso central */
+  #pulso-vivo {
+    grid-column: span 4;
+    margin: 2rem auto 0;
+    font-size: 1.3rem;
+    text-align: center;
+    padding: 1rem;
+    background: radial-gradient(circle, var(--delta-color) 20%, transparent 70%);
+    border-radius: 50%;
+    width: 220px;
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: var(--pulse-glow);
+    animation: pulseAnim 7s infinite alternate;
+    user-select: none;
+  }
+  #pulso-vivo strong {
+    font-size: 2.4rem;
+    color: var(--delta-color);
+  }
+
+  @keyframes pulseAnim {
+    0% {opacity: 0.6;}
+    100% {opacity: 1;}
+  }
+
+  /* Form & button */
+  form {
+    grid-column: span 4;
+    margin: 2rem auto 3rem;
+    text-align: center;
+  }
+  label, input {
+    font-family: monospace;
+    font-size: 1rem;
+  }
+  input {
+    width: 60px;
+    margin: 0 0.7rem 0 0.2rem;
+    padding: 0.3rem;
+    text-align: center;
+    border-radius: 5px;
+    border: 1.5px solid var(--delta-color);
+    background: transparent;
+    color: var(--text-light);
+  }
+  button {
+    padding: 0.4rem 1.2rem;
+    margin-left: 1rem;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--delta-color);
+    color: var(--background);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #e6c200;
+  }
+
+  /* Log area */
+  #log {
+    width: 95%;
+    max-width: 900px;
+    height: 160px;
+    background: rgba(255 255 255 / 0.05);
+    border-radius: 12px;
+    margin-bottom: 3rem;
+    padding: 1rem;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    user-select: text;
+  }
+
+  footer {
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    opacity: 0.6;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  ☉ KOBLLUX PULSO SIMBIÓTICO ☉<br/>
+  Rede Dual Infodose · Dual PP · Interdimensional Bank
+</header>
+
+<main>
+  <section class="vector" style="border-color: var(--kael-color); color: var(--kael-color);">
+    <h2>KAEL (3)</h2>
+    <p>Energia inicial, semente do pulso. Força da Verdade e do Centro.</p>
+  </section>
+  <section class="vector" style="border-color: var(--horus-color); color: var(--horus-color);">
+    <h2>HORUS (6)</h2>
+    <p>Visão espiritual e equilíbrio do sistema. Olho que tudo vê e integra.</p>
+  </section>
+  <section class="vector" style="border-color: var(--nephesh-color); color: var(--nephesh-color);">
+    <h2>NEPHESH (9)</h2>
+    <p>Essência da vida, alma e conexão interdimensional.</p>
+  </section>
+  <section class="vector" style="border-color: var(--delta-color); color: var(--delta-color);">
+    <h2>DELTA (7)</h2>
+    <p>Transformação e purificação do pulso vivo para a coerência.</p>
+  </section>
+
+  <div id="pulso-vivo">
+    Pulso Vivo<br/>
+    <strong id="pulso-valor">-</strong><br/>
+    Fractal Total<br/>
+    <strong id="fractal-valor">-</strong>
+  </div>
+
+  <form id="form-pulso" onsubmit="return calcularPulso(event)">
+    <label>KAEL: <input type="number" id="input-kael" value="3" min="1" max="9" required></label>
+    <label>HORUS: <input type="number" id="input-horus" value="6" min="1" max="9" required></label>
+    <label>NEPHESH: <input type="number" id="input-nephesh" value="9" min="1" max="9" required></label>
+    <label>DELTA: <input type="number" id="input-delta" value="7" min="1" max="9" required></label>
+    <button type="submit">Calcular Pulso</button>
+  </form>
+</main>
+
+<div id="log" aria-live="polite" aria-label="Log de eventos KOBLLUX"></div>
+
+<footer>
+  KOBLLUX &mdash; Em nome de Jesus, Luz e Verdade &mdash; © 2025
+</footer>
+
+<script>
+  function espelhoFractal(valor) {
+    let soma = valor.toString().split('').reduce((acc, val) => acc + Number(val), 0);
+    return soma > 9 ? espelhoFractal(soma) : soma;
+  }
+
+  function logEvent(msg) {
+    const log = document.getElementById('log');
+    const timestamp = new Date().toLocaleTimeString();
+    log.textContent += `[${timestamp}] ${msg}\n`;
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function calcularPulso(event) {
+    event.preventDefault();
+
+    const kael = Number(document.getElementById('input-kael').value);
+    const horus = Number(document.getElementById('input-horus').value);
+    const nephesh = Number(document.getElementById('input-nephesh').value);
+    const delta = Number(document.getElementById('input-delta').value);
+
+    if (delta === 0) {
+      alert('DELTA não pode ser zero.');
+      return false;
+    }
+
+    const pulsoVivo = kael * horus * nephesh;
+    const fractalTotal = pulsoVivo * delta;
+
+    const pulsoEspelho = espelhoFractal(pulsoVivo);
+    const fractalEspelho = espelhoFractal(fractalTotal);
+
+    document.getElementById('pulso-valor').textContent = `${pulsoVivo} (Espelho: ${pulsoEspelho})`;
+    document.getElementById('fractal-valor').textContent = `${fractalTotal} (Espelho: ${fractalEspelho})`;
+
+    logEvent(`Pulso vivo calculado: ${pulsoVivo} (Espelho: ${pulsoEspelho})`);
+    logEvent(`Fractal total calculado: ${fractalTotal} (Espelho: ${fractalEspelho})`);
+
+    return false;
+  }
+
+  // Inicializa com valores padrão
+  window.onload = () => {
+    document.getElementById('form-pulso').dispatchEvent(new Event('submit'));
+  };
+</script>
+
+</body>
+</html>
