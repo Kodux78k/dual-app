@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="pt-BR" >
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX 9x+ Interface Completa: Snippets, IA, Voz, Multi-idioma, Tema</title>
+
+<style>
+  /* CSS reset + base */
+  :root {
+    --bg-dark: #0b0f21;
+    --bg-dark-alt: #121b3a;
+    --bg-light: #f0f4f8;
+    --bg-light-alt: #e2e8f0;
+    --text-dark: #cdd6f4;
+    --text-light: #222;
+    --primary: #36c7ff;
+    --primary-light: #a5d6ff;
+    --primary-dark: #1c2541;
+    --error: #ef4444;
+  }
+  body[data-theme="dark"] {
+    background: var(--bg-dark);
+    color: var(--text-dark);
+  }
+  body[data-theme="dark"] section {
+    background: var(--bg-dark-alt);
+    box-shadow: 0 0 22px var(--primary-light);
+  }
+  body[data-theme="light"] {
+    background: var(--bg-light);
+    color: var(--text-light);
+  }
+  body[data-theme="light"] section {
+    background: var(--bg-light-alt);
+    box-shadow: 0 0 15px var(--primary);
+  }
+
+  body {
+    margin: 0; padding: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+    overflow-y: scroll;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  h1,h2,h3 {
+    color: var(--primary-light);
+    text-shadow: 0 0 8px var(--primary-light);
+    margin-bottom: 6px;
+  }
+  section {
+    max-width: 900px;
+    margin: 0 auto 48px auto;
+    border-radius: 12px;
+    padding: 20px 26px 26px 26px;
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  }
+  label, button {
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+  }
+  button {
+    background: var(--primary-dark);
+    border: 1.5px solid var(--primary-light);
+    border-radius: 6px;
+    padding: 8px 14px;
+    margin: 4px 6px 8px 0;
+    color: var(--primary-light);
+    transition: 0.3s ease;
+  }
+  button:hover, button:focus {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary-dark);
+    outline: none;
+  }
+  button:active {
+    background: var(--primary);
+    color: var(--primary-dark);
+    box-shadow: none;
+  }
+  textarea, pre, code {
+    font-family: 'Fira Code', Consolas, monospace;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--primary-light);
+    padding: 14px 18px;
+    resize: vertical;
+    max-height: 400px;
+    min-height: 280px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    tab-size: 2;
+    line-height: 1.45;
+    background: var(--bg-dark-alt);
+    color: var(--text-dark);
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  body[data-theme="light"] textarea,
+  body[data-theme="light"] pre,
+  body[data-theme="light"] code {
+    background: var(--bg-light-alt);
+    color: var(--text-light);
+    border-color: var(--primary-dark);
+  }
+  #html-paste-area, #snippet-edit-area {
+    width: 100%;
+    margin-top: 6px;
+  }
+  #analyzer-results {
+    max-height: 300px;
+    margin-top: 14px;
+    cursor: pointer;
+    white-space: pre-wrap;
+  }
+  #preview-frame {
+    width: 100%;
+    height: 400px;
+    border: 2px solid var(--primary-light);
+    border-radius: 12px;
+    background: var(--bg-dark);
+    box-shadow: inset 0 0 25px var(--primary-light);
+    transition: border-color 0.4s ease;
+  }
+  #presets-list {
+    max-height: 220px;
+    overflow-y: auto;
+    background: var(--primary-dark);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    color: var(--primary-light);
+    user-select: text;
+    font-family: 'Fira Code', monospace;
+  }
+  .preset-item {
+    border-bottom: 1px solid var(--primary-light);
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  .preset-item:hover, .preset-item:focus {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    outline: none;
+  }
+  .preset-title {
+    font-weight: 700;
+    color: #72c7ff;
+  }
+  #live-status {
+    background: var(--primary-dark);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-style: italic;
+    box-shadow: 0 0 14px var(--primary-light);
+    color: var(--primary-light);
+    user-select: none;
+    margin-bottom: 20px;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+  /* Syntax highlight */
+  .syntax-tag { color: #4ade80; font-weight: 700; }
+  .syntax-attr { color: #facc15; font-style: italic; }
+  .syntax-string { color: #f97316; }
+  .syntax-comment { color: #94a3b8; font-style: italic; }
+  .syntax-important { color: var(--error); font-weight: 700; }
+  .syntax-number { color: #60a5fa; }
+  /* Layout múltiplos snippets */
+  #snippets-container {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 16px;
+  }
+  .snippet-box {
+    flex: 1 1 400px;
+    max-width: 480px;
+    background: var(--primary-dark);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 0 14px var(--primary-light);
+    display: flex;
+    flex-direction: column;
+  }
+  .snippet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .snippet-header h3 {
+    margin: 0;
+    font-weight: 700;
+    color: var(--primary-light);
+  }
+  .snippet-textarea {
+    margin-top: 8px;
+    flex-grow: 1;
+    resize: vertical;
+  }
+  .snippet-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  /* Diff highlight */
+  .diff-added { background: #155724; color: #d4edda; }
+  .diff-removed { background: #721c24; color: #f8d7da; text-decoration: line-through; }
+  /* Responsive */
+  @media (max-width: 950px) {
+    #snippets-container {
+      flex-direction: column;
+    }
+    .snippet-box {
+      max-width: 100%;
+    }
+  }
+</style>
+
+</head>
+<body data-theme="dark" >
+
+<h1 tabindex="0">🧠 KOBLLUX 9x+ Completo: Snippets, IA, Voz, Multi-idioma, Tema</h1>
+<div id="live-status" tabindex="0" aria-live="polite" aria-atomic="true">Status: Pronto para sua revolução HTML!</div>
+
+<section aria-label="Carregar e colar HTML para análise e edição" >
+  <label for="upload-html" title="Carregar arquivo HTML" style="user-select:none;cursor:pointer;">📂 Carregar HTML</label>
+  <input type="file" id="upload-html" accept=".html,.htm" style="display:none" aria-hidden="true" />
+  <button id="paste-btn" aria-label="Colar HTML do clipboard">📋 Colar HTML</button>
+  <button id="apply-btn" aria-label="Aplicar análise e formatar código">⚡ Aplicar Análise</button>
+  <button id="clear-btn" aria-label="Limpar área de código">🧹 Limpar Área</button>
+  <select id="language-select" aria-label="Selecionar idioma">
+    <option value="pt-BR" selected>Português (BR)</option>
+    <option value="en-US">English (US)</option>
+  </select>
+  <button id="theme-toggle-btn" aria-label="Alternar tema escuro e claro">🌙 Tema Claro/Escuro</button>
+  <textarea id="html-paste-area" aria-label="Área para colar ou editar HTML para análise e destaque" spellcheck="false" placeholder="Cole ou carregue seu HTML aqui..."></textarea>
+</section>
+
+<section aria-label="Resultado da análise e preview do código HTML">
+  <h2 tabindex="0">📊 Resultado da Análise 9x + Código Destacado</h2>
+  <pre id="analyzer-results" tabindex="0" role="region" aria-live="polite" aria-atomic="true" aria-label="Visualização de código com destaque"></pre>
+</section>
+
+<section aria-label="Preview visual do HTML carregado">
+  <h2 tabindex="0">👁️ Preview Visual</h2>
+  <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin" aria-label="Preview do HTML carregado"></iframe>
+</section>
+
+<section aria-label="Gerenciador de presets de snippets e múltiplos snippets customizáveis">
+  <h2 tabindex="0">🎛️ Gerenciador de Presets e Editor de Snippets</h2>
+  <div id="presets-list" role="list" tabindex="0" aria-label="Lista de presets de snippets"></div>
+  <button id="add-preset-btn" aria-label="Adicionar preset atual">➕ Adicionar Preset</button>
+  <button id="clear-presets-btn" aria-label="Limpar todos presets">🗑️ Limpar Todos</button>
+  <button id="export-presets-btn" aria-label="Exportar presets para JSON">⬆ Exportar JSON</button>
+  <button id="import-presets-btn" aria-label="Importar presets JSON">⬇ Importar JSON</button>
+
+  <div id="snippets-container" aria-label="Editor de múltiplos snippets customizáveis">
+    <!-- Snippets vão aparecer aqui -->
+  </div>
+</section>
+
+<section aria-label="Controles adicionais">
+  <button id="copy-result-btn" aria-label="Copiar resultado da análise">📑 Copiar Resultado</button>
+  <button id="copy-preset-btn" aria-label="Copiar preset selecionado">📋 Copiar Preset</button>
+  <button id="download-btn" aria-label="Baixar HTML atualizado">⬇ Baixar Atualizado</button>
+  <button id="toggle-speech-btn" aria-pressed="true" aria-label="Ativar ou desativar voz da página">🔊 Voz Ligada</button>
+</section>
+
+<script>
+(() => {
+  // --- Variáveis DOM ---
+  const uploadInput = document.getElementById('upload-html');
+  const pasteBtn = document.getElementById('paste-btn');
+  const applyBtn = document.getElementById('apply-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const htmlPasteArea = document.getElementById('html-paste-area');
+  const analyzerResults = document.getElementById('analyzer-results');
+  const previewFrame = document.getElementById('preview-frame');
+  const presetsList = document.getElementById('presets-list');
+  const addPresetBtn = document.getElementById('add-preset-btn');
+  const clearPresetsBtn = document.getElementById('clear-presets-btn');
+  const exportPresetsBtn = document.getElementById('export-presets-btn');
+  const importPresetsBtn = document.getElementById('import-presets-btn');
+  const snippetsContainer = document.getElementById('snippets-container');
+  const copyResultBtn = document.getElementById('copy-result-btn');
+  const copyPresetBtn = document.getElementById('copy-preset-btn');
+  const downloadBtn = document.getElementById('download-btn');
+  const toggleSpeechBtn = document.getElementById('toggle-speech-btn');
+  const liveStatus = document.getElementById('live-status');
+  const languageSelect = document.getElementById('language-select');
+  const themeToggleBtn = document.getElementById('theme-toggle-btn');
+
+  // Estado
+  let speechEnabled = true;
+  let currentPresetIndex = null;
+  let presets = JSON.parse(localStorage.getItem('koblluxPresets') || '[]');
+  let snippets = []; // { id, code, editedCode, diffHtml }
+
+  // Idiomas - pt-BR / en-US (pode expandir)
+  const LANGS = {
+    "pt-BR": {
+      statusReady: "Status: Pronto para sua revolução HTML!",
+      alertNoCode: "Não há código para salvar como preset.",
+      alertNoResultCopy: "Nenhum resultado para copiar.",
+      alertNoTextCopy: "Nada para copiar.",
+      alertLoadJSONFail: "Erro ao carregar JSON: ",
+      alertJSONInvalid: "JSON inválido para importar.",
+      alertClearPresetsConfirm: "Tem certeza que deseja apagar todos os presets?",
+      alertFileNotHTML: "Por favor, envie um arquivo HTML válido.",
+      alertClipboardEmpty: "Clipboard vazio ou sem texto.",
+      speechVoiceActivated: "Voz ativada.",
+      speechVoiceDeactivated: "Voz desativada.",
+      speechCommandNotRecognized: "Comando não reconhecido.",
+      voiceStart: "Comandos por voz ativados. Diga algo...",
+      voiceEnd: "Reconhecimento de voz finalizado.",
+      voiceError: "Erro reconhecimento de voz: ",
+      presetSaved: "Preset salvo. Total presets: ",
+      presetsCleared: "Todos presets apagados.",
+      textSentParent: "Texto enviado para container pai.",
+      iframeNoParent: "Este documento não está em iframe, não pode enviar para container pai.",
+      analyzeEmpty: "Área vazia, nada para analisar.",
+      analyzeDone: "Análise 9x concluída com sucesso.",
+      downloadReady: "HTML atualizado pronto para download.",
+      snippetAdded: "Snippet adicionado.",
+      snippetRemoved: "Snippet removido.",
+      snippetUpdated: "Snippet atualizado.",
+      snippetCopied: "Snippet copiado para a área de transferência!",
+      snippetEditLabel: "Editar snippet",
+      snippetDiffLabel: "Diff do snippet",
+      snippetAdd: "Adicionar snippet",
+      snippetRemove: "Remover snippet",
+      snippetCopy: "Copiar snippet",
+      snippetSuggestIA: "Sugerir melhoria IA",
+      snippetNamePrefix: "Snippet",
+      snippetNewCodePlaceholder: "Cole ou edite seu snippet aqui...",
+      commandAnalyze: "analisar",
+      commandCopyResult: "copiar resultado",
+      commandCopyPreset: "copiar preset",
+      commandClear: "limpar",
+      commandDownload: "baixar",
+      commandToggleTheme: "tema",
+      commandToggleLang: "idioma",
+      commandAddSnippet: "adicionar snippet",
+      commandRemoveSnippet: "remover snippet",
+    },
+    "en-US": {
+      statusReady: "Status: Ready for your HTML revolution!",
+      alertNoCode: "No code to save as preset.",
+      alertNoResultCopy: "No result to copy.",
+      alertNoTextCopy: "Nothing to copy.",
+      alertLoadJSONFail: "Failed to load JSON: ",
+      alertJSONInvalid: "Invalid JSON to import.",
+      alertClearPresetsConfirm: "Are you sure you want to delete all presets?",
+      alertFileNotHTML: "Please upload a valid HTML file.",
+      alertClipboardEmpty: "Clipboard empty or no text.",
+      speechVoiceActivated: "Voice activated.",
+      speechVoiceDeactivated: "Voice deactivated.",
+      speechCommandNotRecognized: "Command not recognized.",
+      voiceStart: "Voice commands activated. Speak now...",
+      voiceEnd: "Voice recognition ended.",
+      voiceError: "Voice recognition error: ",
+      presetSaved: "Preset saved. Total presets: ",
+      presetsCleared: "All presets deleted.",
+      textSentParent: "Text sent to parent container.",
+      iframeNoParent: "This document is not in an iframe, cannot send to parent container.",
+      analyzeEmpty: "Empty area, nothing to analyze.",
+      analyzeDone: "9x analysis completed successfully.",
+      downloadReady:"HTML updated ready for download.",
+      snippetAdded: "Snippet added.",
+      snippetRemoved: "Snippet removed.",
+      snippetUpdated: "Snippet updated.",
+      snippetCopied: "Snippet copied to clipboard!",
+      snippetEditLabel: "Edit snippet",
+      snippetDiffLabel: "Snippet diff",
+      snippetAdd: "Add snippet",
+      snippetRemove: "Remove snippet",
+      snippetCopy: "Copy snippet",
+      snippetSuggestIA: "Suggest IA improvement",
+      snippetNamePrefix: "Snippet",
+      snippetNewCodePlaceholder: "Paste or edit your snippet here...",
+      commandAnalyze: "analyze",
+      commandCopyResult: "copy result",
+      commandCopyPreset: "copy preset",
+      commandClear: "clear",
+      commandDownload: "download",
+      commandToggleTheme: "theme",
+      commandToggleLang: "language",
+      commandAddSnippet: "add snippet",
+      commandRemoveSnippet: "remove snippet",
+    }
+  };
+
+  // Obtem o texto do idioma atual
+  function t(key) {
+    const lang = languageSelect.value || 'pt-BR';
+    return (LANGS[lang] && LANGS[lang][key]) || key;
+  }
+
+  // Função log + fala
+  function logMistico(msg) {
+    liveStatus.textContent = msg;
+    liveStatus.focus();
+    if (speechEnabled && 'speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(msg);
+      utter.lang = languageSelect.value || 'pt-BR';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+  }
+
+  // --- Função de Syntax Highlight básica para HTML ---
+  function syntaxHighlight(html) {
+    if (!html) return '';
+    let text = html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    // Comentários
+    text = text.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="syntax-comment">$1</span>');
+    // Tags e atributos
+    text = text.replace(/(&lt;\/?)([\w\-]+)([^&]*?)(&gt;)/g, (m,m1,m2,m3,m4) => {
+      let attrs = m3.replace(/([\w\-:]+)(="[^"]*")?/g, '<span class="syntax-attr">$1</span>$2');
+      // Strings
+      attrs = attrs.replace(/="([^"]*)"/g, '="<span class="syntax-string">$1</span>"');
+      // !important
+      attrs = attrs.replace(/!important/g, '<span class="syntax-important">!important</span>');
+      // Números
+      attrs = attrs.replace(/\b(\d+)\b/g, '<span class="syntax-number">$1</span>');
+      return `${m1}<span class="syntax-tag">${m2}</span>${attrs}${m4}`;
+    });
+    return text;
+  }
+
+  // Identação simples para HTML via DOMParser
+  function formatHTML(raw) {
+    try {
+      const doc = new DOMParser().parseFromString(raw, 'text/html');
+      const walk = (node, level = 0) => {
+        let indent = '  '.repeat(level);
+        let html = '';
+        node.childNodes.forEach(child => {
+          if (child.nodeType === Node.TEXT_NODE) {
+            let txt = child.textContent.trim();
+            if (txt) html += indent + txt + '\n';
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            html += indent + `<${child.tagName.toLowerCase()}`;
+            for (let attr of child.attributes) {
+              html += ` ${attr.name}="${attr.value}"`;
+            }
+            html += '>\n';
+            html += walk(child, level+1);
+            html += indent + `</${child.tagName.toLowerCase()}>\n`;
+          }
+        });
+        return html;
+      };
+      return walk(doc.body);
+    } catch(e) {
+      return raw;
+    }
+  }
+
+  // Função diff simples, linha a linha (adicionado e removido)
+  function simpleDiff(oldStr, newStr) {
+    const oldLines = oldStr.split('\n');
+    const newLines = newStr.split('\n');
+    let diffHtml = '';
+    const maxLen = Math.max(oldLines.length, newLines.length);
+    for(let i=0; i<maxLen; i++) {
+      const oldLine = oldLines[i]||'';
+      const newLine = newLines[i]||'';
+      if(oldLine === newLine) {
+        diffHtml += `<div>${escapeHTML(newLine)}</div>`;
+      } else {
+        if(oldLine) diffHtml += `<div class="diff-removed">${escapeHTML(oldLine)}</div>`;
+        if(newLine) diffHtml += `<div class="diff-added">${escapeHTML(newLine)}</div>`;
+      }
+    }
+    return diffHtml;
+  }
+  function escapeHTML(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  // Detectar blocos clicáveis na análise expandida (9x)
+  function analyzeHTMLAndExpand(htmlString) {
+    if (!htmlString) {
+      logMistico(t('analyzeEmpty'));
+      analyzerResults.innerHTML = '';
+      previewFrame.srcdoc = '';
+      clearSnippets();
+      return null;
+    }
+    const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+    const title = doc.title || '[Sem título]';
+    const bodyText = doc.body.textContent.trim().replace(/\s+/g,' ');
+    // Seletor padrão, pode ser ampliado
+    const knownSelectors = ['.block', '#output', '.response-block', '.card', '.item', '[data-snippet]'];
+    const foundBlocks = knownSelectors.map(sel => {
+      return { selector: sel, count: doc.querySelectorAll(sel).length };
+    }).filter(b => b.count > 0);
+
+    // Listagem detalhada com ids/classes/texto resumido
+    const blocksDetails = [];
+    foundBlocks.forEach(({selector}) => {
+      const nodes = doc.querySelectorAll(selector);
+      nodes.forEach((n, i) => {
+        const idText = n.id ? `#${n.id}` : '';
+        const classText = n.className ? '.' + n.className.toString().replace(/\s+/g, '.') : '';
+        let text = n.innerText.trim().slice(0, 40).replace(/\s+/g, ' ');
+        blocksDetails.push(`${selector}${idText}${classText} — "${text}"`);
+      });
+    });
+
+    // Texto resumo e destacado
+    const summaryLines = [
+      `Título do HTML: ${title}`,
+      `Texto corpo (resumo): ${bodyText.slice(0, 80)}...`,
+      `Blocos clicáveis detectados: ${foundBlocks.reduce((acc, b) => acc + b.count, 0)}`,
+      `Tipos detectados: ${foundBlocks.map(b => b.selector).join(', ')}`,
+      'Detalhes de blocos: ',
+      ...blocksDetails.slice(0, 15)
+    ];
+
+    analyzerResults.innerHTML = syntaxHighlight(summaryLines.join('\n'));
+
+    // Atualiza preview iframe
+    previewFrame.srcdoc = htmlString;
+
+    logMistico(t('analyzeDone'));
+
+    // Preenche snippets baseados nos blocos encontrados
+    clearSnippets();
+    let idCounter = 1;
+    foundBlocks.forEach(({selector}) => {
+      const nodes = doc.querySelectorAll(selector);
+      nodes.forEach(n => {
+        const snippetCode = n.outerHTML;
+        addSnippet(`Snippet ${idCounter++} [${selector}]`, snippetCode);
+      });
+    });
+
+    return {
+      title, bodyText, foundBlocks, blocksDetails, summary: summaryLines.join('\n')
+    };
+  }
+
+  // --- Gerenciar snippets ---
+  function clearSnippets() {
+    snippets = [];
+    snippetsContainer.innerHTML = '';
+    currentPresetIndex = null;
+  }
+  function addSnippet(name, code) {
+    const id = `snippet-${Date.now()}-${Math.floor(Math.random()*1000)}`;
+    const editedCode = code;
+    const diffHtml = simpleDiff(code, editedCode);
+    const snippet = { id, name, code, editedCode, diffHtml };
+    snippets.push(snippet);
+    renderSnippets();
+    logMistico(`${t('snippetAdded')} (${name})`);
+  }
+  function removeSnippet(id) {
+    snippets = snippets.filter(s => s.id !== id);
+    renderSnippets();
+    logMistico(t('snippetRemoved'));
+  }
+  function updateSnippet(id, newCode) {
+    const snip = snippets.find(s => s.id === id);
+    if(!snip) return;
+    snip.editedCode = newCode;
+    snip.diffHtml = simpleDiff(snip.code, newCode);
+    renderSnippets();
+    logMistico(t('snippetUpdated'));
+  }
+
+  function renderSnippets() {
+    snippetsContainer.innerHTML = '';
+    snippets.forEach(snip => {
+      const div = document.createElement('div');
+      div.classList.add('snippet-box');
+      div.setAttribute('role','region');
+      div.setAttribute('aria-label', `${snip.name} - ${t('snippetEditLabel')}`);
+      div.innerHTML = `
+        <div class="snippet-header">
+          <h3>${snip.name}</h3>
+          <div>
+            <button aria-label="${t('snippetRemove')}" title="${t('snippetRemove')}" data-remove="${snip.id}">✖</button>
+            <button aria-label="${t('snippetCopy')}" title="${t('snippetCopy')}" data-copy="${snip.id}">📋</button>
+            <button aria-label="${t('snippetSuggestIA')}" title="${t('snippetSuggestIA')}" data-suggest="${snip.id}">🤖</button>
+          </div>
+        </div>
+        <textarea class="snippet-textarea" aria-label="${t('snippetEditLabel')}" spellcheck="false" data-edit="${snip.id}">${snip.editedCode}</textarea>
+        <details aria-label="${t('snippetDiffLabel')}">
+          <summary>Diff</summary>
+          <pre style="max-height: 160px; overflow-y:auto; font-family: monospace; font-size: 0.9rem;">${snip.diffHtml}</pre>
+        </details>
+      `;
+      snippetsContainer.appendChild(div);
+    });
+  }
+
+  // Eventos snippets
+  snippetsContainer.addEventListener('click', (e) => {
+    if(e.target.matches('button[data-remove]')) {
+      removeSnippet(e.target.getAttribute('data-remove'));
+    }
+    else if(e.target.matches('button[data-copy]')) {
+      const id = e.target.getAttribute('data-copy');
+      const snip = snippets.find(s => s.id === id);
+      if(!snip) return;
+      navigator.clipboard.writeText(snip.editedCode)
+        .then(() => {
+  // ...
+  // Continuação do evento copiar snippet
+  navigator.clipboard.writeText(snip.editedCode)
+    .then(() => {
+      logMistico(t('snippetCopied'));
+    })
+    .catch(() => {
+      alert('Erro ao copiar snippet.');
+    });
+  }
+  else if(e.target.matches('button[data-suggest]')) {
+    // Sugestão IA (mock)
+    const id = e.target.getAttribute('data-suggest');
+    const snip = snippets.find(s => s.id === id);
+    if(!snip) return;
+    logMistico(`🤖 ${t('snippetSuggestIA')} para ${snip.name}...`);
+    // Aqui você integraria chamada real IA, demo fake:
+    setTimeout(() => {
+      const suggestion = snip.editedCode + "\n\n<!-- Sugestão IA: Código otimizado para melhor performance. -->";
+      updateSnippet(id, suggestion);
+      logMistico(`🤖 Sugestão IA aplicada ao ${snip.name}`);
+    }, 2500);
+  }
+});
+
+snippetsContainer.addEventListener('input', (e) => {
+  if(e.target.matches('textarea[data-edit]')) {
+    const id = e.target.getAttribute('data-edit');
+    updateSnippet(id, e.target.value);
+  }
+});
+
+// Upload de HTML
+uploadInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  if(!file.name.match(/\.(html|htm)$/i)) {
+    alert(t('alertFileNotHTML'));
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    htmlPasteArea.value = reader.result;
+    logMistico(`📂 ${file.name} carregado.`);
+    analyzeHTMLAndExpand(reader.result);
+  };
+  reader.readAsText(file);
+  // Reset input para carregar o mesmo arquivo repetidamente
+  uploadInput.value = '';
+});
+
+// Colar do clipboard
+pasteBtn.addEventListener('click', async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if(!text) {
+      alert(t('alertClipboardEmpty'));
+      return;
+    }
+    htmlPasteArea.value = text;
+    logMistico('📋 Texto colado do clipboard.');
+    analyzeHTMLAndExpand(text);
+  } catch {
+    alert(t('alertClipboardEmpty'));
+  }
+});
+
+// Aplicar análise
+applyBtn.addEventListener('click', () => {
+  if(!htmlPasteArea.value.trim()) {
+    alert(t('analyzeEmpty'));
+    return;
+  }
+  analyzeHTMLAndExpand(htmlPasteArea.value);
+});
+
+// Limpar área
+clearBtn.addEventListener('click', () => {
+  if(confirm('🧹 ' + t('commandClear') + '?')) {
+    htmlPasteArea.value = '';
+    analyzerResults.innerHTML = '';
+    previewFrame.srcdoc = '';
+    clearSnippets();
+    logMistico(t('commandClear') + ' concluído.');
+  }
+});
+
+// Gerenciar presets JSON
+function savePresetsToStorage() {
+  localStorage.setItem('koblluxPresets', JSON.stringify(presets));
+}
+function renderPresetsList() {
+  presetsList.innerHTML = '';
+  presets.forEach((preset, i) => {
+    const div = document.createElement('div');
+    div.className = 'preset-item';
+    div.tabIndex = 0;
+    div.setAttribute('role','listitem');
+    div.textContent = `${preset.name} (${preset.snippets.length} snippets)`;
+    div.dataset.index = i;
+    presetsList.appendChild(div);
+  });
+}
+presetsList.addEventListener('click', e => {
+  if(e.target.classList.contains('preset-item')) {
+    const i = +e.target.dataset.index;
+    loadPreset(i);
+  }
+});
+presetsList.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target.classList.contains('preset-item')) {
+    const i = +e.target.dataset.index;
+    loadPreset(i);
+  }
+});
+
+function loadPreset(index) {
+  if(index == null || !presets[index]) return;
+  snippets = JSON.parse(JSON.stringify(presets[index].snippets));
+  currentPresetIndex = index;
+  renderSnippets();
+  logMistico(`📂 Preset "${presets[index].name}" carregado.`);
+}
+
+addPresetBtn.addEventListener('click', () => {
+  if(snippets.length === 0) {
+    alert(t('alertNoCode'));
+    return;
+  }
+  const name = prompt('Nome para o novo preset:', `${t('snippetNamePrefix')} ${presets.length + 1}`);
+  if(!name) return;
+  presets.push({ name, snippets: JSON.parse(JSON.stringify(snippets)) });
+  savePresetsToStorage();
+  renderPresetsList();
+  logMistico(`${t('presetSaved')}${presets.length}`);
+});
+
+clearPresetsBtn.addEventListener('click', () => {
+  if(confirm(t('alertClearPresetsConfirm'))) {
+    presets = [];
+    savePresetsToStorage();
+    renderPresetsList();
+    logMistico(t('presetsCleared'));
+  }
+});
+
+exportPresetsBtn.addEventListener('click', () => {
+  if(presets.length === 0) {
+    alert(t('alertNoCode'));
+    return;
+  }
+  const blob = new Blob([JSON.stringify(presets, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kobllux_presets_${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  logMistico('⬆ Presets exportados para JSON.');
+});
+
+importPresetsBtn.addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(reader.result);
+        if(!Array.isArray(imported)) throw new Error('Formato inválido');
+        presets = presets.concat(imported);
+        savePresetsToStorage();
+        renderPresetsList();
+        logMistico('⬇ Presets importados do JSON.');
+      } catch(err) {
+        alert(t('alertJSONInvalid') + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+});
+
+// Copiar resultado da análise
+copyResultBtn.addEventListener('click', () => {
+  const text = analyzerResults.textContent.trim();
+  if(!text) {
+    alert(t('alertNoResultCopy'));
+    return;
+  }
+  navigator.clipboard.writeText(text)
+    .then(() => {
+      logMistico('📑 Resultado copiado.');
+    })
+    .catch(() => alert('Erro ao copiar resultado.'));
+});
+
+// Copiar preset atual
+copyPresetBtn.addEventListener('click', () => {
+  if(currentPresetIndex == null) {
+    alert('Nenhum preset carregado.');
+    return;
+  }
+  const json = JSON.stringify(presets[currentPresetIndex], null, 2);
+  navigator.clipboard.writeText(json)
+    .then(() => {
+      logMistico('📋 Preset copiado para clipboard.');
+    })
+    .catch(() => alert('Erro ao copiar preset.'));
+});
+
+// Download HTML atualizado
+downloadBtn.addEventListener('click', () => {
+  if(!htmlPasteArea.value.trim()) {
+    alert(t('analyzeEmpty'));
+    return;
+  }
+  const blob = new Blob([htmlPasteArea.value], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `kobllux_updated_${Date.now()}.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+  logMistico(t('downloadReady'));
+});
+
+// Tema toggle
+themeToggleBtn.addEventListener('click', () => {
+  const current = document.body.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.body.setAttribute('data-theme', next);
+  logMistico(`🎨 Tema alterado para ${next}.`);
+});
+
+// Idioma toggle
+languageSelect.addEventListener('change', () => {
+  logMistico(`🌐 Idioma alterado para ${languageSelect.selectedOptions[0].text}.`);
+  renderSnippets(); // para atualizar labels
+  renderPresetsList();
+});
+
+// Speech Synthesis toggle
+toggleSpeechBtn.addEventListener('click', () => {
+  speechEnabled = !speechEnabled;
+  toggleSpeechBtn.textContent = speechEnabled ? '🔊 Voz Ligada' : '🔈 Voz Desligada';
+  toggleSpeechBtn.setAttribute('aria-pressed', speechEnabled.toString());
+  logMistico(speechEnabled ? t('speechVoiceActivated') : t('speechVoiceDeactivated'));
+});
+
+// Controle avançado por voz com Web Speech API e NLP simples
+if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const recognition = new SpeechRecognition();
+  recognition.lang = languageSelect.value || 'pt-BR';
+  recognition.interimResults = false;
+  recognition.continuous = true;
+
+  recognition.onstart = () => logMistico(t('voiceStart'));
+  recognition.onend = () => logMistico(t('voiceEnd'));
+  recognition.onerror = e => logMistico(t('voiceError') + e.error);
+
+  recognition.onresult = (event) => {
+    const last = event.results.length -1;
+    const text = event.results[last][0].transcript.trim().toLowerCase();
+    logMistico(`🎙️ Comando por voz: "${text}"`);
+
+    // Comandos básicos NLP
+    if(text.includes(t('commandAnalyze'))) {
+      applyBtn.click();
+    } else if(text.includes(t('commandCopyResult'))) {
+      copyResultBtn.click();
+    } else if(text.includes(t('commandCopyPreset'))) {
+      copyPresetBtn.click();
+    } else if(text.includes(t('commandClear'))) {
+      clearBtn.click();
+    } else if(text.includes(t('commandDownload'))) {
+      downloadBtn.click();
+    } else if(text.includes(t('commandToggleTheme'))) {
+      themeToggleBtn.click();
+    } else if(text.includes(t('commandToggleLang'))) {
+      languageSelect.selectedIndex = (languageSelect.selectedIndex + 1) % languageSelect.options.length;
+      languageSelect.dispatchEvent(new Event('change'));
+    } else if(text.includes(t('commandAddSnippet'))) {
+      addPresetBtn.click();
+    } else if(text.includes(t('commandRemoveSnippet'))) {
+      if(snippets.length > 0) removeSnippet(snippets[snippets.length - 1].id);
+    } else {
+      logMistico(t('speechCommandNotRecognized'));
+    }
+  };
+
+  recognition.start();
+
+  // Restart recognition if stops (common bug)
+  recognition.onend = () => {
+    if(speechEnabled) recognition.start();
+  };
+} else {
+  logMistico('⚠️ Reconhecimento de voz não suportado neste navegador.');
+}
+
+// Inicialização UI
+(function init() {
+  renderPresetsList();
+  logMistico(t('statusReady'));
+  toggleSpeechBtn.textContent = '🔊 Voz Ligada';
+  toggleSpeechBtn.setAttribute('aria-pressed', 'true');
+})();
+
+})();
+</script>
+
+</body>
+</html>
+        
