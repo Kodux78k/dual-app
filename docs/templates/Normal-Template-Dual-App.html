@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dual App Template Analyzer & Modularizer</title>
+
+<style>
+  /* Reset simples */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    margin: 0;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2 {
+    color: #0fa;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    margin-top: 30px;
+    border-bottom: 2px solid #0fa;
+    padding-bottom: 4px;
+  }
+  p.description {
+    color: #aaa;
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+  textarea#htmlInput {
+    width: 100%;
+    height: 240px;
+    background: #222;
+    border: 1px solid #0fa;
+    border-radius: 8px;
+    color: #eee;
+    font-family: monospace;
+    padding: 15px;
+    resize: vertical;
+    outline-offset: 2px;
+    outline-color: #0fa;
+  }
+  button#analyzeBtn {
+    margin-top: 12px;
+    background: linear-gradient(90deg, #0fa, #0c8);
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #121212;
+    transition: background 0.3s ease;
+    user-select: none;
+  }
+  button#analyzeBtn:hover {
+    background: linear-gradient(90deg, #0cf, #08a);
+    color: #fff;
+  }
+  main#outputContainer {
+    margin-top: 30px;
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 70vh;
+  }
+  section.analysis-section {
+    background: #222;
+    padding: 18px 22px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 0 8px #0fa8;
+  }
+  section.analysis-section > h2 {
+    margin-top: 0;
+  }
+  pre, code {
+    font-family: monospace;
+    background: #111;
+    padding: 10px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+    color: #afa;
+    max-height: 220px;
+    user-select: text;
+  }
+  .list-ul {
+    list-style-type: decimal;
+    margin-left: 20px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  .list-ul li {
+    margin-bottom: 6px;
+    cursor: default;
+  }
+  .copy-button {
+    display: inline-block;
+    margin-left: 12px;
+    background: #0fa;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #121212;
+    user-select: none;
+    transition: background 0.2s ease;
+  }
+  .copy-button:hover {
+    background: #0cf;
+    color: #fff;
+  }
+  .inline-flex {
+    display: inline-flex;
+    align-items: center;
+  }
+  /* Scrollbar custom */
+  ::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0fa;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #111;
+  }
+  /* Responsive */
+  @media (max-width: 720px) {
+    textarea#htmlInput {
+      height: 180px;
+    }
+    pre, code {
+      max-height: 140px;
+    }
+    section.analysis-section {
+      padding: 14px 16px;
+    }
+    button#analyzeBtn {
+      width: 100%;
+      font-size: 1rem;
+      padding: 12px 0;
+    }
+  }
+</style>
+
+</head>
+<body>
+
+<header>
+  <h1>Dual App Template Analyzer & Modularizer</h1>
+  <p class="description">Cole seu código HTML completo no campo abaixo e clique em "Analisar Template" para extrair IDs, classes, estilos, scripts e visualizar a estrutura para modularização. Esse sistema é a base para montar templates unificados e simbióticos para seu app dual infodose.</p>
+</header>
+
+<textarea id="htmlInput" placeholder="Cole seu código HTML completo aqui..."></textarea>
+<button id="analyzeBtn" aria-label="Analisar o template do código HTML">Analisar Template</button>
+
+<main id="outputContainer" aria-live="polite" aria-atomic="true" role="region">
+  <!-- Aqui vão as seções com resultados -->
+</main>
+
+<script defer>
+  (() => {
+    // Função utilitária para copiar texto pro clipboard
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copiado para a área de transferência!');
+      }).catch(() => {
+        alert('Falha ao copiar. Tente manualmente.');
+      });
+    }
+
+    // Função para criar botão de copiar para cada bloco
+    function createCopyButton(text) {
+      const btn = document.createElement('button');
+      btn.textContent = 'Copiar';
+      btn.className = 'copy-button';
+      btn.type = 'button';
+      btn.addEventListener('click', () => copyToClipboard(text));
+      return btn;
+    }
+
+    // Função que transforma array simples em lista HTML numerada
+    function criarListaNumerada(arr) {
+      if (!arr.length) return '<p><em>Nenhum encontrado.</em></p>';
+      const ul = document.createElement('ol');
+      ul.className = 'list-ul';
+      arr.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item;
+        ul.appendChild(li);
+      });
+      return ul.outerHTML;
+    }
+
+    // Função que formata estilos inline
+    function formatarEstilosInline(estilos) {
+      if (!estilos.length) return '<p><em>Nenhum encontrado.</em></p>';
+      return estilos.map(e => {
+        const tag = e.tag;
+        const id = e.id ? ` id="${e.id}"` : '';
+        const classes = e.classes.length ? ` class="${e.classes.join(' ')}"` : '';
+        return `<code>&lt;${tag}${id}${classes}&gt;</code>\nstyle: <code>${e.style}</code>`;
+      }).join('\n\n');
+    }
+
+    // Função que cria seção com título, conteúdo e botão copiar (se for texto)
+    function criarSecao(titulo, conteudo, isHTML = false) {
+      const section = document.createElement('section');
+      section.className = 'analysis-section';
+
+      const h2 = document.createElement('h2');
+      h2.textContent = titulo;
+      section.appendChild(h2);
+
+      if (typeof conteudo === 'string') {
+        if (isHTML) {
+          // Conteúdo HTML - insere como HTML seguro
+          const container = document.createElement('div');
+          container.innerHTML = conteudo;
+          section.appendChild(container);
+        } else {
+          // Conteúdo texto
+          const pre = document.createElement('pre');
+          pre.textContent = conteudo;
+          section.appendChild(pre);
+          section.appendChild(createCopyButton(conteudo));
+        }
+      } else if (conteudo instanceof HTMLElement) {
+        section.appendChild(conteudo);
+      }
+
+      return section;
+    }
+
+    // Função principal que processa o HTML bruto e extrai dados
+    function transformarHTMLparaTemplate(htmlBruto) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlBruto, 'text/html');
+
+      const todosElementos = Array.from(doc.body.querySelectorAll('*'));
+      const ids = new Set();
+      const classes = new Set();
+
+      todosElementos.forEach(el => {
+        if (el.id) ids.add(el.id);
+        el.classList.forEach(c => classes.add(c));
+      });
+
+      const estilosInline = [];
+      todosElementos.forEach(el => {
+        if (el.hasAttribute('style')) {
+          estilosInline.push({
+            tag: el.tagName.toLowerCase(),
+            id: el.id || null,
+            classes: Array.from(el.classList),
+            style: el.getAttribute('style'),
+          });
+        }
+      });
+
+      const estilosEmStyle = [];
+      doc.querySelectorAll('style').forEach(styleTag => {
+        estilosEmStyle.push(styleTag.textContent.trim());
+      });
+
+      const scriptsInline = [];
+      const scriptsExternos = [];
+      doc.querySelectorAll('script').forEach(scriptTag => {
+        if (scriptTag.src) {
+          scriptsExternos.push(scriptTag.src);
+        } else {
+          scriptsInline.push(scriptTag.textContent.trim());
+        }
+      });
+
+      const corpoHTML = doc.body.innerHTML.trim();
+
+      return {
+        estruturaHTML: corpoHTML,
+        ids: Array.from(ids),
+        classes: Array.from(classes),
+        estilosInline,
+        estilosEmStyle,
+        scriptsInline,
+        scriptsExternos,
+      };
+    }
+
+    // Função para renderizar todos os dados na página
+    function renderizarResultado(resultado) {
+      const outputContainer = document.getElementById('outputContainer');
+      outputContainer.innerHTML = ''; // limpa tudo
+
+      // IDs
+      outputContainer.appendChild(
+        criarSecao('IDs encontrados', criarListaNumerada(resultado.ids), true)
+      );
+
+      // Classes
+      outputContainer.appendChild(
+        criarSecao('Classes encontradas', criarListaNumerada(resultado.classes), true)
+      );
+
+      // Estilos inline
+      outputContainer.appendChild(
+        criarSecao('Estilos inline encontrados', formatarEstilosInline(resultado.estilosInline))
+      );
+
+      // Estilos em <style>
+      if (resultado.estilosEmStyle.length) {
+        const estilos = resultado.estilosEmStyle.map((txt, i) => `<h3>Style #${i+1}</h3><pre>${txt}</pre>`).join('');
+        outputContainer.appendChild(criarSecao('Estilos em &lt;style&gt;', estilos, true));
+      } else {
+        outputContainer.appendChild(criarSecao('Estilos em &lt;style&gt;', '<p><em>Nenhum encontrado.</em></p>', true));
+      }
+
+      // Scripts inline
+      if (resultado.scriptsInline.length) {
+        const scripts = resultado.scriptsInline.map((txt, i) => `<h3>Script inline #${i+1}</h3><pre>${txt}</pre>`).join('');
+        outputContainer.appendChild(criarSecao('Scripts inline encontrados', scripts, true));
+      } else {
+        outputContainer.appendChild(criarSecao('Scripts inline encontrados', '<p><em>Nenhum encontrado.</em></p>', true));
+      }
+
+      // Scripts externos
+      outputContainer.appendChild(
+        criarSecao('Scripts externos encontrados', criarListaNumerada(resultado.scriptsExternos), true)
+      );
+
+      // Estrutura HTML limpa
+      outputContainer.appendChild(
+        criarSecao('Estrutura HTML limpa (body)', resultado.estruturaHTML, true)
+      );
+    }
+
+    // Setup do evento do botão
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('analyzeBtn');
+      const input = document.getElementById('htmlInput');
+      const outputContainer = document.getElementById('outputContainer');
+
+      btn.addEventListener('click', () => {
+        const html = input.value.trim();
+        if (!html) {
+          alert('Por favor, cole seu código HTML antes de analisar.');
+          return;
+        }
+        try {
+          const resultado = transformarHTMLparaTemplate(html);
+          renderizarResultado(resultado);
+        } catch (err) {
+          outputContainer.innerHTML = `<p style="color:#f55;">Erro ao processar o HTML: ${err.message}</p>`;
+        }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

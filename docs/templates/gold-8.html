@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Vida ∞ - Infodose</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0;
+      background: #000;
+      overflow: hidden;
+      font-family: 'Helvetica Neue', sans-serif;
+      height: 100%;
+    }
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    canvas {
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+      image-rendering: pixelated;
+    }
+    .btn {
+      background: rgba(0, 255, 255, 0.15);
+      border: 1px solid #0FF;
+      color: #0FF;
+      font-size: 18px;
+      padding: 12px 20px;
+      margin: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s ease;
+      width: 100%;
+      text-align: center;
+      user-select: none;
+    }
+    .btn:hover {
+      background: rgba(255, 0, 255, 0.2);
+      border-color: #F0F;
+      color: #F0F;
+    }
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      width: 90vw;
+      max-width: 400px;
+    }
+    #historia {
+      margin-top: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed #FFF;
+      color: #FFF;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <canvas id="game"></canvas>
+
+  <div id="controls">
+    <button class="btn" onclick="startGame()">▶ Start</button>
+    <button class="btn" onclick="evoluir()">⇪ Evoluir</button>
+    <button class="btn" onclick="impacto()">☍ Impacto</button>
+    <button class="btn" onclick="mutacao()">☖ Mutação</button>
+    <button class="btn" id="historia" onclick="gerarHistoriaEEnviar()">▶ História</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script>
+    particlesJS("particles-js", {
+      particles: {
+        number: { value: 70 },
+        color: { value: ["#0FF", "#F0F"] },
+        shape: { type: "circle" },
+        opacity: { value: 0.4 },
+        size: { value: 2 },
+        line_linked: {
+          enable: true,
+          distance: 130,
+          color: "#FFF",
+          opacity: 0.2,
+          width: 1
+        },
+        move: {
+          enable: true,
+          speed: 0.8,
+          direction: "none",
+          out_mode: "out"
+        }
+      },
+      interactivity: {
+        detect_on: "canvas",
+        events: {
+          onhover: { enable: true, mode: "repulse" },
+          onclick: { enable: true, mode: "push" }
+        },
+        modes: {
+          repulse: { distance: 100 },
+          push: { particles_nb: 3 }
+        }
+      },
+      retina_detect: true
+    });
+
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const resolution = 8;
+    let cols, rows, grid, speed = 200;
+    let started = false;
+    let logAcoes = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols = Math.floor(canvas.width / resolution);
+      rows = Math.floor(canvas.height / resolution);
+      grid = makeGrid();
+      drawGrid(grid);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function makeGrid(random = true) {
+      return Array.from({ length: cols }, () =>
+        Array.from({ length: rows }, () =>
+          random ? Math.floor(Math.random() * 2) : 0
+        )
+      );
+    }
+
+    function drawGrid(grid) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) {
+          if (grid[x][y] === 1) {
+            ctx.save();
+            ctx.translate(x * resolution, y * resolution);
+            ctx.scale(1, 0.8);
+            ctx.transform(1, 0.3, -0.3, 1, 0, 0);
+            ctx.fillStyle = "#0FF";
+            ctx.fillRect(0, 0, resolution, resolution);
+            ctx.restore();
+          }
+        }
+      }
+    }
+
+    function nextGen(grid) {
+      const next = makeGrid(false);
+      for (let x = 0; x < cols; x++) {
+        for (let y = 0; y < rows; y++) {
+          const cell = grid[x][y];
+          const neighbors = countNeighbors(grid, x, y);
+          if (cell === 1 && (neighbors === 2 || neighbors === 3)) {
+            next[x][y] = 1;
+          } else if (cell === 0 && neighbors === 3) {
+            next[x][y] = 1;
+          }
+        }
+      }
+      return next;
+    }
+
+    function countNeighbors(grid, x, y) {
+      let sum = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          if (i === 0 && j === 0) continue;
+          const col = (x + i + cols) % cols;
+          const row = (y + j + rows) % rows;
+          sum += grid[col][row];
+        }
+      }
+      return sum;
+    }
+
+    function atualizarParticulasComGrid() {
+      if (!window.pJSDom || !pJSDom[0]) return;
+      const particles = pJSDom[0].pJS.particles.array;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const gx = Math.floor(p.x / resolution);
+        const gy = Math.floor(p.y / resolution);
+        if (gx >= 0 && gy >= 0 && gx < cols && gy < rows && grid[gx][gy] === 1) {
+          p.vx = Math.sin(Date.now() * 0.001 + i) * 1.5;
+          p.vy = Math.cos(Date.now() * 0.001 + i) * 1.5;
+          p.opacity = 0.8;
+          p.size = 4;
+        } else {
+          p.opacity = 0.3;
+          p.size = 2;
+        }
+      }
+    }
+
+    function update() {
+      grid = nextGen(grid);
+      drawGrid(grid);
+      atualizarParticulasComGrid();
+      setTimeout(() => requestAnimationFrame(update), speed);
+    }
+
+    function startGame() {
+      if (!started) {
+        started = true;
+        update();
+      }
+    }
+
+    function evoluir() {
+      speed = 200;
+      logAcoes.push("⇪");
+    }
+
+    function impacto() {
+      const cx = Math.floor(cols / 2);
+      const cy = Math.floor(rows / 2);
+      for (let x = cx - 4; x < cx + 4; x++) {
+        for (let y = cy - 4; y < cy + 4; y++) {
+          if (x >= 0 && y >= 0 && x < cols && y < rows) {
+            grid[x][y] = 1;
+          }
+        }
+      }
+      logAcoes.push("☍");
+    }
+
+    function mutacao() {
+      for (let i = 0; i < 120; i++) {
+        const x = Math.floor(Math.random() * cols);
+        const y = Math.floor(Math.random() * rows);
+        grid[x][y] = Math.random() < 0.5 ? 1 : 0;
+      }
+      logAcoes.push("☖");
+    }
+
+    function gerarHistoriaEEnviar() {
+      const mapa = {
+        "⇪": "O tempo dobrou sua velocidade.",
+        "☍": "Um evento cósmico colidiu com a estrutura.",
+        "☖": "As formas de vida se reorganizaram."
+      };
+      const historia = logAcoes.map(s => mapa[s] || "").join(" ");
+      const codificada = btoa(historia);
+      alert("História codificada:\n" + historia + "\n\nBase64:\n" + codificada);
+      // Aqui você pode fazer algo com o código, ex: abrir link customizado
+      // window.location.href = `infodose://decode?data=${encodeURIComponent(codificada)}`;
+    }
+  </script>
+</body>
+</html>

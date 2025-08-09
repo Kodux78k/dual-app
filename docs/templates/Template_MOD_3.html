@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gerador Template Modular Inline + ZIP (SuperZip)</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    background: #121212;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 24px auto;
+    max-width: 960px;
+    min-height: 100vh;
+    padding: 0 16px 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  h1 {
+    color: #00ff99;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 24px;
+    user-select: none;
+    text-shadow: 0 0 8px #00ff99aa;
+  }
+  textarea {
+    width: 100%;
+    height: 280px;
+    background: #1e1e1e;
+    border: 2px solid #00ff99;
+    border-radius: 14px;
+    color: #bdeac8;
+    font-family: 'Fira Code', monospace, monospace;
+    font-size: 1.05rem;
+    padding: 20px 24px;
+    resize: vertical;
+    outline-offset: 4px;
+    outline-color: #00ff99;
+    transition: border-color 0.3s ease;
+    box-shadow: 0 0 16px #00ff9955 inset;
+    user-select: text;
+  }
+  textarea:focus {
+    border-color: #00ffaa;
+    box-shadow: 0 0 28px #00ffaaaa inset;
+  }
+  #tabs {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 28px 0 20px;
+  }
+  #tabs button {
+    background: #222;
+    border: 2px solid transparent;
+    color: #a8ffa8;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 0 12px #00ff9944;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.3s ease;
+    user-select: none;
+  }
+  #tabs button[aria-selected="true"] {
+    background: linear-gradient(90deg, #00ff99cc, #00cc88cc);
+    border-color: #00ff99;
+    color: #121212;
+    box-shadow: 0 0 20px #00ff99ee;
+  }
+  #tabs button:hover:not([aria-selected="true"]) {
+    background-color: #333;
+    border-color: #00ff99aa;
+    color: #00ff99;
+  }
+  pre {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 44px;
+    background: #1e1e1e;
+    padding: 26px 32px;
+    border-radius: 18px;
+    box-shadow: 0 0 24px #00ff9955 inset;
+    min-height: 360px;
+    white-space: pre-wrap;
+    font-family: 'Fira Code', monospace, monospace;
+    font-size: 0.95rem;
+    overflow-y: auto;
+    color: #b7f1b7;
+    user-select: text;
+  }
+  .hidden {
+    display: none;
+  }
+  .copy-button, .export-btn {
+    background: linear-gradient(90deg, #00ff99cc, #00cc88cc);
+    border: none;
+    padding: 14px 32px;
+    border-radius: 18px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #121212;
+    box-shadow: 0 0 24px #00ff99dd;
+    transition: background 0.3s ease, color 0.3s ease, transform 0.15s ease;
+    margin: 6px auto 16px;
+    max-width: 240px;
+    user-select: none;
+    display: block;
+  }
+  .copy-button:hover, .export-btn:hover {
+    background: linear-gradient(90deg, #00cc88ee, #009955ee);
+    color: #e0ffe0;
+    transform: scale(1.07);
+  }
+  .export-btn + .export-btn {
+    margin-top: 8px;
+  }
+  @media (max-width: 480px) {
+    textarea {
+      height: 220px;
+      font-size: 0.95rem;
+    }
+    pre {
+      min-height: 280px;
+      font-size: 0.85rem;
+      padding: 20px 24px;
+    }
+    #tabs button {
+      font-size: 0.9rem;
+      padding: 8px 14px;
+    }
+    .copy-button, .export-btn {
+      font-size: 1rem;
+      padding: 12px 20px;
+      max-width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Gerador de Template Modular Inline + ZIP (SuperZip)</h1>
+
+<textarea id="htmlInput" spellcheck="false" placeholder="Cole seu código HTML aqui..."></textarea>
+<button id="generateBtn" aria-label="Gerar templates">Gerar Template Modular</button>
+
+<nav id="tabs" role="tablist" aria-label="Abas de saída">
+  <button role="tab" aria-selected="true" aria-controls="outputInline" id="tab-btn-inline" tabindex="0">Template Inline</button>
+  <button role="tab" aria-selected="false" aria-controls="outputHTML" id="tab-btn-html" tabindex="-1">HTML Separado</button>
+  <button role="tab" aria-selected="false" aria-controls="outputCSS" id="tab-btn-css" tabindex="-1">CSS Separado</button>
+  <button role="tab" aria-selected="false" aria-controls="outputJS" id="tab-btn-js" tabindex="-1">JS Separado</button>
+</nav>
+
+<pre id="outputInline" role="tabpanel" aria-labelledby="tab-btn-inline" tabindex="0"></pre>
+<pre id="outputHTML" class="hidden" role="tabpanel" aria-labelledby="tab-btn-html" tabindex="0"></pre>
+<pre id="outputCSS" class="hidden" role="tabpanel" aria-labelledby="tab-btn-css" tabindex="0"></pre>
+<pre id="outputJS" class="hidden" role="tabpanel" aria-labelledby="tab-btn-js" tabindex="0"></pre>
+
+<button class="copy-button" id="copyBtn" aria-label="Copiar conteúdo da aba atual">Copiar Conteúdo da Aba Atual</button>
+<button class="export-btn" id="exportBtn" aria-label="Exportar arquivo da aba atual">Exportar Arquivo da Aba Atual</button>
+<button class="export-btn" id="exportZipBtn" aria-label="Exportar ZIP com todos os arquivos">Exportar ZIP com Todos os Arquivos</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<script>
+(() => {
+  const htmlInput = document.getElementById('htmlInput');
+  const generateBtn = document.getElementById('generateBtn');
+  const tabs = Array.from(document.querySelectorAll('#tabs button'));
+  const outputInline = document.getElementById('outputInline');
+  const outputHTML = document.getElementById('outputHTML');
+  const outputCSS = document.getElementById('outputCSS');
+  const outputJS = document.getElementById('outputJS');
+  const copyBtn = document.getElementById('copyBtn');
+  const exportBtn = document.getElementById('exportBtn');
+  const exportZipBtn = document.getElementById('exportZipBtn');
+
+  const presetCSS = `.button-standard {
+  border-radius: 10px;
+  opacity: var(--slow, 1);
+  border: 1px solid transparent;
+  border-image: linear-gradient(45deg, #F0F, #0FF);
+  border-image-slice: 1;
+  -webkit-mask-image: radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+  overflow: hidden;
+  font-size: 1.1rem;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+:root {
+  --slow: 0.8;
+}`;
+
+  const presetJS = `// Funções básicas para modularidade
+function carregarComponente(url, containerId) {
+  fetch(url)
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById(containerId).innerHTML = html;
+    })
+    .catch(e => {
+      console.error('Erro ao carregar componente:', e);
+    });
+}
+
+// Evento básico para botões .symbol-button alterar iframe src
+document.querySelectorAll('.symbol-button').forEach(btn => {
+  btn.addEventListener('click', e => {
+    const target = e.currentTarget;
+    const page = target.getAttribute('data-page') || target.getAttribute('onclick')?.match(/loadPage\$begin:math:text$'(.*?)'\\$end:math:text$/)?.[1];
+    if (page) {
+      const iframe = document.querySelector('iframe#frame');
+      if (iframe) iframe.src = page;
+    }
+  });
+});
+`;
+
+  function gerarTemplateModularInline(htmlBruto) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlBruto, 'text/html');
+    const bodyContent = doc.body.innerHTML;
+
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Template Modular Inline Gerado</title>
+<style>
+${presetCSS}
+</style>
+</head>
+<body>
+${bodyContent}
+
+<script>
+${presetJS}
+</script>
+</body>
+</html>
+    `;
+  }
+
+  function gerarArquivosSeparados(htmlBruto) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlBruto, 'text/html');
+    const bodyContent = doc.body.innerHTML;
+
+    const htmlBase = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Template Modular Separado</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+${bodyContent}
+
+<script src="script.js"></script>
+</body>
+</html>`;
+
+    return {
+      html: htmlBase,
+      css: presetCSS,
+      js: presetJS,
+    };
+  }
+
+  function copiarTexto(texto) {
+    navigator.clipboard.writeText(texto).then(() => {
+      alert('Conteúdo copiado para área de transferência!');
+    }).catch(() => {
+      alert('Erro ao copiar para a área de transferência.');
+    });
+  }
+
+  function exportarArquivo(nome, conteudo) {
+    const blob = new Blob([conteudo], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  async function exportarZip(arquivos) {
+    const zip = new JSZip();
+    zip.file("template-inline.html", arquivos.inline);
+    zip.file("template.html", arquivos.html);
+    zip.file("style.css", arquivos.css);
+    zip.file("script.js", arquivos.js);
+    const content = await zip.generateAsync({type:"blob"});
+    const url = URL.createObjectURL(content);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "template-modular.zip";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  }
+
+  function ativarAba(id) {
+    tabs.forEach(tab => {
+      const isSelected = (tab.getAttribute('aria-controls') === id);
+      tab.setAttribute('aria-selected', isSelected);
+      document.getElementById(tab.getAttribute('aria-controls')).classList.toggle('hidden', !isSelected);
+      // Gerenciar foco para acessibilidade
+      if (isSelected) {
+        document.getElementById(tab.getAttribute('aria-controls')).focus();
+        tab.setAttribute('tabindex', '0');
+      } else {
+        tab.setAttribute('tabindex', '-1');
+      }
+    });
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => ativarAba(tab.getAttribute('aria-controls')));
+  });
+
+  generateBtn.addEventListener('click', () => {
+    const htmlBruto = htmlInput.value;
+    if (!htmlBruto.trim()) {
+      alert('Cole seu código HTML para gerar o template.');
+      return;
+    }
+    const templateInline = gerarTemplateModularInline(htmlBruto);
+    const arquivosSeparados = gerarArquivosSeparados(htmlBruto);
+
+    outputInline.textContent = templateInline;
+    outputHTML.textContent = arquivosSeparados.html;
+    outputCSS.textContent = arquivosSeparados.css;
+    outputJS.textContent = arquivosSeparados.js;
+
+    ativarAba('outputInline');
+  });
+
+  copyBtn.addEventListener('click', () => {
+    const abaAtiva = tabs.find(t => t.getAttribute('aria-selected') === 'true');
+    if (!abaAtiva) return;
+    const id = abaAtiva.getAttribute('aria-controls');
+    const outputEl = document.getElementById(id);
+    if (outputEl) copiarTexto(outputEl.textContent);
+  });
+
+  exportBtn.addEventListener('click', () => {
+    const abaAtiva = tabs.find(t => t.getAttribute('aria-selected') === 'true');
+    if (!abaAtiva) return;
+    const id = abaAtiva.getAttribute('aria-controls');
+    let nomeArquivo = 'template.txt';
+    switch(id) {
+      case 'outputInline': nomeArquivo = 'template-inline.html'; break;
+      case 'outputHTML': nomeArquivo = 'template.html'; break;
+      case 'outputCSS': nomeArquivo = 'style.css'; break;
+      case 'outputJS': nomeArquivo = 'script.js'; break;
+    }
+    const outputEl = document.getElementById(id);
+    if (outputEl) exportarArquivo(nomeArquivo, outputEl.textContent);
+  });
+
+  exportZipBtn.addEventListener('click', () => {
+    const htmlBruto = htmlInput.value;
+    if (!htmlBruto.trim()) {
+      alert('Cole seu código HTML para gerar o template.');
+      return;
+    }
+    const templateInline = gerarTemplateModularInline(htmlBruto);
+    const arquivosSeparados = gerarArquivosSeparados(htmlBruto);
+    exportarZip({
+      inline: templateInline,
+      html: arquivosSeparados.html,
+      css: arquivosSeparados.css,
+      js: arquivosSeparados.js
+    });
+  });
+
+  ativarAba('outputInline');
+})();
+</script>
+
+</body>
+</html>

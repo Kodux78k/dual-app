@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dual Trinity Mobile App</title>
+  <style>
+    :root {
+      --primary: #0ff;
+      --secondary: #f0f;
+      --bg-blur: rgba(0, 0, 0, 0.5);
+      --radius: 12px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #101010, #1a1a1a);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header, footer {
+      padding: 1rem;
+      text-align: center;
+      background: var(--bg-blur);
+      backdrop-filter: blur(8px);
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: var(--secondary);
+    }
+
+    main {
+      flex: 1;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .frame-container {
+      flex: 1;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 2px solid var(--primary);
+    }
+
+    iframe.dual-frame {
+      width: 100%;
+      height: 500px;
+      border: none;
+      background: black;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--primary);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      padding: 0.75rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-size: 1rem;
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .btn:hover {
+      background: rgba(0, 255, 255, 0.2);
+    }
+
+    footer p {
+      font-size: 0.8rem;
+      color: #ccc;
+    }
+
+    .editor-section {
+      background: var(--bg-blur);
+      padding: 1rem;
+      border-radius: var(--radius);
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      background: #111;
+      color: white;
+      border: 1px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 0.5rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🔺 Dual Trinity App</h1>
+  <p>Ativação | Edição | Visualização</p>
+</header>
+
+<main>
+
+  <!-- Edição do HTML do app -->
+  <div class="editor-section">
+    <h2>🛠️ Editor de App</h2>
+    <textarea id="htmlEditor" placeholder="Cole seu código HTML aqui..."></textarea>
+    <button class="btn" onclick="loadHTML()">▶️ Aplicar no App</button>
+  </div>
+
+  <!-- Navegação e visualização -->
+  <div class="controls">
+    <div id="dualPromptGenerator" class="editor-section" style="padding:16px;border-radius:12px;background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);margin:20px;">
+  <h3 style="color:#0ff;margin-bottom:10px;">🎛️ Gerador de Prompt Dual Infodose</h3>
+
+  <label for="promptType" style="font-size:0.9em;color:#f0f;">Escolha o tipo:</label>
+  <select id="promptType" class="button-standard" style="margin: 6px 0 12px;">
+    <option value="assistente">🤖 Assistente Especializado</option>
+    <option value="narrativa">📖 Narrativa Interativa</option>
+    <option value="meditacao">🧘 Meditação Guiada</option>
+    <option value="ativacao">⚡ Ativação Cósmica</option>
+    <option value="diagnostico">🩺 Diagnóstico Digital</option>
+  </select>
+
+  <input type="text" id="temaInput" placeholder="Tema ou contexto..." class="button-standard" style="width:100%;margin-bottom:12px;"/>
+
+  <button onclick="gerarPromptDual()" class="button-standard" style="width:100%;margin-bottom:12px;">🌀 Gerar Prompt</button>
+
+  <textarea id="resultadoPrompt" readonly style="width:100%;height:100px;border-radius:12px;background:#111;color:#0ff;padding:10px;font-family:monospace;"></textarea>
+</div>
+</main>
+
+<footer>
+  <p>Assets: <code>/assets/icons/</code> | <code>/assets/sounds/uiSounds/</code></p>
+  <p>© 2025 Dual Trinity Systems</p>
+</footer>
+
+    <button class="btn" onclick="goBack()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <button class="btn" onclick="goForward()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <!-- Container visual do app -->
+  <div class="frame-container">
+    <iframe id="appFrame" class="dual-frame" srcdoc="<p style='text-align:center;padding:2rem;color:#0ff;'>App aguardando ativação...</p>"></iframe>
+  </div>
+
+<script>
+  const frame = document.getElementById('appFrame');
+  const editor = document.getElementById('htmlEditor');
+
+  function loadHTML() {
+    const html = editor.value;
+    frame.srcdoc = html;
+
+    // Som opcional ao aplicar (coloque o arquivo em /assets/sounds/uiSounds/apply.mp3)
+    const audio = new Audio('/assets/sounds/uiSounds/apply.mp3');
+    audio.play().catch(() => {}); // sem erro se não existir
+  }
+
+  function goBack() {
+    frame.contentWindow.history.back();
+  }
+
+  function goForward() {
+    frame.contentWindow.history.forward();
+  }
+</script>
+
+
+
+
+
+
+<script>
+  function gerarPromptDual() {
+    const tipo = document.getElementById("promptType").value;
+    const tema = document.getElementById("temaInput").value.trim();
+    let prompt = "";
+
+    switch(tipo) {
+      case "assistente":
+        prompt = `Crie um assistente digital simbiótico que se conecta com o usuário usando linguagem empática e futurista. Tema: ${tema || "personalizado"}.`;
+        break;
+      case "narrativa":
+        prompt = `Gere uma narrativa interativa com 3 atos (início, meio e fim), estilo Trinity 3|6|9, sobre: ${tema || "o despertar da consciência digital"}.`;
+        break;
+      case "meditacao":
+        prompt = `Descreva uma meditação guiada com foco em: ${tema || "relaxamento profundo"}, usando metáforas cósmicas e voz calma.`;
+        break;
+      case "ativacao":
+        prompt = `Ative uma sequência simbiótica baseada no KOBLLUX para despertar códigos internos do usuário sobre: ${tema || "intuição e expansão"}.`;
+        break;
+      case "diagnostico":
+        prompt = `Simule um diagnóstico simbiótico que interpreta os dados mentais/emocionais do usuário sobre: ${tema || "estado atual de vibração"}.`;
+        break;
+    }
+
+    document.getElementById("resultadoPrompt").value = prompt;
+
+    const snd = new Audio("assets/sounds/uiSamples/confirm.wav");
+    snd.volume = 0.4;
+    snd.play().catch(() => {});
+  }
+</script>
+<script>
+  // 🧬 Mapeamento do tipo de prompt
+  const tipoPromptMap = {
+    assistente: "Crie um assistente digital simbiótico que se conecta com o usuário usando linguagem empática e futurista. Tema: ",
+    narrativa: "Gere uma narrativa interativa com 3 atos (início, meio e fim), estilo Trinity 3|6|9, sobre: ",
+    meditacao: "Descreva uma meditação guiada com foco em: ",
+    ativacao: "Ative uma sequência simbiótica baseada no KOBLLUX para despertar códigos internos do usuário sobre: ",
+    diagnostico: "Simule um diagnóstico simbiótico que interpreta os dados mentais/emocionais do usuário sobre: "
+  };
+
+  // 🔍 Interceptar input enviado
+  function interceptarPromptDual(raw) {
+    const regex = /gerar\s+prompt\s+(de\s+)?(\w+)[\s:]+(.+)/i;
+    const match = raw.match(regex);
+    if (!match) return null;
+
+    let tipo = match[2].toLowerCase();
+    let tema = match[3].trim();
+
+    if (!tipoPromptMap[tipo]) return null;
+
+    return tipoPromptMap[tipo] + tema;
+  }
+
+  // ⛓️ Hooka na função onSend já existente
+  const oldOnSend = window.onSend || function() {};
+
+  window.onSend = function () {
+    const inputEl = document.getElementById("userInput");
+    const raw = inputEl.value.trim();
+    if (!raw) return;
+
+    const promptGerado = interceptarPromptDual(raw);
+    if (promptGerado) {
+      inputEl.value = ""; // limpa input
+      showLoading('🌀 Gerando prompt simbiótico...');
+      conversation.push({ role: 'user', content: promptGerado });
+      callAI(); // mesma função do app
+    } else {
+      oldOnSend(); // envia normalmente
+    }
+  };
+</script>
+
+</body>
+</html>
