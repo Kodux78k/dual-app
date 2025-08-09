@@ -1174,6 +1174,46 @@ function voltarEtapa() {
   atualizarEtapa();
 }
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Lista de seletores possíveis de blocos clicáveis
+  const blockSelectors = ['.block', '#output', '.response-block', '.card', '.item'];
+  
+  // Detecta quais existem na página
+  const activeSelectors = blockSelectors.filter(sel => document.querySelector(sel));
+
+  if (activeSelectors.length === 0) {
+    console.warn("⚠ Nenhum bloco clicável encontrado para integração callAI().");
+    return;
+  }
+
+  // Adiciona listener de clique
+  document.addEventListener('click', (e) => {
+    const block = e.target.closest(activeSelectors.join(','));
+    if (block) {
+      const text = block.innerText.trim();
+      if (!text) return;
+      
+      // Log Místico (se existir)
+      if (typeof logMistico === 'function') {
+        logMistico("🖱️ Bloco clicado → enviado para IA: " + text.slice(0, 60) + "...");
+      } else {
+        console.log("🖱️ Bloco clicado:", text);
+      }
+
+      // Envio para IA
+      if (typeof conversation !== 'undefined' && typeof callAI === 'function') {
+        conversation.push({ role: 'user', content: text });
+        callAI();
+      } else {
+        console.error("⚠️ conversation[] ou callAI() não estão definidos no contexto.");
+      }
+    }
+  });
+});
+</script>
+
  </body> 
 
 
