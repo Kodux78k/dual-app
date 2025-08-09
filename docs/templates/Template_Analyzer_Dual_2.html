@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Template Master - Analisador e Refatorador</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0; background: #121217; color: #eee; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  header {
+    background: #22222a; padding: 1rem; text-align: center; font-size: 1.5rem; font-weight: bold; user-select:none;
+  }
+  main {
+    flex-grow: 1; padding: 1rem; max-width: 960px; margin: auto; width: 100%;
+    display: flex; flex-direction: column;
+  }
+  label {
+    display: block; margin-bottom: 0.5rem; font-weight: 600;
+  }
+  textarea#htmlInput {
+    width: 100%; height: 240px; background: #18181b; border: 1px solid #444; border-radius: 6px; color: #eee;
+    font-family: monospace; font-size: 14px; padding: 0.5rem;
+    resize: vertical;
+  }
+  button {
+    cursor: pointer; background: #4a90e2; border: none; border-radius: 4px;
+    padding: 0.5rem 1rem; margin-right: 0.5rem; color: #eee; font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background: #357ABD;
+  }
+  .btn-group {
+    margin-top: 1rem;
+  }
+  #tabs {
+    display: flex; flex-wrap: wrap; margin: 1rem 0; border-bottom: 2px solid #333;
+  }
+  #tabs button {
+    flex: 1 1 100px; background: #2a2a34; border: none; color: #aaa; padding: 0.7rem 0;
+    font-weight: 700; border-bottom: 3px solid transparent;
+  }
+  #tabs button[aria-selected="true"] {
+    color: #4a90e2; border-bottom: 3px solid #4a90e2;
+  }
+  #outputContainer {
+    background: #1e1e29; padding: 1rem; border-radius: 6px;
+    overflow: auto; max-height: 480px;
+    font-family: monospace; font-size: 13px; white-space: pre-wrap;
+  }
+  ul {
+    padding-left: 1.2rem;
+    margin: 0.3rem 0;
+  }
+  ul.treeview {
+    list-style-type: none;
+    padding-left: 1rem;
+  }
+  ul.treeview ul {
+    padding-left: 1.5rem;
+  }
+  ul.treeview li {
+    margin: 0.2rem 0;
+  }
+  pre {
+    background: #282c34;
+    padding: 0.8rem; border-radius: 5px; overflow-x: auto;
+    font-size: 13px;
+  }
+  .btn-copy-all {
+    margin-top: 0.6rem;
+    background: #28a745 !important;
+    color: #fff !important;
+  }
+  textarea.editable-area {
+    width: 100%;
+    height: 240px;
+    background: #18181b;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #eee;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 0.5rem;
+    resize: vertical;
+  }
+</style>
+</head>
+<body>
+<header>Template Master - Analisador, Editor, Exportador</header>
+<main>
+  <label for="htmlInput">Cole seu código HTML aqui para análise e refatoração:</label>
+  <textarea id="htmlInput" spellcheck="false" placeholder="Cole seu HTML completo aqui..."></textarea>
+  <div class="btn-group">
+    <button id="analyzeBtn">Analisar Template</button>
+    <button id="minifyBtn">Minificar Código</button>
+    <button id="exportJsonBtn">Exportar JSON</button>
+    <button id="downloadJsonBtn">Baixar JSON</button>
+  </div>
+
+  <nav id="tabs" role="tablist" aria-label="Seções do analisador">
+    <button role="tab" aria-controls="tab-ids" aria-selected="true" id="tab-btn-ids">IDs</button>
+    <button role="tab" aria-controls="tab-classes" id="tab-btn-classes">Classes</button>
+    <button role="tab" aria-controls="tab-inline-style" id="tab-btn-inline-style">Estilos Inline</button>
+    <button role="tab" aria-controls="tab-style-tags" id="tab-btn-style-tags">Estilos &lt;style&gt;</button>
+    <button role="tab" aria-controls="tab-scripts-inline" id="tab-btn-scripts-inline">Scripts Inline</button>
+    <button role="tab" aria-controls="tab-scripts-external" id="tab-btn-scripts-external">Scripts Externos</button>
+    <button role="tab" aria-controls="tab-html-structure" id="tab-btn-html-structure">Estrutura HTML</button>
+    <button role="tab" aria-controls="tab-components" id="tab-btn-components">Componentes</button>
+    <button role="tab" aria-controls="tab-deps" id="tab-btn-deps">Dependências</button>
+    <button role="tab" aria-controls="tab-edit-html" id="tab-btn-edit-html">Editor & Refatoração</button>
+    <button role="tab" aria-controls="tab-report" id="tab-btn-report">Relatórios</button>
+  </nav>
+
+  <section id="outputContainer" role="tabpanel" tabindex="0" aria-live="polite" aria-relevant="additions"></section>
+</main>
+
+<script>
+(() => {
+  // Elementos principais
+  const htmlInput = document.getElementById('htmlInput');
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const minifyBtn = document.getElementById('minifyBtn');
+  const exportJsonBtn = document.getElementById('exportJsonBtn');
+  const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+  const outputContainer = document.getElementById('outputContainer');
+  const tabs = Array.from(document.querySelectorAll('#tabs button[role="tab"]'));
+
+  let resultadoGlobal = null;
+  let jsonExport = null;
+
+  // Função copiar texto para clipboard
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).catch(() => {
+      alert('Erro ao copiar. Use Ctrl+C manualmente.');
+    });
+  }
+
+  // Função para criar lista simples em HTML
+  function criarLista(arr) {
+    if (!arr || arr.length === 0) return '<p><em>Nenhum item encontrado.</em></p>';
+    return `<ul>${arr.map(item => `<li>${item}</li>`).join('')}</ul>`;
+  }
+
+  // Função para detectar componentes modulares (simplificado: elementos com atributo data-module)
+  function detectarComponentesModulares(docBody) {
+    let componentes = [];
+    function escanear(node) {
+      if (node.nodeType !== 1) return null; // só elementos
+      if (node.hasAttribute('data-module')) {
+        let comp = {
+          nome: node.getAttribute('data-module'),
+          tag: node.tagName.toLowerCase(),
+          children: []
+        };
+        for (let child of node.children) {
+          const c = escanear(child);
+          if (c) comp.children.push(c);
+        }
+        return comp;
+      } else {
+        let filhosComps = [];
+        for (let child of node.children) {
+          const c = escanear(child);
+          if (c) filhosComps.push(c);
+        }
+        if (filhosComps.length) {
+          return {
+            nome: null,
+            tag: node.tagName.toLowerCase(),
+            children: filhosComps
+          };
+        }
+      }
+      return null;
+    }
+    const raiz = escanear(docBody);
+    if (raiz) componentes.push(raiz);
+    return componentes;
+  }
+
+  // Função para extrair dados do HTML
+  function transformarHTMLparaTemplate(html) {
+    let dados = {
+      ids: [],
+      classes: [],
+      estilosInline: [],
+      estilosEmStyle: [],
+      scriptsInline: [],
+      scriptsExternos: [],
+      dependenciasCSS: [],
+      dependenciasJS: [],
+      componentes: [],
+      estruturaHTML: html,
+      docBody: null,
+    };
+
+    try {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      dados.docBody = doc.body;
+
+      // Extrair IDs e classes
+      const allElems = Array.from(doc.querySelectorAll('*'));
+      allElems.forEach(el => {
+        if (el.id) dados.ids.push(el.id);
+        if (el.classList.length) {
+          el.classList.forEach(cl => {
+            if (!dados.classes.includes(cl)) dados.classes.push(cl);
+          });
+        }
+        if (el.hasAttribute('style')) {
+          dados.estilosInline.push({
+            tag: el.tagName.toLowerCase(),
+            id: el.id || '',
+            classes: Array.from(el.classList),
+            style: el.getAttribute('style')
+          });
+        }
+      });
+
+      // Extrair blocos <style>
+      const styleTags = Array.from(doc.querySelectorAll('style'));
+      styleTags.forEach(styleTag => {
+        dados.estilosEmStyle.push(styleTag.textContent.trim());
+      });
+
+      // Extrair scripts inline
+      const scriptsInline = Array.from(doc.querySelectorAll('script:not([src])'));
+      scriptsInline.forEach(script => {
+        dados.scriptsInline.push(script.textContent.trim());
+      });
+
+      // Extrair scripts externos
+      const scriptsExternos = Array.from(doc.querySelectorAll('script[src]'));
+      scriptsExternos.forEach(script => {
+        dados.scriptsExternos.push(script.getAttribute('src'));
+      });
+
+      // Extrair dependências CSS externas (link)
+      const linksCSS = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+      linksCSS.forEach(link => {
+        dados.dependenciasCSS.push(link.getAttribute('href'));
+      });
+
+      // Dependências JS externas são os scripts externos
+      dados.dependenciasJS = [...dados.scriptsExternos];
+
+      // Detectar componentes modulares
+      dados.componentes = detectarComponentesModulares(doc.body);
+
+    } catch (e) {
+      alert('Erro ao processar HTML: ' + e.message);
+    }
+
+    return dados;
+  }
+
+  // Função para criar lista em HTML para estilos inline formatados
+  function formatarEstilosInline(estilos) {
+    return estilos.map(e => `<${e.tag}${e.id ? ` id="${e.id}"` : ''}${e.classes.length ? ` class="${e.classes.join(' ')}"` : ''}> { ${e.style} }`).join('\n');
+  }
+
+  // Função para criar árvore interativa HTML para estrutura do <body>
+  function criarArvoreInterativa(node) {
+    if (!node || node.nodeType !== 1) return null;
+    const li = document.createElement('li');
+    li.textContent = `<${node.tagName.toLowerCase()}>${node.id ? ' #' + node.id : ''}${node.classList.length ? ' .' + [...node.classList].join('.') : ''}`;
+    if (node.children.length) {
+      const ul = document.createElement('ul');
+      Array.from(node.children).forEach(child => {
+        const childLi = criarArvoreInterativa(child);
+        if (childLi) ul.appendChild(childLi);
+      });
+      li.appendChild(ul);
+    }
+    return li;
+  }
+
+  // Função de indentação simples para refatorar HTML (formatação básica)
+  function refatorarHTML(html) {
+    try {
+      // Usar DOMParser para formatar (indenta a estrutura)
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      function format(node, level = 0) {
+        let indentBefore = '\n' + '  '.repeat(level);
+        let indentAfter = '\n' + '  '.repeat(level - 1);
+        let textNodes = Array.from(node.childNodes).filter(n => n.nodeType === 3);
+        // remover nós de texto vazios e espaços
+        textNodes.forEach(tn => {
+          if (!tn.textContent.trim()) tn.parentNode.removeChild(tn);
+        });
+        Array.from(node.children).forEach(child => format(child, level + 1));
+        if (node.children.length) {
+          node.innerHTML = indentBefore + Array.from(node.children).map(c => c.outerHTML).join(indentBefore) + indentAfter;
+        }
+      }
+      format(doc.body, 0);
+      return doc.body.innerHTML.trim();
+    } catch {
+      return html;
+    }
+  }
+
+  // Função para minificar HTML (super simples, remove espaços, quebras e comentários)
+  function minifyHTML(html) {
+    return html
+      .replace(/>\s+</g, '><')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .trim();
+  }
+  // Função minificar CSS simples
+  function minifyCSS(css) {
+    return css
+      .replace(/\s*([{}:;,])\s*/g, '$1')
+      .replace(/;\}/g, '}')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .trim();
+  }
+  // Função minificar JS simples
+  function minifyJS(js) {
+    return js
+      .replace(/\s*([{};,:])\s*/g, '$1')
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  // --------- Função de geração dos relatórios ---------
+
+  function gerarRelatorioVisual(data) {
+    let txt = '=== RELATÓRIO VISUAL DO TEMPLATE ===\n\n';
+    txt += `IDs (${data.ids.length}):\n${data.ids.join(', ') || 'Nenhum'}\n\n`;
+    txt += `Classes (${data.classes.length}):\n${data.classes.join(', ') || 'Nenhuma'}\n\n`;
+    txt += `Estilos Inline (${data.estilosInline.length}):\n`;
+    data.estilosInline.forEach(e => {
+      txt += `- <${e.tag}${e.id ? ` id="${e.id}"` : ''}${e.classes.length ? ` class="${e.classes.join(' ')}"` : ''}> { ${e.style} }\n`;
+    });
+    txt += `\nEstilos em <style> (${data.estilosEmStyle.length} blocos):\n`;
+    data.estilosEmStyle.forEach((css, i) => {
+      txt += `--- Bloco ${i+1} ---\n${css}\n\n`;
+    });
+    txt += '=== FIM DO RELATÓRIO VISUAL ===\n';
+    return txt;
+  }
+
+  function gerarRelatorioFuncional(data) {
+    let txt = '=== RELATÓRIO FUNCIONAL / MODULARIZAÇÃO ===\n\n';
+    txt += `Dependências CSS (${data.dependenciasCSS.length}):\n`;
+    data.dependenciasCSS.forEach(css => {
+      txt += '- ' + css + '\n';
+    });
+    txt += `\nDependências JS (${data.dependenciasJS.length}):\n`;
+    data.dependenciasJS.forEach(js => {
+      txt += '- ' + js + '\n';
+    });
+    txt += '\nComponentes detectados (hierarquia):\n';
+
+    function renderComp(comp, nivel=0) {
+      if (!comp) return '';
+      let indent = '  '.repeat(nivel);
+      let nome = comp.nome || `(tag: ${comp.tag})`;
+      let str = indent + '- ' + nome + '\n';
+      if (comp.children && comp.children.length) {
+        comp.children.forEach(c => { str += renderComp(c, nivel+1); });
+      }
+      return str;
+    }
+
+    if (data.componentes && data.componentes.length) {
+      data.componentes.forEach(c => {
+        txt += renderComp(c);
+      });
+    } else {
+      txt += '(Nenhum componente modular detectado)\n';
+    }
+    txt += '\n=== FIM DO RELATÓRIO FUNCIONAL ===\n';
+    return txt;
+  }
+
+  // --------- Função para exportar JSON dos dados ---------
+  function gerarJSONExport(data) {
+    const jsonObj = {
+      ids: data.ids,
+      classes: data.classes,
+      estilosInline: data.estilosInline,
+      estilosEmStyle: data.estilosEmStyle,
+      scriptsInline: data.scriptsInline,
+      scriptsExternos: data.scriptsExternos,
+      dependenciasCSS: data.dependenciasCSS,
+      dependenciasJS: data.dependenciasJS,
+      componentes: data.componentes,
+      estruturaHTML: data.estruturaHTML,
+    };
+    return JSON.stringify(jsonObj, null, 2);
+  }
+
+  // --------- Renderização das seções ---------
+  function ativarTab(id) {
+    tabs.forEach(t => {
+      const isSelected = t.getAttribute('aria-controls') === id;
+      t.setAttribute('aria-selected', isSelected);
+      if (isSelected) renderizarSecao(id);
+    });
+  }
+
+  function renderizarSecao(id) {
+    if (!resultadoGlobal) {
+      outputContainer.innerHTML = `<p style="color:#f55;">Cole um HTML válido e clique em Analisar para começar.</p>`;
+      return;
+    }
+    const data = resultadoGlobal;
+    switch (id) {
+      case 'tab-ids':
+        outputContainer.innerHTML = criarLista(data.ids.map(i => `<code>${i}</code>`));
+        break;
+      case 'tab-classes':
+        outputContainer.innerHTML = criarLista(data.classes.map(c => `<code>${c}</code>`));
+        break;
+      case 'tab-inline-style':
+        outputContainer.innerHTML = `<pre>${formatarEstilosInline(data.estilosInline)}</pre>`;
+        break;
+      case 'tab-style-tags':
+        outputContainer.innerHTML = data.estilosEmStyle.length
+          ? data.estilosEmStyle.map((css, i) => `<pre><strong>Bloco ${i + 1}</strong>\n${css}</pre>`).join('')
+          : '<p><em>Não foram encontrados estilos &lt;style&gt;.</em></p>';
+        break;
+      case 'tab-scripts-inline':
+        outputContainer.innerHTML = data.scriptsInline.length
+          ? data.scriptsInline.map((js, i) => `<pre><strong>Script Inline ${i + 1}</strong>\n${js}</pre>`).join('')
+          : '<p><em>Não foram encontrados scripts inline.</em></p>';
+        break;
+      case 'tab-scripts-external':
+        outputContainer.innerHTML = criarLista(data.scriptsExternos);
+        break;
+      case 'tab-html-structure':
+        if (!data.docBody) {
+          outputContainer.innerHTML = '<p><em>Erro ao gerar estrutura HTML.</em></p>';
+          break;
+        }
+        const treeRoot = criarArvoreInterativa(data.docBody);
+        if (!treeRoot) {
+          outputContainer.innerHTML = '<p><em>Sem estrutura para mostrar.</em></p>';
+          break;
+        }
+        const ulTree = document.createElement('ul');
+        ulTree.classList.add('treeview');
+        ulTree.appendChild(treeRoot);
+        outputContainer.innerHTML = '';
+        outputContainer.appendChild(ulTree);
+        break;
+      case 'tab-components':
+        if (!data.componentes || !data.componentes.length) {
+          outputContainer.innerHTML = '<p><em>Nenhum componente modular detectado.</em></p>';
+          break;
+        }
+        // Renderizar componentes com hierarquia em lista
+        function renderCompList(comp, level = 0) {
+          let html = `<li>${comp.nome ? `<strong>${comp.nome}</strong>` : `(tag: ${comp.tag})`}`;
+          if (comp.children && comp.children.length) {
+            html += '<ul>';
+            comp.children.forEach(c => {
+              html += renderCompList(c, level + 1);
+            });
+            html += '</ul>';
+          }
+          html += '</li>';
+          return html;
+        }
+        let compsHTML = '<ul class="treeview">';
+        data.componentes.forEach(c => {
+          compsHTML += renderCompList(c);
+        });
+        compsHTML += '</ul>';
+        outputContainer.innerHTML = compsHTML;
+        break;
+      case 'tab-deps':
+        let depsHtml = `<h3>Dependências CSS Externas</h3>`;
+        depsHtml += criarLista(data.dependenciasCSS.map(d => `<code>${d}</code>`));
+        depsHtml += `<h3>Dependências JS Externas</h3>`;
+        depsHtml += criarLista(data.dependenciasJS.map(d => `<code>${d}</code>`));
+        outputContainer.innerHTML = depsHtml;
+        break;
+      case 'tab-edit-html':
+        outputContainer.innerHTML = `
+          <textarea id="editableHtmlArea" class="editable-area" spellcheck="false">${data.estruturaHTML}</textarea>
+          <div style="margin-top: 0.6rem;">
+            <button id="btn-copy-html" class="btn-copy-all">Copiar HTML</button>
+            <button id="btn-download-html">Baixar HTML</button>
+            <button id="btn-refactor-html">Reorganizar/Refatorar HTML</button>
+            <button id="btn-expand-html">Expandir HTML</button>
+          </div>
+        `;
+        // Adicionar eventos para novos botões
+        document.getElementById('btn-copy-html').onclick = () => {
+          const text = document.getElementById('editableHtmlArea').value;
+          copyToClipboard(text);
+          alert('HTML copiado para área de transferência!');
+        };
+        document.getElementById('btn-download-html').onclick = () => {
+          const text = document.getElementById('editableHtmlArea').value;
+          baixarArquivo('template-refatorado.html', text, 'text/html');
+        };
+        document.getElementById('btn-refactor-html').onclick = () => {
+          const textarea = document.getElementById('editableHtmlArea');
+          textarea.value = refatorarHTML(textarea.value);
+          alert('HTML reorganizado e refatorado.');
+        };
+        document.getElementById('btn-expand-html').onclick = () => {
+          alert('Expansão automática complexa não implementada nesta demo básica.');
+        };
+        break;
+      case 'tab-report':
+        let relVis = gerarRelatorioVisual(data);
+        let relFunc = gerarRelatorioFuncional(data);
+        outputContainer.innerHTML = `<pre>${relVis}\n\n${relFunc}</pre>`;
+        break;
+      default:
+        outputContainer.innerHTML = `<p><em>Aba desconhecida.</em></p>`;
+    }
+  }
+
+  // Função para baixar arquivo
+  function baixarArquivo(nome, conteudo, tipo) {
+    const blob = new Blob([conteudo], { type: tipo });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 200);
+  }
+
+  // Ação principal do botão analisar
+  analyzeBtn.addEventListener('click', () => {
+    const html = htmlInput.value.trim();
+    if (!html) {
+      alert('Cole um HTML válido para analisar.');
+      return;
+    }
+    resultadoGlobal = transformarHTMLparaTemplate(html);
+    jsonExport = gerarJSONExport(resultadoGlobal);
+    ativarTab('tab-ids');
+  });
+
+  // Minificar HTML (editor)
+  minifyBtn.addEventListener('click', () => {
+    if (!resultadoGlobal) {
+      alert('Analise um HTML válido antes de minificar.');
+      return;
+    }
+    const editor = document.getElementById('editableHtmlArea');
+    if (!editor) {
+      alert('Abra a aba Editor para minificar o HTML editável.');
+      return;
+    }
+    editor.value = minifyHTML(editor.value);
+    alert('HTML minificado.');
+  });
+
+  // Exportar JSON na aba
+  exportJsonBtn.addEventListener('click', () => {
+    if (!jsonExport) {
+      alert('Analise um HTML válido para exportar JSON.');
+      return;
+    }
+    // Abrir nova aba com JSON formatado para copiar
+    const win = window.open('', '_blank');
+    win.document.write('<pre style="white-space: pre-wrap; font-family: monospace;">' + jsonExport.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre>');
+    win.document.title = 'JSON Exportado do Template';
+  });
+
+  downloadJsonBtn.addEventListener('click', () => {
+    if (!jsonExport) {
+      alert('Analise um HTML válido para baixar o JSON.');
+      return;
+    }
+    baixarArquivo('template-data.json', jsonExport, 'application/json');
+  });
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const id = tab.getAttribute('aria-controls');
+      ativarTab(id);
+    });
+  });
+
+  // Inicialização: aba padrão
+  ativarTab('tab-ids');
+
+})();
+</script>
+</body>
+</html>

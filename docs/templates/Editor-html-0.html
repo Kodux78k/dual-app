@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página Principal - Editor HTML Lovable</title>
+<style>
+:root {
+  --font-primary: 'Segoe UI', sans-serif;
+  --color-primary: #0ff;
+  --color-accent: magenta;
+  --color-bg: #0a0a0a;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-primary);
+  background: var(--color-bg);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  padding: 10px;
+  text-align: center;
+  background: rgba(0,0,0,0.5);
+  box-shadow: 0 0 10px rgba(0,255,255,0.2);
+}
+
+h1 {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+}
+
+.button-standard {
+  border-radius: 10px;
+  background: rgba(0,0,0,0.3);
+  color: #0ff;
+  border: 2px solid transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  background-image: linear-gradient(90deg, cyan, magenta);
+  background-origin: border-box;
+  box-shadow: 0 0 10px rgba(0,255,255,0.2);
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.editor-container {
+  flex: 1;
+  overflow: auto;
+  background: #111;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 0.85rem;
+  line-height: 1.3rem;
+  white-space: pre;
+  outline: none;
+}
+
+.syntax-tag { color: cyan; }
+.syntax-attr { color: orange; }
+.syntax-value { color: #0f0; }
+.syntax-text { color: #fff; }
+
+.search-box {
+  padding: 5px;
+  font-size: 0.9rem;
+  border-radius: 5px;
+  border: none;
+}
+
+@media (max-width: 600px) {
+  h1 { font-size: 1rem; }
+  .toolbar { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Editor HTML Lovable - Página Principal</h1>
+</header>
+
+<div class="toolbar">
+  <label class="button-standard" for="uploadHTML">Upload HTML</label>
+  <input type="file" id="uploadHTML" accept=".html,.htm">
+  <button class="button-standard" id="downloadHTML">Salvar HTML</button>
+  <button class="button-standard" id="downloadPrompt">Baixar Prompt Base</button>
+  <input type="text" id="searchHTML" class="search-box" placeholder="Buscar no código...">
+</div>
+
+<div id="editor" class="editor-container" contenteditable="true">
+<!-- HTML carregado ou padrão aparecerá aqui -->
+</div>
+
+<script>
+const editor = document.getElementById('editor');
+const uploadHTML = document.getElementById('uploadHTML');
+const downloadHTML = document.getElementById('downloadHTML');
+const downloadPrompt = document.getElementById('downloadPrompt');
+const searchHTML = document.getElementById('searchHTML');
+
+function highlightHTML(html) {
+  return html
+    .replace(/(&lt;\/?)([a-zA-Z0-9-]+)(.*?&gt;)/g, (_, start, tag, rest) =>
+      `<span class="syntax-tag">${start}${tag}</span>` +
+      rest.replace(/([a-zA-Z-]+)="(.*?)"/g,
+        (_, attr, value) =>
+          `<span class="syntax-attr"> ${attr}</span>=<span class="syntax-value">"${value}"</span>`
+      ) +
+      `<span class="syntax-tag">&gt;</span>`
+    )
+    .replace(/([^<]+)(?=<|$)/g, text =>
+      text.trim() ? `<span class="syntax-text">${text}</span>` : text
+    );
+}
+
+function setEditorContent(html) {
+  editor.innerHTML = highlightHTML(
+    html.replace(/</g, "&lt;").replace(/>/g, "&gt;")
+  );
+}
+
+uploadHTML.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => setEditorContent(reader.result);
+  reader.readAsText(file);
+});
+
+downloadHTML.addEventListener('click', () => {
+  const blob = new Blob([editor.innerText], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'meu_arquivo.html';
+  a.click();
+});
+
+downloadPrompt.addEventListener('click', () => {
+  const promptText = `Prompt Base Lovable - Dual Infodose com Arquétipos\n\n... (conteúdo do prompt aqui) ...`;
+  const blob = new Blob([promptText], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'prompt_base.txt';
+  a.click();
+});
+
+searchHTML.addEventListener('input', () => {
+  const term = searchHTML.value.toLowerCase();
+  const lines = editor.innerText.split('\n');
+  const filtered = lines.filter(line => line.toLowerCase().includes(term)).join('\n');
+  setEditorContent(filtered || editor.innerText);
+});
+
+// Conteúdo inicial de exemplo
+setEditorContent(`<!DOCTYPE html>
+<html>
+<head>
+<title>Exemplo</title>
+</head>
+<body>
+<h1>Olá Mundo</h1>
+</body>
+</html>`);
+</script>
+
+</body>
+</html>

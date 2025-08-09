@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game of Life Dual</title>
+<style>
+  body {
+    margin: 0;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    color: #fff;
+  }
+  #controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin: 10px;
+  }
+  button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: rgba(0,0,0,0.7);
+  }
+  canvas {
+    border: 1px solid #444;
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+</head>
+<body>
+
+<h1>Game of Life Dual</h1>
+<canvas id="gameCanvas"></canvas>
+
+<div id="controls">
+  <button id="startBtn">Iniciar</button>
+  <button id="pauseBtn">Pausar</button>
+  <button id="resetBtn">Resetar</button>
+  <button id="soundToggleBtn">🔊 Som: On</button>
+</div>
+
+<script>
+// 🎧 Sons de interface - Coblux UI Samples
+const uiSounds = {
+  click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+  hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+  confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+  back: new Audio('assets/sounds/uiSamples/back.wav'),
+  temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+  temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+};
+
+// 🎧 Novos sons com base em IDs
+const uiBL = {
+  toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+  kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+  ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+  nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+  cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+};
+
+// Controle de som com localStorage
+let soundEnabled = localStorage.getItem("soundEnabled") !== "false";
+const soundToggleBtn = document.getElementById("soundToggleBtn");
+function updateSoundButton() {
+  soundToggleBtn.textContent = soundEnabled ? "🔊 Som: On" : "🔇 Som: Off";
+}
+function playSound(audio) {
+  if (soundEnabled && audio) {
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+  }
+}
+soundToggleBtn.addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem("soundEnabled", soundEnabled);
+  updateSoundButton();
+  playSound(uiBL.toggle);
+});
+updateSoundButton();
+
+// Configuração do Game of Life
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let resolution = 10;
+let cols, rows;
+let grid = [];
+let running = false;
+let animationId;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth * 0.9;
+  canvas.height = window.innerHeight * 0.6;
+  cols = Math.floor(canvas.width / resolution);
+  rows = Math.floor(canvas.height / resolution);
+  grid = makeGrid();
+  drawGrid();
+}
+window.addEventListener('resize', resizeCanvas);
+
+function makeGrid() {
+  return new Array(cols).fill(null)
+    .map(() => new Array(rows).fill(0).map(() => Math.random() > 0.8 ? 1 : 0));
+}
+
+function drawGrid() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let col = 0; col < cols; col++) {
+    for (let row = 0; row < rows; row++) {
+      ctx.beginPath();
+      ctx.rect(col * resolution, row * resolution, resolution, resolution);
+      ctx.fillStyle = grid[col][row] ? '#0ff' : 'rgba(0,0,0,0)';
+      ctx.fill();
+    }
+  }
+}
+
+function nextGen() {
+  const next = grid.map(arr => [...arr]);
+  for (let col = 0; col < cols; col++) {
+    for (let row = 0; row < rows; row++) {
+      const cell = grid[col][row];
+      let numNeighbors = 0;
+      for (let i = -1; i < 2; i++) {
+        for (let j = -1; j < 2; j++) {
+          if (i === 0 && j === 0) continue;
+          const x = col + i;
+          const y = row + j;
+          if (x >= 0 && y >= 0 && x < cols && y < rows) {
+            numNeighbors += grid[x][y];
+          }
+        }
+      }
+      if (cell === 1 && (numNeighbors < 2 || numNeighbors > 3)) {
+        next[col][row] = 0;
+      } else if (cell === 0 && numNeighbors === 3) {
+        next[col][row] = 1;
+      }
+    }
+  }
+  grid = next;
+}
+
+function update() {
+  drawGrid();
+  nextGen();
+  animationId = requestAnimationFrame(update);
+}
+
+// Controles
+document.getElementById('startBtn').addEventListener('click', () => {
+  if (!running) {
+    running = true;
+    playSound(uiSounds.confirm);
+    update();
+  }
+});
+document.getElementById('pauseBtn').addEventListener('click', () => {
+  if (running) {
+    running = false;
+    playSound(uiBL.cancel);
+    cancelAnimationFrame(animationId);
+  }
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  playSound(uiSounds.back);
+  grid = makeGrid();
+  drawGrid();
+});
+
+resizeCanvas();
+drawGrid();
+</script>
+</body>
+</html>

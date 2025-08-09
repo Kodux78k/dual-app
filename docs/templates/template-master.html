@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dual App Template Machine</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #0d0d0d;
+        color: #f0f0f0;
+    }
+    header {
+        background: #1a1a1a;
+        padding: 20px;
+        text-align: center;
+        font-size: 1.5em;
+        border-bottom: 2px solid #333;
+    }
+    main {
+        padding: 20px;
+    }
+    textarea {
+        width: 100%;
+        height: 250px;
+        background: #1e1e1e;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        font-family: monospace;
+        resize: vertical;
+    }
+    button {
+        background: #333;
+        color: #fff;
+        padding: 10px 15px;
+        margin: 5px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    button:hover {
+        background: #555;
+    }
+    #report {
+        white-space: pre-wrap;
+        background: #111;
+        padding: 10px;
+        border: 1px solid #333;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+<header>Dual App Template Machine ⚡</header>
+<main>
+    <p>Cole seu HTML abaixo para análise e transformação:</p>
+    <textarea id="inputHTML"></textarea><br>
+    <button onclick="analisarHTML()">Analisar & Transformar</button>
+    <button onclick="copiarResultado()">Copiar HTML Transformado</button>
+    <button onclick="baixarHTML()">Baixar HTML Transformado</button>
+    <button onclick="baixarRelatorio()">Baixar Relatório</button>
+    <h3>Resultado:</h3>
+    <textarea id="outputHTML"></textarea>
+    <h3>Relatório:</h3>
+    <div id="report"></div>
+</main>
+<script>
+function analisarHTML() {
+    const input = document.getElementById("inputHTML").value;
+    let parser = new DOMParser();
+    let doc = parser.parseFromString(input, "text/html");
+
+    let ids = [];
+    let classes = [];
+    doc.querySelectorAll("*").forEach(el => {
+        if (el.id) ids.push(el.id);
+        if (el.classList.length > 0) classes.push(...el.classList);
+    });
+
+    let relatorio = "📌 Relatório de Análise:\n";
+    relatorio += "\nIDs Detectados:\n" + [...new Set(ids)].join(", ");
+    relatorio += "\n\nClasses Detectadas:\n" + [...new Set(classes)].join(", ");
+
+    document.getElementById("outputHTML").value = doc.documentElement.outerHTML;
+    document.getElementById("report").innerText = relatorio;
+}
+
+function copiarResultado() {
+    let output = document.getElementById("outputHTML");
+    output.select();
+    document.execCommand("copy");
+    alert("HTML copiado para a área de transferência!");
+}
+
+function baixarHTML() {
+    let blob = new Blob([document.getElementById("outputHTML").value], { type: "text/html" });
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "html_transformado.html";
+    a.click();
+}
+
+function baixarRelatorio() {
+    let blob = new Blob([document.getElementById("report").innerText], { type: "text/plain" });
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "relatorio_template.txt";
+    a.click();
+}
+</script>
+</body>
+</html>
