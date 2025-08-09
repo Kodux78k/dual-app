@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>KOBLLUX Infinito 3x6x9 Interdimensional Editor</title>
+<style>
+  /* Root Variables Dinâmicas */
+  :root {
+    --cor-primaria: #6200ee;
+    --cor-hover: #3700b3;
+    --cor-erro: #ff4444;
+    --cor-sucesso: #00c851;
+    --bg-light: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --bg-dark: linear-gradient(135deg, #1e1e2f 0%, #3a3a4f 100%);
+    --texto-light: #000;
+    --texto-dark: #fff;
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0; padding: 0; overflow-x: hidden;
+    display: flex; flex-direction: column; align-items: center;
+    background: var(--bg-light);
+    color: var(--texto-light);
+    transition: background 0.5s ease, color 0.5s ease;
+    min-height: 100vh;
+  }
+  body.dark {
+    background: var(--bg-dark);
+    color: var(--texto-dark);
+  }
+
+  #particles-canvas {
+    position: fixed; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .container {
+    background: rgba(255,255,255,0.92);
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 30px 25px;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.15);
+    backdrop-filter: blur(8px);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  body.dark .container {
+    background: rgba(20,20,32,0.92);
+  }
+
+  h1 {
+    margin: 0;
+    text-align: center;
+    color: var(--cor-primaria);
+    font-weight: 900;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+  }
+
+  .toolbar, .dim-panel, .mode-panel {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  button, select {
+    background-color: var(--cor-primaria);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.4s ease, transform 0.3s ease;
+  }
+  button:hover, select:hover {
+    background-color: var(--cor-hover);
+    transform: translateY(-3px);
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 250px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #ddd;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.4s ease;
+  }
+  textarea:focus {
+    border-color: var(--cor-primaria);
+    outline: none;
+  }
+
+  #preview-frame {
+    width: 100%;
+    height: 400px;
+    border-radius: 15px;
+    border: 2px solid #ddd;
+    margin-top: 10px;
+    filter: none;
+    transition: filter 0.7s ease;
+  }
+
+  #feedback {
+    font-weight: 800;
+    white-space: pre-wrap;
+    min-height: 4.5em;
+    font-size: 1.05rem;
+    color: var(--cor-sucesso);
+    text-align: center;
+  }
+  #feedback.error {
+    color: var(--cor-erro);
+  }
+
+  .contador {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #444;
+  }
+  body.dark .contador {
+    color: #bbb;
+  }
+
+  .history {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .history button {
+    background-color: var(--cor-hover);
+    font-size: 0.85rem;
+    padding: 6px 14px;
+    border-radius: 12px;
+    color: white;
+  }
+
+  footer {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    text-align: center;
+    opacity: 0.8;
+    font-style: italic;
+    letter-spacing: 0.1em;
+    color: var(--cor-primaria);
+  }
+
+  /* Modo meditação */
+  body.meditation .container {
+    background: rgba(10, 10, 20, 0.95);
+    box-shadow: 0 0 50px #663399aa;
+  }
+
+</style>
+</head>
+<body>
+<canvas id="particles-canvas"></canvas>
+
+<div class="container" role="main" aria-label="Editor HTML KOBLLUX Interdimensional">
+  <h1>🚀 KOBLLUX Infinito 3×6×9 Dimensional Editor</h1>
+
+  <!-- Painéis de controle -->
+  <div class="toolbar" role="toolbar" aria-label="Controles principais">
+    <button id="btn-theme" aria-pressed="false" aria-label="Alternar tema claro e escuro">🌗 Tema</button>
+    <button id="btn-clear" aria-label="Limpar código">🗑 Limpar</button>
+    <button id="btn-download" aria-label="Download do código HTML">⬇ Download</button>
+    <label for="file-upload" aria-label="Carregar arquivo HTML" tabindex="0" style="cursor:pointer; background:var(--cor-primaria); border-radius:8px; padding:8px 16px; font-weight:bold; color:#fff;">
+      📂 Upload
+      <input type="file" id="file-upload" accept=".html" style="display:none" />
+    </label>
+  </div>
+
+  <div class="dim-panel" role="region" aria-label="Seleção da dimensão e ciclo">
+    <label for="dimension-select">🌌 Dimensão:</label>
+    <select id="dimension-select" aria-describedby="dimension-desc">
+      <option value="">Escolha uma dimensão</option>
+      <option value="1">1D — Linha reta</option>
+      <option value="2">2D — Plano</option>
+      <option value="3">3D — Volume</option>
+      <option value="4">4D — Hipercubo (Tesserato)</option>
+      <option value="5">5D — Pentachoron</option>
+      <option value="6">6D — Hiper-poliedro</option>
+      <option value="7">7D — Toro (Torus)</option>
+      <option value="8">8D — Hipercubo 8D</option>
+      <option value="9">9D — Fractal e Espiral</option>
+      <option value="10">10D — Esfera Perfeita</option>
+    </select>
+    <span id="dimension-desc" style="position:absolute; left:-9999px; height:1px; width:1px; overflow:hidden;">Selecione a dimensão para ativar filtros cósmicos no preview.</span>
+
+    <label for="cycle-select">🔄 Ciclo:</label>
+    <select id="cycle-select" aria-describedby="cycle-desc">
+      <option value="">Escolha o ciclo</option>
+      <option value="3">Início 3</option>
+      <option value="6">Meio 6</option>
+      <option value="9">Conclusão 9</option>
+    </select>
+    <span id="cycle-desc" style="position:absolute; left:-9999px; height:1px; width:1px; overflow:hidden;">Escolha o ciclo narrativo para alterar tema e animações.</span>
+  </div>
+
+  <label for="html-input" style="margin-top:15px; font-weight:bold;">📝 Código HTML:</label>
+  <textarea id="html-input" aria-multiline="true" aria-label="Editor de código HTML" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Digite ou cole seu código HTML aqui..."></textarea>
+  <span class="contador" aria-live="polite" id="char-counter">0 caracteres</span>
+
+  <button id="btn-send" aria-label="Enviar código para análise e preview">Enviar para KOBLLUX</button>
+  <div id="feedback" aria-live="polite" role="alert"></div>
+
+  <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin" aria-label="Visualizador de preview do código HTML"></iframe>
+
+  <div class="history" role="list" aria-label="Histórico de versões"></div>
+
+  <div class="mode-panel" role="region" aria-label="Alternar modos de operação" style="justify-content:center; margin-top:15px;">
+    <button id="btn-mode-dev" aria-pressed="true" aria-label="Modo Desenvolvedor">💻 Dev</button>
+    <button id="btn-mode-meditation" aria-pressed="false" aria-label="Modo Meditação">🧘 Meditação</button>
+  </div>
+
+  <footer aria-label="Informações e slogan do KOBLLUX" role="contentinfo">
+    ATIVAR Δ | DNA KOBLLUX | Conclusão 9 — Sempre em Ciclo ∞
+  </footer>
+</div>
+
+<script>
+  // Estado global
+  const state = {
+    theme: 'light',
+    dimension: null,
+    cycle: null,
+    history: [],
+    mode: 'dev',
+    audioContext: null,
+    audioBuffers: {},
+  };
+
+  // Elementos DOM
+  const htmlInput = document.getElementById('html-input');
+  const previewFrame = document.getElementById('preview-frame');
+  const feedback = document.getElementById('feedback');
+  const charCounter = document.getElementById('char-counter');
+  const dimensionSelect = document.getElementById('dimension-select');
+  const cycleSelect = document.getElementById('cycle-select');
+  const btnTheme = document.getElementById('btn-theme');
+  const btnClear = document.getElementById('btn-clear');
+  const btnDownload = document.getElementById('btn-download');
+  const fileUpload = document.getElementById('file-upload');
+  const historyDiv = document.querySelector('.history');
+  const btnSend = document.getElementById('btn-send');
+  const btnModeDev = document.getElementById('btn-mode-dev');
+  const btnModeMeditation = document.getElementById('btn-mode-meditation');
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Ajuste do canvas para partículas
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Função para salvar estado no localStorage
+  function saveState() {
+    localStorage.setItem('kobllux_html', htmlInput.value);
+    localStorage.setItem('kobllux_theme', state.theme);
+    localStorage.setItem('kobllux_dimension', state.dimension);
+    localStorage.setItem('kobllux_cycle', state.cycle);
+    localStorage.setItem('kobllux_mode', state.mode);
+    localStorage.setItem('kobllux_history', JSON.stringify(state.history));
+  }
+
+  // Função para carregar estado do localStorage
+  function loadState() {
+    const savedHtml = localStorage.getItem('kobllux_html');
+    const savedTheme = localStorage.getItem('kobllux_theme');
+    const savedDimension = localStorage.getItem('kobllux_dimension');
+    const savedCycle = localStorage.getItem('kobllux_cycle');
+    const savedMode = localStorage.getItem('kobllux_mode');
+    const savedHistory = localStorage.getItem('kobllux_history');
+
+    if (savedHtml) htmlInput.value = savedHtml;
+    if (savedTheme) setTheme(savedTheme);
+    if (savedDimension) setDimension(savedDimension, false);
+    if (savedCycle) setCycle(savedCycle, false);
+    if (savedMode) setMode(savedMode, false);
+    if (savedHistory) state.history = JSON.parse(savedHistory);
+  }
+
+  // Atualiza contador de caracteres
+  function updateCharCount() {
+    charCounter.textContent = `${htmlInput.value.length} caracteres`;
+  }
+
+  // Atualiza preview com filtro e ciclo
+  function updatePreview() {
+    previewFrame.srcdoc = htmlInput.value;
+
+    // Aplica filtros dimensionais no iframe
+    const filtros = {
+      "1": "grayscale(100%)",
+      "2": "contrast(120%)",
+      "3": "drop-shadow(0 0 10px cyan)",
+      "4": "hue-rotate(90deg)",
+      "5": "sepia(60%)",
+      "6": "invert(100%)",
+      "7": "blur(3px)",
+      "8": "brightness(1.4)",
+      "9": "drop-shadow(0 0 15px magenta)",
+      "10": "saturate(200%)"
+    };
+    previewFrame.style.filter = filtros[state.dimension] || "none";
+
+    // Cores ciclo narrativo
+    const coresCiclo = {
+      "3": "#ff9800",
+      "6": "#00bcd4",
+      "9": "#e91e63"
+    };
+    document.documentElement.style.setProperty('--cor-primaria', coresCiclo[state.cycle] || "#6200ee");
+  }
+
+  // Adiciona código ao histórico
+  function addHistory(code) {
+    if (state.history.length > 0 && state.history[0] === code) return; // evita duplicar
+    state.history.unshift(code);
+    if (state.history.length > 50) state.history.pop(); // Limita histórico
+    renderHistory();
+  }
+
+  // Renderiza histórico com botões para restaurar
+  function renderHistory() {
+    historyDiv.innerHTML = "<strong>Histórico (Últimas versões):</strong> ";
+    state.history.forEach((code, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = `Versão ${idx + 1}`;
+      btn.setAttribute('aria-label', `Restaurar versão número ${idx + 1}`);
+      btn.onclick = () => {
+        htmlInput.value = code;
+        updateCharCount();
+        updatePreview();
+        feedback.textContent = `⚡ Versão ${idx + 1} restaurada!`;
+        addHistory(code); // reposiciona no topo
+      };
+      historyDiv.appendChild(btn);
+    });
+  }
+
+  // Envia o código para análise e feedback
+  function sendCode() {
+    const code = htmlInput.value.trim();
+    if (!code) {
+      feedback.textContent = "❌ Insira um código HTML antes de enviar.";
+      feedback.classList.add('error');
+      return;
+    }
+    feedback.classList.remove('error');
+    feedback.textContent = "✅ Código recebido! Analisando...";
+    addHistory(code);
+    updatePreview();
+    saveState();
+
+    setTimeout(() => {
+      // Extração simples de tags HTML únicas
+      const tags = [...new Set(code.match(/<\s*([a-z1-9]+)/gi).map(t => t.replace(/<\s*/, '')))];
+      feedback.textContent += `\n🔍 Tags detectadas: ${tags.join(', ')}`;
+
+      // Dicas narrativas KOBLLUX
+      if (state.cycle === "3") feedback.textContent += "\n✨ Ciclo Início 3 ativo: organização e estruturação.";
+      else if (state.cycle === "6") feedback.textContent += "\n⚡ Ciclo Meio 6 ativo: equilíbrio e expansão.";
+      else if (state.cycle === "9") feedback.textContent += "\n🌟 Ciclo Conclusão 9 ativo: finalização e renovação.";
+
+      playAudioFeedback(state.cycle, state.dimension);
+    }, 1000);
+  }
+
+  // Alterna tema claro/escuro
+  function toggleTheme() {
+    if (state.theme === 'light') setTheme('dark');
+    else setTheme('light');
+  }
+
+  function setTheme(theme) {
+    state.theme = theme;
+    if (theme === 'dark') {
+      document.body.classList.add('dark');
+      btnTheme.setAttribute('aria-pressed', 'true');
+    } else {
+      document.body.classList.remove('dark');
+      btnTheme.setAttribute('aria-pressed', 'false');
+    }
+    saveState();
+  }
+
+  // Limpa editor
+  function clearEditor() {
+    if (confirm("Deseja realmente limpar todo o código?")) {
+      htmlInput.value = '';
+      updateCharCount();
+      updatePreview();
+      feedback.textContent = '';
+      saveState();
+    }
+  }
+
+  // Baixar HTML
+  function downloadHTML() {
+    const code = htmlInput.value;
+    const blob = new Blob([code], { type: "text/html" });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = "kobllux_code.html";
+    link.click();
+  }
+
+  // Upload HTML via input file
+  function uploadHTML(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      htmlInput.value = e.target.result;
+      updateCharCount();
+      updatePreview();
+      feedback.textContent = "📂 Arquivo carregado!";
+      addHistory(htmlInput.value);
+      saveState();
+    };
+    reader.readAsText(file);
+  }
+
+  // Seta dimensão e atualiza preview
+  function setDimension(dim, save = true) {
+    state.dimension = dim;
+    dimensionSelect.value = dim;
+    updatePreview();
+    if (save) saveState();
+  }
+
+  // Seta ciclo e atualiza tema
+  function setCycle(cycle, save = true) {
+    state.cycle = cycle;
+    cycleSelect.value = cycle;
+    updatePreview();
+    if (save) saveState();
+  }
+
+  // Alterna modo dev/meditação
+  function setMode(mode, save = true) {
+    state.mode = mode;
+    if (mode === 'meditation') {
+      document.body.classList.add('meditation');
+      btnModeMeditation.setAttribute('aria-pressed', 'true');
+      btnModeDev.setAttribute('aria-pressed', 'false');
+    } else {
+      document.body.classList.remove('meditation');
+      btnModeMeditation.setAttribute('aria-pressed', 'false');
+      btnModeDev.setAttribute('aria-pressed', 'true');
+    }
+    if (save) saveState();
+  }
+
+  // Áudio com Web Audio API (sons básicos por ciclo e dimensão)
+  function setupAudio() {
+    if (!window.AudioContext && !window.webkitAudioContext) return;
+    state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Gerar tom simples para cada ciclo e dimensão
+    function createOscillator(freq) {
+      const osc = state.audioContext.createOscillator();
+      const gain = state.audioContext.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, state.audioContext.currentTime);
+      osc.connect(gain);
+      gain.connect(state.audioContext.destination);
+      gain.gain.setValueAtTime(0.1, state.audioContext.currentTime);
+      return {osc, gain};
+    }
+
+    state.audioBuffers = {
+      '3': createOscillator(261.63), // C4
+      '6': createOscillator(329.63), // E4
+      '9': createOscillator(392.00), // G4
+      '1D': createOscillator(130.81), // C3
+      '2D': createOscillator(146.83), // D3
+      '3D': createOscillator(164.81), // E3
+      '4D': createOscillator(174.61), // F3
+      '5D': createOscillator(196.00), // G3
+      '6D': createOscillator(220.00), // A3
+      '7D': createOscillator(246.94), // B3
+      '8D': createOscillator(261.63), // C4
+      '9D': createOscillator(293.66), // D4
+      '10D': createOscillator(311.13), // Eb4
+    };
+  }
+
+  function playAudioFeedback(cycle, dimension) {
+    if (!state.audioContext) return;
+
+    // Dispara som para ciclo e dimensão
+    const oscCycle = state.audioBuffers[cycle];
+    const oscDim = state.audioBuffers[dimension + 'D'];
+
+    const now = state.audioContext.currentTime;
+
+    function playOsc(oscObj) {
+      if (!oscObj) return;
+      oscObj.osc.start(now);
+      oscObj.gain.gain.setValueAtTime(0.1, now);
+      oscObj.gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+      oscObj.osc.stop(now + 1.5);
+    }
+
+    playOsc(oscCycle);
+    playOsc(oscDim);
+  }
+
+  // Partículas dinâmicas KOBLLUX - complexo e responsivo
+  let particles = [];
+  function initParticles() {
+    particles = [];
+    const count = 120;
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 3 + 0.5,
+        dx: (Math.random() - 0.5) * 0.8,
+        dy: (Math.random() - 0.5) * 0.8,
+        color: `hsl(${Math.random()*360}, 70%, 70%)`,
+      });
+    }
+  }
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.fillStyle = p.color;
+      ctx.shadowColor = p.color;
+      ctx.shadowBlur = 8;
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fill();
+      // Atualiza posição
+      p.x += p.dx;
+      p.y += p.dy;
+      if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+      if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+    });
+    requestAnimationFrame(drawParticles);
+  }
+
+  // Eventos e listeners
+  htmlInput.addEventListener('input', () => {
+    updateCharCount();
+    saveState();
+  });
+  btnSend.addEventListener('click', sendCode);
+  btnTheme.addEventListener('click', toggleTheme);
+  btnClear.addEventListener('click', clearEditor);
+  btnDownload.addEventListener('click', downloadHTML);
+  fileUpload.addEventListener('change', uploadHTML);
+  dimensionSelect.addEventListener('change', e => setDimension(e.target.value));
+  cycleSelect.addEventListener('change', e => setCycle(e.target.value));
+  btnModeDev.addEventListener('click', () => setMode('dev'));
+  btnModeMeditation.addEventListener('click', () => setMode('meditation'));
+
+  // Inicialização
+  loadState();
+  updateCharCount();
+  updatePreview();
+  renderHistory();
+  initParticles();
+  drawParticles();
+  setupAudio();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>KOBLLUX — Editor Infinito 3×6×9 Dimensional</title>
+<style>
+/* ===========================
+   KOBLLUX Infinito - Styles
+   ===========================
+   Customize variables below
+*/
+:root{
+  --accent: #6a00ff;
+  --accent-2: #00bcd4;
+  --bg-light: linear-gradient(135deg,#f6f8ff 0%, #e9f2ff 100%);
+  --bg-dark: linear-gradient(135deg,#060616 0%, #1a1230 100%);
+  --glass: rgba(255,255,255,0.86);
+  --glass-dark: rgba(8,8,16,0.8);
+  --text-light: #0b0b0b;
+  --text-dark: #eef2ff;
+  --success: #00c851;
+  --error: #ff4444;
+  --muted: #9aa3b2;
+  --max-width: 1200px;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;}
+body{display:flex;justify-content:center;padding:28px;background:var(--bg-light);color:var(--text-light);transition:background .45s,color .45s;min-height:100vh;}
+body.dark{background:var(--bg-dark);color:var(--text-dark)}
+.app{width:100%;max-width:var(--max-width);display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start;}
+.container{background:var(--glass);padding:16px;border-radius:12px;box-shadow:0 10px 30px rgba(10,10,20,.12);backdrop-filter: blur(6px);overflow:hidden;transition:background .3s}
+body.dark .container{background:var(--glass-dark)}
+.header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.brand{display:flex;flex-direction:column}
+.brand h2{margin:0;font-size:18px;letter-spacing:0.6px}
+.brand p{margin:0;font-size:12px;color:var(--muted)}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.btn{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px}
+.btn.alt{background:#fff;color:var(--accent);border:1px solid rgba(0,0,0,.06)}
+.btn:active{transform:translateY(1px)}
+.small{padding:6px 8px;font-size:12px;border-radius:6px}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;gap:6px}
+.editor-wrap{display:flex;flex-direction:column;gap:6px}
+textarea#editor{width:100%;min-height:260px;border-radius:10px;border:1px solid rgba(10,10,20,.06);padding:12px;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:13px;resize:vertical;background:transparent;color:inherit}
+.counter{font-size:12px;color:var(--muted);text-align:right}
+.preview{margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid rgba(10,10,20,.06);position:relative;background:#fff}
+.preview iframe{width:100%;height:380px;border:0;display:block;transition:filter .6s, transform .6s}
+.preview .preview-top{display:flex;justify-content:space-between;padding:8px 10px;background:transparent;align-items:center}
+.side{position:relative}
+.panel{background:var(--glass);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+.body-dark .panel{background:var(--glass-dark)}
+.dimensions{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.select,select{padding:8px;border-radius:8px;border:1px solid rgba(10,10,20,.06);background:transparent}
+.history{display:flex;flex-direction:column;gap:6px;margin-top:8px;max-height:260px;overflow:auto;padding-right:6px}
+.hist-item{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px;border-radius:8px;border:1px solid rgba(10,10,20,.03);background:transparent}
+.footer{margin-top:10px;text-align:center;font-size:12px;opacity:.9}
+.kob{display:inline-block;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700}
+.snippets{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.snip{padding:8px;border-radius:8px;border:1px solid rgba(10,10,20,.03);cursor:pointer;background:transparent;font-size:13px}
+.hint{font-size:12px;color:var(--muted)}
+.toolbar .kbd{background:rgba(0,0,0,.06);padding:4px 6px;border-radius:6px;font-weight:700;font-size:12px}
+.switch{display:inline-flex;align-items:center;gap:8px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(0,0,0,.06);font-size:12px}
+.console{background:#0b1220;color:#cfe8ff;padding:8px;border-radius:8px;font-size:13px;height:120px;overflow:auto;margin-top:8px}
+.info-line{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sep{height:1px;background:rgba(10,10,20,.04);margin:10px 0;border-radius:2px}
+.note{font-size:12px;color:var(--muted);}
+
+/* responsive */
+@media(max-width:980px){
+  .app{grid-template-columns:1fr;}
+  .preview iframe{height:260px}
+}
+</style>
+</head>
+<body>
+<!-- Particles canvas -->
+<canvas id="particles" style="position:fixed;left:0;top:0;width:100%;height:100%;z-index:-2;pointer-events:none"></canvas>
+
+<div class="app">
+  <!-- MAIN -->
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <h2>KOBLLUX — Editor Infinito</h2>
+        <p>3 | 6 | 9 · ATIVAR Δ · DNA KOBLLUX</p>
+      </div>
+      <div style="flex:1"></div>
+      <div class="toolbar">
+        <button class="btn small" id="btnRun" title="Enviar (Ctrl+Enter)">▶ Enviar</button>
+        <button class="btn small" id="btnDownload">⬇ Baixar</button>
+        <button class="btn small" id="btnCopy">📋 Copiar</button>
+        <button class="btn small" id="btnNewWindow">🔗 Abrir preview</button>
+        <button class="btn small" id="btnExport">⤓ Exportar workspace</button>
+        <button class="btn small" id="btnImport">⤒ Importar</button>
+        <button class="btn small" id="btnUndo" title="Undo (Ctrl+Z)">↺</button>
+        <button class="btn small" id="btnRedo" title="Redo (Ctrl+Y)">↻</button>
+        <label class="kbd">Ctrl+Enter</label>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="col" style="flex:1">
+        <div class="editor-wrap panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <div>
+              <strong>Editor</strong>
+              <div class="hint">Escreva ou cole HTML — auto-save, snapshots e preview ao vivo.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span id="charCount" class="badge">0</span>
+              <span id="status" class="hint">salvo</span>
+            </div>
+          </div>
+          <textarea id="editor" spellcheck="false" placeholder="<!-- Cole o HTML aqui -->"></textarea>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="counter">Linhas: <span id="lineCount">0</span></span>
+            <div style="flex:1"></div>
+            <select id="sandboxToggle" class="select" title="Sandbox do preview">
+              <option value="sandbox">Preview seguro (sandbox)</option>
+              <option value="nosandbox">Permitir scripts (não recomendado)</option>
+            </select>
+          </div>
+          <div class="sep"></div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button class="btn small" id="btnInsertTemplate">+ Inserir Template</button>
+            <button class="btn small" id="btnSnapshot">★ Snapshot</button>
+            <button class="btn small" id="btnClear">🗑 Limpar</button>
+            <div style="flex:1"></div>
+            <div class="note">Atalhos: <span class="kbd">Ctrl+Enter</span> enviar — <span class="kbd">Ctrl+S</span> salvar snapshot</div>
+          </div>
+        </div>
+
+        <div class="preview panel" style="margin-top:12px">
+          <div class="preview-top">
+            <div><strong>Preview</strong> <span class="hint" id="previewMode"></span></div>
+            <div class="info-line">
+              <span class="hint">Filtro: <span id="filterLabel">none</span></span>
+              <span class="hint">Dimensão: <span id="activeDim">—</span></span>
+            </div>
+          </div>
+          <iframe id="iframePreview" sandbox="allow-forms allow-same-origin" title="Preview"></iframe>
+        </div>
+
+        <div style="margin-top:10px" class="panel">
+          <strong>Console do preview</strong>
+          <div id="console" class="console"></div>
+        </div>
+      </div>
+
+      <!-- SIDE PANEL -->
+      <div class="side">
+        <div class="panel">
+          <div class="dimensions">
+            <label><strong>Dimensão</strong></label>
+            <select id="dimension" class="select">
+              <option value="">— Selecionar —</option>
+              <option value="1">1D — Linha</option>
+              <option value="2">2D — Plano</option>
+              <option value="3">3D — Volume</option>
+              <option value="4">4D — Hipercubo</option>
+              <option value="5">5D — Pentachoron</option>
+              <option value="6">6D — Hiper-poliedro</option>
+              <option value="7">7D — Toro</option>
+              <option value="8">8D — Hipercubo 8D</option>
+              <option value="9">9D — Fractal</option>
+              <option value="10">10D — Esfera</option>
+            </select>
+
+            <label><strong>Ciclo</strong></label>
+            <select id="cycle" class="select">
+              <option value="">— Ciclo —</option>
+              <option value="3">Início 3</option>
+              <option value="6">Meio 6</option>
+              <option value="9">Conclusão 9</option>
+            </select>
+
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="btn small" id="btnLoopDim">▶ Loop Dimensões</button>
+              <button class="btn small" id="btnMute">🔊 Som</button>
+            </div>
+
+            <div class="sep"></div>
+
+            <label><strong>Snippets rápidos</strong></label>
+            <div class="snippets" id="snippets">
+              <!-- snippets populated by JS -->
+            </div>
+
+            <div class="sep"></div>
+
+            <label><strong>Histórico & Snapshots</strong></label>
+            <div class="history" id="historyList"></div>
+
+            <div class="sep"></div>
+
+            <div class="hint">Exporte/import workspace, snapshots e histórico. Configurar política de retenção em "Config".</div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="panel">
+          <strong>Config</strong>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+            <label class="hint">Auto-save</label>
+            <select id="autoSaveInterval" class="select">
+              <option value="500">Debounce 500ms</option>
+              <option value="1000">1s</option>
+              <option value="2000">2s</option>
+              <option value="off">Desligado</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+            <label class="hint">Max snapshots</label>
+            <input id="maxSnapshots" type="number" min="1" max="500" value="100" class="select" style="width:100%">
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="panel">
+          <strong>Ritual</strong>
+          <div style="margin-top:8px">
+            <div class="hint">ATIVAR Δ — Botões rápidos</div>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <button class="btn small" data-ritual="Δ">ATIVAR Δ</button>
+              <button class="btn small" data-ritual="DNA">DNA KOBLLUX</button>
+              <button class="btn small" data-ritual="C9">Conclusão 9</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <div style="margin-top:8px"><span class="kob">KOBLLUX</span> · <span id="uStamp">—</span></div>
+          <div style="margin-top:6px" class="note">Versão Infinito • Salve frequentemente • Aberto para customizações</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SERVICE WORKER INLINE (registration only) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      try { navigator.serviceWorker.register('./kobllux-sw.js').catch(()=>{}); } catch(e){}
+      /* Note: inline SW file path above — some hosts block; you can generate a separate service worker file.
+         We include a minimal SW later as a fallback via blob if needed. */
+    }
+  </script>
+
+</div>
+
+<!-- Scripts -->
+<script>
+/* ===========================
+   KOBLLUX Infinito - Logic
+   ===========================
+   Extensive single-file implementation.
+*/
+
+// ---------- Utilities ----------
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const now = ()=> new Date().toISOString();
+const saveLS = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+const loadLS = k => { try { return JSON.parse(localStorage.getItem(k)); } catch(e){return null;} };
+const human = ms => new Date(ms).toLocaleString();
+
+// ---------- Elements ----------
+const editor = $('#editor');
+const iframe = $('#iframePreview');
+const charCount = $('#charCount');
+const lineCount = $('#lineCount');
+const statusEl = $('#status');
+const btnRun = $('#btnRun');
+const btnDownload = $('#btnDownload');
+const btnCopy = $('#btnCopy');
+const btnNewWindow = $('#btnNewWindow');
+const btnSnapshot = $('#btnSnapshot');
+const historyList = $('#historyList');
+const btnClear = $('#btnClear');
+const dimensionSel = $('#dimension');
+const cycleSel = $('#cycle');
+const filterLabel = $('#filterLabel');
+const activeDim = $('#activeDim');
+const previewMode = $('#previewMode');
+const consoleEl = $('#console');
+const sandboxToggle = $('#sandboxToggle');
+const btnUndo = $('#btnUndo');
+const btnRedo = $('#btnRedo');
+const btnExport = $('#btnExport');
+const btnImport = $('#btnImport');
+const btnInsertTemplate = $('#btnInsertTemplate');
+const btnLoopDim = $('#btnLoopDim');
+const btnMute = $('#btnMute');
+const snippetsWrap = $('#snippets');
+
+// ---------- State ----------
+let state = {
+  autosaveDebounce: 500,
+  snapshots: loadLS('kob_snapshots') || [],
+  history: loadLS('kob_history') || [],
+  maxSnapshots: parseInt(localStorage.getItem('kob_maxSnapshots')||100,10) || 100,
+  soundOn: true,
+  undoStack: [],
+  redoStack: [],
+  looping: false,
+  loopTimer: null,
+  particlesMode: 3
+};
+
+// ---------- Init defaults ----------
+editor.value = loadLS('kob_content') || "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>\n    <title>KOBLLUX Preview</title>\n  </head>\n  <body>\n    <h1>ATIVAR Δ</h1>\n    <p>Bem-vindo ao KOBLLUX — modo Infinito</p>\n  </body>\n</html>";
+updateCounters();
+renderSnippets();
+renderSnapshots();
+renderHistory();
+updateFooter();
+
+// ---------- Keyboard shortcuts ----------
+window.addEventListener('keydown', (e)=>{
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); run(); }
+  if (e.ctrlKey && e.key.toLowerCase() === 's') { e.preventDefault(); createSnapshot(); flash('snapshot created');}
+  if (e.ctrlKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+  if (e.ctrlKey && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+});
+
+// ---------- Auto-save (debounced) ----------
+let autosaveTimer = null;
+function scheduleAutoSave() {
+  const val = $('#autoSaveInterval').value;
+  if (val === 'off') return;
+  const ms = parseInt(val,10) || 500;
+  state.autosaveDebounce = ms;
+  if (autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(()=>{
+    localStorage.setItem('kob_content', editor.value);
+    status('salvo ' + new Date().toLocaleTimeString());
+    pushUndo(); // store for undo
+  }, ms);
+}
+
+// editor events
+editor.addEventListener('input', ()=>{
+  updateCounters();
+  scheduleAutoSave();
+  updatePreviewLive();
+  pushUndoLimited();
+});
+
+// ---------- Update counters ----------
+function updateCounters(){
+  charCount.textContent = editor.value.length;
+  lineCount.textContent = editor.value.split('\n').length;
+}
+
+// ---------- Preview live ----------
+function updatePreviewLive(){
+  const code = editor.value;
+  const allow = sandboxToggle.value === 'nosandbox' ? '' : 'allow-forms allow-same-origin';
+  iframe.setAttribute('sandbox', allow);
+  iframe.srcdoc = code;
+  logConsole('preview updated');
+}
+
+// ---------- Run / Enviar ----------
+btnRun.addEventListener('click', run);
+function run(){
+  const code = editor.value.trim();
+  if (!code) { status('editor vazio',true); return; }
+  // analyze
+  const tags = (code.match(/<\s*([a-z0-9\-]+)/ig) || []).map(t=>t.replace(/<\s*/,''));
+  const unique = [...new Set(tags)];
+  status('Enviado • tags: ' + (unique.slice(0,10).join(', ') || 'nenhuma'));
+  createSnapshot('auto '+now());
+  updatePreviewLive();
+  playToneForDimension(dimensionSel.value||'0', cycleSel.value||'0');
+}
+
+// ---------- Download ----------
+btnDownload.addEventListener('click', ()=> {
+  const blob = new Blob([editor.value], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'kobllux_code_' + (new Date().toISOString().replace(/[:.]/g,'-')) + '.html';
+  a.click();
+  status('download iniciado');
+});
+
+// ---------- Copy to clipboard ----------
+btnCopy.addEventListener('click', async ()=>{
+  try {
+    await navigator.clipboard.writeText(editor.value);
+    status('copiado para área de transferência');
+  } catch(e) { status('falha ao copiar',true); }
+});
+
+// ---------- Open preview in new tab ----------
+btnNewWindow.addEventListener('click', ()=>{
+  const url = 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(editor.value)));
+  window.open(url, '_blank');
+});
+
+// ---------- Snapshot / History ----------
+btnSnapshot.addEventListener('click', ()=>createSnapshot('manual '+now()));
+function createSnapshot(label){
+  const snap = { ts: Date.now(), label: label||now(), code: editor.value };
+  state.snapshots.unshift(snap);
+  // enforce max
+  const max = parseInt($('#maxSnapshots').value || state.maxSnapshots,10) || 100;
+  if (state.snapshots.length > max) state.snapshots.length = max;
+  saveLS('kob_snapshots', state.snapshots);
+  renderSnapshots();
+  pushHistory('snapshot ' + (label||now()));
+  status('snapshot salvo');
+}
+// render snapshot list
+function renderSnapshots(){
+  const wrap = $('#historyList');
+  wrap.innerHTML = '';
+  state.snapshots.forEach((s,i)=>{
+    const el = document.createElement('div'); el.className='hist-item';
+    el.innerHTML = `<div style="flex:1"><strong>Versão ${i+1}</strong><div class="hint">${new Date(s.ts).toLocaleString()} — ${s.label}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="small" onclick="restoreSnapshot(${i})">↺</button>
+        <button class="small" onclick="downloadSnapshot(${i})">⬇</button>
+        <button class="small" onclick="deleteSnapshot(${i})">✖</button>
+      </div>`;
+    wrap.appendChild(el);
+  });
+}
+window.restoreSnapshot = function(i){
+  const s = state.snapshots[i];
+  if (!s) return;
+  if (!confirm('Restaurar snapshot?')) return;
+  editor.value = s.code;
+  updateCounters();
+  updatePreviewLive();
+  status('snapshot restaurado');
+}
+window.downloadSnapshot = function(i){
+  const s = state.snapshots[i];
+  if (!s) return;
+  const blob = new Blob([s.code],{type:'text/html'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='snapshot_'+i+'.html'; a.click();
+}
+window.deleteSnapshot = function(i){
+  if (!confirm('Excluir snapshot?')) return;
+  state.snapshots.splice(i,1);
+  saveLS('kob_snapshots', state.snapshots);
+  renderSnapshots();
+  status('snapshot excluído');
+}
+
+// ---------- History actions ----------
+function pushHistory(msg){
+  const item = { ts: Date.now(), msg, code: editor.value };
+  state.history.unshift(item);
+  if (state.history.length > 200) state.history.length = 200;
+  saveLS('kob_history', state.history);
+  renderHistory();
+}
+function renderHistory(){
+  const h = loadLS('kob_history') || state.history;
+  const wrap = $('#historyList');
+  // also render short history above
+  const short = (h||[]).slice(0,10);
+  // already rendered snapshots above — we keep history minimal here
+  // create a compact history view if needed
+}
+function pushHistoryEvent(msg){ pushHistory(msg); }
+
+// ---------- Clear editor ----------
+btnClear.addEventListener('click', ()=> {
+  if (!confirm('Limpar editor?')) return;
+  editor.value = '';
+  updateCounters();
+  updatePreviewLive();
+  status('editor limpo');
+});
+
+// ---------- Undo / Redo ----------
+function pushUndo(){
+  state.undoStack.push(editor.value);
+  if (state.undoStack.length > 200) state.undoStack.shift();
+}
+function pushUndoLimited(){ // push limited to detect changes
+  const last = state.undoStack[state.undoStack.length-1];
+  if (last !== editor.value) pushUndo();
+}
+function undo(){
+  if (!state.undoStack.length) return status('nada para desfazer',true);
+  const prev = state.undoStack.pop();
+  state.redoStack.push(editor.value);
+  editor.value = prev;
+  updateCounters();
+  updatePreviewLive();
+  status('undo');
+}
+function redo(){
+  if (!state.redoStack.length) return status('nada para refazer',true);
+  const nxt = state.redoStack.pop();
+  state.undoStack.push(editor.value);
+  editor.value = nxt;
+  updateCounters();
+  updatePreviewLive();
+  status('redo');
+}
+btnUndo.addEventListener('click', undo);
+btnRedo.addEventListener('click', redo);
+
+// ---------- Export / Import workspace ----------
+btnExport.addEventListener('click', ()=> {
+  const pkg = {
+    content: editor.value,
+    snapshots: state.snapshots,
+    history: state.history,
+    config: {
+      dimension: dimensionSel.value,
+      cycle: cycleSel.value,
+      theme: document.body.classList.contains('dark')?'dark':'light'
+    },
+    exportedAt: Date.now()
+  };
+  const blob = new Blob([JSON.stringify(pkg, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'kobllux-workspace-'+Date.now()+'.json'; a.click();
+  status('workspace exportado');
+});
+
+btnImport.addEventListener('click', ()=> {
+  const input = document.createElement('input'); input.type='file'; input.accept='application/json';
+  input.onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader(); r.onload = ev => {
+      try {
+        const obj = JSON.parse(ev.target.result);
+        if (obj.content) editor.value = obj.content;
+        if (obj.snapshots) state.snapshots = obj.snapshots;
+        if (obj.history) state.history = obj.history;
+        if (obj.config) {
+          if (obj.config.dimension) dimensionSel.value = obj.config.dimension;
+          if (obj.config.cycle) cycleSel.value = obj.config.cycle;
+          if (obj.config.theme === 'dark') document.body.classList.add('dark'); else document.body.classList.remove('dark');
+        }
+        updateCounters(); updatePreviewLive(); renderSnapshots(); renderHistory();
+        status('workspace importado');
+      } catch(err){ status('import falhou',true); }
+    }; r.readAsText(f);
+  };
+  input.click();
+});
+
+// ---------- Insert snippet / templates ----------
+const templates = [
+  {name:'Boilerplate HTML', code: "<!DOCTYPE html>\n<html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width'><title>KOBLLUX</title></head><body><h1>KOBLLUX</h1></body></html>"},
+  {name:'Página com CSS', code:"<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width'><style>body{font-family:Arial;padding:40px;background:#111;color:#fff}</style></head><body><h1>Estilo KOBLLUX</h1><p>Exemplo com css inline</p></body></html>"},
+  {name:'Form Simples', code:"<form><label>Nome<input name='nome'></label><button>Enviar</button></form>"},
+  {name:'Canvas Partículas', code:"<canvas id='c'></canvas><script>const c=document.getElementById('c'),ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;ctx.fillStyle='#111';ctx.fillRect(0,0,c.width,c.height);</script>"},
+  {name:'Iframe Example', code:"<iframe src='https://example.com' style='width:100%;height:240px;border:0;'></iframe>"},
+  {name:'Minimal React CDN (exemplo)', code:"<div id='root'></div><script src='https://unpkg.com/react@17/umd/react.development.js'></script><script src='https://unpkg.com/react-dom@17/umd/react-dom.development.js'></script><script>ReactDOM.render(React.createElement('div',null,'React via CDN'),document.getElementById('root'))</script>"},
+  {name:'Grid Layout', code:"<div style='display:grid;grid-template-columns:repeat(3,1fr);gap:8px'><div style='background:#eee;padding:16px'>A</div><div style='background:#eee;padding:16px'>B</div><div style='background:#eee;padding:16px'>C</div></div>"},
+  {name:'SVG Example', code:"<svg width='100%' height='120' viewBox='0 0 200 100'><circle cx='50' cy='50' r='40' fill='url(#g)'></circle><defs><linearGradient id='g'><stop offset='0' stop-color='#6a00ff'/><stop offset='1' stop-color='#00bcd4'/></linearGradient></defs></svg>"},
+  {name:'Audio Test', code:"<button onclick='(async()=>{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();o.frequency.value=440;o.connect(ctx.destination);o.start();setTimeout(()=>o.stop(),400)})()'>Play Tone</button>"},
+  {name:'Meta Minimal', code:"<meta name='description' content='KOBLLUX preview'>"}
+];
+
+function renderSnippets(){
+  snippetsWrap.innerHTML = '';
+  templates.forEach((t, i)=>{
+    const b = document.createElement('button'); b.className='snip'; b.textContent = t.name;
+    b.onclick = ()=> {
+      const pos = editor.selectionStart || editor.value.length;
+      const before = editor.value.slice(0,pos);
+      const after = editor.value.slice(pos);
+      editor.value = before + t.code + after;
+      updateCounters();
+      updatePreviewLive();
+      status('snippet inserido: '+t.name);
+    };
+    snippetsWrap.appendChild(b);
+  });
+}
+
+btnInsertTemplate.addEventListener('click', ()=> {
+  // insert first template quick
+  editor.value = templates[0].code + "\n\n" + editor.value;
+  updateCounters();
+  updatePreviewLive();
+  status('template inserido');
+});
+
+// ---------- Simple lint / validation ----------
+function validateHTML(code){
+  const warnings = [];
+  if (!/<!doctype html>/i.test(code)) warnings.push('DOCTYPE ausente');
+  // naive check for unclosed tags: count open vs close for some tags
+  const tags = ['div','p','span','section','article','header','footer','main','form','body','html','script','style'];
+  tags.forEach(t=>{
+    const open = (code.match(new RegExp('<'+t+'\\b','gi'))||[]).length;
+    const close = (code.match(new RegExp('</'+t+'>','gi'))||[]).length;
+    if (open > close) warnings.push('Possível tag não fechada: <'+t+'>');
+  });
+  if (/on\w+\s*=/i.test(code)) warnings.push('Eventos inline detectados (on*) — cuidado com segurança');
+  if (/<script/gi.test(code) && sandboxToggle.value === 'sandbox') warnings.push('Scripts detectados mas preview está em sandbox (scripts não executarão)');
+  return warnings;
+}
+
+// ---------- Console capture between iframe and parent ----------
+window.addEventListener('message', (e)=>{
+  if (e.data && e.data.kob_console){
+    consoleLogFromPreview(e.data.kob_console);
+  }
+});
+function consoleLogFromPreview(msg){
+  const d = document.createElement('div'); d.textContent = "["+new Date().toLocaleTimeString()+"] " + msg; consoleEl.appendChild(d); consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+function logConsole(msg){ const d = document.createElement('div'); d.textContent = "["+new Date().toLocaleTimeString()+"] " + msg; consoleEl.appendChild(d); consoleEl.scrollTop = consoleEl.scrollHeight; }
+
+// ---------- Sanitize / Security note ----------
+function securityScan(){
+  const code = editor.value;
+  const issues = validateHTML(code);
+  if (issues.length) {
+    status('análise: ' + issues.join('; '), true);
+  } else {
+    status('análise: OK');
+  }
+}
+
+// ---------- Status / flash ----------
+function status(msg, isError){
+  statusEl.textContent = msg;
+  statusEl.className = isError ? 'erro' : 'sucesso';
+  setTimeout(()=>{ statusEl.textContent = 'salvo'; statusEl.className = ''; }, 4000);
+}
+function flash(t){
+  const el = document.createElement('div'); el.textContent = t; el.style.position='fixed'; el.style.right='20px'; el.style.bottom='20px';
+  el.style.background='rgba(0,0,0,.7)'; el.style.color='#fff'; el.style.padding='8px 12px'; el.style.borderRadius='8px';
+  document.body.appendChild(el); setTimeout(()=>el.remove(),1200);
+}
+
+// ---------- Play tones via WebAudio per dimension/cycle ----------
+const audioCtx = (typeof AudioContext !== 'undefined') ? new AudioContext() : null;
+function playTone(freq, duration=300, type='sine'){
+  if (!audioCtx || !state.soundOn) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type; o.frequency.value = freq;
+  o.connect(g); g.connect(audioCtx.destination);
+  g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
+  o.start();
+  setTimeout(()=> {
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.02);
+    try{ o.stop(audioCtx.currentTime + 0.03); } catch(e){}
+  }, duration);
+}
+function playToneForDimension(dim, cycle){
+  if (!state.soundOn) return;
+  const d = parseInt(dim||0,10) || 0;
+  const c = parseInt(cycle||0,10) || 0;
+  const base = 220 + (d*20) + (c*40);
+  playTone(base, 260, 'sine');
+  playTone(base*1.5, 140, 'triangle');
+}
+
+// ---------- Dimension filters & particle modes ----------
+const dimFilters = {
+  "1": {filter:'grayscale(100%)', particleMode:0, label:'1D—Linha'},
+  "2": {filter:'contrast(120%)', particleMode:1, label:'2D—Plano'},
+  "3": {filter:'drop-shadow(0 0 12px cyan)', particleMode:2, label:'3D—Volume'},
+  "4": {filter:'hue-rotate(90deg)', particleMode:3, label:'4D—Hipercubo'},
+  "5": {filter:'sepia(50%)', particleMode:4, label:'5D—Pentachoron'},
+  "6": {filter:'invert(100%)', particleMode:5, label:'6D—Hiper-poliedro'},
+  "7": {filter:'blur(2px)', particleMode:6, label:'7D—Toro'},
+  "8": {filter:'brightness(1.4)', particleMode:7, label:'8D—Hipercubo8D'},
+  "9": {filter:'drop-shadow(0 0 18px magenta)', particleMode:8, label:'9D—Fractal'},
+  "10": {filter:'saturate(200%)', particleMode:9, label:'10D—Esfera'}
+};
+dimensionSel.addEventListener('change', ()=>{
+  const v = dimensionSel.value;
+  applyDimension(v);
+  saveLS('kob_dimension', v);
+});
+cycleSel.addEventListener('change', ()=>{
+  const c = cycleSel.value;
+  applyCycle(c);
+  saveLS('kob_cycle', c);
+});
+function applyDimension(v){
+  activeDim.textContent = dimFilters[v] ? dimFilters[v].label : '—';
+  const f = dimFilters[v] ? dimFilters[v].filter : 'none';
+  filterLabel.textContent = f;
+  iframe.style.filter = f;
+  state.particlesMode = dimFilters[v] ? dimFilters[v].particleMode : 3;
+  // play tone
+  playToneForDimension(v, cycleSel.value);
+}
+function applyCycle(c){
+  if (c==='3'){ document.documentElement.style.setProperty('--accent','#ff9800'); }
+  else if (c==='6'){ document.documentElement.style.setProperty('--accent','#00bcd4'); }
+  else if (c==='9'){ document.documentElement.style.setProperty('--accent','#e91e63'); }
+  else { document.documentElement.style.setProperty('--accent','#6a00ff'); }
+  status('Ciclo ' + (c||'—') + ' aplicado');
+}
+
+// ---------- Loop dimensions ----------
+btnLoopDim.addEventListener('click', toggleLoop);
+function toggleLoop(){
+  state.looping = !state.looping;
+  if (state.looping) {
+    btnLoopDim.textContent = '⏸ Pausar Loop';
+    let dims = Object.keys(dimFilters).filter(Boolean);
+    let i=0;
+    state.loopTimer = setInterval(()=> {
+      dimensionSel.value = dims[i% dims.length];
+      applyDimension(dimensionSel.value);
+      i++;
+    }, 1600);
+  } else {
+    btnLoopDim.textContent = '▶ Loop Dimensões';
+    clearInterval(state.loopTimer);
+  }
+}
+
+// ---------- Mute toggle ----------
+btnMute.addEventListener('click', ()=>{
+  state.soundOn = !state.soundOn;
+  btnMute.textContent = state.soundOn ? '🔊 Som' : '🔈 Mudo';
+  status('som ' + (state.soundOn ? 'ativado' : 'silenciado'));
+});
+
+// ---------- Particles system ----------
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+function initParticles(n=120){
+  particles = [];
+  for(let i=0;i<n;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      vx: (Math.random()-0.5)*0.6,
+      vy: (Math.random()-0.5)*0.6,
+      r: 1 + Math.random()*2,
+      hue: Math.floor(Math.random()*360)
+    });
+  }
+}
+initParticles(160);
+
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{
+    p.x += p.vx * (1 + (state.particlesMode||1));
+    p.y += p.vy * (1 + (state.particlesMode||1));
+    if (p.x<0) p.x = canvas.width;
+    if (p.x>canvas.width) p.x = 0;
+    if (p.y<0) p.y = canvas.height;
+    if (p.y>canvas.height) p.y = 0;
+    // color by mode
+    const mode = state.particlesMode || 3;
+    let a = 0.7;
+    let color = `hsla(${(p.hue + mode*30)%360},70%,60%,${a})`;
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ---------- Console injection into iframe to forward logs -->
+function injectConsoleCapture(doc){
+  try {
+    const s = doc.createElement('script');
+    s.textContent = `
+      (function(){
+        const orig = console.log;
+        console.log = function(...args){
+          try{ window.parent.postMessage({kob_console: args.join(' ')}, '*'); }catch(e){}
+          orig.apply(console, args);
+        };
+        window.addEventListener('error', function(e){ window.parent.postMessage({kob_console:'ERROR: '+e.message}, '*'); });
+      })();
+    `;
+    doc.head.appendChild(s);
+  } catch(e){}
+}
+
+// Capture iframe load to inject console capture
+iframe.addEventListener('load', ()=>{
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    injectConsoleCapture(doc);
+  } catch(e){ /* cross-origin prevents injection */ }
+});
+
+// ---------- Simple service worker fallback (create blob SW if not found) ----------
+async function ensureServiceWorker(){
+  if (!('serviceWorker' in navigator)) return;
+  try {
+    // try fetching worker path; if fails, register a small blob SW
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg){
+      const swCode = `
+        self.addEventListener('install', event => { self.skipWaiting(); });
+        self.addEventListener('activate', event => { self.clients.claim(); });
+        self.addEventListener('fetch', event => { /* minimal: pass through */ });
+      `;
+      const blob = new Blob([swCode], {type:'application/javascript'});
+      const url = URL.createObjectURL(blob);
+      await navigator.serviceWorker.register(url);
+      console.log('kobllux: service worker registrado via blob');
+    }
+  } catch(e){ console.warn('sw err',e); }
+}
+ensureServiceWorker();
+
+// ---------- Import/Export shortcuts ----------
+btnExport.addEventListener('click', ()=>{ /* handled above */ });
+btnImport.addEventListener('click', ()=>{ /* handled above */ });
+
+// ---------- Simple security / lint on run -->
+btnRun.addEventListener('click', ()=> {
+  const warnings = validateHTML(editor.value);
+  if (warnings.length) {
+    status('Avisos: ' + warnings.slice(0,3).join(' • '), true);
+  }
+});
+
+// ---------- Undo push initial ----------
+pushUndo();
+
+// ---------- Initial render preview ----------
+updatePreviewLive();
+applyDimension(loadLS('kob_dimension')||'3');
+applyCycle(loadLS('kob_cycle')||'3');
+
+// ---------- Small helpers used by inline handlers (exposed) ----------
+window.restoreSnapshot = window.restoreSnapshot || function(){};
+window.downloadSnapshot = window.downloadSnapshot || function(){};
+window.deleteSnapshot = window.deleteSnapshot || function(){};
+
+// ---------- Update footer stamp ----------
+function updateFooter(){ $('#uStamp').textContent = 'at ' + new Date().toLocaleString(); }
+setInterval(updateFooter, 1000 * 60);
+
+// ---------- Expose some functions for debugging (optional) ----------
+window.kob = { state, run, createSnapshot, applyDimension, applyCycle, updatePreviewLive };
+
+// ---------- Final status ----------
+status('pronto • KOBLLUX Infinito ativo');
+
+/* End of main script */
+</script>
+
+</body>
+</html>

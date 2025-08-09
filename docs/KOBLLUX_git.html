@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX - Editor HTML com GitHub, Autocomplete e Preview</title>
+
+<!-- CodeMirror 6 básico e linguagem HTML -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.0.1/basic.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.19.3/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-html@0.19.6/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/view@0.19.33/dist/index.min.js"></script>
+
+<style>
+  /* Reset e base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin:0; padding:0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #55aaff, #3377ee);
+    color: #222;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  h1 {
+    text-align: center;
+    margin: 15px 0;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(0,0,0,0.6);
+  }
+  #app {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    max-width: 1300px;
+    margin: 0 auto 30px auto;
+  }
+  /* Editor e Preview lado a lado */
+  #editor-container, #preview-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255 255 255 / 0.95);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+  }
+  /* Editor */
+  #editor {
+    flex: 1;
+    /* altura mínima para CodeMirror */
+    min-height: 600px;
+  }
+  .cm-editor {
+    height: 100% !important;
+  }
+  /* Preview */
+  #preview-header {
+    padding: 10px;
+    background: #4466cc;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    user-select: none;
+  }
+  #preview-frame {
+    flex: 1;
+    border: none;
+    background: white;
+    width: 100%;
+  }
+
+  /* Controls */
+  #controls {
+    max-width: 1300px;
+    margin: 0 auto 30px auto;
+    background: rgba(255 255 255 / 0.9);
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+  }
+  label {
+    font-weight: 600;
+    color: #222;
+    user-select: none;
+  }
+  select, input[type="text"], input[type="password"] {
+    padding: 6px 8px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    min-width: 150px;
+  }
+  input[type="checkbox"] {
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  button {
+    cursor: pointer;
+    padding: 10px 18px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: none;
+    background: #3377ee;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #2255bb;
+  }
+  button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+  #char-count {
+    margin-left: auto;
+    font-weight: 700;
+    color: #333;
+  }
+  /* Dark mode */
+  body.dark {
+    background: linear-gradient(135deg, #222, #111 90%);
+    color: #eee;
+  }
+  body.dark #controls {
+    background: rgba(0,0,0,0.7);
+    color: #eee;
+  }
+  body.dark label, body.dark select, body.dark input {
+    color: #eee;
+    background: #222;
+    border-color: #555;
+  }
+  body.dark button {
+    background: #6699ff;
+    color: #222;
+  }
+  body.dark button:hover {
+    background: #4477ee;
+  }
+
+  /* Textarea for logs */
+  #log {
+    font-family: monospace;
+    font-size: 13px;
+    background: #222;
+    color: #0f0;
+    height: 80px;
+    overflow-y: auto;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+  }
+
+  /* Preview container with particles canvas */
+  #preview-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  #preview-canvas {
+    position: absolute;
+    top:0; left:0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+  iframe#preview-frame {
+    position: relative;
+    z-index: 20;
+    height: 100%;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    #app {
+      flex-direction: column;
+    }
+    #editor-container, #preview-container {
+      max-height: 500px;
+    }
+  }
+</style>
+
+</head>
+<body>
+<h1>KOBLLUX - Editor HTML com GitHub, Autocomplete e Preview Lado a Lado</h1>
+
+<div id="controls">
+  <label for="dim-select">Dimensão:</label>
+  <select id="dim-select" title="Escolha dimensão 3, 6 ou 9">
+    <option value="3">3</option>
+    <option value="6" selected>6</option>
+    <option value="9">9</option>
+  </select>
+
+  <label for="cycle-select">Ciclo:</label>
+  <select id="cycle-select" title="Escolha ciclo 3, 6 ou 9">
+    <option value="3">3</option>
+    <option value="6" selected>6</option>
+    <option value="9">9</option>
+  </select>
+
+  <label for="github-token">GitHub Token:</label>
+  <input id="github-token" type="password" placeholder="Insira seu token pessoal GitHub" autocomplete="off" spellcheck="false" size="30" />
+
+  <label for="github-repo">Repositório:</label>
+  <input id="github-repo" type="text" placeholder="usuario/repositorio" autocomplete="off" spellcheck="false" size="25" />
+
+  <label for="github-branch">Branch:</label>
+  <input id="github-branch" type="text" placeholder="main" autocomplete="off" spellcheck="false" size="10" value="main" />
+
+  <button id="btn-list">Listar Arquivos</button>
+  <button id="btn-load">Carregar Arquivo</button>
+  <button id="btn-save">Salvar no GitHub</button>
+
+  <button id="btn-clear">Limpar Editor</button>
+  <button id="btn-preview">Atualizar Preview</button>
+  <button id="btn-download-original">Download Original</button>
+  <button id="btn-download-transformed">Download Transformado</button>
+
+  <span id="char-count">0 caracteres</span>
+
+  <label>
+    <input type="checkbox" id="dark-mode-toggle" />
+    Modo Escuro
+  </label>
+</div>
+
+<div id="app">
+  <div id="editor-container">
+    <div id="editor"></div>
+  </div>
+
+  <div id="preview-container">
+    <div id="preview-header">Preview Transformado</div>
+    <div id="preview-wrapper">
+      <canvas id="preview-canvas"></canvas>
+      <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+  </div>
+</div>
+
+<div id="log" aria-live="polite" aria-atomic="true"></div>
+
+<script type="module">
+
+import { EditorState } from "https://cdn.jsdelivr.net/npm/@codemirror/state@0.19.10/dist/index.min.js";
+import { EditorView, keymap, highlightActiveLine, lineNumbers } from "https://cdn.jsdelivr.net/npm/@codemirror/view@0.19.33/dist/index.min.js";
+import { defaultHighlightStyle, syntaxHighlighting } from "https://cdn.jsdelivr.net/npm/@codemirror/language@0.19.10/dist/index.min.js";
+import { html } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-html@0.19.6/dist/index.min.js";
+import { defaultKeymap, history, historyKeymap } from "https://cdn.jsdelivr.net/npm/@codemirror/commands@0.19.12/dist/index.min.js";
+
+const logEl = document.getElementById('log');
+const charCountEl = document.getElementById('char-count');
+const editorDiv = document.getElementById('editor');
+const previewFrame = document.getElementById('preview-frame');
+
+let editorView = null;
+let currentCode = '';
+let githubFiles = [];
+
+function log(msg, error=false){
+  let now = new Date().toLocaleTimeString();
+  logEl.textContent += `[${now}] ${msg}\n`;
+  logEl.scrollTop = logEl.scrollHeight;
+  if(error) console.error(msg);
+}
+
+// Inicializa editor CodeMirror
+function initEditor(){
+  editorView = new EditorView({
+    state: EditorState.create({
+      doc: `<!-- Cole seu HTML aqui -->
+<html>
+  <head><title>KOBLLUX Test</title></head>
+  <body>
+    <h1>Olá Mundo KOBLLUX!</h1>
+    <p>Edite o código à vontade.</p>
+  </body>
+</html>`,
+      extensions: [
+        lineNumbers(),
+        highlightActiveLine(),
+        history(),
+        keymap.of([...defaultKeymap, ...historyKeymap]),
+        html(),
+        syntaxHighlighting(defaultHighlightStyle),
+        EditorView.lineWrapping,
+        EditorView.updateListener.of(update => {
+          if(update.docChanged){
+            currentCode = editorView.state.doc.toString();
+            updateCharCount();
+          }
+        })
+      ]
+    }),
+    parent: editorDiv
+  });
+}
+
+function updateCharCount(){
+  const len = editorView.state.doc.length;
+  charCountEl.textContent = `${len} caracteres`;
+}
+
+function transformCode(code, dim, cycle){
+  // Aqui aplicamos transformações simples baseadas em dimensão e ciclo
+  // Por exemplo, adicionamos classes CSS e pequenos estilos inline
+  // para ilustrar animações e efeitos visuais
+
+  let transformed = code;
+
+  // Inject CSS para animações baseado nas opções
+  const styleTag = `<style>
+  /* Dimensão efeitos */
+  .dim-3 div { border: 2px solid #3366ff; transform: rotate(3deg); transition: transform 0.6s ease; }
+  .dim-3 div:hover { transform: rotate(-3deg) scale(1.05); }
+  .dim-6 p { animation: pulse 3s infinite ease-in-out; }
+  .dim-9 h1,h2,h3,h4,h5,h6 { animation: spincolor 6s infinite linear; }
+  /* Ciclo efeitos */
+  .cycle-3 .container { box-shadow: 0 0 20px 5px #33aaff; }
+  .cycle-6 a:hover { text-shadow: 0 0 10px #5599ff; }
+  .cycle-9 body { border: 5px solid #3377ee; animation: borderPulse 5s infinite ease-in-out; }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  @keyframes spincolor {
+    0% { color: #3366ff; transform: rotate(0deg);}
+    50% { color: #8855ff; transform: rotate(180deg);}
+    100% { color: #3366ff; transform: rotate(360deg);}
+  }
+  @keyframes borderPulse {
+    0%,100% { box-shadow: 0 0 15px #3377ee; }
+    50% { box-shadow: 0 0 40px #55aaff; }
+  }
+  </style>`;
+
+  // Inject classes no <body> se existir, senão cria um wrapper
+  if(transformed.includes('<body')){
+    transformed = transformed.replace(/<body([^>]*)>/i, `<body$1 class="dim-${dim} cycle-${cycle} container">`);
+  } else {
+    transformed = `<div class="dim-${dim} cycle-${cycle} container">${transformed}</div>`;
+  }
+
+  // Adiciona style no <head> ou cria head
+  if(transformed.includes('<head')){
+    transformed = transformed.replace(/<\/head>/i, `${styleTag}</head>`);
+  } else {
+    transformed = `<head>${styleTag}</head>` + transformed;
+  }
+
+  return transformed;
+}
+
+function updatePreview(){
+  const dim = document.getElementById('dim-select').value;
+  const cycle = document.getElementById('cycle-select').value;
+  const originalCode = editorView.state.doc.toString();
+  const transformedCode = transformCode(originalCode, dim, cycle);
+
+  // Cria um blob para o iframe
+  const blob = new Blob([transformedCode], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+
+  previewFrame.src = url;
+
+  // Atualiza download links
+  originalBlob = new Blob([originalCode], {type: 'text/html'});
+  originalUrl = URL.createObjectURL(originalBlob);
+  transformedBlob = blob;
+  transformedUrl = url;
+}
+
+// Download arquivos
+let originalBlob, originalUrl, transformedBlob, transformedUrl;
+
+function downloadFile(blob, filename){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// Função GitHub API (usando fetch, token do input)
+async function githubRequest(endpoint, method = 'GET', body=null){
+  const token = document.getElementById('github-token').value.trim();
+  const repo = document.getElementById('github-repo').value.trim();
+  const branch = document.getElementById('github-branch').value.trim() || 'main';
+
+  if(!token || !repo) {
+    log('GitHub Token ou Repo não preenchido', true);
+    throw new Error('Token e repositório são obrigatórios para usar GitHub API');
+  }
+
+  const url = `https://api.github.com/repos/${repo}${endpoint}${endpoint.includes('?') ? '&' : '?'}ref=${branch}`;
+
+  const headers = {
+    'Authorization': `token ${token}`,
+    'Accept': 'application/vnd.github.v3+json'
+  };
+
+  const opts = {
+    method,
+    headers
+  };
+
+  if(body){
+    opts.body = JSON.stringify(body);
+  }
+
+  const res = await fetch(url, opts);
+  if(!res.ok) {
+    const text = await res.text();
+    log(`Erro GitHub API: ${res.status} ${res.statusText} - ${text}`, true);
+    throw new Error(text);
+  }
+  return res.json();
+}
+
+// Listar arquivos na raiz do repo (HTML apenas)
+async function listGitHubFiles(){
+  try {
+    const data = await githubRequest('/contents/');
+    githubFiles = data.filter(f => f.name.endsWith('.html'));
+    if(githubFiles.length === 0) {
+      log('Nenhum arquivo HTML encontrado no repositório.');
+      return;
+    }
+    log(`Arquivos HTML no repo: ${githubFiles.map(f=>f.name).join(', ')}`);
+    alert(`Arquivos HTML:\n${githubFiles.map(f=>f.name).join('\n')}`);
+  } catch(e){
+    log('Erro ao listar arquivos: ' + e.message, true);
+  }
+}
+
+// Carregar arquivo do GitHub para editor
+async function loadGitHubFile(){
+  try {
+    if(githubFiles.length === 0){
+      alert('Lista vazia, por favor clique em "Listar Arquivos" antes.');
+      return;
+    }
+    let filename = prompt('Digite o nome do arquivo para carregar:\n' + githubFiles.map(f=>f.name).join('\n'));
+    if(!filename) return;
+    const file = githubFiles.find(f=>f.name === filename);
+    if(!file) {
+      alert('Arquivo não encontrado na lista.');
+      return;
+    }
+    // Buscar conteúdo (base64)
+    const token = document.getElementById('github-token').value.trim();
+    const repo = document.getElementById('github-repo').value.trim();
+    const branch = document.getElementById('github-branch').value.trim() || 'main';
+    const url = `https://api.github.com/repos/${repo}/contents/${filename}?ref=${branch}`;
+    const res = await fetch(url, {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if(!res.ok) throw new Error('Falha ao carregar arquivo: '+ res.statusText);
+    const json = await res.json();
+    const content = atob(json.content.replace(/\n/g, ''));
+    editorView.dispatch({
+      changes: { from: 0, to: editorView.state.doc.length, insert: content }
+    });
+    log(`Arquivo ${filename} carregado com sucesso.`);
+    updateCharCount();
+    updatePreview();
+  } catch(e){
+    log('Erro ao carregar arquivo: ' + e.message, true);
+  }
+}
+
+// Salvar arquivo no GitHub
+async function saveGitHubFile(){
+  try {
+    let filename = prompt('Digite o nome do arquivo para salvar (.html recomendado):','kobllux_saved.html');
+    if(!filename) return;
+
+    const token = document.getElementById('github-token').value.trim();
+    const repo = document.getElementById('github-repo').value.trim();
+    const branch = document.getElementById('github-branch').value.trim() || 'main';
+
+    // Primeiro buscar se arquivo existe para obter sha
+    let sha = null;
+    try {
+      const headRes = await fetch(`https://api.github.com/repos/${repo}/contents/${filename}?ref=${branch}`, {
+        headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+      });
+      if(headRes.ok){
+        const headJson = await headRes.json();
+        sha = headJson.sha;
+      }
+    } catch{}
+
+    const content = btoa(unescape(encodeURIComponent(editorView.state.doc.toString())));
+    const body = {
+      message: `KOBLLUX Save: ${filename} at ${new Date().toISOString()}`,
+      content: content,
+      branch: branch
+    };
+    if(sha) body.sha = sha;
+
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${filename}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `token ${token}`,
+        Accept: 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok) throw new Error(`Erro ao salvar: ${res.statusText}`);
+
+    log(`Arquivo ${filename} salvo com sucesso no GitHub.`);
+    alert(`Arquivo salvo: ${filename}`);
+  } catch(e){
+    log('Erro ao salvar arquivo: ' + e.message, true);
+  }
+}
+
+// Botões eventos
+document.getElementById('btn-clear').onclick = () => {
+  if(confirm('Tem certeza que deseja limpar o editor?')){
+    editorView.dispatch({
+      changes: { from: 0, to: editorView.state.doc.length, insert: '' }
+    });
+    updateCharCount();
+    updatePreview();
+  }
+};
+document.getElementById('btn-preview').onclick = () => updatePreview();
+document.getElementById('btn-download-original').onclick = () => {
+  if(!originalBlob) return alert('Sem código para baixar');
+  downloadFile(originalBlob, 'kobllux_original.html');
+};
+document.getElementById('btn-download-transformed').onclick = () => {
+  if(!transformedBlob) return alert('Sem código para baixar');
+  downloadFile(transformedBlob, 'kobllux_transformado.html');
+};
+document.getElementById('btn-list').onclick = () => listGitHubFiles();
+document.getElementById('btn-load').onclick = () => loadGitHubFile();
+document.getElementById('btn-save').onclick = () => saveGitHubFile();
+
+// Tema dark toggle
+document.getElementById('dark-mode-toggle').addEventListener('change', e => {
+  document.body.classList.toggle('dark', e.target.checked);
+});
+
+// Partículas no preview (simples, tipo partículas animadas leves)
+const canvas = document.getElementById('preview-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+const particleCount = 40;
+
+function resizeCanvas(){
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+  constructor(){
+    this.x = Math.random()*canvas.width;
+    this.y = Math.random()*canvas.height;
+    this.vx = (Math.random()-0.5)*0.3;
+    this.vy = (Math.random()-0.5)*0.3;
+    this.size = Math.random()*3+1;
+    this.alpha = Math.random()*0.5 + 0.3;
+  }
+  update(){
+    this.x += this.vx;
+    this.y += this.vy;
+    if(this.x < 0) this.x = canvas.width;
+    if(this.x > canvas.width) this.x = 0;
+    if(this.y < 0) this.y = canvas.height;
+    if(this.y > canvas.height) this.y = 0;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(51,119,238,${this.alpha})`;
+    ctx.shadowColor = '#88aaff';
+    ctx.shadowBlur = 4;
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function initParticles(){
+  particles = [];
+  for(let i=0; i<particleCount; i++){
+    particles.push(new Particle());
+  }
+}
+
+function animateParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p => {
+    p.update();
+    p.draw();
+  });
+  requestAnimationFrame(animateParticles);
+}
+
+initParticles();
+animateParticles();
+
+// Inicialização
+initEditor();
+updatePreview();
+
+</script>
+
+</body>
+</html>

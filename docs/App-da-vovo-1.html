@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Compras da Vó Maria Antonieta 🛒</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #fff8f0;
+      color: #4a4a4a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 0.2rem;
+      color: #e17055;
+      text-align: center;
+      user-select: none;
+      text-shadow: 1px 1px 4px #f2c1b4;
+    }
+    h2 {
+      font-size: 1.3rem;
+      color: #d35400;
+      margin: 1rem 0 0.5rem 0;
+    }
+    .app-container {
+      max-width: 480px;
+      width: 100%;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+      padding: 1rem 1.2rem 2rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .categories {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+    }
+    .category-btn {
+      background: #ff9f43;
+      border: none;
+      border-radius: 24px;
+      padding: 0.7rem 1.4rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(255,159,67,0.5);
+      transition: background-color 0.3s ease, transform 0.15s ease;
+      user-select: none;
+      flex-grow: 1;
+      margin: 0 0.3rem;
+    }
+    .category-btn:hover {
+      background: #ff7f00;
+      transform: scale(1.06);
+    }
+    .category-btn.active {
+      background: #e17055;
+      box-shadow: 0 4px 14px rgba(225,112,85,0.7);
+      transform: scale(1.1);
+    }
+    .search-input {
+      margin-bottom: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1.1rem;
+      border-radius: 20px;
+      border: 1.5px solid #f0d9cc;
+      width: 100%;
+      outline-color: #e17055;
+      transition: border-color 0.3s ease;
+    }
+    .search-input::placeholder {
+      color: #d3a58a;
+    }
+    .search-input:focus {
+      border-color: #e17055;
+    }
+    .products-list {
+      flex-grow: 1;
+      overflow-y: auto;
+      max-height: 300px;
+      margin-bottom: 1rem;
+      border-top: 1px solid #f0d9cc;
+      border-bottom: 1px solid #f0d9cc;
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+      user-select: none;
+    }
+    .product-item {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f5d6cc;
+      font-size: 1.1rem;
+      color: #4a4a4a;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    .product-item:last-child {
+      border-bottom: none;
+    }
+    .product-item:hover {
+      background-color: #ffe5d2;
+    }
+    .product-checkbox {
+      margin-right: 1rem;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      accent-color: #e17055;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .quantity-container {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      user-select: none;
+    }
+    .quantity-btn {
+      background: #e17055;
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-weight: 700;
+      font-size: 1.3rem;
+      line-height: 1;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 4px;
+      transition: background-color 0.3s ease;
+    }
+    .quantity-btn:hover {
+      background-color: #ff7043;
+    }
+    .quantity-number {
+      min-width: 22px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #4a4a4a;
+      user-select: text;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .btn {
+      background: #e17055;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.85rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(225,112,85,0.6);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      user-select: none;
+      flex-grow: 1;
+      margin: 0 0.3rem;
+      text-align: center;
+    }
+    .btn:active {
+      transform: scale(0.95);
+      background-color: #c85c40;
+    }
+    .btn:hover {
+      background-color: #ff7043;
+    }
+    .btn:disabled {
+      background-color: #d3a58a;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+    /* Modal resumo */
+    .modal-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(0,0,0,0.35);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 1rem;
+      user-select: none;
+    }
+    .modal-bg.show {
+      display: flex;
+      animation: fadeIn 0.3s ease forwards;
+    }
+    .modal-content {
+      background: #fff8f0;
+      border-radius: 18px;
+      max-width: 400px;
+      width: 100%;
+      padding: 1.5rem 1.8rem;
+      box-shadow: 0 8px 20px rgba(225,112,85,0.7);
+      position: relative;
+      font-size: 1.1rem;
+      color: #4a4a4a;
+      max-height: 80vh;
+      overflow-y: auto;
+      user-select: text;
+    }
+    .modal-content h3 {
+      margin-top: 0;
+      color: #e17055;
+      font-weight: 700;
+      font-size: 1.4rem;
+      user-select: none;
+    }
+    .modal-list {
+      margin: 1rem 0 1.5rem 0;
+      padding-left: 1.2rem;
+    }
+    .modal-list li {
+      margin-bottom: 0.5rem;
+    }
+    .modal-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #e17055;
+      background: none;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s ease;
+    }
+    .modal-close-btn:hover {
+      color: #ff7043;
+    }
+    /* Scroll suave */
+    .products-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .products-list::-webkit-scrollbar-thumb {
+      background: #e17055;
+      border-radius: 3px;
+    }
+    /* Animações */
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.92);}
+      to {opacity: 1; transform: scale(1);}
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Compras da Vó Maria Antonieta 🛒</h1>
+  <div class="app-container" role="main" aria-label="Aplicativo de Compras">
+
+    <nav class="categories" aria-label="Categorias de produtos">
+      <button class="category-btn active" data-cat="limpeza" aria-pressed="true">Limpeza 🧽</button>
+      <button class="category-btn" data-cat="comidas" aria-pressed="false">Comidas 🍎</button>
+      <button class="category-btn" data-cat="utensilios" aria-pressed="false">Utensílios 🍴</button>
+    </nav>
+
+    <input
+      type="search"
+      class="search-input"
+      placeholder="Buscar produto na categoria..."
+      aria-label="Buscar produto na categoria atual"
+    />
+
+    <ul class="products-list" aria-live="polite" aria-relevant="additions removals">
+      <!-- Produtos aparecem aqui via JS -->
+    </ul>
+
+    <div class="actions" aria-label="Ações principais">
+      <button class="btn btn-clear" aria-label="Limpar lista de compras">🧹 Limpar Lista</button>
+      <button class="btn btn-save" aria-label="Salvar lista de compras em arquivo">💾 Salvar Lista</button>
+      <button class="btn btn-speak" aria-label="Ouvir lista de compras em áudio">🔊 Ouvir Lista</button>
+    </div>
+
+    <button class="btn btn-finalize" aria-label="Finalizar compra e ver resumo">Finalizar Compra ✅</button>
+  </div>
+
+  <!-- Modal resumo -->
+  <div class="modal-bg" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+    <div class="modal-content">
+      <button class="modal-close-btn" aria-label="Fechar resumo">×</button>
+      <h3 id="modalTitle">Resumo da Compra</h3>
+      <ul class="modal-list" id="modalDesc">
+        <!-- Lista de itens selecionados -->
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const categories = {
+        limpeza: [
+          "Detergente Líquido",
+          "Álcool Gel",
+          "Sabão em Pó",
+          "Esponja de Aço",
+          "Limpador Multiuso",
+          "Panos de Chão",
+          "Desinfetante",
+          "Saco de Lixo",
+          "Vassoura",
+          "Rodo"
+        ],
+        comidas: [
+          "Arroz",
+          "Feijão",
+          "Macarrão",
+          "Óleo de Cozinha",
+          "Açúcar",
+          "Café",
+          "Leite",
+          "Pão",
+          "Manteiga",
+          "Frutas Sortidas"
+        ],
+        utensilios: [
+          "Panela Média",
+          "Frigideira",
+          "Talheres (jogo)",
+          "Tábua de Corte",
+          "Escorredor de Macarrão",
+          "Potes Plásticos",
+          "Abridor de Latas",
+          "Ralador",
+          "Faca Chef",
+          "Colher de Pau"
+        ]
+      };
+
+      const catButtons = document.querySelectorAll(".category-btn");
+      const productsList = document.querySelector(".products-list");
+      const btnFinalize = document.querySelector(".btn-finalize");
+      const modalBg = document.querySelector(".modal-bg");
+      const modalCloseBtn = document.querySelector(".modal-close-btn");
+      const modalList = document.querySelector(".modal-list");
+      const btnClear = document.querySelector(".btn-clear");
+      const btnSave = document.querySelector(".btn-save");
+      const btnSpeak = document.querySelector(".btn-speak");
+      const searchInput = document.querySelector(".search-input");
+
+      let currentCategory = "limpeza";
+
+      // Estado: itens selecionados com quantidade
+      // Exemplo: {limpeza: { "Detergente Líquido": 2, "Álcool Gel": 1 }, comidas: {...}, utensilios: {...} }
+      let selectedItems = JSON.parse(localStorage.getItem("selectedItems")) || {
+        limpeza: {},
+        comidas: {},
+        utensilios: {}
+      };
+
+      // Função para salvar no localStorage
+      function saveSelected() {
+        localStorage.setItem("selectedItems", JSON.stringify(selectedItems));
+      }
+
+      // Atualiza aria-pressed dos botões categoria
+      function updateAriaPressed() {
+        catButtons.forEach(btn => {
+          btn.setAttribute("aria-pressed", btn.classList.contains("active"));
+        });
+      }
+
+      // Renderiza produtos da categoria atual, aplicando filtro da busca
+      function renderProducts(filter = "") {
+        productsList.innerHTML = "";
+        const prods = categories[currentCategory];
+        const filterLower = filter.trim().toLowerCase();
+
+        prods.forEach(prod => {
+          if (filterLower && !prod.toLowerCase().includes(filterLower)) return;
+
+          const li = document.createElement("li");
+          li.className = "product-item";
+          li.tabIndex = 0;
+          li.setAttribute("role", "checkbox");
+          const isSelected = selectedItems[currentCategory][prod] && selectedItems[currentCategory][prod] > 0;
+          li.setAttribute("aria-checked", isSelected ? "true" : "false");
+          li.dataset.prod = prod;
+
+          // Checkbox
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "product-checkbox";
+          checkbox.checked = isSelected;
+          checkbox.setAttribute("aria-label", "Selecionar " + prod);
+          checkbox.tabIndex = -1;
+
+          // Quantidade container
+          const quantityContainer = document.createElement("div");
+          quantityContainer.className = "quantity-container";
+
+          // Botão diminuir
+          const btnMinus = document.createElement("button");
+          btnMinus.className = "quantity-btn";
+          btnMinus.type = "button";
+          btnMinus.textContent = "−";
+          btnMinus.setAttribute("aria-label", `Diminuir quantidade de ${prod}`);
+          btnMinus.disabled = !isSelected;
+
+          // Número da quantidade
+          const quantityNumber = document.createElement("span");
+          quantityNumber.className = "quantity-number";
+          quantityNumber.textContent = isSelected ? selectedItems[currentCategory][prod] : "0";
+
+          // Botão aumentar
+          const btnPlus = document.createElement("button");
+          btnPlus.className = "quantity-btn";
+          btnPlus.type = "button";
+          btnPlus.textContent = "+";
+          btnPlus.setAttribute("aria-label", `Aumentar quantidade de ${prod}`);
+          btnPlus.disabled = !isSelected;
+
+          quantityContainer.appendChild(btnMinus);
+          quantityContainer.appendChild(quantityNumber);
+          quantityContainer.appendChild(btnPlus);
+
+          li.textContent = prod;
+          li.prepend(checkbox);
+          li.appendChild(quantityContainer);
+
+          // Eventos
+          // Alterna seleção ao clicar no item (menos nos botões)
+          li.addEventListener("click", (e) => {
+            if (e.target === btnMinus || e.target === btnPlus || e.target === checkbox) return;
+            toggleItem(prod, li, checkbox, quantityNumber, btnMinus, btnPlus);
+          });
+
+          li.addEventListener("keydown", (e) => {
+            if (e.key === " " || e.key === "Enter") {
+              e.preventDefault();
+              toggleItem(prod, li, checkbox, quantityNumber, btnMinus, btnPlus);
+            }
+          });
+
+          checkbox.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleItem(prod, li, checkbox, quantityNumber, btnMinus, btnPlus);
+          });
+
+          btnMinus.addEventListener("click", (e) => {
+            e.stopPropagation();
+            changeQuantity(prod, -1, quantityNumber, btnMinus, btnPlus, checkbox, li);
+          });
+
+          btnPlus.addEventListener("click", (e) => {
+            e.stopPropagation();
+            changeQuantity(prod, +1, quantityNumber, btnMinus, btnPlus, checkbox, li);
+          });
+
+          productsList.appendChild(li);
+        });
+      }
+
+      // Alterna seleção de produto (marca/desmarca)
+      function toggleItem(prod, li, checkbox, quantityNumber, btnMinus, btnPlus) {
+        const isSelected = selectedItems[currentCategory][prod] && selectedItems[currentCategory][prod] > 0;
+        if (isSelected) {
+          // Desmarca
+          delete selectedItems[currentCategory][prod];
+          checkbox.checked = false;
+          li.setAttribute("aria-checked", "false");
+          quantityNumber.textContent = "0";
+          btnMinus.disabled = true;
+          btnPlus.disabled = true;
+        } else {
+          // Marca com quantidade 1
+          selectedItems[currentCategory][prod] = 1;
+          checkbox.checked = true;
+          li.setAttribute("aria-checked", "true");
+          quantityNumber.textContent = "1";
+          btnMinus.disabled = false;
+          btnPlus.disabled = false;
+        }
+        saveSelected();
+      }
+
+      // Muda quantidade e atualiza estado
+      function changeQuantity(prod, delta, quantityNumber, btnMinus, btnPlus, checkbox, li) {
+        let currentQty = selectedItems[currentCategory][prod] || 0;
+        currentQty += delta;
+        if (currentQty < 1) {
+          // Desmarca item se quantidade menor que 1
+          delete selectedItems[currentCategory][prod];
+          checkbox.checked = false;
+          li.setAttribute("aria-checked", "false");
+          quantityNumber.textContent = "0";
+          btnMinus.disabled = true;
+          btnPlus.disabled = true;
+        } else {
+          selectedItems[currentCategory][prod] = currentQty;
+          checkbox.checked = true;
+          li.setAttribute("aria-checked", "true");
+          quantityNumber.textContent = currentQty.toString();
+          btnMinus.disabled = false;
+          btnPlus.disabled = false;
+        }
+        saveSelected();
+      }
+
+      // Eventos troca categoria
+      catButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          if (btn.classList.contains("active")) return;
+          catButtons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentCategory = btn.getAttribute("data-cat");
+          updateAriaPressed();
+          searchInput.value = "";
+          renderProducts();
+          searchInput.focus();
+        });
+      });
+
+      // Busca produtos
+      searchInput.addEventListener("input", (e) => {
+        renderProducts(e.target.value);
+      });
+
+      // Limpar lista toda
+      btnClear.addEventListener("click", () => {
+        if (confirm("Deseja limpar toda a lista de compras?")) {
+          selectedItems = { limpeza: {}, comidas: {}, utensilios: {} };
+          saveSelected();
+          renderProducts(searchInput.value);
+        }
+      });
+
+      // Mostrar modal resumo
+      btnFinalize.addEventListener("click", () => {
+        const resumo = [];
+        for (const cat in selectedItems) {
+          const items = Object.entries(selectedItems[cat]).filter(([_, q]) => q > 0);
+          if (items.length > 0) {
+            resumo.push(cat.charAt(0).toUpperCase() + cat.slice(1) + ":");
+            items.forEach(([item, qty]) => resumo.push(` - ${item} (x${qty})`));
+          }
+        }
+        modalList.innerHTML = resumo.length > 0 ? resumo.map(item => {
+          const li = document.createElement("li");
+          li.textContent = item;
+          if (item.endsWith(":")) li.style.fontWeight = "700";
+          return li.outerHTML;
+        }).join("") : "<li>Nenhum item selecionado 😕</li>";
+
+        modalBg.classList.add("show");
+        modalCloseBtn.focus();
+      });
+
+      // Fechar modal
+      modalCloseBtn.addEventListener("click", () => {
+        modalBg.classList.remove("show");
+      });
+
+      modalBg.addEventListener("click", (e) => {
+        if (e.target === modalBg) modalBg.classList.remove("show");
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modalBg.classList.contains("show")) {
+          modalBg.classList.remove("show");
+        }
+      });
+
+      // Salvar lista em arquivo .txt
+      btnSave.addEventListener("click", () => {
+        let text = "Lista de Compras da Vó Maria Antonieta\n\n";
+        for (const cat in selectedItems) {
+          const items = Object.entries(selectedItems[cat]).filter(([_, q]) => q > 0);
+          if (items.length > 0) {
+            text += cat.charAt(0).toUpperCase() + cat.slice(1) + ":\n";
+            items.forEach(([item, qty]) => {
+              text += `- ${item} (x${qty})\n`;
+            });
+            text += "\n";
+          }
+        }
+        if (text.trim() === "Lista de Compras da Vó Maria Antonieta") {
+          alert("Nenhum item selecionado para salvar.");
+          return;
+        }
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "lista_compras_vo_maria_antonieta.txt";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+      });
+
+      // Ouvir lista com Speech Synthesis
+      btnSpeak.addEventListener("click", () => {
+        if (!window.speechSynthesis) {
+          alert("Seu navegador não suporta síntese de voz.");
+          return;
+        }
+        let text = "Lista de compras da Vó Maria Antonieta. ";
+        let countItems = 0;
+        for (const cat in selectedItems) {
+          const items = Object.entries(selectedItems[cat]).filter(([_, q]) => q > 0);
+          if (items.length > 0) {
+            text += cat.charAt(0).toUpperCase() + cat.slice(1) + ": ";
+            items.forEach(([item, qty]) => {
+              text += `${item}, quantidade ${qty}. `;
+              countItems++;
+            });
+          }
+        }
+        if (countItems === 0) {
+          alert("Nenhum item selecionado para ouvir.");
+          return;
+        }
+
+        // Parar fala atual se houver
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "pt-BR";
+        utterance.rate = 1; // velocidade normal
+        utterance.pitch = 1; // tom normal
+
+        utterance.onend = () => {
+          // Pode indicar que terminou (se quiser)
+        };
+
+        window.speechSynthesis.speak(utterance);
+      });
+
+      // Inicialização
+      updateAriaPressed();
+      renderProducts();
+
+    })();
+  </script>
+</body>
+</html>

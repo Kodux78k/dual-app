@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX - Painel Multi-Projetos Simulado</title>
+
+<!-- CodeMirror 6 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.0.1/basic.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/state@0.19.10/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/view@0.19.33/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/lang-html@0.19.6/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/language@0.19.10/dist/index.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@codemirror/commands@0.19.12/dist/index.min.js"></script>
+
+<style>
+  /* Reset e base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin:0; padding:0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #55aaff, #3377ee);
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  body.dark {
+    background: linear-gradient(135deg, #222, #111 90%);
+    color: #eee;
+  }
+  h1, h2, h3, h4 {
+    margin: 0 0 10px 0;
+  }
+  #login-screen, #app-screen {
+    flex: 1;
+    display: none;
+    padding: 20px;
+    max-width: 1100px;
+    margin: 0 auto 30px auto;
+    background: rgba(255 255 255 / 0.95);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  #login-screen.active, #app-screen.active {
+    display: flex;
+    flex-direction: column;
+  }
+  label {
+    font-weight: 600;
+    color: inherit;
+  }
+  input[type="text"], input[type="password"], select {
+    padding: 6px 8px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: 1px solid #aaa;
+    width: 100%;
+    max-width: 350px;
+    margin-bottom: 20px;
+  }
+  button {
+    cursor: pointer;
+    padding: 10px 18px;
+    font-weight: 700;
+    border-radius: 6px;
+    border: none;
+    background: #3377ee;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transition: background 0.3s ease;
+    margin-right: 10px;
+  }
+  button:hover {
+    background: #2255bb;
+  }
+  button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+  }
+  #user-info {
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+  #projects-list {
+    margin-bottom: 15px;
+  }
+  #projects-list ul {
+    list-style: none;
+    padding: 0;
+  }
+  #projects-list ul li {
+    margin-bottom: 8px;
+    cursor: pointer;
+    padding: 6px 10px;
+    background: #d0e3ff;
+    border-radius: 6px;
+    user-select: none;
+  }
+  #projects-list ul li.active {
+    background: #3377ee;
+    color: white;
+  }
+  #history-list {
+    max-height: 120px;
+    overflow-y: auto;
+    background: #f4f9ff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 10px;
+  }
+  #history-list div {
+    padding: 5px;
+    cursor: pointer;
+    border-bottom: 1px solid #bbb;
+    user-select: none;
+  }
+  #history-list div:hover {
+    background: #c7dafd;
+  }
+  #history-list div.active {
+    background: #3377ee;
+    color: white;
+  }
+  #controls {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+  #controls label {
+    margin-right: 5px;
+  }
+  #controls select {
+    min-width: 60px;
+  }
+  #app {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    height: 600px;
+  }
+  #editor-container, #preview-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255 255 255 / 0.98);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+  }
+  #editor {
+    flex: 1;
+    min-height: 100%;
+  }
+  .cm-editor {
+    height: 100% !important;
+  }
+  #preview-header {
+    padding: 10px;
+    background: #4466cc;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    user-select: none;
+  }
+  #preview-frame {
+    flex: 1;
+    border: none;
+    background: white;
+    width: 100%;
+  }
+  #char-count {
+    margin-left: auto;
+    font-weight: 700;
+  }
+  #log {
+    font-family: monospace;
+    font-size: 13px;
+    background: #222;
+    color: #0f0;
+    height: 80px;
+    overflow-y: auto;
+    padding: 8px;
+    margin-top: 10px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+  }
+  body.dark #login-screen, body.dark #app-screen {
+    background: rgba(0,0,0,0.85);
+    color: #eee;
+    box-shadow: 0 8px 20px rgba(255,255,255,0.15);
+  }
+  body.dark button {
+    background: #6699ff;
+    color: #222;
+  }
+  body.dark button:hover {
+    background: #4477ee;
+  }
+  body.dark #projects-list ul li {
+    background: #224488;
+    color: white;
+  }
+  body.dark #projects-list ul li.active {
+    background: #aaccff;
+    color: #112244;
+  }
+  body.dark #history-list {
+    background: #224488;
+    color: #ddeeff;
+    border-color: #5577cc;
+  }
+  body.dark #history-list div {
+    border-bottom: 1px solid #5577cc;
+  }
+  body.dark #history-list div.active {
+    background: #aaccff;
+    color: #112244;
+  }
+</style>
+</head>
+<body>
+
+<div id="login-screen" class="active" role="main" aria-label="Tela de Login">
+  <h2>Login Simulado KOBLLUX</h2>
+  <label for="username-input">Nome de usuário</label>
+  <input type="text" id="username-input" autocomplete="username" aria-required="true" />
+  <button id="btn-login" disabled>Entrar</button>
+</div>
+
+<div id="app-screen" role="main" aria-label="Painel de Projetos KOBLLUX" tabindex="0">
+  <div id="user-info" aria-live="polite"></div>
+  <div id="projects-list" aria-label="Lista de projetos">
+    <h3>Projetos</h3>
+    <button id="btn-new-project">+ Novo Projeto</button>
+    <ul></ul>
+  </div>
+  <div id="controls" aria-label="Controles do editor">
+    <label for="dim-select">Dimensão:</label>
+    <select id="dim-select" title="Escolha dimensão 3, 6 ou 9">
+      <option value="3">3</option>
+      <option value="6" selected>6</option>
+      <option value="9">9</option>
+    </select>
+
+    <label for="cycle-select">Ciclo:</label>
+    <select id="cycle-select" title="Escolha ciclo 3, 6 ou 9">
+      <option value="3">3</option>
+      <option value="6" selected>6</option>
+      <option value="9">9</option>
+    </select>
+
+    <button id="btn-save-version" disabled>Salvar Versão</button>
+    <button id="btn-rollback" disabled>Reverter para Versão Selecionada</button>
+    <button id="btn-download-original" disabled>Download Original</button>
+    <button id="btn-download-transformed" disabled>Download Transformado</button>
+
+    <label>
+      <input type="checkbox" id="dark-mode-toggle" />
+      Modo Escuro
+    </label>
+    <div id="char-count" aria-live="polite">0 caracteres</div>
+  </div>
+
+  <div id="app">
+    <div id="editor-container">
+      <div id="editor" aria-label="Editor de código HTML" role="textbox"></div>
+      <div id="history-list" aria-label="Histórico de versões"></div>
+    </div>
+
+    <div id="preview-container">
+      <div id="preview-header">Preview Transformado</div>
+      <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin" aria-label="Preview do HTML transformado"></iframe>
+    </div>
+  </div>
+
+  <pre id="log" aria-live="polite" aria-atomic="true"></pre>
+</div>
+
+<script type="module">
+  import { EditorState } from "https://cdn.jsdelivr.net/npm/@codemirror/state@0.19.10/dist/index.min.js";
+  import { EditorView, keymap, highlightActiveLine, lineNumbers } from "https://cdn.jsdelivr.net/npm/@codemirror/view@0.19.33/dist/index.min.js";
+  import { defaultHighlightStyle, syntaxHighlighting } from "https://cdn.jsdelivr.net/npm/@codemirror/language@0.19.10/dist/index.min.js";
+  import { html } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-html@0.19.6/dist/index.min.js";
+  import { defaultKeymap, history, historyKeymap } from "https://cdn.jsdelivr.net/npm/@codemirror/commands@0.19.12/dist/index.min.js";
+
+  // Elements
+  const loginScreen = document.getElementById('login-screen');
+  const appScreen = document.getElementById('app-screen');
+  const usernameInput = document.getElementById('username-input');
+  const btnLogin = document.getElementById('btn-login');
+  const userInfo = document.getElementById('user-info');
+  const projectsListUL = document.querySelector('#projects-list ul');
+  const btnNewProject = document.getElementById('btn-new-project');
+  const dimSelect = document.getElementById('dim-select');
+  const cycleSelect = document.getElementById('cycle-select');
+  const btnSaveVersion = document.getElementById('btn-save-version');
+  const btnRollback = document.getElementById('btn-rollback');
+  const btnDownloadOriginal = document.getElementById('btn-download-original');
+  const btnDownloadTransformed = document.getElementById('btn-download-transformed');
+  const darkModeToggle = document.getElementById('dark-mode-toggle');
+  const charCount = document.getElementById('char-count');
+  const historyList = document.getElementById('history-list');
+  const previewFrame = document.getElementById('preview-frame');
+  const logEl = document.getElementById('log');
+
+  // State
+  let editorView = null;
+  let currentUser = null;
+  let projects = [];
+  let currentProjectId = null;
+  let currentVersionIndex = -1;
+
+  // --- Utils ---
+  function log(msg, isError = false) {
+    const now = new Date().toLocaleTimeString();
+    logEl.textContent += `[${now}] ${msg}\n`;
+    logEl.scrollTop = logEl.scrollHeight;
+    if (isError) console.error(msg);
+  }
+
+  function saveToStorage() {
+    if (!currentUser) return;
+    localStorage.setItem(`kobllux_projects_${currentUser}`, JSON.stringify(projects));
+    log('Dados salvos localmente.');
+  }
+
+  function loadFromStorage() {
+    if (!currentUser) return [];
+    const raw = localStorage.getItem(`kobllux_projects_${currentUser}`);
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+
+  function generateId() {
+    return Math.random().toString(36).slice(2,10);
+  }
+
+  // --- Editor Setup ---
+  function createEditor(content = '') {
+    if (editorView) {
+      editorView.destroy();
+      editorView = null;
+    }
+    editorView = new EditorView({
+      state: EditorState.create({
+        doc: content,
+        extensions: [
+          lineNumbers(),
+          highlightActiveLine(),
+          history(),
+          keymap.of([...defaultKeymap, ...historyKeymap]),
+          syntaxHighlighting(defaultHighlightStyle),
+          html()
+        ]
+      }),
+      parent: document.getElementById('editor')
+    });
+    editorView.dispatch({
+      effects: EditorView.scrollIntoView(0)
+    });
+  }
+
+  // --- Projects & Versions ---
+  function renderProjectsList() {
+    projectsListUL.innerHTML = '';
+    projects.forEach(p => {
+      const li = document.createElement('li');
+      li.textContent = p.name;
+      li.dataset.id = p.id;
+      if (p.id === currentProjectId) li.classList.add('active');
+      li.tabIndex = 0;
+      li.setAttribute('role','button');
+      li.setAttribute('aria-pressed', p.id === currentProjectId ? 'true' : 'false');
+      li.addEventListener('click', () => selectProject(p.id));
+      li.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          selectProject(p.id);
+        }
+      });
+      projectsListUL.appendChild(li);
+    });
+  }
+
+  function selectProject(id) {
+    const proj = projects.find(p => p.id === id);
+    if (!proj) return;
+    currentProjectId = id;
+    renderProjectsList();
+    currentVersionIndex = proj.versions.length - 1;
+    updateHistoryList();
+    loadVersion(currentVersionIndex);
+    updateControls(true);
+    log(`Projeto selecionado: ${proj.name}`);
+  }
+
+  function updateHistoryList() {
+    const proj = projects.find(p => p.id === currentProjectId);
+    if (!proj) {
+      historyList.innerHTML = '';
+      btnRollback.disabled = true;
+      return;
+    }
+    historyList.innerHTML = '';
+    proj.versions.forEach((v,i) => {
+      const div = document.createElement('div');
+      const d = new Date(v.timestamp);
+      div.textContent = `${d.toLocaleString()} (${v.note || 'sem nota'})`;
+      div.dataset.index = i;
+      if (i === currentVersionIndex) {
+        div.classList.add('active');
+      }
+      div.tabIndex = 0;
+      div.setAttribute('role','button');
+      div.setAttribute('aria-pressed', i === currentVersionIndex ? 'true' : 'false');
+      div.addEventListener('click', () => {
+        loadVersion(i);
+      });
+      div.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          loadVersion(i);
+        }
+      });
+      historyList.appendChild(div);
+    });
+    btnRollback.disabled = currentVersionIndex === proj.versions.length - 1;
+  }
+
+  function loadVersion(index) {
+    const proj = projects.find(p => p.id === currentProjectId);
+    if (!proj || !proj.versions[index]) return;
+    currentVersionIndex = index;
+    createEditor(proj.versions[index].code);
+    renderProjectsList();
+    updateHistoryList();
+    updateControls(true);
+    updateCharCount();
+    updatePreview();
+    log(`Versão carregada: ${new Date(proj.versions[index].timestamp).toLocaleString()}`);
+  }
+
+  function saveVersion(note = '') {
+    if (!currentProjectId) return;
+    const proj = projects.find(p => p.id === currentProjectId);
+    if (!proj) return;
+    const code = editorView.state.doc.toString();
+    const timestamp = Date.now();
+    proj.versions.push({code, timestamp, note});
+    currentVersionIndex = proj.versions.length - 1;
+    saveToStorage();
+    updateHistoryList();
+    updateControls(true);
+    log(`Versão salva (${new Date(timestamp).toLocaleString()})`);
+  }
+
+  function rollbackVersion() {
+    if (!currentProjectId) return;
+    const proj = projects.find(p => p.id === currentProjectId);
+    if (!proj) return;
+    if (currentVersionIndex === proj.versions.length - 1) return; // já última
+    loadVersion(proj.versions.length - 1);
+    log('Revertido para última versão salva.');
+  }
+
+  // --- Controls ---
+  function updateControls(hasProject) {
+    btnSaveVersion.disabled = !hasProject;
+    btnDownloadOriginal.disabled = !hasProject;
+    btnDownloadTransformed.disabled = !hasProject;
+    btnRollback.disabled = !hasProject || currentVersionIndex === projects.find(p => p.id === currentProjectId).versions.length - 1;
+  }
+
+  // --- Preview & Transformation ---
+  function updateCharCount() {
+    if (!editorView) return;
+    const count = editorView.state.doc.length;
+    charCount.textContent = `${count} caracteres`;
+  }
+
+  function transformHTML(html) {
+    // Simulação de transformação conforme dimensão e ciclo escolhidos
+    // Aplicar efeitos simples para mostrar alma dinâmica
+    // Exemplo: substituir tags <body> por body com background e animação simples
+
+    let dim = dimSelect.value;
+    let cyc = cycleSelect.value;
+
+    // Exemplo: adicionar atributo data-dim e data-cyc e animação CSS inline
+    const animName = `pulse-dim${dim}-cyc${cyc}`;
+    const styleTag = `<style>
+    @keyframes ${animName} {
+      0%, 100% {opacity:1;}
+      50% {opacity:0.5;}
+    }
+    body[data-dim="${dim}"][data-cyc="${cyc}"] {
+      animation: ${animName} 4s ease-in-out infinite;
+      background: linear-gradient(135deg, #${dim}${dim}${cyc}${cyc}ee, #${cyc}${cyc}${dim}${dim}ff);
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    </style>`;
+
+    // Insert style tag + add data attributes in body tag
+    // Cuidado para manter html válido
+    let newHtml = html;
+
+    // Remove existing <style> tag with pulse-dim.. if exists
+    newHtml = newHtml.replace(/<style>@keyframes pulse-dim.*?<\/style>/gs, '');
+
+    // Add or replace <style> in head or insert at top
+    if (/<head>/i.test(newHtml)) {
+      newHtml = newHtml.replace(/<head>/i, `<head>${styleTag}`);
+    } else {
+      newHtml = styleTag + newHtml;
+    }
+
+    // Add data attributes to <body> tag
+    newHtml = newHtml.replace(/<body([^>]*)>/i, `<body$1 data-dim="${dim}" data-cyc="${cyc}">`);
+
+    return newHtml;
+  }
+
+  function updatePreview() {
+    if (!editorView) return;
+    const originalCode = editorView.state.doc.toString();
+    const transformed = transformHTML(originalCode);
+
+    // Load iframe with transformed html
+    const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+    previewDoc.open();
+    previewDoc.write(transformed);
+    previewDoc.close();
+
+    updateCharCount();
+  }
+
+  // --- Downloads ---
+  function downloadFile(content, filename) {
+    const blob = new Blob([content], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'download.html';
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 1000);
+  }
+
+  // --- Events ---
+  btnNewProject.onclick = () => {
+    let name = prompt('Nome do novo projeto:', `Projeto ${projects.length+1}`);
+    if (!name) return;
+    const id = generateId();
+    const proj = {id, name, versions: [{code: '<!DOCTYPE html><html><head><title>Projeto</title></head><body>\n\n</body></html>', timestamp: Date.now(), note: 'Inicial'}]};
+    projects.push(proj);
+    currentProjectId = id;
+    currentVersionIndex = 0;
+    saveToStorage();
+    renderProjectsList();
+    selectProject(id);
+  };
+
+  btnSaveVersion.onclick = () => {
+    const note = prompt('Nota para a versão (opcional):', '');
+    saveVersion(note || '');
+  };
+
+  btnRollback.onclick = () => rollbackVersion();
+
+  btnDownloadOriginal.onclick = () => {
+    if (!currentProjectId) return alert('Nenhum projeto selecionado');
+    const proj = projects.find(p => p.id === currentProjectId);
+    if (!proj) return;
+    if (currentVersionIndex < 0) return alert('Nenhuma versão selecionada');
+    const code = proj.versions[currentVersionIndex].code;
+    downloadFile(code, `${proj.name}_original.html`);
+  };
+
+  btnDownloadTransformed.onclick = () => {
+    if (!editorView) return alert('Editor não inicializado');
+    const code = transformHTML(editorView.state.doc.toString());
+    const proj = projects.find(p => p.id === currentProjectId);
+    downloadFile(code, `${proj.name}_transformado.html`);
+  };
+
+  dimSelect.onchange = () => updatePreview();
+  cycleSelect.onchange = () => updatePreview();
+
+  darkModeToggle.onchange = e => {
+    if (e.target.checked) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  };
+
+  // --- Editor change watcher ---
+  function setupEditorListeners() {
+    if (!editorView) return;
+    editorView.dispatch({
+      effects: EditorView.scrollIntoView(0)
+    });
+    editorView.state.field(EditorState.changeFilter, {
+      filter: () => true,
+      provide: (tr) => {
+        if (tr.docChanged) {
+          updatePreview();
+        }
+        return false;
+      }
+    });
+  }
+
+  // Simpler update preview on content change
+  function onEditorChange() {
+    updatePreview();
+    updateCharCount();
+  }
+
+  // Listen changes on editor
+  function addEditorChangeListener() {
+    if (!editorView) return;
+    editorView.updateListener = EditorView.updateListener.of(update => {
+      if (update.docChanged) {
+        onEditorChange();
+      }
+    });
+    editorView.dispatch({
+      effects: EditorView.scrollIntoView(0)
+    });
+  }
+
+  // --- Login logic ---
+  usernameInput.oninput = () => {
+    btnLogin.disabled = usernameInput.value.trim().length < 3;
+  };
+  btnLogin.onclick = () => {
+    currentUser = usernameInput.value.trim();
+    if (!currentUser) return alert('Informe um nome de usuário válido');
+    projects = loadFromStorage();
+    if (!projects.length) {
+      // Cria projeto default se vazio
+      btnNewProject.click();
+    }
+    loginScreen.classList.remove('active');
+    appScreen.classList.add('active');
+    userInfo.textContent = `Usuário: ${currentUser}`;
+    renderProjectsList();
+    selectProject(currentProjectId || projects[0].id);
+    createEditor(projects[0].versions[0].code);
+    addEditorChangeListener();
+    updatePreview();
+    log('Login simulado realizado.');
+  };
+
+  // --- Init ---
+  function init() {
+    if (localStorage.getItem('darkMode') === 'true') {
+      darkModeToggle.checked = true;
+      document.body.classList.add('dark');
+    }
+  }
+
+  init();
+
+</script>
+
+</body>
+</html>

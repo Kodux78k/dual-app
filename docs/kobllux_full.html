@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>KOBLLUX 3×6×9 — Editor Vivo + Backend</title>
+<style>
+  /* CSS expandido para alma e estilo vibrante */
+  :root {
+    --cor-primaria: #6200ee;
+    --cor-hover: #3700b3;
+    --cor-erro: #ff4444;
+    --cor-sucesso: #00c851;
+    --bg-light: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --bg-dark: linear-gradient(135deg, #1e1e2f 0%, #3a3a4f 100%);
+    --texto-light: #000;
+    --texto-dark: #fff;
+    --pulse-glow: 0 0 10px 3px #00c8ffaa;
+  }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0; padding: 0; overflow-x: hidden;
+    display: flex; flex-direction: column; align-items: center;
+    background: var(--bg-light);
+    color: var(--texto-light);
+    transition: background 0.5s ease, color 0.5s ease;
+    min-height: 100vh;
+  }
+  body.dark {
+    background: var(--bg-dark);
+    color: var(--texto-dark);
+  }
+  .container {
+    background: rgba(255,255,255,0.98);
+    max-width: 1000px;
+    margin: 30px auto 60px;
+    padding: 35px 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 35px rgba(98,0,238,0.4);
+    backdrop-filter: blur(12px);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    user-select: none;
+  }
+  body.dark .container {
+    background: rgba(20,20,32,0.95);
+    box-shadow: 0 0 45px #6200eecc;
+  }
+  h1 {
+    margin: 0;
+    text-align: center;
+    color: var(--cor-primaria);
+    font-weight: 900;
+    font-size: 3rem;
+    letter-spacing: 3px;
+    user-select: text;
+    text-shadow: 0 0 5px #6200ee88;
+  }
+  .toolbar, .dim-panel, .mode-panel {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button, select {
+    background-color: var(--cor-primaria);
+    color: white;
+    border: none;
+    padding: 12px 26px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1.15rem;
+    transition: background-color 0.5s ease, transform 0.4s ease, box-shadow 0.3s ease;
+    user-select: none;
+    box-shadow: 0 0 12px transparent;
+  }
+  button:hover, select:hover {
+    background-color: var(--cor-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--pulse-glow);
+  }
+  button:active, select:active {
+    transform: translateY(0);
+    box-shadow: 0 0 8px #3700b3aa;
+  }
+  textarea {
+    width: 100%;
+    min-height: 350px;
+    font-family: 'Courier New', monospace;
+    font-size: 17px;
+    padding: 25px;
+    border-radius: 20px;
+    border: 3px solid #ddd;
+    resize: vertical;
+    box-sizing: border-box;
+    transition: border-color 0.5s ease;
+    background: #fafafa;
+    color: #222;
+    user-select: text;
+  }
+  textarea:focus {
+    border-color: var(--cor-primaria);
+    outline: none;
+    background: #fff;
+  }
+  body.dark textarea {
+    background: #222;
+    color: #ddd;
+    border-color: #444;
+  }
+  #preview-frame {
+    width: 100%;
+    height: 500px;
+    border-radius: 20px;
+    border: 3px solid #ddd;
+    margin-top: 10px;
+    box-shadow: 0 0 22px rgba(98,0,238,0.7);
+    transition: box-shadow 0.8s ease;
+    background: white;
+  }
+  body.dark #preview-frame {
+    background: #1b1b2f;
+    border-color: #6200ee;
+    box-shadow: 0 0 30px #6200eecc;
+  }
+  #feedback {
+    font-weight: 900;
+    white-space: pre-wrap;
+    min-height: 5em;
+    font-size: 1.2rem;
+    color: var(--cor-sucesso);
+    text-align: center;
+    user-select: text;
+  }
+  #feedback.error {
+    color: var(--cor-erro);
+  }
+  .contador {
+    text-align: right;
+    font-size: 1rem;
+    color: #555;
+    user-select: none;
+  }
+  body.dark .contador {
+    color: #bbb;
+  }
+  .history {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .history button {
+    background-color: var(--cor-hover);
+    font-size: 0.9rem;
+    padding: 8px 20px;
+    border-radius: 16px;
+    color: white;
+    user-select: none;
+  }
+  .history button:hover {
+    background-color: #240086;
+  }
+  footer {
+    margin-top: 30px;
+    font-size: 1rem;
+    text-align: center;
+    opacity: 0.85;
+    font-style: italic;
+    letter-spacing: 0.12em;
+    color: var(--cor-primaria);
+    user-select: none;
+  }
+  /* Efeitos para o preview conforme dimensão e ciclo */
+  .dim-3d-wrapper {
+    perspective: 1100px;
+    transform-style: preserve-3d;
+    animation: rotateYslow 18s linear infinite;
+  }
+  @keyframes rotateYslow {
+    0% {transform: rotateY(0deg);}
+    100% {transform: rotateY(360deg);}
+  }
+  .dim-6d-wrapper {
+    animation: pulseScale 5s ease-in-out infinite;
+  }
+  @keyframes pulseScale {
+    0%, 100% {transform: scale(1);}
+    50% {transform: scale(1.08);}
+  }
+  .dim-9d-wrapper {
+    animation: swirl 14s linear infinite;
+    filter: hue-rotate(0deg);
+  }
+  @keyframes swirl {
+    0% {
+      transform: rotate(0deg) scale(1);
+      filter: hue-rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg) scale(1);
+      filter: hue-rotate(360deg);
+    }
+  }
+  /* Ciclo cores para o preview frame border */
+  .cycle-3 {
+    box-shadow: 0 0 35px 6px #ff9800cc;
+    border-radius: 30px;
+  }
+  .cycle-6 {
+    box-shadow: 0 0 38px 7px #00bcd4cc;
+    border-radius: 30px;
+  }
+  .cycle-9 {
+    box-shadow: 0 0 44px 9px #e91e63cc;
+    border-radius: 30px;
+  }
+
+  /* Alma extra: partículas animadas por canvas de fundo no preview */
+  #preview-canvas {
+    position: absolute;
+    pointer-events: none;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+  }
+
+  /* Modo meditação */
+  body.meditation-mode .container {
+    box-shadow: 0 0 55px 15px #00c8ff99;
+    animation: glowPulse 8s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { box-shadow: 0 0 55px 15px #00c8ff99; }
+    50% { box-shadow: 0 0 75px 22px #00e5ffcc; }
+  }
+</style>
+</head>
+<body>
+<div class="container" role="main" aria-label="Editor HTML KOBLLUX com Backend e Alma Expandida">
+  <h1>🚀 KOBLLUX 3×6×9 — Editor Vivo + Backend</h1>
+
+  <div class="toolbar" role="toolbar" aria-label="Controles principais">
+    <button id="btn-theme" aria-pressed="false" aria-label="Alternar tema claro e escuro">🌗 Tema</button>
+    <button id="btn-clear" aria-label="Limpar código">🗑 Limpar</button>
+    <button id="btn-download" aria-label="Download do código original HTML">⬇ Download Original</button>
+    <button id="btn-download-transformed" aria-label="Download do código transformado HTML">⬇ Download Transformado</button>
+    <button id="btn-send-backend" aria-label="Enviar código para salvar no backend">📤 Enviar ao Backend</button>
+    <label for="file-upload" aria-label="Carregar arquivo HTML" tabindex="0" style="cursor:pointer; background:var(--cor-primaria); border-radius:12px; padding:12px 22px; font-weight:bold; color:#fff;">
+      📂 Upload
+      <input type="file" id="file-upload" accept=".html" style="display:none" />
+    </label>
+  </div>
+
+  <div class="dim-panel" role="region" aria-label="Seleção da dimensão e ciclo">
+    <label for="dimension-select">🌌 Dimensão:</label>
+    <select id="dimension-select" aria-describedby="dimension-desc">
+      <option value="">Nenhuma</option>
+      <option value="3">3D — Efeito Rotação</option>
+      <option value="6">6D — Efeito Pulsação</option>
+      <option value="9">9D — Efeito Redemoinho</option>
+    </select>
+    <span id="dimension-desc" class="sr-only">Selecione a dimensão para ativar filtros e animações no preview.</span>
+
+    <label for="cycle-select">🔄 Ciclo:</label>
+    <select id="cycle-select" aria-describedby="cycle-desc">
+      <option value="">Nenhum</option>
+      <option value="3">Início 3</option>
+      <option value="6">Meio 6</option>
+      <option value="9">Conclusão 9</option>
+    </select>
+    <span id="cycle-desc" class="sr-only">Escolha o ciclo narrativo para alterar tema e animações.</span>
+  </div>
+
+  <label for="html-input" style="margin-top:15px; font-weight:bold;">📝 Código HTML:</label>
+  <textarea id="html-input" aria-multiline="true" aria-label="Editor de código HTML" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Digite ou cole seu código HTML aqui..."></textarea>
+  <span class="contador" aria-live="polite" id="char-counter">0 caracteres</span>
+
+  <button id="btn-send" aria-label="Enviar código para análise e preview" style="font-size:1.2rem; margin-top:10px; padding: 15px 35px;">🚀 Enviar para KOBLLUX</button>
+
+  <div id="feedback" aria-live="polite" role="alert"></div>
+
+  <div id="preview-wrapper" style="margin-top: 20px; border-radius: 30px; overflow: hidden; position:relative;">
+    <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin" aria-label="Visualizador de preview do código HTML"></iframe>
+    <canvas id="preview-canvas"></canvas>
+  </div>
+
+  <div class="history" role="list" aria-label="Histórico de versões"></div>
+
+  <div class="mode-panel" role="region" aria-label="Alternar modos de operação" style="justify-content:center; margin-top:25px; gap:20px;">
+    <button id="btn-mode-dev" aria-pressed="true" aria-label="Modo Desenvolvedor">💻 Dev</button>
+    <button id="btn-mode-meditation" aria-pressed="false" aria-label="Modo Meditação">🧘 Meditação</button>
+  </div>
+
+  <footer aria-label="Informações e slogan do KOBLLUX" role="contentinfo">
+    ATIVAR Δ | DNA KOBLLUX | Conclusão 9 — Sempre em Ciclo ∞
+  </footer>
+</div>
+
+<script>
+  /* ---------- Estado global ---------- */
+  const state = {
+    theme: 'light',
+    dimension: null,
+    cycle: null,
+    history: [],
+    mode: 'dev',
+    transformedHTML: '',
+  };
+
+  /* ---------- Elementos ---------- */
+  const htmlInput = document.getElementById('html-input');
+  const previewFrame = document.getElementById('preview-frame');
+  const feedback = document.getElementById('feedback');
+  const charCounter = document.getElementById('char-counter');
+  const dimensionSelect = document.getElementById('dimension-select');
+  const cycleSelect = document.getElementById('cycle-select');
+  const btnTheme = document.getElementById('btn-theme');
+  const btnClear = document.getElementById('btn-clear');
+  const btnDownload = document.getElementById('btn-download');
+  const btnDownloadTransformed = document.getElementById('btn-download-transformed');
+  const btnSend = document.getElementById('btn-send');
+  const btnSendBackend = document.getElementById('btn-send-backend');
+  const fileUpload = document.getElementById('file-upload');
+  const historyDiv = document.querySelector('.history');
+  const previewWrapper = document.getElementById('preview-wrapper');
+  const btnModeDev = document.getElementById('btn-mode-dev');
+  const btnModeMeditation = document.getElementById('btn-mode-meditation');
+
+  /* ---------- Funções utilitárias ---------- */
+  // Atualiza contador de caracteres
+  function updateCharCount() {
+    const length = htmlInput.value.length;
+    charCounter.textContent = `${length} caractere${length !== 1 ? 's' : ''}`;
+  }
+
+  // Salva estado no localStorage
+  function saveState() {
+    localStorage.setItem('kobllux-state', JSON.stringify(state));
+  }
+
+  // Carrega estado do localStorage
+  function loadState() {
+    const saved = localStorage.getItem('kobllux-state');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      Object.assign(state, parsed);
+      htmlInput.value = state.history.length ? state.history[state.history.length-1] : '';
+      dimensionSelect.value = state.dimension || '';
+      cycleSelect.value = state.cycle || '';
+      setTheme(state.theme, false);
+      setMode(state.mode, false);
+    }
+  }
+
+  /* ---------- Transformações da Dimensão e Ciclo ---------- */
+  function transformarHTML(htmlRaw, dim, ciclo) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlRaw, 'text/html');
+
+    // Limpa classes e estilos anteriores
+    const allEls = doc.body.querySelectorAll('*');
+    allEls.forEach(el => {
+      el.classList.remove('kobllux-dim-3d', 'kobllux-dim-6d', 'kobllux-dim-9d');
+      el.classList.remove('kobllux-cycle-3', 'kobllux-cycle-6', 'kobllux-cycle-9');
+      el.style.transition = '';
+      el.style.filter = '';
+      el.style.transform = '';
+      el.onmouseenter = null;
+      el.onmouseleave = null;
+      el.style.border = '';
+      el.style.borderRadius = '';
+      el.style.boxShadow = '';
+      el.style.backgroundColor = '';
+      el.style.color = '';
+      el.style.textShadow = '';
+      el.style.display = '';
+      el.style.animation = '';
+    });
+
+    // Dimensão
+    switch(dim) {
+      case '3':
+        doc.body.querySelectorAll('div').forEach(div=>{
+          div.classList.add('kobllux-dim-3d');
+          div.style.border = '2px solid #6200ee';
+          div.style.borderRadius = '10px';
+          div.style.transition = 'transform 0.4s ease, box-shadow 0.3s ease';
+          div.onmouseenter = () => {
+            div.style.transform = 'rotateY(10deg) scale(1.06)';
+            div.style.boxShadow = '0 0 16px #6200ee';
+          };
+          div.onmouseleave = () => {
+            div.style.transform = 'none';
+            div.style.boxShadow = 'none';
+          };
+        });
+        break;
+      case '6':
+        doc.body.querySelectorAll('p').forEach(p=>{
+          p.classList.add('kobllux-dim-6d');
+          p.style.transition = 'transform 1.8s ease-in-out, background-color 1.8s ease-in-out';
+          let pulsing = true;
+          function pulse() {
+            if(!pulsing) return;
+            p.style.backgroundColor = 'rgba(0, 188, 212, 0.2)';
+            p.style.transform = 'scale(1.07)';
+            setTimeout(() => {
+              p.style.backgroundColor = 'transparent';
+              p.style.transform = 'scale(1)';
+              setTimeout(pulse, 1800);
+            }, 900);
+          }
+          pulse();
+        });
+        break;
+      case '9':
+        doc.body.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h=>{
+          h.classList.add('kobllux-dim-9d');
+          h.style.display = 'inline-block';
+          h.style.transition = 'transform 12s linear, color 12s linear';
+          let angle = 0;
+          let hue = 0;
+          function swirl() {
+            angle += 0.7;
+            hue += 4;
+            h.style.transform = `rotate(${angle}deg)`;
+            h.style.color = `hsl(${hue % 360}, 90%, 65%)`;
+            requestAnimationFrame(swirl);
+          }
+          swirl();
+        });
+        break;
+      default:
+        break;
+    }
+
+    // Ciclo
+    switch(ciclo) {
+      case '3':
+        let wrapper3 = doc.createElement('div');
+        wrapper3.className = 'kobllux-cycle-3-wrapper';
+        wrapper3.style.boxShadow = '0 0 32px 10px rgba(255,152,0,0.5)';
+        wrapper3.style.borderRadius = '20px';
+        wrapper3.style.padding = '18px';
+        wrapper3.style.transition = 'box-shadow 0.7s ease-in-out infinite alternate';
+        while(doc.body.firstChild) wrapper3.appendChild(doc.body.firstChild);
+        doc.body.appendChild(wrapper3);
+        break;
+      case '6':
+        doc.body.querySelectorAll('a').forEach(a=>{
+          a.classList.add('kobllux-cycle-6');
+          a.style.color = '#00bcd4';
+          a.style.textShadow = '0 0 10px #00bcd4';
+          a.style.transition = 'text-shadow 1.5s ease-in-out';
+          let bright = false;
+          function glow() {
+            bright = !bright;
+            a.style.textShadow = bright ? '0 0 20px #00e5ff' : '0 0 10px #00bcd4';
+            setTimeout(glow, 1500);
+          }
+          glow();
+        });
+        break;
+      case '9':
+        doc.body.style.border = '6px solid #e91e63';
+        doc.body.style.borderRadius = '28px';
+        doc.body.style.animation = 'pulseBorder 3s ease-in-out infinite alternate';
+        if (!doc.head.querySelector('#pulse-border-style')) {
+          const stylePulse = doc.createElement('style');
+          stylePulse.id = 'pulse-border-style';
+          stylePulse.textContent = `
+            @keyframes pulseBorder {
+              0% {border-color: #e91e63;}
+              50% {border-color: #f48fb1;}
+              100% {border-color: #e91e63;}
+            }
+          `;
+          doc.head.appendChild(stylePulse);
+        }
+        break;
+      default:
+        break;
+    }
+
+    // Retorna o HTML transformado completo
+    return '<!DOCTYPE html>\n<html lang="pt-BR">\n<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Preview KOBLLUX</title></head>\n<body style="margin:10px;">' + doc.body.innerHTML + '</body>\n</html>';
+  }
+
+  /* ---------- Preview e interação ---------- */
+  function updatePreview() {
+    const dim = state.dimension;
+    const ciclo = state.cycle;
+    const htmlRaw = htmlInput.value.trim();
+
+    if (!htmlRaw) {
+      feedback.textContent = "❌ Insira um código HTML para visualizar.";
+      feedback.classList.add('error');
+      previewFrame.srcdoc = '';
+      previewWrapper.className = '';
+      return;
+    }
+
+    feedback.textContent = "✅ Processando e aplicando transformações...";
+    feedback.classList.remove('error');
+
+    try {
+      const htmlTransformed = transformarHTML(htmlRaw, dim, ciclo);
+      state.transformedHTML = htmlTransformed;
+      previewFrame.srcdoc = htmlTransformed;
+
+      previewWrapper.className = '';
+      if (dim) previewWrapper.classList.add(`dim-${dim}d-wrapper`);
+      if (ciclo) previewWrapper.classList.add(`cycle-${ciclo}`);
+
+      feedback.textContent = `✅ Código transformado aplicado!\nDimensão: ${dim || 'nenhuma'} | Ciclo: ${ciclo || 'nenhum'}`;
+    } catch (e) {
+      feedback.textContent = "❌ Erro ao processar o código: " + e.message;
+      feedback.classList.add('error');
+      previewFrame.srcdoc = '';
+    }
+  }
+
+  /* ---------- Envio ao backend ---------- */
+  async function sendToBackend() {
+    const code = htmlInput.value.trim();
+    if (!code) {
+      feedback.textContent = "❌ Código vazio! Insira algo antes de enviar.";
+      feedback.classList.add('error');
+      return;
+    }
+
+    feedback.textContent = "⏳ Enviando código ao backend...";
+    feedback.classList.remove('error');
+
+    try {
+      const response = await fetch('/api/save', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ code, dimension: state.dimension, cycle: state.cycle, timestamp: Date.now() }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        feedback.textContent = `✅ Código salvo no backend com ID: ${result.id}`;
+        addHistory(code);
+      } else {
+        feedback.textContent = "❌ Falha ao salvar no backend.";
+        feedback.classList.add('error');
+      }
+    } catch (error) {
+      feedback.textContent = "❌ Erro na comunicação com backend: " + error.message;
+      feedback.classList.add('error');
+    }
+  }
+
+  /* ---------- Histórico ---------- */
+  function addHistory(code) {
+    if (!code.trim()) return;
+    if (state.history.length > 19) state.history.shift();
+    state.history.push(code);
+    renderHistory();
+    saveState();
+  }
+  function renderHistory() {
+    historyDiv.innerHTML = '';
+    state.history.forEach((code, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = `Versão ${i + 1}`;
+      btn.title = `Carregar versão ${i + 1}`;
+      btn.onclick = () => {
+        htmlInput.value = code;
+        updateCharCount();
+        updatePreview();
+      };
+      historyDiv.appendChild(btn);
+    });
+  }
+
+  /* ---------- Limpar editor ---------- */
+  function clearEditor() {
+    if (confirm("Deseja realmente limpar todo o código?")) {
+      htmlInput.value = '';
+      updateCharCount();
+      updatePreview();
+      feedback.textContent = '';
+      addHistory('');
+      saveState();
+    }
+  }
+
+  /* ---------- Downloads ---------- */
+  function downloadOriginal() {
+    const code = htmlInput.value;
+    if (!code.trim()) {
+      alert("Nada para baixar! Insira algum código primeiro.");
+      return;
+    }
+    const blob = new Blob([code], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kobllux_original.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  function downloadTransformed() {
+    const code = state.transformedHTML;
+    if (!code.trim()) {
+      alert("Nada para baixar! Gere o preview primeiro.");
+      return;
+    }
+    const blob = new Blob([code], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kobllux_transformado.html';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  /* ---------- Upload arquivo ---------- */
+  function uploadHTML(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      htmlInput.value = e.target.result;
+      updateCharCount();
+      updatePreview();
+      feedback.textContent = "📂 Arquivo carregado com sucesso!";
+      addHistory(htmlInput.value);
+      saveState();
+    };
+    reader.readAsText(file);
+  }
+
+  /* ---------- Tema ---------- */
+  function setTheme(theme, save=true) {
+    state.theme = theme;
+    if (theme === 'dark') {
+      document.body.classList.add('dark');
+      btnTheme.setAttribute('aria-pressed', 'true');
+    } else {
+      document.body.classList.remove('dark');
+      btnTheme.setAttribute('aria-pressed', 'false');
+    }
+    if (save) saveState();
+  }
+  btnTheme.onclick = () => {
+    setTheme(state.theme === 'light' ? 'dark' : 'light');
+  };
+
+  /* ---------- Dimensão e Ciclo ---------- */
+  dimensionSelect.onchange = e => {
+    state.dimension = e.target.value || null;
+    saveState();
+    updatePreview();
+  };
+  cycleSelect.onchange = e => {
+    state.cycle = e.target.value || null;
+    saveState();
+    updatePreview();
+  };
+
+  /* ---------- Modo Dev / Meditação ---------- */
+  function setMode(mode, save=true) {
+    state.mode = mode;
+    if (mode === 'meditation') {
+      document.body.classList.add('meditation-mode');
+      btnModeMeditation.setAttribute('aria-pressed', 'true');
+      btnModeDev.setAttribute('aria-pressed', 'false');
+    } else {
+      document.body.classList.remove('meditation-mode');
+      btnModeMeditation.setAttribute('aria-pressed', 'false');
+      btnModeDev.setAttribute('aria-pressed', 'true');
+    }
+    if (save) saveState();
+  }
+  btnModeDev.onclick = () => setMode('dev');
+  btnModeMeditation.onclick = () => setMode('meditation');
+
+  /* ---------- Botões ---------- */
+  btnClear.onclick = clearEditor;
+  btnDownload.onclick = downloadOriginal;
+  btnDownloadTransformed.onclick = downloadTransformed;
+  btnSend.onclick = () => {
+    addHistory(htmlInput.value);
+    updateCharCount();
+    updatePreview();
+  };
+  btnSendBackend.onclick = sendToBackend;
+  fileUpload.onchange = uploadHTML;
+
+  /* ---------- Inicialização ---------- */
+  window.onload = () => {
+    loadState();
+    updateCharCount();
+    updatePreview();
+    renderHistory();
+  };
+
+  /* ---------- Alma extra: Partículas animadas no preview com canvas ---------- */
+  (function particles() {
+    const canvas = document.getElementById('preview-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, particlesArray = [];
+    const maxParticles = 80;
+
+    function Particle() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.size = Math.random() * 3 + 1;
+      this.speedX = (Math.random() - 0.5) * 0.5;
+      this.speedY = (Math.random() - 0.5) * 0.5;
+      this.alpha = Math.random() * 0.4 + 0.1;
+    }
+    Particle.prototype.update = function() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if(this.x < 0 || this.x > width) this.speedX *= -1;
+      if(this.y < 0 || this.y > height) this.speedY *= -1;
+    }
+    Particle.prototype.draw = function() {
+      ctx.fillStyle = `rgba(98,0,238,${this.alpha})`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    function init() {
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = width * window.devicePixelRatio;
+      canvas.height = height * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      particlesArray = [];
+      for(let i=0; i < maxParticles; i++) {
+        particlesArray.push(new Particle());
+      }
+    }
+    function animate() {
+      ctx.clearRect(0,0,width,height);
+      particlesArray.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    window.addEventListener('resize', init);
+    init();
+    animate();
+  })();
+
+</script>
+</body>
+</html>
