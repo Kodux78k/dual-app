@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX ∞ Editor Final HTML</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+  body {
+    font-family: 'Share Tech Mono', monospace;
+    background: #0b001f;
+    color: #f9d880;
+    margin: 0; padding: 1rem;
+    display: flex; flex-direction: column; min-height: 100vh;
+  }
+  h1 {
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  label {
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+  textarea {
+    width: 100%;
+    height: 200px;
+    background: #1b0033;
+    color: #f9d880;
+    border: 2px solid #f9d880;
+    border-radius: 6px;
+    padding: 0.8rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    resize: vertical;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  textarea:focus {
+    outline: 2px solid #ffd54f;
+  }
+  #buttons {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  button {
+    background: #f9d880;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: bold;
+    color: #1b0033;
+    cursor: pointer;
+    box-shadow: 0 0 12px #f9d880cc;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: #f2c95b;
+  }
+  #error {
+    margin-top: 1rem;
+    color: #ff5555;
+    font-weight: bold;
+    min-height: 1.5rem;
+    text-align: center;
+  }
+  #preview {
+    margin-top: 1rem;
+    border: 2px solid #f9d880;
+    border-radius: 6px;
+    background: #1b0033;
+    height: 300px;
+    overflow: auto;
+  }
+  #preview iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Destaque da busca */
+  .highlight {
+    background-color: #ffd54f88;
+    color: #000;
+    font-weight: bold;
+  }
+
+  /* Container dos inputs de busca */
+  .search-container {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .search-container input {
+    flex-grow: 1;
+    padding: 0.3rem;
+    border-radius: 4px;
+    border: 1px solid #f9d880;
+    background: #1b0033;
+    color: #f9d880;
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+</style>
+</head>
+<body>
+
+<h1>KOBLLUX ∞ Editor Final HTML</h1>
+
+<label for="mainSearch">Buscar no HTML Principal:</label>
+<div class="search-container">
+  <input type="text" id="mainSearch" placeholder="Buscar texto no HTML principal..." autocomplete="off" />
+  <button id="mainSearchBtn">Buscar</button>
+  <button id="mainClearSearchBtn" title="Limpar busca">✕</button>
+</div>
+<label for="mainHTML">HTML Principal (Documento Base):</label>
+<textarea id="mainHTML" placeholder="Cole ou digite o HTML principal aqui..."></textarea>
+
+<label for="updateSearch">Buscar na Atualização HTML:</label>
+<div class="search-container">
+  <input type="text" id="updateSearch" placeholder="Buscar texto na atualização..." autocomplete="off" />
+  <button id="updateSearchBtn">Buscar</button>
+  <button id="updateClearSearchBtn" title="Limpar busca">✕</button>
+</div>
+<label for="updateHTML">Atualização Parcial (HTML a ser inserido):</label>
+<textarea id="updateHTML" placeholder="Cole ou digite o HTML da atualização aqui..."></textarea>
+
+<div id="buttons">
+  <button id="validateBtn">Validar Sintaxe</button>
+  <button id="applyBtn" disabled>Aplicar Atualização</button>
+  <button id="copyBtn" disabled>Copiar Resultado</button>
+  <button id="saveBtn" disabled>Salvar Arquivo</button>
+  <button id="clearBtn">Limpar Tudo</button>
+</div>
+
+<div id="error"></div>
+
+<label>Visualização Preview:</label>
+<div id="preview"><iframe sandbox="allow-scripts allow-same-origin"></iframe></div>
+
+<script>
+  const mainHTML = document.getElementById('mainHTML');
+  const updateHTML = document.getElementById('updateHTML');
+  const validateBtn = document.getElementById('validateBtn');
+  const applyBtn = document.getElementById('applyBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const errorDiv = document.getElementById('error');
+  const previewIframe = document.querySelector('#preview iframe');
+
+  const mainSearchInput = document.getElementById('mainSearch');
+  const mainSearchBtn = document.getElementById('mainSearchBtn');
+  const mainClearSearchBtn = document.getElementById('mainClearSearchBtn');
+
+  const updateSearchInput = document.getElementById('updateSearch');
+  const updateSearchBtn = document.getElementById('updateSearchBtn');
+  const updateClearSearchBtn = document.getElementById('updateClearSearchBtn');
+
+  let combinedHTML = '';
+
+  // Função simples para validar sintaxe HTML básica
+  // (validação via DOMParser - não detecta tudo, mas já útil)
+  function validateHTML(html) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const errors = doc.querySelectorAll('parsererror');
+    if (errors.length > 0) {
+      return errors[0].textContent;
+    }
+    return null; // sem erros detectados
+  }
+
+  // Função para aplicar atualização: insere updateHTML antes do </body> se possível
+  function applyUpdate(main, update) {
+    const bodyCloseTagIndex = main.toLowerCase().lastIndexOf('</body>');
+    if (bodyCloseTagIndex === -1) {
+      return main + '\n' + update;
+    }
+    return main.slice(0, bodyCloseTagIndex) + update + main.slice(bodyCloseTagIndex);
+  }
+
+  // Atualiza preview com o HTML combinado
+  function updatePreview(html) {
+    const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+    doc.open();
+    doc.write(html);
+    doc.close();
+  }
+
+  // Função para escapar texto para regex
+  function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Função para destacar palavras em textarea (via HTML é complexo, aqui destacamos via seleção)
+  // Mas a forma mais simples é mostrar os índices para navegação — aqui uma versão que seleciona próximo resultado:
+  function highlightSearch(textarea, searchTerm) {
+    if (!searchTerm) return;
+    const value = textarea.value;
+    const regex = new RegExp(escapeRegExp(searchTerm), 'gi');
+    let match;
+    const matches = [];
+    while ((match = regex.exec(value)) !== null) {
+      matches.push({start: match.index, end: regex.lastIndex});
+    }
+    if (matches.length === 0) {
+      alert(`"${searchTerm}" não encontrado.`);
+      return;
+    }
+    // Selecionar primeiro resultado:
+    const first = matches[0];
+    textarea.focus();
+    textarea.setSelectionRange(first.start, first.end);
+  }
+
+  // Limpar seleção
+  function clearHighlight(textarea) {
+    const pos = textarea.selectionStart;
+    textarea.setSelectionRange(pos, pos);
+  }
+
+  // Eventos de busca no textarea mainHTML
+  mainSearchBtn.addEventListener('click', () => {
+    const term = mainSearchInput.value.trim();
+    if (!term) {
+      alert('Digite um termo para buscar no HTML principal.');
+      return;
+    }
+    highlightSearch(mainHTML, term);
+  });
+  mainClearSearchBtn.addEventListener('click', () => {
+    clearHighlight(mainHTML);
+    mainSearchInput.value = '';
+  });
+
+  // Eventos de busca no textarea updateHTML
+  updateSearchBtn.addEventListener('click', () => {
+    const term = updateSearchInput.value.trim();
+    if (!term) {
+      alert('Digite um termo para buscar na atualização HTML.');
+      return;
+    }
+    highlightSearch(updateHTML, term);
+  });
+  updateClearSearchBtn.addEventListener('click', () => {
+    clearHighlight(updateHTML);
+    updateSearchInput.value = '';
+  });
+
+  // Evento de validação
+  validateBtn.addEventListener('click', () => {
+    errorDiv.textContent = '';
+    applyBtn.disabled = true;
+    copyBtn.disabled = true;
+    saveBtn.disabled = true;
+
+    const mainVal = mainHTML.value.trim();
+    const updateVal = updateHTML.value.trim();
+
+    if (!mainVal) {
+      errorDiv.textContent = 'Erro: O HTML principal não pode estar vazio.';
+      return;
+    }
+    if (!updateVal) {
+      errorDiv.textContent = 'Erro: A atualização HTML não pode estar vazia.';
+      return;
+    }
+
+    const mainError = validateHTML(mainVal);
+    const updateError = validateHTML(updateVal);
+
+    if (mainError) {
+      errorDiv.textContent = 'Erro no HTML principal: ' + mainError;
+      return;
+    }
+    if (updateError) {
+      errorDiv.textContent = 'Erro na atualização HTML: ' + updateError;
+      return;
+    }
+
+    errorDiv.textContent = 'Validação concluída com sucesso!';
+    applyBtn.disabled = false;
+  });
+
+  // Evento para aplicar atualização
+  applyBtn.addEventListener('click', () => {
+    errorDiv.textContent = '';
+    const mainVal = mainHTML.value.trim();
+    const updateVal = updateHTML.value.trim();
+
+    combinedHTML = applyUpdate(mainVal, updateVal);
+
+    updatePreview(combinedHTML);
+
+    copyBtn.disabled = false;
+    saveBtn.disabled = false;
+
+    errorDiv.textContent = 'Atualização aplicada com sucesso!';
+  });
+
+  // Copiar resultado para a área de transferência
+  copyBtn.addEventListener('click', () => {
+    if (!combinedHTML) return;
+    navigator.clipboard.writeText(combinedHTML).then(() => {
+      errorDiv.textContent = 'HTML copiado para a área de transferência!';
+    }).catch(() => {
+      errorDiv.textContent = 'Erro ao copiar para a área de transferência.';
+    });
+  });
+
+  // Salvar resultado em arquivo .html
+  saveBtn.addEventListener('click', () => {
+    if (!combinedHTML) return;
+    const blob = new Blob([combinedHTML], {type: 'text/html'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kobllux_editor_output.html';
+    a.click();
+    URL.revokeObjectURL(url);
+    errorDiv.textContent = 'Arquivo salvo!';
+  });
+
+  // Limpar tudo
+  clearBtn.addEventListener('click', () => {
+    mainHTML.value = '';
+    updateHTML.value = '';
+    mainSearchInput.value = '';
+    updateSearchInput.value = '';
+    combinedHTML = '';
+    updatePreview('');
+    errorDiv.textContent = '';
+    applyBtn.disabled = true;
+    copyBtn.disabled = true;
+    saveBtn.disabled = true;
+  });
+
+  // Inicializa preview vazio
+  updatePreview('');
+</script>
+</body>
+</html>

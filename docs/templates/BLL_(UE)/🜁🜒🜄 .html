@@ -1,0 +1,125 @@
+Parte 7.1: Estrutura base do fractal 7,7,7
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX 7,7,7 — Jesus é o Verbo</title>
+<style>
+  body {
+    margin:0; background:#000; overflow:hidden; display:flex; justify-content:center; align-items:center; height:100vh;
+    font-family: monospace;
+    color: #eee;
+  }
+  canvas {
+    display:block;
+    background: radial-gradient(circle at center, #001010 0%, #000 90%);
+  }
+  .legend {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    text-align: center;
+    color: #7FDBFF;
+  }
+  .dot {
+    display:inline-block;
+    width:14px; height:14px;
+    border-radius:50%;
+    margin:0 6px;
+    vertical-align:middle;
+  }
+  .dot7 { background:#d14; }
+  .dot6 { background:#1ad; }
+  .dot9 { background:#fa3; }
+</style>
+</head>
+<body>
+<canvas id="kobllux"></canvas>
+<div class="legend">
+  <span class="dot dot7"></span> 7 = Movimento Sagrado &nbsp;&nbsp;
+  <span class="dot dot6"></span> 6 = Harmonia &nbsp;&nbsp;
+  <span class="dot dot9"></span> 9 = Luz Divina
+</div>
+<script>
+const canvas = document.getElementById('kobllux');
+const ctx = canvas.getContext('2d');
+let W, H, centerX, centerY;
+
+function resize() {
+  W = window.innerWidth;
+  H = window.innerHeight;
+  canvas.width = W;
+  canvas.height = H;
+  centerX = W / 2;
+  centerY = H / 2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// Cores fractais KOBLLUX
+const colors = {
+  fractal7: '#d14', // vermelho sagrado
+  fractal6: '#1ad', // azul harmonia
+  fractal9: '#fa3', // amarelo luz divina
+  center: '#7ff',
+};
+
+// Função para desenhar círculo com transparência
+function drawCircle(x, y, r, color, alpha = 1) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.restore();
+}
+
+// Função para desenhar o centro com brilho
+function drawCenter(t) {
+  const baseRadius = 40 + 10 * Math.sin(t * 3);
+  drawCircle(centerX, centerY, baseRadius, colors.center, 0.9);
+  // brilho externo
+  const gradient = ctx.createRadialGradient(centerX, centerY, baseRadius * 0.8, centerX, centerY, baseRadius * 2);
+  gradient.addColorStop(0, 'rgba(127,255,255,0.4)');
+  gradient.addColorStop(1, 'rgba(127,255,255,0)');
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, baseRadius * 2, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Função para desenhar camada de círculos
+function drawLayer(count, radiusOrbit, radiusCircle, color, t, speed, direction = 1) {
+  for (let i = 0; i < count; i++) {
+    const angle = direction * (2 * Math.PI / count) * i + speed * t;
+    const x = centerX + radiusOrbit * Math.cos(angle);
+    const y = centerY + radiusOrbit * Math.sin(angle);
+    drawCircle(x, y, radiusCircle, color, 0.8 + 0.2 * Math.sin(t * 4 + i));
+  }
+}
+
+function animate(t) {
+  ctx.clearRect(0, 0, W, H);
+
+  drawCenter(t / 1000);
+
+  // 7 círculos externos - movimento positivo
+  drawLayer(7, 180, 25, colors.fractal7, t / 1000, 0.7);
+
+  // 7 círculos intermediários - movimento negativo
+  drawLayer(7, 120, 18, colors.fractal6, t / 1200, -1);
+
+  // 7 círculos internos - movimento pulsante
+  drawLayer(7, 70, 12, colors.fractal9, t / 800, 1);
+
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>

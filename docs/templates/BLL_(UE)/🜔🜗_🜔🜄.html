@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>🝅🜴🝁🜳🜰🜳🜴 × 🜸🜽🝃🜴🜶🝁🜰🝁 ÷ ∆ = ♾️</title>
+<style>
+  /* Reset e base */
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    background: #0a0a0a;
+    color: #eeeeee;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    user-select: none;
+  }
+  #container {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+  canvas {
+    display: block;
+    margin: 0 auto;
+    background: #111111;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #33ccff88;
+  }
+  /* Texto central */
+  #formula {
+    position: absolute;
+    top: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 1.4rem;
+    letter-spacing: 0.12rem;
+    color: #33ccffcc;
+    font-weight: 700;
+    user-select: none;
+  }
+</style>
+</head>
+<body>
+  <div id="container">
+    <div id="formula">🝅🜴🝁🜳🜰🜳🜴 × 🜸🜽🝃🜴🜶🝁🜰🝁 ÷ ∆ = ♾️</div>
+    <canvas id="fractalCanvas" width="600" height="600"></canvas>
+  </div>
+    <script>
+  (function() {
+    const canvas = document.getElementById('fractalCanvas');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+
+    // Configurações fractais
+    const maxDepth = 7;  // Número de iterações fractais (7 etapas, sinergia)
+    const baseRadius = 120;
+    const baseColor = [51, 204, 255]; // Cor azulada principal
+
+    // Função utilitária para interpolar cores
+    function lerpColor(c1, c2, t) {
+      return c1.map((v, i) => Math.round(v + (c2[i] - v) * t));
+    }
+
+    // Função para converter rgb array para css string
+    function rgbToCss(rgb, alpha = 1) {
+      return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
+    }
+
+    // Função para desenhar círculo com sombra e cor suave
+    function drawCircle(x, y, radius, color, shadow = true) {
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      if (shadow) {
+        ctx.shadowColor = color;
+        ctx.shadowBlur = radius * 0.5;
+      } else {
+        ctx.shadowBlur = 0;
+      }
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.closePath();
+    }
+
+    // Função fractal recursiva (placeholder por enquanto)
+    function drawFractal(x, y, radius, depth) {
+      if (depth <= 0) return;
+      // Aqui virá o desenho fractal detalhado nas próximas etapas
+    }
+
+    // Função principal de animação
+    function animate(time = 0) {
+      ctx.clearRect(0, 0, W, H);
+
+      // Fundo suave com leve degradê (para efeito sutil)
+      let gradient = ctx.createRadialGradient(W/2, H/2, baseRadius*0.3, W/2, H/2, baseRadius*1.5);
+      gradient.addColorStop(0, 'rgba(51,204,255,0.1)');
+      gradient.addColorStop(1, 'rgba(10,10,10,0.9)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, W, H);
+
+      // Chamar fractal
+      drawFractal(W/2, H/2, baseRadius, maxDepth);
+
+      // Loop da animação
+      requestAnimationFrame(animate);
+    }
+
+    // Iniciar animação
+    animate();
+
+    // Exportar para etapas futuras
+    window.KOBLLUX = {
+      ctx, W, H,
+      drawCircle,
+      lerpColor,
+      rgbToCss,
+      drawFractal,
+      baseColor,
+      maxDepth,
+      baseRadius
+    };
+  })();
+</script>
+    
+    <script>
+  (function() {
+    const { ctx, W, H, drawCircle, lerpColor, rgbToCss, baseColor, maxDepth, baseRadius } = window.KOBLLUX;
+
+    // Variável de tempo para pulsação
+    let time = 0;
+
+    // Função fractal recursiva com pulsação variável e simetria circular
+    function drawFractal(x, y, radius, depth) {
+      if (depth <= 0 || radius < 1) return;
+
+      // Cálculo de transparência e cor com base na profundidade e tempo
+      const alpha = 0.4 + 0.6 * Math.sin(time * 0.01 + depth);
+      const color = lerpColor(baseColor, [255, 255, 255], depth / maxDepth);
+      const colorCss = rgbToCss(color, alpha);
+
+      // Desenha o círculo principal da camada fractal
+      drawCircle(x, y, radius, colorCss);
+
+      // Número de círculos filhos para esta camada (fractal radial, baseado em 7 para sinergia)
+      const numChildren = 7;
+      const angleStep = (2 * Math.PI) / numChildren;
+
+      // Raio reduzido para os círculos filhos, reduzido fractalmente
+      const childRadius = radius * 0.4;
+
+      // Posiciona os círculos filhos em volta do pai, com pulsação na posição
+      for (let i = 0; i < numChildren; i++) {
+        // Ângulo básico para o filho i
+        let angle = i * angleStep + time * 0.002 * depth;
+
+        // Pulsação radial variável
+        let pulse = Math.sin(time * 0.02 + i) * radius * 0.15;
+
+        // Posição do filho, pulsando em zênite
+        let cx = x + (radius + pulse) * Math.cos(angle);
+        let cy = y + (radius + pulse) * Math.sin(angle);
+
+        // Chama recursivamente para o filho
+        drawFractal(cx, cy, childRadius, depth - 1);
+      }
+    }
+
+    // Atualiza o tempo e chama a animação
+    function animate(timeStamp) {
+      time = timeStamp || 0;
+      ctx.clearRect(0, 0, W, H);
+
+      // Fundo com leve degrade (mais escuro para dar contraste)
+      let gradient = ctx.createRadialGradient(W/2, H/2, baseRadius*0.3, W/2, H/2, baseRadius*1.8);
+      gradient.addColorStop(0, 'rgba(51,204,255,0.1)');
+      gradient.addColorStop(1, 'rgba(5,5,5,0.9)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, W, H);
+
+      // Desenha fractal com profundidade máxima, pulso ativo
+      drawFractal(W/2, H/2, baseRadius, maxDepth);
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+  })();
+</script>
+    
+    <script>
+  (function() {
+    const { ctx, W, H, drawCircle, lerpColor, rgbToCss, baseColor, maxDepth, baseRadius } = window.KOBLLUX;
+
+    // Variável de tempo refinada
+    let time = 0;
+
+    // Frequências fractais baseadas no movimento 3x6x9x7
+    const freqBase = 0.001;          // Movimento base lento
+    const freqLayer1 = freqBase * 3; // Geração (3)
+    const freqLayer2 = freqBase * 6; // Integração (6)
+    const freqLayer3 = freqBase * 9; // Retorno (9)
+    const freqLayer4 = freqBase * 7; // Simplificação (7)
+
+    // Função para calcular o tempo fractal total baseado em camadas harmônicas
+    function fractalTime(t) {
+      return (
+        Math.sin(t * freqLayer1) +
+        Math.sin(t * freqLayer2) +
+        Math.sin(t * freqLayer3) +
+        Math.sin(t * freqLayer4)
+      );
+    }
+
+    // Função fractal recursiva com pulso sincronizado
+    function drawFractal(x, y, radius, depth, t) {
+      if (depth <= 0 || radius < 1) return;
+
+      // Cálculo de alpha e cor baseado em tempo fractal e profundidade
+      const fractPulse = fractalTime(t + depth * 100);
+      const alpha = 0.3 + 0.7 * (fractPulse * 0.5 + 0.5);  // normaliza para 0~1
+      const color = lerpColor(baseColor, [255, 255, 255], depth / maxDepth);
+      const colorCss = rgbToCss(color, alpha);
+
+      drawCircle(x, y, radius, colorCss);
+
+      const numChildren = 7;
+      const angleStep = (2 * Math.PI) / numChildren;
+      const childRadius = radius * 0.4;
+
+      for (let i = 0; i < numChildren; i++) {
+        let angle = i * angleStep + t * 0.002 * depth;
+        let pulse = Math.sin(t * 0.02 + i) * radius * 0.15 * fractPulse;
+
+        let cx = x + (radius + pulse) * Math.cos(angle);
+        let cy = y + (radius + pulse) * Math.sin(angle);
+
+        drawFractal(cx, cy, childRadius, depth - 1, t);
+      }
+    }
+
+    function animate(timeStamp) {
+      time = timeStamp || 0;
+
+      ctx.clearRect(0, 0, W, H);
+
+      let gradient = ctx.createRadialGradient(W/2, H/2, baseRadius*0.3, W/2, H/2, baseRadius*1.8);
+      gradient.addColorStop(0, 'rgba(51,204,255,0.1)');
+      gradient.addColorStop(1, 'rgba(5,5,5,0.9)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, W, H);
+
+      drawFractal(W/2, H/2, baseRadius, maxDepth, time);
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  })();
+</script>
+    <script>
+(() => {
+  const canvas = document.getElementById('koblluxCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Ajusta o tamanho do canvas
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Constantes fractais
+  const maxDepth = 6;
+  const baseRadius = Math.min(canvas.width, canvas.height) / 6;
+
+  // Cor base (BLLUE)
+  const baseColor = [51, 204, 255];
+
+  // Função para converter rgb e alpha para CSS rgba()
+  function rgbToCss(rgb, alpha=1) {
+    return `rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
+  }
+
+  // Interpolação linear de cor entre base e branco
+  function lerpColor(c1, c2, t) {
+    return c1.map((v, i) => v + (c2[i] - v) * t);
+  }
+
+  // Frequências base para o tempo fractal (3,6,9,7)
+  const freqBase = 0.001;
+  const freqLayer = [3,6,9,7].map(f => freqBase * f);
+
+  // Pulso fractal temporal
+  function fractalTime(t) {
+    return freqLayer.reduce((acc,f) => acc + Math.sin(t * f), 0);
+  }
+
+  // Desenha círculo com sombra e brilho
+  function drawCircle(x, y, radius, color, shadowBlur=20) {
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = shadowBlur;
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Recursão fractal com luz e sombra
+  function drawFractal(x, y, radius, depth, t) {
+    if(depth <= 0 || radius < 1) return;
+
+    const fractPulse = fractalTime(t + depth * 100);
+    const alpha = 0.3 + 0.7 * (fractPulse * 0.5 + 0.5);
+    const color = lerpColor(baseColor, [255,255,255], depth/maxDepth);
+    const colorCss = rgbToCss(color, alpha);
+
+    drawCircle(x, y, radius, colorCss, 25);
+
+    const numChildren = 7;
+    const angleStep = (2 * Math.PI) / numChildren;
+    const childRadius = radius * 0.4;
+
+    for(let i=0; i<numChildren; i++) {
+      let angle = i * angleStep + t*0.002*depth;
+      let pulse = Math.sin(t*0.02 + i)*radius*0.15*fractPulse;
+
+      let cx = x + (radius + pulse) * Math.cos(angle);
+      let cy = y + (radius + pulse) * Math.sin(angle);
+
+      drawFractal(cx, cy, childRadius, depth-1, t);
+    }
+  }
+
+  // Animação
+  function animate(ts=0) {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // Fundo com degradê radial
+    let gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, baseRadius*0.3, canvas.width/2, canvas.height/2, baseRadius*1.8);
+    gradient.addColorStop(0, 'rgba(51,204,255,0.1)');
+    gradient.addColorStop(1, 'rgba(5,5,5,0.9)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    drawFractal(canvas.width/2, canvas.height/2, baseRadius, maxDepth, ts);
+
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+})();
+</script>
+</body>
+</html>

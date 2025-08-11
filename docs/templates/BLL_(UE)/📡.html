@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>KOBLLUX ∴ Livro Digital | Infodosis & DualPP Design</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap');
+
+  body {
+    margin: 0;
+    background: #0e0e11;
+    color: #e0e0e0;
+    font-family: 'Fira Mono', monospace;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  #sidebar {
+    width: 280px;
+    background: #12131a;
+    border-right: 2px solid #0077ff;
+    padding: 20px 15px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  #sidebar h2 {
+    margin-top: 0;
+    font-weight: 700;
+    font-size: 1.3em;
+    color: #33aaff;
+    border-bottom: 1px solid #0077ff55;
+    padding-bottom: 8px;
+  }
+
+  #chapterList {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  #chapterList li {
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background 0.25s ease;
+  }
+  #chapterList li:hover,
+  #chapterList li.active {
+    background: #0077ff88;
+    color: #fff;
+  }
+
+  #mainContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #181a23;
+    padding: 30px 40px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  #bookTitle {
+    font-size: 1.8em;
+    font-weight: 900;
+    margin-bottom: 15px;
+    color: #33aaff;
+  }
+
+  #chapterTitle {
+    font-size: 1.5em;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #0077ff;
+    padding-bottom: 8px;
+  }
+
+  #chapterText {
+    line-height: 1.6;
+    font-size: 1.1em;
+    white-space: pre-wrap;
+  }
+
+  #inputArea {
+    margin-bottom: 20px;
+  }
+
+  #inputText {
+    width: 100%;
+    height: 140px;
+    border-radius: 8px;
+    border: none;
+    padding: 15px;
+    font-family: 'Fira Mono', monospace;
+    font-size: 1em;
+    background: #12131a;
+    color: #ccc;
+    resize: vertical;
+  }
+
+  #controls {
+    margin-top: 12px;
+  }
+
+  button {
+    background: #0077ff;
+    border: none;
+    padding: 10px 20px;
+    color: #fff;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 12px;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #005fcc;
+  }
+
+  #exportArea {
+    margin-top: 20px;
+    background: #0b0c11;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    overflow-x: auto;
+    max-height: 180px;
+    white-space: pre-wrap;
+  }
+
+  /* Scrollbars */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #12131a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0077ffaa;
+    border-radius: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <h2>KOBLLUX ∴ Índice</h2>
+  <ul id="chapterList"></ul>
+</div>
+
+<div id="mainContent">
+  <div id="inputArea">
+    <textarea id="inputText" placeholder="Cole seu texto aqui, use '---' para separar capítulos..."></textarea>
+    <div id="controls">
+      <button id="generateBookBtn">Gerar Livro</button>
+      <button id="exportBookBtn" disabled>Exportar HTML</button>
+    </div>
+  </div>
+
+  <div id="bookView" style="flex-grow:1; display:none; flex-direction: column;">
+    <div id="bookTitle">Livro Digital KOBLLUX</div>
+    <div id="chapterTitle"></div>
+    <div id="chapterText"></div>
+  </div>
+
+  <pre id="exportArea" style="display:none;"></pre>
+</div>
+
+<script>
+  const inputText = document.getElementById('inputText');
+  const generateBookBtn = document.getElementById('generateBookBtn');
+  const exportBookBtn = document.getElementById('exportBookBtn');
+  const chapterList = document.getElementById('chapterList');
+  const bookView = document.getElementById('bookView');
+  const chapterTitle = document.getElementById('chapterTitle');
+  const chapterText = document.getElementById('chapterText');
+  const exportArea = document.getElementById('exportArea');
+
+  let chapters = [];
+  let currentChapterIndex = 0;
+
+  // Função para gerar o livro: divide texto em capítulos pelo separador ---
+  function gerarLivro() {
+    const rawText = inputText.value.trim();
+    if (!rawText) {
+      alert("Por favor, insira o texto para gerar o livro.");
+      return;
+    }
+    chapters = rawText.split(/\n---\n/).map(ch => ch.trim()).filter(Boolean);
+    if (chapters.length === 0) {
+      alert("Não foi possível detectar capítulos. Use '---' para separar capítulos.");
+      return;
+    }
+    montarIndice();
+    mostrarCapitulo(0);
+    bookView.style.display = 'flex';
+    exportBookBtn.disabled = false;
+    exportArea.style.display = 'none';
+  }
+
+  // Monta índice lateral com os capítulos
+  function montarIndice() {
+    chapterList.innerHTML = '';
+    chapters.forEach((chapter, idx) => {
+      // Extrair título do capítulo: primeira linha do capítulo ou "Capítulo X"
+      const firstLine = chapter.split('\n')[0];
+      const title = firstLine.length < 40 ? firstLine : `Capítulo ${idx + 1}`;
+      const li = document.createElement('li');
+      li.textContent = title;
+      li.dataset.index = idx;
+      if (idx === 0) li.classList.add('active');
+      li.onclick = () => {
+        mostrarCapitulo(idx);
+      };
+      chapterList.appendChild(li);
+    });
+  }
+
+  // Mostrar capítulo selecionado
+  function mostrarCapitulo(idx) {
+    currentChapterIndex = idx;
+    // Atualiza título no topo
+    const chapter = chapters[idx];
+    const firstLine = chapter.split('\n')[0];
+    const title = firstLine.length < 40 ? firstLine : `Capítulo ${idx + 1}`;
+    chapterTitle.textContent = title;
+    // Mostrar conteúdo (excluindo título se presente)
+    let content = chapter;
+    if (content.startsWith(firstLine)) {
+      content = content.slice(firstLine.length).trim();
+    }
+    chapterText.textContent = content;
+
+    // Atualiza destaque no índice
+    [...chapterList.children].forEach(li => li.classList.remove('active'));
+    chapterList.children[idx].classList.add('active');
+  }
+
+  // Exportar livro em HTML simples
+  exportBookBtn.onclick = () => {
+    let html = `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<title>Livro Digital KOBLLUX</title>
+<style>
+  body { font-family: monospace; background:#0e0e11; color:#e0e0e0; padding: 40px; }
+  h1,h2 { color:#33aaff; }
+  h1 { border-bottom: 2px solid #0077ff; padding-bottom: 8px;}
+  h2 { margin-top: 40px; }
+  p { max-width: 700px; line-height: 1.6; font-size: 1.1em; }
+</style>
+</head>
+<body>
+  <h1>Livro Digital KOBLLUX</h1>
+  ${chapters.map((ch, i) => {
+    const firstLine = ch.split('\n')[0];
+    const title = firstLine.length < 40 ? firstLine : `Capítulo ${i + 1}`;
+    const content = ch.startsWith(firstLine) ? ch.slice(firstLine.length).trim() : ch;
+    return `<h2>${title}</h2><p>${content.replace(/\n/g, "<br>")}</p>`;
+  }).join('\n')}
+</body>
+</html>`;
+
+    exportArea.style.display = 'block';
+    exportArea.textContent = html.trim();
+    alert("Livro gerado! Você pode copiar o HTML abaixo.");
+  }
+
+  generateBookBtn.onclick = gerarLivro;
+</script>
+
+</body>
+</html>
