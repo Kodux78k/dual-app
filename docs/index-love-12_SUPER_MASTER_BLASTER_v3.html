@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central - Dual Infodose</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      overscroll-behavior: none;
+    }
+    body {
+      font-family:'Montserrat',sans-serif;
+      background: linear-gradient(to bottom, #000, #1a1a1a);
+      color:#f0f;
+      height:100vh; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      padding-top:0px; position:relative;
+      opacity:0; animation:fadeInBody 1.8s ease forwards;
+    }
+    @keyframes fadeInBody { to { opacity:1 } }
+    /* ——— SEU CSS INTEGRAL (ajustes) ——— */
+    :root {
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
+      --text: #444;
+      --fast: .4s; --med: .8s; --slow: 1.8s;
+    }
+    body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+    body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+    body.vibe  { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden}
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      padding:0px;background:var(--bg);color:var(--text);
+      font-family:'Montserrat',sans-serif;
+      transition:background var(--slow),color var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+  /*  #particles-js {
+     position:absolute; inset:0; z-index:0;
+    } */
+
+    .center-group {
+      z-index:99;
+      display:flex; flex-direction:column; align-items:center;
+      gap:1rem; padding:20px; 
+    }
+    .logo-container {
+      width:249px; 
+      animation:glow 3s ease-in-out infinite alternate;
+      cursor: pointer;
+      position:relative;
+    }
+    .logo-container object { width:100%; display:block }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #f0f) }
+      to   { filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 35px #f0f) }
+    }
+    .infodose {
+      font-size:1.4em; font-weight:300;
+      animation:fadeIn 1.5s forwards 1s; opacity:0;
+    }
+    .infodose strong { font-weight:600 }
+    @keyframes fadeIn { to { opacity:0.8 } }
+
+    .login-container {
+      width:248px; padding:0.8rem;
+      background:rgba(0,0,0,0.6);
+      border:2px solid transparent;
+      border-radius:24px; backdrop-filter:blur(8px);
+      display:flex; flex-direction:column; gap:1rem;
+      opacity:0; transition:opacity .3s;
+      pointer-events:none;
+    }
+    .login-container.active {
+      opacity:0.8; pointer-events:auto;
+    }
+    .login-container input {
+      width:100%; background:rgba(255,255,255,0.05);
+      border:none; border-bottom:1px solid rgba(255,255,255,0.3);
+      padding:0.6rem; font-size:1em; font-weight:300;
+      color:#fff; outline:none; text-align:center;
+      transition: background .3s;
+      border-radius:10px;
+    }
+    .login-container input:focus {
+      background:rgba(255,255,255,0.1);
+    }
+
+    .btn-container {
+  display: flex;
+  gap: 10px; /* espaço entre botões */
+  flex-wrap: wrap; /* quebra linha se não couber */
+}
+
+.btn-full {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  padding: 0.8rem 1.5rem; /* aumentei o padding horizontal pra ficar bonito */
+  background: rgba(255,255,255,0.05);
+  border: none;
+  border-radius: 20px;
+  font-size: 1em;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+  /* width removido para não forçar 100% */
+  flex: 1 1 auto; /* deixa os botões flexíveis no container */
+  min-width: 100px; /* largura mínima para não ficar muito pequeno */
+}
+
+.btn-full::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
+  border-radius: 20px;
+  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.btn-full:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,0.15);
+}
+
+    .logout-area {
+      display: none;
+      margin-top: 0.3rem;
+      outline: none;
+      text-align: center;
+      
+    }
+    .logout-area .username {
+      /* font-weight: 300;*/
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 1.1em; opacity:0.8;
+    }
+    .logout-area .btn-full {
+      background: rgba(255,50,50,0.1);
+      color: #f55;
+    }
+    .logout-area .btn-full::before {
+      background: linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5));
+    }
+.upload-btn {
+      
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10;
+    }
+    #uploadHTMLBtn{
+Position: fixed;
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      right:19px;
+      z-index: 10;
+      }
+    #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
+    #buyTokens { display:none; }
+    #buyTokens button {
+      width:100%; padding:0.8rem 0;
+      background:rgba(255,255,255,0.05);
+      border:2px solid transparent;
+      border-image: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5)) 1;
+      border-radius:20px;
+      font-size:1em; font-weight:600; color:#fff;
+      cursor:pointer;
+      transition: transform .3s, background .3s;
+    }
+    #buyTokens button:hover {
+      transform:scale(1.05);
+      background:rgba(255,255,255,0.15);
+    }
+
+    #decoderBox {
+      display:none;
+      position:fixed;
+      top:42px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.6);
+      padding:1rem;
+      border-radius:20px;
+      backdrop-filter:blur(8px);
+      z-index:20000;
+      text-align:center;
+    }
+    #decoderBox input {
+      padding:0.6rem;
+      width:200px;
+      text-align:center;
+      border-radius:10px;
+      border:none;
+      font-size:1em;
+    }
+
+    #toggleDecoderBtn
+     {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 19;
+      padding: 0.3rem 0.7rem;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.15);
+      color: #444;
+      font-weight: bold;
+      font-size: 0.95em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    #toggleDecoderBtn:hover,
+    #uploadHTMLBtn:hover {
+      transform: translateX(-50%) scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+    /* #toggleDecoderBtn { top: 138px; } */
+   /* #uploadHTMLBtn  { top: 93px; } */
+
+#userBgOptions {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 16px;
+  margin-top: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn var(--fast) ease;
+}
+
+#userBgOptions button {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background 0.3s, transform 0.3s;
+}
+
+#userBgOptions button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.03);
+}
+
+#userBgOptions .thumbnails img {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+#userBgOptions .thumbnails img:hover {
+  border-color: #fff;
+  opacity: 1;
+}
+ body {background: 
+  linear-gradient(to top, rgba(68, 68, 68, 0.4),rgba(255, 255, 255, 0.6));} 
+
+/* Animação de pulsar body {
+  background: 
+    linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7));
+  background-blend-mode: lighten;
+}cósmico */
+
+<style>
+  }
+  #miniPlayerContainer {
+    position: fixed;
+    top: 89px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 80vw;
+    max-width: 400px;
+    font-size: 0.9rem;
+  }
+  #toggleMiniPlayer {
+    background: linear-gradient(90deg, #8882f8, #c277f2);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 0 12px rgba(140, 102, 255, 0.8);
+    cursor: pointer;
+    font-weight: 700;
+    user-select: none;
+    transition: transform 0.2s ease;
+    width: 48px;
+    height: 48px;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #toggleMiniPlayer:hover {
+    transform: scale(1.1);
+  }
+  #panel {
+    margin-top: 12px;
+    background: rgba(25, 25, 35, 0.9);
+    border-radius: 18px;
+    box-shadow: 0 0 15px #7f52ff88;
+    padding: 16px;
+    max-height: 360px;
+    overflow-y: auto;
+    display: none;
+    backdrop-filter: blur(6px);
+  }
+  h2 {
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #d8b9ff;
+    border-bottom: 1px solid #6e4de7;
+    padding-bottom: 4px;
+  }
+  pre {
+    background: #222;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.85rem;
+    max-height: 100px;
+    overflow-y: auto;
+  }
+  button.actionBtn {
+    background: linear-gradient(45deg, #d97aff, #60e3ff);
+    border: none;
+    border-radius: 12px;
+    padding: 6px 14px;
+    color: #121212;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    user-select: none;
+    transition: background-color 0.25s ease;
+  }
+  button.actionBtn:hover {
+    background: linear-gradient(45deg, #e0b8ff, #94f0ff);
+  }
+  .section {
+    margin-bottom: 18px;
+  }
+  .small-info {
+    color: #bbb;
+    font-size: 0.8rem;
+    margin-top: -12px;
+    margin-bottom: 8px;
+  }
+  /* Scrollbar dark style */
+  #panel::-webkit-scrollbar {
+    width: 8px;
+  }
+  #panel::-webkit-scrollbar-thumb {
+    background: #7f52ffcc;
+    border-radius: 6px;
+  }
+  #panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+/* Hide legacy/old log pills if present */
+#logBtn, .log-pill, .pill-log, .old-log { display: none !important; }
+/* If there was a central old pill container */
+#miniPlayerContainer, #centralPill, .old-center-button { display: none !important; }
+
+</style>
+
+  </style>
+      <!-- body {background: transparent !important; !-->
+
+<style>
+  /* === Tiny Ultra button inside response-controls (bottom-left) === */
+  #kblxUltraMini{
+    position:absolute; left:8px; bottom:8px; z-index:1200;
+    width:16px; height:16px; border-radius:50%;
+    background: linear-gradient(135deg, rgba(0,216,216,0.9), rgba(216,0,216,0.9));
+    border:1px solid rgba(255,255,255,.18);
+    box-shadow: 0 6px 16px rgba(0,0,0,.35);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    cursor:pointer;
+  }
+  .response-controls{ position:relative } /* to anchor the mini button */
+
+  /* === Tiny 3D ON/OFF button below Log pill (top-left stack) === */
+  #kblx3DToggle{ position:fixed; top:46px; left:25px; z-index:2001; width:16px; height:16px; border-radius:50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.2)); border:1px solid rgba(255,255,255,.35); box-shadow: 0 6px 14px rgba(0,0,0,.35); cursor:pointer; }
+  #kblx3DToggle.on{ background: radial-gradient(circle at 30% 30%, #00ffee, rgba(0,255,255,.25)) }
+
+  /* === 3D Hyperbolic Space === */
+  #kblxSpaceWrap{
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    perspective: var(--kblx-perspective, 900px);
+    transition: perspective .25s ease;
+  }
+  #kblxSpace{
+    position: absolute; inset: 0; transform-style: preserve-3d;
+    transform: translateZ(var(--kblx-camZ, -400px)) rotateX(var(--kblx-rotX, -6deg)) rotateY(var(--kblx-rotY, 0deg));
+    transition: transform .06s linear;
+  }
+  .kblx-panel3d{
+    position: absolute; width: 560px; height: 360px;
+    transform-style: preserve-3d;
+    border-radius: 14px; overflow: hidden;
+    background: rgba(0,0,0,.35);
+    border:1px solid rgba(255,255,255,.08);
+    box-shadow: 0 18px 38px rgba(0,0,0,.45);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    pointer-events: auto; /* allow interaction when 3D enabled */
+  }
+  .kblx-panel3d header{
+    background: linear-gradient(90deg, rgba(0,216,216,.35), rgba(216,0,216,.25));
+    color:#fff; font-weight:700; padding:6px 10px; font-size:12px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .kblx-panel3d iframe{ width:100%; height: calc(100% - 32px); border:0; background:#000 }
+  .kblx-close3d{
+    background: transparent; border:0; color:#fff; font-size:16px; cursor:pointer;
+  }
+
+  /* Interactions surface on top for gestures (but keep UI clickable) */
+  #kblxGestureLayer{
+    position: fixed; inset: 0; z-index: 10;
+    pointer-events: none; /* enabled only when 3D is on via JS */
+  }
+  #kblxGestureLayer.active{ pointer-events: auto; touch-action: none }
+</style>
+
+</head>
+<body>
+
+
+<div id="miniPlayerContainer" role="region" aria-label="Painel de Ativações">
+  <button id="toggleMiniPlayer" aria-expanded="false" aria-controls="panel" title="Abrir painel de ativações">💊</button>
+
+  <div id="panel" tabindex="0">
+    <div class="section" id="localStorageSection">
+      <h2>🗄️ LocalStorage</h2>
+      <pre id="localStorageContent">Carregando...</pre>
+      <button class="actionBtn" id="clearLocalStorageBtn" title="Limpar LocalStorage">Limpar LocalStorage</button>
+    </div>
+
+    <div class="section" id="logsSection">
+      <h2>📜 Logs Recentes</h2>
+      <pre id="logsContent">Nenhum log registrado.</pre>
+      <button class="actionBtn" id="clearLogsBtn" title="Limpar logs">Limpar Logs</button>
+    </div>
+
+    <div class="section" id="fetchSection">
+      <h2>🌐 Fetch & IA Acionada</h2>
+      <pre id="fetchContent">Nenhum fetch recente.</pre>
+      <div class="small-info" id="iaUsedInfo">IA atual: Nenhuma</div>
+      <button class="actionBtn" id="clearFetchBtn" title="Limpar dados fetch">Limpar Dados Fetch</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Toggle painel
+  const toggleBtn = document.getElementById('toggleMiniPlayer');
+  const panel = document.getElementById('panel');
+  toggleBtn.addEventListener('click', () => {
+    const isVisible = panel.style.display === 'block';
+    if (isVisible) {
+      panel.style.display = 'none';
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    } else {
+      panel.style.display = 'block';
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      loadLocalStorage();
+      loadLogs();
+      loadFetch();
+    }
+  });
+
+  // === LocalStorage ===
+  const localStorageContent = document.getElementById('localStorageContent');
+  const clearLocalStorageBtn = document.getElementById('clearLocalStorageBtn');
+
+  function loadLocalStorage() {
+    if (localStorage.length === 0) {
+      localStorageContent.textContent = 'LocalStorage vazio.';
+      return;
+    }
+    let content = '';
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      let value = localStorage.getItem(key);
+      try {
+        // tenta formatar JSON para melhor visualização
+        value = JSON.stringify(JSON.parse(value), null, 2);
+      } catch {
+        // valor normal
+      }
+      content += `${key}: ${value}\n\n`;
+    }
+    localStorageContent.textContent = content.trim();
+  }
+  clearLocalStorageBtn.addEventListener('click', () => {
+    if (confirm('Confirma limpar todo o LocalStorage?')) {
+      localStorage.clear();
+      loadLocalStorage();
+      addLog('LocalStorage limpo pelo usuário.');
+    }
+  });
+
+  // === Logs simples (exemplo) ===
+  // Simulando um log armazenado na memória local do script
+  let logs = [];
+
+  function addLog(text) {
+    const now = new Date().toLocaleTimeString();
+    logs.push(`[${now}] ${text}`);
+    if (logs.length > 30) logs.shift(); // mantém só os últimos 30 logs
+    if (panel.style.display === 'block') loadLogs();
+  }
+
+  const logsContent = document.getElementById('logsContent');
+  const clearLogsBtn = document.getElementById('clearLogsBtn');
+
+  function loadLogs() {
+    if (logs.length === 0) {
+      logsContent.textContent = 'Nenhum log registrado.';
+      return;
+    }
+    logsContent.textContent = logs.join('\n');
+  }
+  clearLogsBtn.addEventListener('click', () => {
+    if (confirm('Limpar todos os logs?')) {
+      logs = [];
+      loadLogs();
+    }
+  });
+
+  // === Fetch & IA usada (exemplo) ===
+  // Simulação de dados fetch e IA para demo
+  let fetchData = [];
+  let iaAtual = 'Nenhuma';
+
+  function addFetchData(url, iaName, responseSample) {
+    iaAtual = iaName;
+    const now = new Date().toLocaleTimeString();
+    fetchData.push(`[${now}] URL: ${url}\nIA: ${iaName}\nResposta: ${responseSample}`);
+    if (fetchData.length > 10) fetchData.shift();
+    if (panel.style.display === 'block') loadFetch();
+  }
+
+  const fetchContent = document.getElementById('fetchContent');
+  const iaUsedInfo = document.getElementById('iaUsedInfo');
+  const clearFetchBtn = document.getElementById('clearFetchBtn');
+
+  function loadFetch() {
+    if (fetchData.length === 0) {
+      fetchContent.textContent = 'Nenhum fetch recente.';
+      iaUsedInfo.textContent = 'IA atual: Nenhuma';
+      return;
+    }
+    fetchContent.textContent = fetchData.join('\n\n');
+    iaUsedInfo.textContent = 'IA atual: ' + iaAtual;
+  }
+  clearFetchBtn.addEventListener('click', () => {
+    if (confirm('Limpar dados de fetch?')) {
+      fetchData = [];
+      iaAtual = 'Nenhuma';
+      loadFetch();
+    }
+  });
+
+  // Exemplo de uso para testar (pode remover/editar)
+  addLog('Painel carregado.');
+  addFetchData('https://api.exemplo.com/gpt4', 'GPT-4', '{"result":"ok"}');
+
+  // Você pode criar funções para capturar seus fetch reais e IA em uso, e adicionar aqui
+  // Por exemplo, sobrescrever fetch para logar automaticamente, se quiser
+</script>
+  <div class="center-group">
+    <div class="logo-container" id="logoDual">
+      <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
+      <object data="assets/icons/Dual-Orb-e2.png" type="image/png"></object>
+    </div>
+    <div class="infodose">dual.<strong>Infodose</strong></div>
+
+    <div class="login-container" id="loginBox">
+      <input type="text" id="user" placeholder="Usuário" required>
+      <input type="password" id="pass" placeholder="Senha" required>
+      <button class="btn-full" id="submitBtn">Entrar</button>
+      <div>  <!-- Botão de upload -->
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
+  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
+</div>
+        <div id="decoderBox">
+    <input type="text" id="codeInput" placeholder="Digite o selo...">
+    <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+  </div>
+  <button id="toggleDecoderBtn">
+  <img src="assets/icons/KBLX-pack/SuS-logo-1.PNG" alt="SuS Logo" style="height: 24px; vertical-align: middle;">
+</button>
+  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+  <button id="uploadHTMLBtn">☍</button>
+      
+      <div id="messageBox"></div>
+      <div id="buyTokens">
+        <button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
+      </div>
+      <div class="logout-area">
+        <div id="loggedUsername" class="username"></div>
+        <button id="logoutBtn" class="btn-full">Desconectar</button>
+      </div>
+      
+    </div>
+  </div>
+
+  
+
+  <script type="module">
+    const loginBox   = document.getElementById('loginBox');
+    const userInput  = document.getElementById('user');
+    const passInput  = document.getElementById('pass');
+    const submitBtn  = document.getElementById('submitBtn');
+    const messageBox = document.getElementById('messageBox');
+    const buyArea    = document.getElementById('buyTokens');
+    const buyBtn     = document.getElementById('buyIFTBtn');
+    const logoutArea = document.querySelector('.logout-area');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const loggedUser = document.getElementById('loggedUsername');
+    const logoDual   = document.getElementById('logoDual');
+    const storedKey  = 'infodose_user';
+
+    const decoderBox = document.getElementById('decoderBox');
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const uploadInput = document.getElementById('uploadHTML');
+    const uploadBtn   = document.getElementById('uploadHTMLBtn');
+
+    const USERS_JSON = 'users/usersid.json';
+    const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
+    
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBX": "menu-x-1.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "1991": "menu-x-1-E-19-E-9re-1.html",
+      "DBK": "dual-book-12.html",
+      "IMN": "index-manifestado.html",
+      "IMNN": "index-manifestado-tangle.html",
+      "BTS": "botao-simbolico.html",
+      "SBK": "SmbS-book-4.html",
+      "SBL": "SmbS-book-2.html",
+      "KDX": "menu-x-1-E-19-E-9_refatorado_final.html",
+      "KDI": "menu-integrado-kobllux.html",
+      "1992": "menu-x-1-E-19-E-9re-2.html",
+      "KDF": "menu-x-1-E-8.html",
+      "KDB": "menu-x-1-E-10.html",
+      "KDJ": "menu-x-1-E-19-E-9_renderresponse-final.html",
+      "HTM": "KBLX-HTML-v4.1-FULLSCREEN-SEPARADOR.html",
+      "MN6": "menu-x-1-E-6.html",
+      "MN7": "menu-x-1-E-7.html",
+      "MN8": "menu-x-1-E-8.html",
+      "MN9": "menu-x-1-E-9.html",
+      "MN10": "menu-x-1-E-10.html",
+      "MN11e": "menu-x-1-E-11e.html",
+      "MN12": "menu-x-1-E-12.html",
+      "MN13": "menu-final-com-pulso.html",
+      "MN14": "menu-pulso-final.html",
+      "MN15": "menu-x-1-E-15.html",
+      "19E9": "menu-x-1-E-19-E-9.html",
+      "19E10": "menu-x-1-E-19-E-10.html",
+      "19E11": "menu-x-1-E-19-E-11.html",
+      "MN19": "menu-x-1-E-19.html",
+      "19E8": "menu-x-1-E-19-E-8.html",
+      "19E0": "menu-x-1-E-19-E-0.html",
+      "19921": "menu-x-1-E-19-E-9re-2-1.html",
+      "19922": "menu-x-1-E-19-E-9re-2-2.html",
+      "19923": "menu-x-1-E-19-E-9re-2-3.html",
+      "19924": "menu-x-1-E-19-E-9re-2-4.html",
+      "19925": "menu-x-1-E-19-E-9re-2-5.html",
+      "19926": "menu-x-1-E-19-E-9re-2-6.html",
+      "19927": "menu-x-1-E-19-E-9re-2-7.html",
+      "19928": "menu-x-1-E-19-E-9re-2-8.html",
+      "9231": "menu-x-1-E-19-E-9-2re-3-1.html",
+      "9232": "menu-x-1-E-19-E-9-2re-3-2.html",
+      "9233": "menu-x-1-E-19-E-9-2re-3-3.html",
+      "9241": "menu-x-1-E-19-E-9-2re-4-1.html",
+      "9242": "menu-x-1-E-19-E-9-2re-4-2.html",
+      "9243": "menu-x-1-E-19-E-9-2re-4-3.html",
+      "9244": "menu-x-1-E-19-E-9-2re-4-4.html",
+
+      "920": "menu-x-1-E-19-E-9re-2-FINAL-0e-2-bgvar.html",
+      "92F0": "menu-x-1-E-19-E-9re-2-FINAL-0.html",
+      "F0E": "menu-x-1-E-19-E-9re-2-FINAL-0e.html",
+      "F01": "menu-x-1-E-19-E-9re-2-FINAL-0e-1.html",
+      "F02": "menu-x-1-E-19-E-9re-2-FINAL-0e-2.html",
+      "F03": "menu-x-1-E-19-E-9re-2-FINAL-0e-3.html",
+
+      "F30": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-0.html",
+      "F31": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-1.html",
+      "F32": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-2.html",
+      "F33": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-3.html",
+      "F34": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-4.html",
+      "F10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0.html",
+      "F11": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1.html",
+      "F12": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-2.html",
+      "F13": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-3.html",
+      "F14": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-4.html",
+      "F15": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-5.html",
+      "F16": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-6.html",
+      
+      "100": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1-0.html",
+      "101": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ATUALIZADO.html",
+      "102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO.html",
+
+      "103": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO-INTEGRADO.html",
+      "104": "menu-x-KBLUX-SYM-renderResponse-GLOWED.html",
+      "105": "RENDERRESPONSE-refinado-MODIFICADO.html",
+      "106": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-RESPONSIVO-BOTOES.html",
+      "107": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-TRINITY-ARCHE.html",
+      
+      "108": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-0.html",
+      "109": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1.html",
+      "1102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-2.html",
+      
+      "110": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0.html",
+      
+      "111": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-1.html",
+      "112": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-2.html",
+      "113": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-3.html",
+      "114": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-4.html",
+      "115": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-5.html",
+      "116": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-6.html",
+      "117": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-7.html",
+      "118": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-8.html",
+      "119": "dual-app-renderResponse-SEPARADA.html",
+      "120": "dual-app-renderResponse-UNIFICADA.html",
+      "121": "dual-app-renderResponse-UNIFICADA-COMPACTO.html",
+      "1000": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-0.html",
+    
+      "1001": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-1.html",
+      "1002": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2.html",
+      "1002A": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2a.html",
+      "1003": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-3.html",
+
+      "1008": "dualapp-renderResponse-Trinity-subblocos-integrado.html",
+      "1005": "menu-integrado-renderResponse-v1-final.html",
+      "1006": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-0.html",
+      
+      "AR1": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-1.html",
+      "AR2": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-2.html",
+      "AR3": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-3.html",
+      "AR4": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-4.html",
+      
+      "AR5": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-5.html",
+      "AR6": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6.html",
+      "AR7": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-7.html",
+      "AR8": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-8.html",
+      "AR9": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-9.html",
+      
+      "R10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-10.html",
+      
+      "R60": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-0.html",
+      "R61": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-1.html",
+      "R62": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-2.html",
+      "R63": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3.html",
+
+      "R64": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-4.html",
+      "R65": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-5.html",
+      "R66": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-6.html",
+
+      "999": "dual-infodose-v3-toggle-advanced.html",
+      "666": "dual-infodose-v2-renderResponse-simbio-ajustado.html",
+      "333": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix.html",
+
+      "990": "dual-infodose-v3-refatorado-patch-0.html",
+      "991": "dual-infodose-v3-refatorado-patch-1.html",
+      "992": "dual-infodose-v3-refatorado-patch-2.html",
+      "E99": "dual-infodose-v3-refatorado-patch.html",
+
+      "993": "dual-infodose-v3-refatorado-patch-3.html",
+      "994": "dual-infodose-v3-refatorado-patch-4.html",
+      "995": "dual-infodose-v3-refatorado-patch-5.html",
+      "996": "dual-infodose-v3-refatorado-patch-6.html",
+      "997": "dual-infodose-v3-refatorado-patch-7.html",
+      "998y": "dual-infodose-v3-refatorado-patch-8.html",
+
+      "129": "dual-app-990e-12.html",
+      "139": "dual-app-990e-13.html",
+      "90e": "dual-app-990e.html",
+      "90": "dual-app-990.html",
+      
+      "139e": "dual-app-990e-13-E.html",
+      "149": "dual-app-990e-14.html",
+      "159": "dual-app-990e-15.html",
+      "169": "dual-app-990e-16.html",
+      "179": "dual-app-990e-17.html",
+      "189": "dual-app-990e-18.html",
+      "ADV": "ADV-gen.html",
+      
+      "R630": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html",
+      "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
+      "R632": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html",
+      "R633": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-1.html",
+
+      "R16": "dual-app-990e-16-REFATORADO.html",
+      "R160": "dual-app-990e-16-RE-0.html",
+
+      "Htmn": "Editor-html-0.html",
+      "Html": "Editor-html-1.html",
+      "ht": "Editor-html-2.html",
+      "pf": "pref-0.html",
+
+      
+      "MRR": "menu-RR.html",
+      "R90": "dual-infodose-v4-simbiose-final.html",
+      
+
+
+    };
+
+    function playButtonSound() {
+      const sound = new Audio('assets/sounds/uiSamples/back-action.wav');
+      sound.volume = 0.7;
+      sound.play().catch(() => {});
+    }
+
+    toggleDecoderBtn.addEventListener('click', () => {
+  playButtonSound();
+
+  const isVisible = decoderBox.style.display === 'block';
+  decoderBox.style.display = isVisible ? 'none' : 'block';
+
+  // Animação fluida
+  gsap.fromTo(decoderBox,
+    { opacity: 0, y: -20 },
+    { opacity: isVisible ? 0 : 1, y: 0, duration: 0.4, ease: "power2.out" }
+  );
+});
+
+    uploadBtn.addEventListener('click', () => {
+      playButtonSound();
+      uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+
+    const blob = new Blob([content], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    alert('Página carregada com sucesso! Redirecionando...');
+
+    setTimeout(() => {
+      window.location.href = blobUrl;
+    }, 1000);
+  };
+  reader.readAsText(file);
+      } else {
+        alert("Por favor, selecione um arquivo .html válido.");
+      }
+    });
+
+    window.decodeSymbolicCode = () => {
+  playButtonSound();
+
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const dest = CODE_MAP[code];
+
+  if (dest) {
+  const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
+  audio.volume = 0.6;
+  audio.play().catch(() => {});
+  
+  gsap.to('.logo-container', { scale: 0.8, duration: 0.9, ease: 'power3.out' });
+  gsap.to('.infodose', { scale: 0, duration: 0.9, ease: 'power3.out' });
+  gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
+  gsap.to('body', {
+    opacity: 0,
+    duration: 0.9,
+    delay: 0,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 9); // tempo extra para terminar áudio
+    }
+  });
+} else {
+    alert('Selo desconhecido ou não registrado.');
+  }
+};
+
+    const goToIndex = () => {
+      const audio = new Audio('assets/sounds/suave_portal.mp3');
+      audio.volume = 1;
+      audio.play().catch(() => {});
+      gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+      gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+      gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+      setTimeout(() => { window.location.href = 'index.html'; }, 1399);
+    };
+
+    const lockScroll = () => {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.height = '100vh';
+      document.body.style.height = '100vh';
+      window.scrollTo(0, 0);
+    };
+
+    function showLoginUI() {
+      loginBox.classList.add('active');
+      userInput.style.display  = '';
+      passInput.style.display  = '';
+      submitBtn.style.display  = '';
+      logoutArea.style.display = 'none';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    function showLogoutUI(user) {
+      loginBox.classList.add('active');
+      userInput.style.display  = 'none';
+      passInput.style.display  = 'none';
+      submitBtn.style.display  = 'none';
+      logoutArea.style.display = 'block';
+      loggedUser.textContent   = user ? `${user}` : '';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    window.addEventListener('load', () => {
+      lockScroll();
+      const stored = localStorage.getItem(storedKey);
+      stored ? showLogoutUI(stored) : showLoginUI();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const rawUser = userInput.value.trim();
+      const u = rawUser.toLowerCase();
+      const p = passInput.value.trim();
+      if (!u || !p) {
+        showLoginUI();
+        messageBox.textContent = 'Por favor, preencha usuário e senha.';
+        messageBox.style.display = 'block';
+        return;
+      }
+      try {
+        const res   = await fetch(USERS_JSON);
+        if (!res.ok) throw new Error('Falha ao carregar credenciais.');
+        const creds = await res.json();
+        if (creds[u] && creds[u] === p) {
+          localStorage.setItem(storedKey, rawUser);
+          goToIndex();
+        } else {
+          showLoginUI();
+          messageBox.textContent = creds[u] ? 'Senha incorreta para usuário mestre.' : 'Usuário ainda não conectado com o pulso.';
+          messageBox.style.display = 'block';
+          buyArea.style.display = 'block';
+        }
+      } catch (err) {
+        showLoginUI();
+        messageBox.textContent = err.message;
+        messageBox.style.display = 'block';
+        buyArea.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(storedKey);
+      showLoginUI();
+    });
+
+    logoDual.addEventListener('click', () => {
+      const user = localStorage.getItem(storedKey);
+      if (user) goToIndex();
+    });
+
+    buyBtn.addEventListener('click', () => {
+      window.location.href = PIX_LINK;
+    });
+
+    
+  </script>
+  
+ 
+  <style>
+     body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      /*background: transparent;*/
+    }
+
+    .fake-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* ou 'contain' se quiser ver tudo */
+      object-position: center;
+      z-index: -2;
+      opacity: 0.24; /* ajusta a transparência */
+      pointer-events: none; /* deixa os cliques passarem por ela */
+      transition: opacity 0.5s ease;
+    }
+
+    
+
+    #imgUpload {
+      display: none;
+    }
+  </style>
+
+
+  <!-- IMG como plano de fundo fake 
+  particlesJS('particles-js', {
+      particles: {
+        number:{value:48,density:{enable:true,value_area:600}},
+        color:{value:['#0ff','#f0f']},
+        shape:{type:'circle'},
+        opacity:{value:0.4,random:true},
+        size:{value:3,random:true},
+        move:{enable:true,speed:1.2,random:true,out_mode:'out'}
+      },
+      retina_detect:true
+    }); 
+  -->
+  <img id="bgImage" class="fake-bg" src="about:blank" alt="" />
+
+
+ <!-- botão que abre o painel de opções -->
+<button id="openBgOptionsBtn" style=" border:1px var(--bg); color:var(--text); background:rgba(0,0,0,0.3); padding:3px; border-radius:50%;" title="Opções de BG">௵</button>
+
+<!-- painel de opções -->
+<div id="userBgOptions" style="display:none; flex-direction:column; gap:8px; background:rgba(0,0,0,0.8); padding:10px; border-radius:8px; max-width:320px;">
+  <!-- SEU botão (exatamente como pediu) -->
+  <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
+  <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)" style="display:none;">
+
+  <button id="cycleBtn">🔁 Ciclar</button>
+  <button id="clearHistoryBtn" style="background:#c00; color:#fff;">🗑 Limpar histórico</button>
+
+  <div id="bgHistory" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+</div>
+
+<!-- elemento de fundo (seu bg) -->
+
+
+<script>
+/* --- Keys --- */
+const BG_KEY = "bgImageSource";
+const BG_HISTORY_KEY = "bgImageHistory";
+const FILTER_KEY = "bgImageFilter";
+
+/* --- Imagens fixas --- */
+const imagensFixas = [
+  'assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG',
+  'assets/styles/themes/bgs/Nebula-Galaxy.png',
+  'assets/styles/themes/bgs/Circuit-Spirit.jpg',
+  'assets/styles/themes/bgs/Temple-Net.png'
+];
+
+let indexAtual = 0;
+
+/* --- DOM --- */
+const bg = document.getElementById('bgImage');
+const cycleBtn = document.getElementById('cycleBtn');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const bgHistoryContainer = document.getElementById('bgHistory');
+const userBgOptions = document.getElementById('userBgOptions');
+const openBgOptionsBtn = document.getElementById('openBgOptionsBtn');
+
+/* --- util --- */
+function logMistico(msg) {
+  if (window.logMistico) window.logMistico(msg);
+  else console.log("◉", msg);
+}
+
+/* --- toggle painel --- */
+function toggleUserOptions() {
+  userBgOptions.style.display = (userBgOptions.style.display === 'flex') ? 'none' : 'flex';
+}
+openBgOptionsBtn.addEventListener('click', toggleUserOptions);
+
+/* -------------------------
+   Função de upload (vinda sua)
+   ------------------------- */
+function trocarImagem(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataURL = e.target.result;
+
+    // usa setBG para salvar e adicionar ao histórico
+    setBG(dataURL, true);
+
+    logMistico("Imagem BG atualizada 🖼️ (via trocarImagem)");
+    // limpa input para permitir re-upload do mesmo arquivo depois
+    event.target.value = "";
+  };
+  reader.readAsDataURL(file);
+}
+
+/* --- Carregar usuário / histórico --- */
+function loadUserBG() {
+  const savedSrc = localStorage.getItem(BG_KEY) || imagensFixas[0];
+  const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
+  bg.src = savedSrc;
+  bg.style.filter = savedFilter;
+  renderHistory();
+}
+
+/* --- Ciclar fixas --- */
+cycleBtn.addEventListener('click', () => {
+  indexAtual = (indexAtual + 1) % imagensFixas.length;
+  setBG(imagensFixas[indexAtual], true); // também salva no histórico
+  logMistico("🔁 BG ciclado");
+});
+
+/* --- Limpar histórico --- */
+clearHistoryBtn.addEventListener('click', () => {
+  if (!confirm("Tem certeza que deseja apagar todo o histórico de imagens?")) return;
+  localStorage.removeItem(BG_HISTORY_KEY);
+  // resetar para a primeira fixa (opcional)
+  localStorage.setItem(BG_KEY, imagensFixas[0]);
+  bg.src = imagensFixas[0];
+  renderHistory();
+  logMistico("🗑 Histórico de BG apagado");
+});
+
+/* --- Definir BG e salvar no histórico --- */
+function setBG(src, salvarHistorico = false) {
+  bg.src = src;
+  localStorage.setItem(BG_KEY, src);
+
+  if (salvarHistorico) {
+    let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+    // evita duplicatas
+    if (!history.includes(src)) {
+      history.push(src);
+      localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history));
+    }
+    renderHistory();
+  }
+}
+
+/* --- Renderizar miniaturas do histórico --- */
+function renderHistory() {
+  bgHistoryContainer.innerHTML = "";
+  const history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+
+  history.forEach(src => {
+    const thumb = document.createElement("img");
+    thumb.src = src;
+    thumb.style.width = "58px";
+    thumb.style.height = "38px";
+    thumb.style.objectFit = "cover";
+    thumb.style.cursor = "pointer";
+    thumb.style.border = "2px solid transparent";
+    thumb.style.borderRadius = "4px";
+
+    thumb.addEventListener("click", () => {
+      setBG(src, false); // não duplica no histórico ao escolher
+      logMistico("📷 BG trocado via histórico");
+    });
+
+    // botão de remover miniatura individual (opcional)
+    const wrap = document.createElement("div");
+    wrap.style.position = "relative";
+    wrap.style.display = "inline-block";
+    wrap.appendChild(thumb);
+
+    const rm = document.createElement("button");
+    rm.textContent = "✕";
+    rm.title = "Remover";
+    rm.style.position = "absolute";
+    rm.style.top = "-6px";
+    rm.style.right = "-6px";
+    rm.style.width = "18px";
+    rm.style.height = "18px";
+    rm.style.border = "none";
+    rm.style.borderRadius = "50%";
+    rm.style.fontSize = "11px";
+    rm.style.cursor = "pointer";
+    rm.style.background = "rgba(0,0,0,0.6)";
+    rm.style.color = "#fff";
+    rm.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      removeFromHistory(src);
+    });
+
+    wrap.appendChild(rm);
+    bgHistoryContainer.appendChild(wrap);
+  });
+}
+
+/* --- Remover item do histórico --- */
+function removeFromHistory(src) {
+  let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+  history = history.filter(s => s !== src);
+  localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history));
+  renderHistory();
+  logMistico("🗑 Miniatura removida do histórico");
+}
+
+/* --- init --- */
+window.addEventListener('load', loadUserBG);
+</script>
+<script>
+  const toggleMiniPlayer = document.getElementById("toggleMiniPlayer");
+  const iframeWrapper = document.getElementById("iframeWrapper");
+
+  let showing = false;
+  toggleMiniPlayer.addEventListener("click", () => {
+    showing = !showing;
+    iframeWrapper.style.display = showing ? "block" : "none";
+    toggleMiniPlayer.innerText = showing ? "💊" : "💊";
+  });
+</script>
+<!-- ░░ KBLX INJECTION: Log 💊 + iFrame Toggle 👥 + Command Palette (-o) ░░ -->
+<style>
+  #kblxLogBtn{
+    position:fixed; top:66px; left:20px; z-index:2001;
+    font-size:18px; line-height:1;
+    background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));
+backdrop-filter: blur(6px);
+-webkit-backdrop-filter: blur(6px);
+ color:#fff;
+    border:none; padding:9px 11px; border-radius:10px; cursor:pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px);
+  }
+  #kblxLogPanel{
+    position:fixed; top:108px; left:20px; width:320px; max-height:50vh;
+    display:none; z-index:2000; overflow:auto;
+    background:rgba(0,0,0,0.66); color:#cfe; border-radius:14px; padding:10px 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,.08);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size:.92rem;
+  }
+  #kblxLogPanel strong{ color:#ff00ff }
+  #kblxLogLines > div{ padding:4px 0; border-bottom:1px dashed rgba(255,255,255,.08) }
+  #kblxLogActions{ display:flex; gap:8px; margin-top:8px }
+  #kblxLogActions button{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.08);
+    border-radius:8px; padding:6px 10px; cursor:pointer }
+  #kblxPeopleBtn{
+    position:fixed; top:166px; left:50%; transform:translateX(-50%);
+    z-index:2001; font-size:24px;
+    background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));
+backdrop-filter: blur(6px);
+-webkit-backdrop-filter: blur(6px);
+ color:#fff;
+    border:none; padding:12px; border-radius:50%; cursor:pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px);
+  }
+  #kblxIframeOverlay{ position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55) }
+  #kblxIframeBox{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:88vw; max-width:1000px; height:72vh; min-width:480px; min-height:360px;
+    background:rgba(0,0,0,0.35); border-radius:16px; overflow:hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  #kblxIframeBox header{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:8px 12px; color:#fff;
+    background:linear-gradient(90deg, rgba(0,255,255,.22), rgba(255,0,255,.16));
+    cursor:move;
+  }
+  #kblxIframeClose, #kblxIframePop, #kblxIframeReload{
+    background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;
+  }
+  #kblxIframe{ width:100%; height:calc(72vh - 46px); border:0; display:block; background:#000 }
+  #kblxResize{ position:absolute; right:0; bottom:0; width:20px; height:20px; cursor:nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.35) 51%); opacity:.65; }
+  /* Command Palette */
+  #kblxCmdPal{ position:fixed; inset:0; display:none; z-index:2100; background:rgba(0,0,0,.6);
+    align-items:flex-start; justify-content:center; padding-top:12vh; }
+  #kblxCmdBox{ width:min(820px, 92vw); background:#0f1220; border:1px solid rgba(255,255,255,.08);
+    border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.45); overflow:hidden; }
+  #kblxCmdBox header{ padding:10px 14px; color:#ccd; font-weight:700; background:rgba(255,255,255,.04) }
+  #kblxCmdInput{ width:100%; font-size:16px; color:#fff; background:transparent; border:0; outline:0;
+    padding:14px; font-family:ui-monospace, monospace; }
+  #kblxCmdHelp{ padding:8px 14px; color:#aab; font-size:.9rem; border-top:1px solid rgba(255,255,255,.08) }
+  #kblxCmdHelp code{ background:rgba(255,255,255,.06); padding:2px 6px; border-radius:6px }
+</style>
+
+<button id="kblxLogBtn" title="Log">💊</button>
+
+<!-- Tiny 3D toggle below Log pill -->
+<div id="kblx3DToggle" title="Super Parallax 3D"></div>
+
+<!-- 3D Space (behind UI) -->
+<div id="kblxSpaceWrap" aria-hidden="true">
+  <div id="kblxSpace"></div>
+</div>
+<div id="kblxGestureLayer"></div>
+
+<!-- Mini Ultra button docked inside response-controls (bottom-left) -->
+<button id="kblxUltraMini" title="Ultra Glass"></button>
+
+<div id="kblxLogPanel" role="region" aria-label="Painel de Logs">
+  <strong>◉ LOG</strong>
+  <div id="kblxLogActions">
+    <button id="kblxCopyLog" title="Copiar">Copiar</button>
+    <button id="kblxClearLog" title="Limpar">Limpar</button>
+  </div>
+  <div id="kblxLogLines"></div>
+</div>
+
+<button id="kblxPeopleBtn" title="Abrir iFrame">👥</button>
+
+<div id="kblxIframeOverlay" aria-hidden="true">
+  <div id="kblxIframeBox" role="dialog" aria-modal="true" aria-label="Visor Integrado">
+    <header id="kblxDragBar">
+      <span class="title">Visor Integrado</span>
+      <span style="flex:1"></span>
+      <button id="kblxIframeReload" title="Recarregar">↻</button>
+      <button id="kblxIframePop" title="Abrir em nova guia">⤴︎</button>
+      <button id="kblxIframeClose" aria-label="Fechar">×</button>
+    </header>
+    <iframe id="kblxIframe" src="about:blank" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    <div id="kblxResize" title="Redimensionar"></div>
+  </div>
+</div>
+
+<div id="kblxCmdPal">
+  <div id="kblxCmdBox">
+    <header>Comandos KBLX</header>
+    <input id="kblxCmdInput" placeholder="Digite um comando. Ex.: -o dual-book.html" spellcheck="false" />
+    <div id="kblxCmdHelp">
+      <div>Atalhos: <code>Ctrl/Cmd + K</code> abre; <code>Esc</code> fecha; <code>Ctrl/Cmd + L</code> log; <code>Ctrl/Cmd + O</code> visor.</div>
+      <div style="margin-top:6px">Comandos: <code>-o &lt;url&gt;</code> (abre no iFrame), <code>open &lt;url&gt;</code>, <code>close</code>, <code>reload</code>, <code>log on|off</code>.</div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  (function(){
+    // ----- Ultra Mini Button in controls -----
+    function getControlsContainer(){
+      return document.querySelector('.response-controls') || document.body;
+    }
+    const ultraMini = document.getElementById('kblxUltraMini');
+    function setUltra(on){
+      if(on){ document.body.classList.add('kblx-ultra'); }
+      else { document.body.classList.remove('kblx-ultra'); }
+      localStorage.setItem('kblx.ultra', on ? '1' : '0');
+    }
+    ultraMini.addEventListener('click', ()=> setUltra(!document.body.classList.contains('kblx-ultra')));
+    if(localStorage.getItem('kblx.ultra') === '1'){ setUltra(true); }
+
+    // Ensure mini is in controls container
+    const rc = getControlsContainer();
+    if(rc && ultraMini && ultraMini.parentElement !== rc){ rc.appendChild(ultraMini); }
+
+    // ----- Super Parallax 3D Hyperbolic -----
+    const toggle3D = document.getElementById('kblx3DToggle');
+    const spaceWrap = document.getElementById('kblxSpaceWrap');
+    const space = document.getElementById('kblxSpace');
+    const layer = document.getElementById('kblxGestureLayer');
+
+    let cam = { rotX: -6, rotY: 0, camZ: -400, persp: 900 };
+    let threeDOn = localStorage.getItem('kblx.3d') === '1';
+
+    function applyCam(){
+      document.documentElement.style.setProperty('--kblx-rotX', cam.rotX + 'deg');
+      document.documentElement.style.setProperty('--kblx-rotY', cam.rotY + 'deg');
+      document.documentElement.style.setProperty('--kblx-camZ', cam.camZ + 'px');
+      document.documentElement.style.setProperty('--kblx-perspective', cam.persp + 'px');
+    }
+    applyCam();
+
+    function set3D(on){
+      threeDOn = !!on;
+      toggle3D.classList.toggle('on', threeDOn);
+        toggle3D.setAttribute('aria-pressed', threeDOn ? 'true' : 'false');
+      localStorage.setItem('kblx.3d', threeDOn ? '1' : '0');
+      layer.classList.toggle('active', threeDOn);
+      // When 3D on: allow pointer events inside space panels
+      spaceWrap.style.pointerEvents = threeDOn ? 'auto' : 'none';
+    }
+    set3D(threeDOn);
+
+    toggle3D.addEventListener('click', ()=> set3D(!threeDOn));
+
+    // Hyperbolic zoom curve: camZ and perspective change nonlinearly
+    function hyperZoom(delta){
+      // delta positive -> zoom in (bring camera closer, increase perspective depth)
+      const z = cam.camZ;
+      // use exponential ease
+      cam.camZ = Math.max(-2000, Math.min(-120, z * Math.exp(-delta * 0.0012)));
+      cam.persp = Math.max(400, Math.min(1800, cam.persp * Math.exp(delta * 0.0009)));
+      applyCam();
+    }
+
+    // Gesture handling (pinch, drag/orbit, wheel)
+    let active = false, lastX=0, lastY=0, touchDist=0;
+    function dist(a,b){ const dx=a.clientX-b.clientX, dy=a.clientY-b.clientY; return Math.hypot(dx,dy); }
+
+    layer.addEventListener('pointerdown', (e)=>{
+      if(!threeDOn) return;
+      active = true; lastX = e.clientX; lastY = e.clientY; touchDist = 0;
+      layer.setPointerCapture(e.pointerId);
+    });
+    layer.addEventListener('pointermove', (e)=>{
+      if(!threeDOn) return;
+      if(!active) return;
+      if(e.pressure > 0 && e.isPrimary){
+        // Single-pointer orbit
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        cam.rotY += dx * 0.06;
+        cam.rotX += dy * 0.05;
+        cam.rotX = Math.max(-60, Math.min(60, cam.rotX));
+        applyCam();
+        lastX = e.clientX; lastY = e.clientY;
+      }
+    });
+    layer.addEventListener('pointerup', (e)=>{
+      if(!threeDOn) return;
+      active = false;
+      try{ layer.releasePointerCapture(e.pointerId); }catch(_){}
+    });
+
+    // Pinch via touch events for better multi-touch handling
+    let touches = new Map();
+    layer.addEventListener('touchstart', (e)=>{
+      if(!threeDOn) return;
+      for(const t of e.changedTouches) touches.set(t.identifier, {x:t.clientX, y:t.clientY});
+      if(touches.size >= 2){
+        const [a,b] = Array.from(e.touches).slice(0,2);
+        touchDist = dist(a,b);
+      }
+    }, {passive:false});
+    layer.addEventListener('touchmove', (e)=>{
+      if(!threeDOn || touches.size < 2) return;
+      const [a,b] = Array.from(e.touches).slice(0,2);
+      const d = dist(a,b);
+      const delta = (touchDist ? (touchDist - d) : 0);
+      hyperZoom(delta * -1); // pinch out -> zoom in
+      touchDist = d;
+      e.preventDefault();
+    }, {passive:false});
+    layer.addEventListener('touchend', (e)=>{
+      for(const t of e.changedTouches) touches.delete(t.identifier);
+    });
+
+    // Wheel zoom (desktop)
+    let lastTap=0;
+      layer.addEventListener('touchend', (e)=>{
+        const now = Date.now();
+        if(now - lastTap < 320){
+          const panels = Array.from(space.querySelectorAll('.kblx-panel3d'));
+          const last = panels[panels.length-1];
+          if(last) focusPanel(last);
+          else { cam.rotX=-6; cam.rotY=0; cam.camZ=-400; applyCam(); }
+        }
+        lastTap = now;
+      }, {passive:true});
+
+      layer.addEventListener('wheel', (e)=>{
+      if(!threeDOn) return;
+      hyperZoom(-e.deltaY);
+      e.preventDefault();
+    }, {passive:false});
+
+    // Create 3D panel at polar coordinate around a ring
+    let panelIndex = 0;
+    function addPanel3D(url, label){
+        /* enhanced */
+      const angle = panelIndex * 38; // degrees between panels
+      const radius = 900 + (panelIndex%3)*120;
+      const x = Math.cos(angle * Math.PI/180) * radius;
+      const z = Math.sin(angle * Math.PI/180) * radius;
+      const y = -80 + ((panelIndex%5)-2) * 40;
+
+      const panel = document.createElement('div');
+      panel.className = 'kblx-panel3d';
+      panel.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${ -angle }deg)`;
+      panel.innerHTML = `<header><span>${(label||url)}</span><button class="kblx-close3d">×</button></header>
+        <iframe src="${url}" loading="lazy" referrerpolicy="no-referrer"></iframe>`;
+      panel.querySelector('.kblx-close3d').addEventListener('click', ()=> panel.remove());
+        panel.addEventListener('dblclick', ()=> focusPanel(panel));
+      space.appendChild(panel);
+      panelIndex++;
+      return panel;
+    }
+
+    function smoothTo(target, key, rate=0.12){
+        cam[key] = cam[key] + (target - cam[key]) * rate;
+      }
+      function focusPanel(panel){
+        const angle = parseFloat(panel.dataset.angle||'0');
+        const targetRotY = -angle;
+        const targetZ = -300;
+        const steps = 14; let i=0;
+        const id = setInterval(()=>{
+          smoothTo(targetRotY, 'rotY', 0.18);
+          smoothTo(targetZ, 'camZ', 0.18);
+          applyCam();
+          if(++i>=steps) clearInterval(id);
+        }, 16);
+      }
+
+      // Public API
+    window.kblxToggle3D = ()=> set3D(!threeDOn);
+    window.kblxSet3D = (on)=> set3D(on);
+    window.kblxOpenVisor3D = (url, label)=>{ set3D(true); return addPanel3D(url, label); };
+
+    // Integrate with existing -o/open commands if present by also placing in 3D (but keep previous overlay behavior)
+    // Patch handleCommand if exists
+    const _handleCmd = window.handleCommand;
+    if(typeof _handleCmd === 'function'){
+      window.handleCommand = function(v){
+        const parts = v.trim().split(/\s+/);
+        if(parts[0] === '-o3d' || parts[0] === 'open3d'){
+          const url = parts.slice(1).join(' ');
+          if(url){ kblxOpenVisor3D(url); kblxLog('3D: abrir → ' + url); }
+          return;
+        }
+        return _handleCmd.apply(this, arguments);
+      }
+    }
+
+    // Optional: open default in 3D when pressing the 👥 AND 3D is ON
+    const peopleBtn = document.getElementById('kblxPeopleBtn');
+    if(peopleBtn){
+      const old = peopleBtn.onclick;
+      peopleBtn.onclick = async function(){
+        if(threeDOn){
+          // default target with fallback
+          try {
+            const pref = './Templates/Ativar_Dual_Gen.html';
+            const res = await fetch(pref, {method:'HEAD'});
+            kblxOpenVisor3D(res.ok ? pref : 'Ativar_Dual_Gen.html', 'Ativar Dual Gen');
+          } catch(e){
+            kblxOpenVisor3D('Ativar_Dual_Gen.html', 'Ativar Dual Gen');
+          }
+        } else {
+          if(old) return old();
+        }
+      };
+    }
+
+    // Keep gesture layer above content only in 3D mode
+  })();
+</script>
+
+</body>
+</html>
