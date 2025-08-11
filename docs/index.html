@@ -408,63 +408,6 @@ Position: fixed;
 
   </style>
       <!-- body {background: transparent !important; !-->
-
-<style>
-  /* === Tiny Ultra button inside response-controls (bottom-left) === */
-  #kblxUltraMini{
-    position:absolute; left:8px; bottom:8px; z-index:1200;
-    width:16px; height:16px; border-radius:50%;
-    background: linear-gradient(135deg, rgba(0,216,216,0.9), rgba(216,0,216,0.9));
-    border:1px solid rgba(255,255,255,.18);
-    box-shadow: 0 6px 16px rgba(0,0,0,.35);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    cursor:pointer;
-  }
-  .response-controls{ position:relative } /* to anchor the mini button */
-
-  /* === Tiny 3D ON/OFF button below Log pill (top-left stack) === */
-  #kblx3DToggle{ position:fixed; top:46px; left:25px; z-index:2001; width:16px; height:16px; border-radius:50%; background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.2)); border:1px solid rgba(255,255,255,.35); box-shadow: 0 6px 14px rgba(0,0,0,.35); cursor:pointer; }
-  #kblx3DToggle.on{ background: radial-gradient(circle at 30% 30%, #00ffee, rgba(0,255,255,.25)) }
-
-  /* === 3D Hyperbolic Space === */
-  #kblxSpaceWrap{
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    perspective: var(--kblx-perspective, 900px);
-    transition: perspective .25s ease;
-  }
-  #kblxSpace{
-    position: absolute; inset: 0; transform-style: preserve-3d;
-    transform: translateZ(var(--kblx-camZ, -400px)) rotateX(var(--kblx-rotX, -6deg)) rotateY(var(--kblx-rotY, 0deg));
-    transition: transform .06s linear;
-  }
-  .kblx-panel3d{
-    position: absolute; width: 560px; height: 360px;
-    transform-style: preserve-3d;
-    border-radius: 14px; overflow: hidden;
-    background: rgba(0,0,0,.35);
-    border:1px solid rgba(255,255,255,.08);
-    box-shadow: 0 18px 38px rgba(0,0,0,.45);
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-    pointer-events: auto; /* allow interaction when 3D enabled */
-  }
-  .kblx-panel3d header{
-    background: linear-gradient(90deg, rgba(0,216,216,.35), rgba(216,0,216,.25));
-    color:#fff; font-weight:700; padding:6px 10px; font-size:12px;
-    display:flex; align-items:center; justify-content:space-between;
-  }
-  .kblx-panel3d iframe{ width:100%; height: calc(100% - 32px); border:0; background:#000 }
-  .kblx-close3d{
-    background: transparent; border:0; color:#fff; font-size:16px; cursor:pointer;
-  }
-
-  /* Interactions surface on top for gestures (but keep UI clickable) */
-  #kblxGestureLayer{
-    position: fixed; inset: 0; z-index: 10;
-    pointer-events: none; /* enabled only when 3D is on via JS */
-  }
-  #kblxGestureLayer.active{ pointer-events: auto; touch-action: none }
-</style>
-
 </head>
 <body>
 
@@ -840,7 +783,7 @@ Position: fixed;
 
       "R16": "dual-app-990e-16-REFATORADO.html",
       "R160": "dual-app-990e-16-RE-0.html",
-
+      "R169": "dual-app-990e-16_voice_only_voicebtn_fixed.html",
       "Htmn": "Editor-html-0.html",
       "Html": "Editor-html-1.html",
       "ht": "Editor-html-2.html",
@@ -1301,7 +1244,7 @@ backdrop-filter: blur(6px);
   #kblxIframeOverlay{ position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55) }
   #kblxIframeBox{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:88vw; max-width:1000px; height:72vh; min-width:480px; min-height:360px;
+    width:88vw; max-width:400px; height:72vh; min-width:auto; max-height:360px;
     background:rgba(0,0,0,0.35); border-radius:16px; overflow:hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
     border:1px solid rgba(255,255,255,.08);
@@ -1331,19 +1274,6 @@ backdrop-filter: blur(6px);
 </style>
 
 <button id="kblxLogBtn" title="Log">💊</button>
-
-<!-- Tiny 3D toggle below Log pill -->
-<div id="kblx3DToggle" title="Super Parallax 3D"></div>
-
-<!-- 3D Space (behind UI) -->
-<div id="kblxSpaceWrap" aria-hidden="true">
-  <div id="kblxSpace"></div>
-</div>
-<div id="kblxGestureLayer"></div>
-
-<!-- Mini Ultra button docked inside response-controls (bottom-left) -->
-<button id="kblxUltraMini" title="Ultra Glass"></button>
-
 <div id="kblxLogPanel" role="region" aria-label="Painel de Logs">
   <strong>◉ LOG</strong>
   <div id="kblxLogActions">
@@ -1380,218 +1310,240 @@ backdrop-filter: blur(6px);
   </div>
 </div>
 
-
 <script>
   (function(){
-    // ----- Ultra Mini Button in controls -----
-    function getControlsContainer(){
-      return document.querySelector('.response-controls') || document.body;
+    const $ = (s, r=document) => r.querySelector(s);
+    const logLines = $('#kblxLogLines');
+
+    function kblxLog(msg){
+      const line = document.createElement('div');
+      const t = new Date();
+      line.textContent = '[' + t.toLocaleTimeString() + '] ' + msg;
+      logLines.prepend(line);
+      try {
+        const arr = JSON.parse(localStorage.getItem('kblx.log')||'[]');
+        arr.unshift(line.textContent);
+        localStorage.setItem('kblx.log', JSON.stringify(arr.slice(0, 500)));
+      } catch(e){}
     }
-    const ultraMini = document.getElementById('kblxUltraMini');
-    function setUltra(on){
-      if(on){ document.body.classList.add('kblx-ultra'); }
-      else { document.body.classList.remove('kblx-ultra'); }
-      localStorage.setItem('kblx.ultra', on ? '1' : '0');
+    window.kblxLog = kblxLog;
+
+    // restaura logs
+    try {
+      (JSON.parse(localStorage.getItem('kblx.log')||'[]')).reverse().forEach(t=>{
+        const d=document.createElement('div'); d.textContent=t; logLines.appendChild(d);
+      });
+    } catch(e){}
+
+    const logBtn = $('#kblxLogBtn');
+    const logPanel = $('#kblxLogPanel');
+    const copyBtn = $('#kblxCopyLog');
+    const clearBtn = $('#kblxClearLog');
+
+    function toggleLogPanel(force){
+      const show = force !== undefined ? !!force : (logPanel.style.display !== 'block');
+      logPanel.style.display = show ? 'block' : 'none';
+      localStorage.setItem('kblx.log.visible', show ? '1' : '0');
     }
-    ultraMini.addEventListener('click', ()=> setUltra(!document.body.classList.contains('kblx-ultra')));
-    if(localStorage.getItem('kblx.ultra') === '1'){ setUltra(true); }
-
-    // Ensure mini is in controls container
-    const rc = getControlsContainer();
-    if(rc && ultraMini && ultraMini.parentElement !== rc){ rc.appendChild(ultraMini); }
-
-    // ----- Super Parallax 3D Hyperbolic -----
-    const toggle3D = document.getElementById('kblx3DToggle');
-    const spaceWrap = document.getElementById('kblxSpaceWrap');
-    const space = document.getElementById('kblxSpace');
-    const layer = document.getElementById('kblxGestureLayer');
-
-    let cam = { rotX: -6, rotY: 0, camZ: -400, persp: 900 };
-    let threeDOn = localStorage.getItem('kblx.3d') === '1';
-
-    function applyCam(){
-      document.documentElement.style.setProperty('--kblx-rotX', cam.rotX + 'deg');
-      document.documentElement.style.setProperty('--kblx-rotY', cam.rotY + 'deg');
-      document.documentElement.style.setProperty('--kblx-camZ', cam.camZ + 'px');
-      document.documentElement.style.setProperty('--kblx-perspective', cam.persp + 'px');
-    }
-    applyCam();
-
-    function set3D(on){
-      threeDOn = !!on;
-      toggle3D.classList.toggle('on', threeDOn);
-        toggle3D.setAttribute('aria-pressed', threeDOn ? 'true' : 'false');
-      localStorage.setItem('kblx.3d', threeDOn ? '1' : '0');
-      layer.classList.toggle('active', threeDOn);
-      // When 3D on: allow pointer events inside space panels
-      spaceWrap.style.pointerEvents = threeDOn ? 'auto' : 'none';
-    }
-    set3D(threeDOn);
-
-    toggle3D.addEventListener('click', ()=> set3D(!threeDOn));
-
-    // Hyperbolic zoom curve: camZ and perspective change nonlinearly
-    function hyperZoom(delta){
-      // delta positive -> zoom in (bring camera closer, increase perspective depth)
-      const z = cam.camZ;
-      // use exponential ease
-      cam.camZ = Math.max(-2000, Math.min(-120, z * Math.exp(-delta * 0.0012)));
-      cam.persp = Math.max(400, Math.min(1800, cam.persp * Math.exp(delta * 0.0009)));
-      applyCam();
-    }
-
-    // Gesture handling (pinch, drag/orbit, wheel)
-    let active = false, lastX=0, lastY=0, touchDist=0;
-    function dist(a,b){ const dx=a.clientX-b.clientX, dy=a.clientY-b.clientY; return Math.hypot(dx,dy); }
-
-    layer.addEventListener('pointerdown', (e)=>{
-      if(!threeDOn) return;
-      active = true; lastX = e.clientX; lastY = e.clientY; touchDist = 0;
-      layer.setPointerCapture(e.pointerId);
+    logBtn.addEventListener('click', ()=> toggleLogPanel());
+    copyBtn.addEventListener('click', async ()=>{
+      let text = Array.from(logLines.children).map(n=>n.textContent).join('\n');
+      try{ await navigator.clipboard.writeText(text); }catch(e){}
+      kblxLog('Logs copiados.');
     });
-    layer.addEventListener('pointermove', (e)=>{
-      if(!threeDOn) return;
-      if(!active) return;
-      if(e.pressure > 0 && e.isPrimary){
-        // Single-pointer orbit
-        const dx = e.clientX - lastX;
-        const dy = e.clientY - lastY;
-        cam.rotY += dx * 0.06;
-        cam.rotX += dy * 0.05;
-        cam.rotX = Math.max(-60, Math.min(60, cam.rotX));
-        applyCam();
-        lastX = e.clientX; lastY = e.clientY;
-      }
+    clearBtn.addEventListener('click', ()=>{
+      logLines.innerHTML='';
+      localStorage.removeItem('kblx.log');
+      kblxLog('Logs limpos.');
     });
-    layer.addEventListener('pointerup', (e)=>{
-      if(!threeDOn) return;
-      active = false;
-      try{ layer.releasePointerCapture(e.pointerId); }catch(_){}
-    });
+    if(localStorage.getItem('kblx.log.visible') === '1'){ logPanel.style.display='block'; }
 
-    // Pinch via touch events for better multi-touch handling
-    let touches = new Map();
-    layer.addEventListener('touchstart', (e)=>{
-      if(!threeDOn) return;
-      for(const t of e.changedTouches) touches.set(t.identifier, {x:t.clientX, y:t.clientY});
-      if(touches.size >= 2){
-        const [a,b] = Array.from(e.touches).slice(0,2);
-        touchDist = dist(a,b);
-      }
-    }, {passive:false});
-    layer.addEventListener('touchmove', (e)=>{
-      if(!threeDOn || touches.size < 2) return;
-      const [a,b] = Array.from(e.touches).slice(0,2);
-      const d = dist(a,b);
-      const delta = (touchDist ? (touchDist - d) : 0);
-      hyperZoom(delta * -1); // pinch out -> zoom in
-      touchDist = d;
-      e.preventDefault();
-    }, {passive:false});
-    layer.addEventListener('touchend', (e)=>{
-      for(const t of e.changedTouches) touches.delete(t.identifier);
-    });
+    // visor
+    const overlay = $('#kblxIframeOverlay');
+    const box = $('#kblxIframeBox');
+    const dragBar = $('#kblxDragBar');
+    const iframe = $('#kblxIframe');
+    const btnPeople = $('#kblxPeopleBtn');
+    const btnClose = $('#kblxIframeClose');
+    const btnPop = $('#kblxIframePop');
+    const btnReload = $('#kblxIframeReload');
+    const resizeHandle = $('#kblxResize');
 
-    // Wheel zoom (desktop)
-    let lastTap=0;
-      layer.addEventListener('touchend', (e)=>{
-        const now = Date.now();
-        if(now - lastTap < 320){
-          const panels = Array.from(space.querySelectorAll('.kblx-panel3d'));
-          const last = panels[panels.length-1];
-          if(last) focusPanel(last);
-          else { cam.rotX=-6; cam.rotY=0; cam.camZ=-400; applyCam(); }
-        }
-        lastTap = now;
-      }, {passive:true});
-
-      layer.addEventListener('wheel', (e)=>{
-      if(!threeDOn) return;
-      hyperZoom(-e.deltaY);
-      e.preventDefault();
-    }, {passive:false});
-
-    // Create 3D panel at polar coordinate around a ring
-    let panelIndex = 0;
-    function addPanel3D(url, label){
-        /* enhanced */
-      const angle = panelIndex * 38; // degrees between panels
-      const radius = 900 + (panelIndex%3)*120;
-      const x = Math.cos(angle * Math.PI/180) * radius;
-      const z = Math.sin(angle * Math.PI/180) * radius;
-      const y = -80 + ((panelIndex%5)-2) * 40;
-
-      const panel = document.createElement('div');
-      panel.className = 'kblx-panel3d';
-      panel.style.transform = `translate3d(${x}px, ${y}px, ${z}px) rotateY(${ -angle }deg)`;
-      panel.innerHTML = `<header><span>${(label||url)}</span><button class="kblx-close3d">×</button></header>
-        <iframe src="${url}" loading="lazy" referrerpolicy="no-referrer"></iframe>`;
-      panel.querySelector('.kblx-close3d').addEventListener('click', ()=> panel.remove());
-        panel.addEventListener('dblclick', ()=> focusPanel(panel));
-      space.appendChild(panel);
-      panelIndex++;
-      return panel;
+    function openIframe(src){
+      if (src) iframe.src = src;
+      overlay.style.display = 'block';
+      overlay.setAttribute('aria-hidden','false');
+      localStorage.setItem('kblx.iframe.visible', '1');
+      if(iframe.src && iframe.src !== 'about:blank') localStorage.setItem('kblx.iframe.src', iframe.src);
+      kblxLog('iFrame aberto' + (src? ' → ' + src : ''));
     }
-
-    function smoothTo(target, key, rate=0.12){
-        cam[key] = cam[key] + (target - cam[key]) * rate;
-      }
-      function focusPanel(panel){
-        const angle = parseFloat(panel.dataset.angle||'0');
-        const targetRotY = -angle;
-        const targetZ = -300;
-        const steps = 14; let i=0;
-        const id = setInterval(()=>{
-          smoothTo(targetRotY, 'rotY', 0.18);
-          smoothTo(targetZ, 'camZ', 0.18);
-          applyCam();
-          if(++i>=steps) clearInterval(id);
-        }, 16);
-      }
-
-      // Public API
-    window.kblxToggle3D = ()=> set3D(!threeDOn);
-    window.kblxSet3D = (on)=> set3D(on);
-    window.kblxOpenVisor3D = (url, label)=>{ set3D(true); return addPanel3D(url, label); };
-
-    // Integrate with existing -o/open commands if present by also placing in 3D (but keep previous overlay behavior)
-    // Patch handleCommand if exists
-    const _handleCmd = window.handleCommand;
-    if(typeof _handleCmd === 'function'){
-      window.handleCommand = function(v){
-        const parts = v.trim().split(/\s+/);
-        if(parts[0] === '-o3d' || parts[0] === 'open3d'){
-          const url = parts.slice(1).join(' ');
-          if(url){ kblxOpenVisor3D(url); kblxLog('3D: abrir → ' + url); }
-          return;
-        }
-        return _handleCmd.apply(this, arguments);
-      }
+    function closeIframe(){
+      overlay.style.display = 'none';
+      overlay.setAttribute('aria-hidden','true');
+      localStorage.setItem('kblx.iframe.visible', '0');
+      kblxLog('iFrame fechado.');
     }
+    function toggleIframe(){ (overlay.style.display==='block') ? closeIframe() : openIframe(); }
 
-    // Optional: open default in 3D when pressing the 👥 AND 3D is ON
-    const peopleBtn = document.getElementById('kblxPeopleBtn');
-    if(peopleBtn){
-      const old = peopleBtn.onclick;
-      peopleBtn.onclick = async function(){
-        if(threeDOn){
-          // default target with fallback
-          try {
-            const pref = './Templates/Ativar_Dual_Gen.html';
-            const res = await fetch(pref, {method:'HEAD'});
-            kblxOpenVisor3D(res.ok ? pref : 'Ativar_Dual_Gen.html', 'Ativar Dual Gen');
-          } catch(e){
-            kblxOpenVisor3D('Ativar_Dual_Gen.html', 'Ativar Dual Gen');
+    btnPeople.addEventListener('click', async ()=>{
+        if(!iframe.src || iframe.src==='about:blank') await resolveAndOpenDefault();
+        else toggleIframe();
+      });
+    btnClose.addEventListener('click', closeIframe);
+    btnPop.addEventListener('click', ()=>{
+      try{ window.open(iframe.src || 'about:blank','_blank'); kblxLog('Abrindo em nova guia.'); }catch(e){}
+    });
+    btnReload.addEventListener('click', ()=>{
+      try{ iframe.contentWindow.location.reload(); kblxLog('Recarregando iFrame.'); }catch(e){ iframe.src = iframe.src; }
+    });
+    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeIframe(); });
+
+    // arrastar
+    (function enableDrag(){
+      let startX, startY, oX=0, oY=0;
+      function onDown(e){
+        const rect = box.getBoundingClientRect();
+        oX = rect.left; oY = rect.top;
+        startX = e.clientX; startY = e.clientY;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      }
+      function onMove(e){
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        box.style.left = (oX + dx) + 'px';
+        box.style.top  = (oY + dy) + 'px';
+        box.style.transform = 'translate(0,0)';
+      }
+      function onUp(){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      dragBar.addEventListener('mousedown', onDown);
+    })();
+
+    // redimensionar
+    (function enableResize(){
+      let startX, startY, startW, startH;
+      function onDown(e){
+        e.preventDefault();
+        const rect = box.getBoundingClientRect();
+        startX = e.clientX; startY = e.clientY;
+        startW = rect.width; startH = rect.height;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      }
+      function onMove(e){
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const w = Math.max(480, startW + dx);
+        const h = Math.max(360, startH + dy);
+        box.style.width  = w + 'px';
+        box.style.height = h + 'px';
+        iframe.style.height = (h - 46) + 'px';
+      }
+      function onUp(){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      resizeHandle.addEventListener('mousedown', onDown);
+    })();
+
+    // teclado
+    document.addEventListener('keydown', (e)=>{
+      const mod = e.ctrlKey || e.metaKey;
+      if(mod && e.key.toLowerCase() === 'l'){ e.preventDefault(); toggleLogPanel(); }
+      if(mod && e.key.toLowerCase() === 'o'){ e.preventDefault(); toggleIframe(); }
+      if(mod && e.key.toLowerCase() === 'k'){ e.preventDefault(); toggleCmdPal(); }
+      if(e.key === 'Escape'){
+        if($('#kblxCmdPal').style.display==='block'){ toggleCmdPal(false); return; }
+        if(overlay.style.display==='block'){ closeIframe(); return; }
+        if(logPanel.style.display==='block'){ toggleLogPanel(false); return; }
+      }
+    });
+
+    // restaurar iframe estado
+    (function restoreIframe(){
+      const saved = localStorage.getItem('kblx.iframe.src');
+      if(saved) iframe.src = saved;
+      if(localStorage.getItem('kblx.iframe.visible') === '1'){
+        overlay.style.display='block'; overlay.setAttribute('aria-hidden','false');
+      }
+    })();
+
+    // -o via URL
+    (function openFromURL(){
+      try{
+        const p = new URLSearchParams(window.location.search);
+        const hash = window.location.hash.slice(1);
+        let target = null;
+        if(p.get('o')) target = p.get('o');
+        else if(p.get('open')) target = p.get('open');
+        else if(p.get('iframe')) target = p.get('iframe');
+        if(!target && hash){
+          const parts = hash.split('&').map(s=>s.trim());
+          for(const part of parts){
+            if(part.startsWith('-o=')) target = part.slice(3);
+            else if(part.startsWith('o=')) target = part.slice(2);
           }
-        } else {
-          if(old) return old();
         }
-      };
+        if(target){ openIframe(target); }
+      }catch(e){}
+    })();
+
+    // API pública
+    window.kblxOpenVisor = (url)=> openIframe(url);
+    window.kblxCloseVisor = ()=> closeIframe();
+    window.kblxToggleVisor = ()=> toggleIframe();
+
+    async function resolveAndOpenDefault(){
+      const pref = './Templates/Ativar_Dual_Gen.html';
+      const fallback = 'Ativar_Dual_Gen.html';
+      // Test pref with HEAD; if it fails (CORS), we still try to open pref first,
+      // and on frame error user will see error from the page. We'll attempt fallback on network error via fetch.
+      try {
+        const res = await fetch(pref, { method: 'HEAD' });
+        if(res.ok){ openIframe(pref); return; }
+      } catch(e){ /* ignore and try fallback */ }
+      openIframe(fallback);
     }
 
-    // Keep gesture layer above content only in 3D mode
+    // Command Palette
+    const cmdPal = $('#kblxCmdPal');
+    const cmdInput = $('#kblxCmdInput');
+    function toggleCmdPal(force){
+      const show = force !== undefined ? !!force : (cmdPal.style.display !== 'flex');
+      cmdPal.style.display = show ? 'flex' : 'none';
+      if(show){ cmdInput.focus(); cmdInput.select(); }
+    }
+    cmdPal.addEventListener('click', (e)=>{ if(e.target===cmdPal) toggleCmdPal(false); });
+    cmdInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        const v = cmdInput.value.trim();
+        handleCommand(v);
+      }
+    });
+    function handleCommand(v){
+      if(!v){ toggleCmdPal(false); return; }
+      const parts = v.split(/\s+/);
+      if(parts[0] === '-o' || parts[0] === 'open'){
+        const url = parts.slice(1).join(' ');
+        if(url){ openIframe(url); kblxLog('Comando: abrir → ' + url); }
+        toggleCmdPal(false); return;
+      }
+      if(parts[0] === 'close'){ closeIframe(); toggleCmdPal(false); return; }
+      if(parts[0] === 'reload'){ btnReload.click(); toggleCmdPal(false); return; }
+      if(parts[0] === 'log'){ const s=(parts[1]||'').toLowerCase();
+        if(s==='on') toggleLogPanel(true); else if(s==='off') toggleLogPanel(false);
+        toggleCmdPal(false); return;
+      }
+      kblxLog('Comando desconhecido: ' + v);
+      toggleCmdPal(false);
+    }
+
+    kblxLog('KBLX injetado. Use Ctrl/Cmd+K para comandos, -o para abrir URLs no visor.');
   })();
 </script>
-
+<!-- ░░ /KBLX INJECTION ░░ -->
 </body>
 </html>
