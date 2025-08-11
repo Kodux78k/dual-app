@@ -398,6 +398,12 @@ Position: fixed;
   #panel::-webkit-scrollbar-track {
     background: transparent;
   }
+
+/* Hide legacy/old log pills if present */
+#logBtn, .log-pill, .pill-log, .old-log { display: none !important; }
+/* If there was a central old pill container */
+#miniPlayerContainer, #centralPill, .old-center-button { display: none !important; }
+
 </style>
 
   </style>
@@ -778,32 +784,10 @@ Position: fixed;
       "R16": "dual-app-990e-16-REFATORADO.html",
       "R160": "dual-app-990e-16-RE-0.html",
 
-      "HTMN": "Editor-html-0.html",
-      "HTML": "Editor-html-1.html",
-      "HTMO": "Editor-html-2.html",
+      "Htmn": "Editor-html-0.html",
+      "Html": "Editor-html-1.html",
+      "ht": "Editor-html-2.html",
       "pf": "pref-0.html",
-      
-      "vo10": "App-da-vovo-10.html",
-      "v11": "App-da-vovo-11.html",
-      "v12": "App-da-vovo-12.html",
-      
-      "690": "dual-app-990e-16-refatorado.html",
-      "691": "dual-app-990e-16-upload-integrado.html",
-      "692": "dual-app-990e-16-upload.html",
-      
-      
-      "git1": "KOBLLUX_git.html",
-      "git2": "KOBLLUX_git_2.html",
-      "full": "KOBLLUX_full.html",
-      
-      "G00": "gold-0.html",
-      "G01": "gold-1.html",
-      "G02": "gold-2.html",
-      "G03": "gold-3.html",
-      "G04": "gold-4.html",
-      "G05": "gold-5.html",
-      "G06": "gold-6.html",
-      "GD0": "game-of-life-dual-0.html",
 
       
       "MRR": "menu-RR.html",
@@ -1221,5 +1205,477 @@ window.addEventListener('load', loadUserBG);
     toggleMiniPlayer.innerText = showing ? "💊" : "💊";
   });
 </script>
+<!-- ░░ KBLX INJECTION: Log 💊 + iFrame Toggle 👥 + Command Palette (-o) ░░ -->
+<style>
+  #kblxLogBtn{
+    position:fixed; top:66px; left:20px; z-index:2001;
+    font-size:18px; line-height:1;
+    background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));
+backdrop-filter: blur(6px);
+-webkit-backdrop-filter: blur(6px);
+ color:#fff;
+    border:none; padding:9px 11px; border-radius:10px; cursor:pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px);
+  }
+  #kblxLogPanel{
+    position:fixed; top:108px; left:20px; width:320px; max-height:50vh;
+    display:none; z-index:2000; overflow:auto;
+    background:rgba(0,0,0,0.66); color:#cfe; border-radius:14px; padding:10px 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,.08);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size:.92rem;
+  }
+  #kblxLogPanel strong{ color:#ff00ff }
+  #kblxLogLines > div{ padding:4px 0; border-bottom:1px dashed rgba(255,255,255,.08) }
+  #kblxLogActions{ display:flex; gap:8px; margin-top:8px }
+  #kblxLogActions button{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.08);
+    border-radius:8px; padding:6px 10px; cursor:pointer }
+  #kblxPeopleBtn{
+    position:fixed; top:166px; left:50%; transform:translateX(-50%);
+    z-index:2001; font-size:24px;
+    background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));
+backdrop-filter: blur(6px);
+-webkit-backdrop-filter: blur(6px);
+ color:#fff;
+    border:none; padding:12px; border-radius:50%; cursor:pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px);
+  }
+  #kblxIframeOverlay{ position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55) }
+  #kblxIframeBox{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:88vw; max-width:1000px; height:72vh; min-width:480px; min-height:360px;
+    background:rgba(0,0,0,0.35); border-radius:16px; overflow:hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
+    border:1px solid rgba(255,255,255,.08);
+  }
+  #kblxIframeBox header{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:8px 12px; color:#fff;
+    background:linear-gradient(90deg, rgba(0,255,255,.22), rgba(255,0,255,.16));
+    cursor:move;
+  }
+  #kblxIframeClose, #kblxIframePop, #kblxIframeReload{
+    background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;
+  }
+  #kblxIframe{ width:100%; height:calc(72vh - 46px); border:0; display:block; background:#000 }
+  #kblxResize{ position:absolute; right:0; bottom:0; width:20px; height:20px; cursor:nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.35) 51%); opacity:.65; }
+  /* Command Palette */
+  #kblxCmdPal{ position:fixed; inset:0; display:none; z-index:2100; background:rgba(0,0,0,.6);
+    align-items:flex-start; justify-content:center; padding-top:12vh; }
+  #kblxCmdBox{ width:min(820px, 92vw); background:#0f1220; border:1px solid rgba(255,255,255,.08);
+    border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.45); overflow:hidden; }
+  #kblxCmdBox header{ padding:10px 14px; color:#ccd; font-weight:700; background:rgba(255,255,255,.04) }
+  #kblxCmdInput{ width:100%; font-size:16px; color:#fff; background:transparent; border:0; outline:0;
+    padding:14px; font-family:ui-monospace, monospace; }
+  #kblxCmdHelp{ padding:8px 14px; color:#aab; font-size:.9rem; border-top:1px solid rgba(255,255,255,.08) }
+  #kblxCmdHelp code{ background:rgba(255,255,255,.06); padding:2px 6px; border-radius:6px }
+</style>
+
+<button id="kblxLogBtn" title="Log">💊</button>
+<div id="kblxLogPanel" role="region" aria-label="Painel de Logs">
+  <strong>◉ LOG</strong>
+  <div id="kblxLogActions">
+    <button id="kblxCopyLog" title="Copiar">Copiar</button>
+    <button id="kblxClearLog" title="Limpar">Limpar</button>
+  </div>
+  <div id="kblxLogLines"></div>
+</div>
+
+<button id="kblxPeopleBtn" title="Abrir iFrame">👥</button>
+
+<div id="kblxIframeOverlay" aria-hidden="true">
+  <div id="kblxIframeBox" role="dialog" aria-modal="true" aria-label="Visor Integrado">
+    <header id="kblxDragBar">
+      <span class="title">Visor Integrado</span>
+      <span style="flex:1"></span>
+      <button id="kblxIframeReload" title="Recarregar">↻</button>
+      <button id="kblxIframePop" title="Abrir em nova guia">⤴︎</button>
+      <button id="kblxIframeClose" aria-label="Fechar">×</button>
+    </header>
+    <iframe id="kblxIframe" src="about:blank" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    <div id="kblxResize" title="Redimensionar"></div>
+  </div>
+</div>
+
+<div id="kblxCmdPal">
+  <div id="kblxCmdBox">
+    <header>Comandos KBLX</header>
+    <input id="kblxCmdInput" placeholder="Digite um comando. Ex.: -o dual-book.html" spellcheck="false" />
+    <div id="kblxCmdHelp">
+      <div>Atalhos: <code>Ctrl/Cmd + K</code> abre; <code>Esc</code> fecha; <code>Ctrl/Cmd + L</code> log; <code>Ctrl/Cmd + O</code> visor.</div>
+      <div style="margin-top:6px">Comandos: <code>-o &lt;url&gt;</code> (abre no iFrame), <code>open &lt;url&gt;</code>, <code>close</code>, <code>reload</code>, <code>log on|off</code>.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const $ = (s, r=document) => r.querySelector(s);
+    const logLines = $('#kblxLogLines');
+
+    function kblxLog(msg){
+      const line = document.createElement('div');
+      const t = new Date();
+      line.textContent = '[' + t.toLocaleTimeString() + '] ' + msg;
+      logLines.prepend(line);
+      try {
+        const arr = JSON.parse(localStorage.getItem('kblx.log')||'[]');
+        arr.unshift(line.textContent);
+        localStorage.setItem('kblx.log', JSON.stringify(arr.slice(0, 500)));
+      } catch(e){}
+    }
+    window.kblxLog = kblxLog;
+
+    // restaura logs
+    try {
+      (JSON.parse(localStorage.getItem('kblx.log')||'[]')).reverse().forEach(t=>{
+        const d=document.createElement('div'); d.textContent=t; logLines.appendChild(d);
+      });
+    } catch(e){}
+
+    const logBtn = $('#kblxLogBtn');
+    const logPanel = $('#kblxLogPanel');
+    const copyBtn = $('#kblxCopyLog');
+    const clearBtn = $('#kblxClearLog');
+
+    function toggleLogPanel(force){
+      const show = force !== undefined ? !!force : (logPanel.style.display !== 'block');
+      logPanel.style.display = show ? 'block' : 'none';
+      localStorage.setItem('kblx.log.visible', show ? '1' : '0');
+    }
+    logBtn.addEventListener('click', ()=> toggleLogPanel());
+    copyBtn.addEventListener('click', async ()=>{
+      let text = Array.from(logLines.children).map(n=>n.textContent).join('\n');
+      try{ await navigator.clipboard.writeText(text); }catch(e){}
+      kblxLog('Logs copiados.');
+    });
+    clearBtn.addEventListener('click', ()=>{
+      logLines.innerHTML='';
+      localStorage.removeItem('kblx.log');
+      kblxLog('Logs limpos.');
+    });
+    if(localStorage.getItem('kblx.log.visible') === '1'){ logPanel.style.display='block'; }
+
+    // visor
+    const overlay = $('#kblxIframeOverlay');
+    const box = $('#kblxIframeBox');
+    const dragBar = $('#kblxDragBar');
+    const iframe = $('#kblxIframe');
+    const btnPeople = $('#kblxPeopleBtn');
+    const btnClose = $('#kblxIframeClose');
+    const btnPop = $('#kblxIframePop');
+    const btnReload = $('#kblxIframeReload');
+    const resizeHandle = $('#kblxResize');
+
+    function openIframe(src){
+      if (src) iframe.src = src;
+      overlay.style.display = 'block';
+      overlay.setAttribute('aria-hidden','false');
+      localStorage.setItem('kblx.iframe.visible', '1');
+      if(iframe.src && iframe.src !== 'about:blank') localStorage.setItem('kblx.iframe.src', iframe.src);
+      kblxLog('iFrame aberto' + (src? ' → ' + src : ''));
+    }
+    function closeIframe(){
+      overlay.style.display = 'none';
+      overlay.setAttribute('aria-hidden','true');
+      localStorage.setItem('kblx.iframe.visible', '0');
+      kblxLog('iFrame fechado.');
+    }
+    function toggleIframe(){ (overlay.style.display==='block') ? closeIframe() : openIframe(); }
+
+    btnPeople.addEventListener('click', async ()=>{
+        if(!iframe.src || iframe.src==='about:blank') await resolveAndOpenDefault();
+        else toggleIframe();
+      });
+    btnClose.addEventListener('click', closeIframe);
+    btnPop.addEventListener('click', ()=>{
+      try{ window.open(iframe.src || 'about:blank','_blank'); kblxLog('Abrindo em nova guia.'); }catch(e){}
+    });
+    btnReload.addEventListener('click', ()=>{
+      try{ iframe.contentWindow.location.reload(); kblxLog('Recarregando iFrame.'); }catch(e){ iframe.src = iframe.src; }
+    });
+    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeIframe(); });
+
+    // arrastar
+    (function enableDrag(){
+      let startX, startY, oX=0, oY=0;
+      function onDown(e){
+        const rect = box.getBoundingClientRect();
+        oX = rect.left; oY = rect.top;
+        startX = e.clientX; startY = e.clientY;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      }
+      function onMove(e){
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        box.style.left = (oX + dx) + 'px';
+        box.style.top  = (oY + dy) + 'px';
+        box.style.transform = 'translate(0,0)';
+      }
+      function onUp(){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      dragBar.addEventListener('mousedown', onDown);
+    })();
+
+    // redimensionar
+    (function enableResize(){
+      let startX, startY, startW, startH;
+      function onDown(e){
+        e.preventDefault();
+        const rect = box.getBoundingClientRect();
+        startX = e.clientX; startY = e.clientY;
+        startW = rect.width; startH = rect.height;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      }
+      function onMove(e){
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const w = Math.max(480, startW + dx);
+        const h = Math.max(360, startH + dy);
+        box.style.width  = w + 'px';
+        box.style.height = h + 'px';
+        iframe.style.height = (h - 46) + 'px';
+      }
+      function onUp(){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      resizeHandle.addEventListener('mousedown', onDown);
+    })();
+
+    // teclado
+    document.addEventListener('keydown', (e)=>{
+      const mod = e.ctrlKey || e.metaKey;
+      if(mod && e.key.toLowerCase() === 'l'){ e.preventDefault(); toggleLogPanel(); }
+      if(mod && e.key.toLowerCase() === 'o'){ e.preventDefault(); toggleIframe(); }
+      if(mod && e.key.toLowerCase() === 'k'){ e.preventDefault(); toggleCmdPal(); }
+      if(e.key === 'Escape'){
+        if($('#kblxCmdPal').style.display==='block'){ toggleCmdPal(false); return; }
+        if(overlay.style.display==='block'){ closeIframe(); return; }
+        if(logPanel.style.display==='block'){ toggleLogPanel(false); return; }
+      }
+    });
+
+    // restaurar iframe estado
+    (function restoreIframe(){
+      const saved = localStorage.getItem('kblx.iframe.src');
+      if(saved) iframe.src = saved;
+      if(localStorage.getItem('kblx.iframe.visible') === '1'){
+        overlay.style.display='block'; overlay.setAttribute('aria-hidden','false');
+      }
+    })();
+
+    // -o via URL
+    (function openFromURL(){
+      try{
+        const p = new URLSearchParams(window.location.search);
+        const hash = window.location.hash.slice(1);
+        let target = null;
+        if(p.get('o')) target = p.get('o');
+        else if(p.get('open')) target = p.get('open');
+        else if(p.get('iframe')) target = p.get('iframe');
+        if(!target && hash){
+          const parts = hash.split('&').map(s=>s.trim());
+          for(const part of parts){
+            if(part.startsWith('-o=')) target = part.slice(3);
+            else if(part.startsWith('o=')) target = part.slice(2);
+          }
+        }
+        if(target){ openIframe(target); }
+      }catch(e){}
+    })();
+
+    // API pública
+    window.kblxOpenVisor = (url)=> openIframe(url);
+    window.kblxCloseVisor = ()=> closeIframe();
+    window.kblxToggleVisor = ()=> toggleIframe();
+
+    async function resolveAndOpenDefault(){
+      const pref = '/templates/Ativar_Dual_Gen.html';
+      const fallback = 'Ativar_Dual_Gen.html';
+      // Test pref with HEAD; if it fails (CORS), we still try to open pref first,
+      // and on frame error user will see error from the page. We'll attempt fallback on network error via fetch.
+      try {
+        const res = await fetch(pref, { method: 'HEAD' });
+        if(res.ok){ openIframe(pref); return; }
+      } catch(e){ /* ignore and try fallback */ }
+      openIframe(fallback);
+    }
+
+    // Command Palette
+    const cmdPal = $('#kblxCmdPal');
+    const cmdInput = $('#kblxCmdInput');
+    function toggleCmdPal(force){
+      const show = force !== undefined ? !!force : (cmdPal.style.display !== 'flex');
+      cmdPal.style.display = show ? 'flex' : 'none';
+      if(show){ cmdInput.focus(); cmdInput.select(); }
+    }
+    cmdPal.addEventListener('click', (e)=>{ if(e.target===cmdPal) toggleCmdPal(false); });
+    cmdInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        const v = cmdInput.value.trim();
+        handleCommand(v);
+      }
+    });
+    function handleCommand(v){
+      if(!v){ toggleCmdPal(false); return; }
+      const parts = v.split(/\s+/);
+      if(parts[0] === '-o' || parts[0] === 'open'){
+        const url = parts.slice(1).join(' ');
+        if(url){ openIframe(url); kblxLog('Comando: abrir → ' + url); }
+        toggleCmdPal(false); return;
+      }
+      if(parts[0] === 'close'){ closeIframe(); toggleCmdPal(false); return; }
+      if(parts[0] === 'reload'){ btnReload.click(); toggleCmdPal(false); return; }
+      if(parts[0] === 'log'){ const s=(parts[1]||'').toLowerCase();
+        if(s==='on') toggleLogPanel(true); else if(s==='off') toggleLogPanel(false);
+        toggleCmdPal(false); return;
+      }
+      kblxLog('Comando desconhecido: ' + v);
+      toggleCmdPal(false);
+    }
+
+    kblxLog('KBLX injetado. Use Ctrl/Cmd+K para comandos, -o para abrir URLs no visor.');
+  })();
+</script>
+<!-- ░░ /KBLX INJECTION ░░ -->
+
+<style>
+  /* === KBLX Gradient Glass Upgrade (Mobile-first) === */
+  :root {
+    --kblx-grad: linear-gradient(135deg, rgba(0,216,216,0.88), rgba(216,0,216,0.88));
+    --kblx-border: rgba(255,255,255,0.12);
+    --kblx-shadow: 0 10px 26px rgba(0,0,0,.35);
+  }
+  /* Botões principais existentes */
+  .control-buttons button,
+  .copy-button,
+  .paste-button,
+  .toggle-button,
+  .kitty-button,
+  .history-button,
+  #sendBtn,
+  #voiceBtn,
+  .pagination button {
+    background: var(--kblx-grad) !important;
+    color: #fff !important;
+    border: 1px solid var(--kblx-border) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--kblx-shadow) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transition: transform .08s ease, filter .18s ease;
+  }
+  .control-buttons button:active,
+  .copy-button:active,
+  .paste-button:active,
+  .toggle-button:active,
+  .kitty-button:active,
+  .history-button:active,
+  #sendBtn:active,
+  #voiceBtn:active,
+  .pagination button:active {
+    transform: scale(0.98);
+    filter: brightness(0.95);
+  }
+  /* Ícones <object> dentro dos botões */
+  .control-buttons button object,
+  #voiceBtn object {
+    pointer-events: none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+  }
+  /* Chips/cards comuns – aplicar leve glass */
+  .card, .block, .response-container .page, .pages-wrapper .page {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid var(--kblx-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 6px 18px rgba(0,0,0,.28) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+  /* Input + enviar agrupados */
+  .input-container {
+    gap: 10px;
+  }
+  #userInput {
+    border: 1px solid var(--kblx-border);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  /* Ajustes de toque para mobile */
+  @media (hover: none) {
+    .control-buttons button,
+    #sendBtn, #voiceBtn { min-height: 42px; }
+  }
+</style>
+
+
+<style>
+  /* ==== KBLX: Input + Placeholder + Footer (Glass + Border Gradient) ==== */
+  :root{
+    --kblx-grad: linear-gradient(135deg, rgba(0,216,216,0.88), rgba(216,0,216,0.88));
+    --kblx-grad-soft: linear-gradient(135deg, rgba(0,216,216,0.45), rgba(216,0,216,0.45));
+    --kblx-border: rgba(255,255,255,0.12);
+    --kblx-text-muted: rgba(255,255,255,0.78);
+  }
+  /* Input com borda gradiente e glass */
+  #userInput{
+    background: linear-gradient(transparent, transparent) padding-box,
+                var(--kblx-grad-soft) border-box !important;
+    border: 1px solid transparent !important;
+    color: #fff !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-radius: 14px !important;
+    padding: 12px 14px !important;
+  }
+  #userInput::placeholder{
+    color: var(--kblx-text-muted);
+    opacity: 0.8;
+  }
+  #userInput:focus{
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(0,216,216,.18) inset,
+                0 0 0 2px rgba(216,0,216,.12) inset;
+  }
+
+  /* Footer glass + borda gradiente suave */
+  .footer-text{
+    display: inline-block;
+    margin: 10px auto 0 auto;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    background: linear-gradient(transparent, transparent) padding-box,
+                var(--kblx-grad-soft) border-box;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,.25);
+  }
+  .footer-text em{ color:#eaeaf3 }
+  .footer-text strong{ color:#ffffff }
+
+  /* Melhor espaçamento do container de input em mobile */
+  .input-container{
+    padding: 8px 10px;
+  }
+
+  @media (max-width: 420px){
+    #userInput{ font-size: 16px }
+    .footer-text{ font-size: 12.8px }
+  }
+</style>
+
 </body>
 </html>
