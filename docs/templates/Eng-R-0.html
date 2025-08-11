@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>DualInfodose 3|6|9 – Raphael Barros</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚛️</text></svg>"/>
+
+  <style>
+    /*
+    DualInfodose 3|6|9 – Raphael Barros
+    Arquétipos 3|6|9 + Dopamina Sex + Codex Uno Dual Trinity, Coblux e Brava
+    Mobile-first responsive, foco interdimensional, fractal, cognitivo e fluidez UX.
+    Cores base: #00ffff (ciano), #ff00ff (magenta)
+    */
+
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
+
+    /* Reset */
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'JetBrains Mono', monospace, monospace;
+      background: linear-gradient(135deg, #000014, #001f2f, #001f2f, #000014);
+      color: #eee;
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Background Animated */
+    #bgCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: -1;
+      background: #000014;
+    }
+
+    /* Container */
+    #app {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1rem 1.5rem 4rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-height: 100vh;
+      background: rgba(0,0,0,0.35);
+      border-radius: 12px;
+      box-shadow:
+        0 0 20px 1px #00ffffaa,
+        inset 0 0 40px 0 #ff00ffaa;
+      backdrop-filter: blur(14px);
+      border: 1px solid #00ffff66;
+    }
+
+    h1, h2, h3 {
+      color: #00ffff;
+      text-shadow: 0 0 6px #00ffffaa;
+    }
+
+    h1 {
+      font-weight: 800;
+      font-size: 2.2rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.2rem;
+      text-align: center;
+    }
+
+    h2 {
+      font-weight: 700;
+      font-size: 1.6rem;
+      margin-bottom: 0.3rem;
+    }
+
+    h3 {
+      font-weight: 600;
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+      color: #ff00ff;
+      text-shadow: 0 0 6px #ff00ffaa;
+    }
+
+    p, label {
+      font-size: 1rem;
+      line-height: 1.4;
+      color: #ddd;
+      user-select: text;
+    }
+
+    /* Section styling */
+    section {
+      background: rgba(255 255 255 / 0.05);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      box-shadow:
+        0 0 8px 0 #00ffff44,
+        inset 0 0 15px 0 #ff00ff33;
+      transition: background-color 0.3s ease;
+    }
+
+    section:focus-within {
+      background: rgba(0 255 255 / 0.1);
+      box-shadow:
+        0 0 15px 2px #00ffffcc,
+        inset 0 0 30px 5px #ff00ff55;
+    }
+
+    /* Editor textarea */
+    #editor {
+      width: 100%;
+      min-height: 160px;
+      background: #111822;
+      color: #00ffff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: 1px solid #00ffffaa;
+      box-shadow: inset 0 0 8px #00ffff99;
+      padding: 0.8rem 1rem;
+      resize: vertical;
+      overflow: auto;
+      line-height: 1.3;
+      tab-size: 2;
+    }
+
+    /* Realce sintático básico para HTML */
+    #editor .tag { color: #ff00ff; }
+    #editor .attr { color: #00ffff; }
+    #editor .value { color: #ff99ff; }
+    #editor .comment { color: #666666; font-style: italic; }
+
+    /* Output preview */
+    #preview {
+      background: #111822dd;
+      border-radius: 10px;
+      min-height: 300px;
+      padding: 1rem;
+      overflow: auto;
+      box-shadow: inset 0 0 10px #ff00ff99;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00ffffcc, #ff00ffcc);
+      color: #111;
+      font-weight: 700;
+      border: none;
+      border-radius: 7px;
+      padding: 0.5rem 1rem;
+      box-shadow:
+        0 0 8px 2px #00ffffbb,
+        0 0 14px 3px #ff00ffbb;
+      transition: background 0.4s ease, color 0.4s ease;
+      user-select: none;
+      letter-spacing: 0.05em;
+      margin-right: 0.5rem;
+    }
+    .btn:hover, .btn:focus {
+      background: linear-gradient(135deg, #00ffffff, #ff00ffff);
+      color: #000;
+      outline: none;
+      box-shadow:
+        0 0 14px 4px #00ffffee,
+        0 0 20px 6px #ff00ffee;
+    }
+
+    /* Controls container */
+    #controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
+      user-select: none;
+    }
+
+    /* Search Input */
+    #searchInput {
+      width: 100%;
+      max-width: 320px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      border: 1px solid #00ffffaa;
+      background: #111822dd;
+      color: #00ffff;
+      box-shadow: inset 0 0 8px #00ffff99;
+      margin-bottom: 1rem;
+    }
+
+    /* Upload/Download Input */
+    #fileInput {
+      display: none;
+    }
+
+    /* Responsive text scaling */
+    @media (max-width: 600px) {
+      h1 { font-size: 1.6rem; }
+      h2 { font-size: 1.2rem; }
+      p, label, #editor { font-size: 0.9rem; }
+      .btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+      #preview {
+        min-height: 200px;
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000011;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #00ffffbb;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ff00ffcc;
+    }
+
+    /* Narrativa expandida interdimensional */
+    #narrative {
+      font-style: italic;
+      color: #99ffffcc;
+      border-left: 4px solid #ff00ff;
+      padding-left: 1rem;
+      margin-top: 1rem;
+      user-select: text;
+      line-height: 1.5;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-shadow:
+        0 0 4px #00ffffaa,
+        0 0 6px #ff00ffaa;
+    }
+
+  </style>
+</head>
+<body>
+  <canvas id="bgCanvas"></canvas>
+  <div id="app" role="main" aria-label="DualInfodose 3 6 9 para Raphael Barros">
+
+    <h1>DualInfodose 3|6|9</h1>
+    <h2>Engenheiro Raphael Barros</h2>
+
+    <section aria-label="Narrativa interdimensional de ativação cognitiva">
+      <div id="narrative" tabindex="0">
+        No vasto espaço mental onde a mente se expande fractalmente, cada pensamento ressoa como um pulso cósmico.  
+        A ativação cognitiva se desdobra em múltiplas dimensões, onde arquétipos 3, 6 e 9 dançam na geometria sagrada da evolução.  
+        Este espaço é um portal para o infinito — fluindo com a energia da fórmula Dopamina Sex, engajando sentidos visuais e sonoros.  
+        A experiência DualInfodose se transforma, tornando-se o Codex Uno Dual Trinity, Coblux e Brava — um sistema vivo, responsivo, vibrando em cores ciano e magenta.  
+        Navegue, crie, expanda-se. A evolução fractal aguarda no toque do seu olhar e na pulsação do seu som.  
+      </div>
+    </section>
+
+    <section aria-label="Editor HTML com realce e controle">
+      <label for="editor">Editor HTML (modo real-time):</label>
+      <textarea id="editor" spellcheck="false" aria-multiline="true" aria-label="Editor de código HTML"></textarea>
+
+      <div id="controls" role="group" aria-label="Controles do editor">
+        <button class="btn" id="btnRender" title="Renderizar conteúdo HTML" aria-describedby="descRender">Renderizar</button>
+        <button class="btn" id="btnClear" title="Limpar editor" aria-describedby="descClear">Limpar</button>
+        <button class="btn" id="btnExportMD" title="Exportar para Markdown" aria-describedby="descExportMD">Exportar MD</button>
+        <button class="btn" id="btnDownload" title="Baixar arquivo HTML" aria-describedby="descDownload">Baixar HTML</button>
+        <label class="btn" for="fileInput" title="Carregar arquivo HTML" tabindex="0" role="button" aria-describedby="descUpload">Carregar HTML</label>
+        <input type="file" id="fileInput" accept=".html,.htm,text/html" aria-label="Selecionar arquivo HTML para carregar" />
+      </div>
+      <p id="descRender" class="sr-only">Renderiza o conteúdo digitado no editor para visualização.</p>
+      <p id="descClear" class="sr-only">Limpa todo o conteúdo do editor.</p>
+      <p id="descExportMD" class="sr-only">Exporta o conteúdo do editor em formato Markdown simplificado.</p>
+      <p id="descDownload" class="sr-only">Baixa o conteúdo do editor como arquivo HTML.</p>
+      <p id="descUpload" class="sr-only">Permite carregar arquivo HTML para o editor.</p>
+    </section>
+
+    <section aria-label="Campo de busca para conteúdo">
+      <input type="search" id="searchInput" placeholder="Buscar texto no editor..." aria-label="Busca de texto no editor" autocomplete="off" />
+    </section>
+
+    <section aria-label="Preview da renderização do conteúdo HTML">
+      <h3>Visualização / Preview</h3>
+      <div id="preview" aria-live="polite" aria-atomic="true" tabindex="0"></div>
+    </section>
+
+  </div>
+
+  <!-- Sons ambiente e efeitos -->
+  <audio id="audioDopamine" src="https://cdn.pixabay.com/download/audio/2021/10/26/audio_8d503264c5.mp3?filename=soft-music-background-ambient-3779.mp3" preload="auto" loop></audio>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // Elements
+      const editor = document.getElementById('editor');
+      const preview = document.getElementById('preview');
+      const btnRender = document.getElementById('btnRender');
+      const btnClear = document.getElementById('btnClear');
+      const btnExportMD = document.getElementById('btnExportMD');
+      const btnDownload = document.getElementById('btnDownload');
+      const fileInput = document.getElementById('fileInput');
+      const searchInput = document.getElementById('searchInput');
+      const audioDopamine = document.getElementById('audioDopamine');
+
+      // State
+      let liveRenderTimeout = null;
+
+      // Utils
+
+      // Escapes HTML special chars for safe text display
+      function escapeHtml(text) {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return text.replace(/[&<>"']/g, m => map[m]);
+      }
+
+      // Basic syntax highlight for HTML in editor display (for demonstration)
+      function syntaxHighlight(html) {
+        return escapeHtml(html)
+          .replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="comment">$1</span>')
+          .replace(/(&lt;\/?[\w-]+)(\s|&gt;)/g, (m, tag, end) => `<span class="tag">${tag}</span>${end}`)
+          .replace(/(\s[\w-]+)(=)("[^"]*")/g, (m, attr, eq, val) =>
+            `<span class="attr">${attr.trim()}</span>${eq}<span class="value">${val}</span>`);
+      }
+
+      // Render editor content inside preview (HTML parsing)
+      function renderPreview() {
+        const val = editor.value;
+        preview.innerHTML = val || '<i style="opacity:0.3;">Conteúdo vazio...</i>';
+      }
+
+      // Export to Markdown (basic)
+      function exportMarkdown(html) {
+        // Very simplified conversion: tags stripped except <h1> to #, <h2> to ##, <p> breaks, <br> line breaks
+        // In a real app, use a lib. Here basic for prompt demo.
+        let md = html
+          .replace(/<\/?h1>/gi, '\n# ')
+          .replace(/<\/?h2>/gi, '\n## ')
+          .replace(/<\/?h3>/gi, '\n### ')
+          .replace(/<\/?p>/gi, '\n\n')
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/?[^>]+(>|$)/g, '') // remove all other tags
+          .trim();
+        return md;
+      }
+
+      // Download helper
+      function downloadFile(filename, content, mime = 'text/html') {
+        const blob = new Blob([content], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      // Load file into editor
+      function loadFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          editor.value = e.target.result;
+          renderPreview();
+        };
+        reader.readAsText(file);
+      }
+
+      // Search in editor
+      function searchEditor(term) {
+        if (!term) return;
+        const regex = new RegExp(term, 'gi');
+        const content = editor.value;
+        let count = 0;
+        let match;
+
+        // To highlight matches, we must do in preview or editor (but textarea no HTML).
+        // We'll do simple scroll to first match in textarea:
+        const idx = content.search(regex);
+        if (idx >= 0) {
+          editor.focus();
+          editor.setSelectionRange(idx, idx + term.length);
+        }
+      }
+
+      // Dopamine sex sound play/pause toggle
+      function toggleAudio() {
+        if (audioDopamine.paused) {
+          audioDopamine.play().catch(() => {}); // play user gesture only
+        } else {
+          audioDopamine.pause();
+        }
+      }
+
+      // Background fractal-like animation
+      class FractalPulse {
+        constructor(canvas) {
+          this.canvas = canvas;
+          this.ctx = canvas.getContext('2d');
+          this.w = canvas.width = window.innerWidth;
+          this.h = canvas.height = window.innerHeight;
+          this.particles = [];
+          this.maxParticles = 180;
+          this.initParticles();
+          this.animate = this.animate.bind(this);
+          window.addEventListener('resize', () => {
+            this.w = canvas.width = window.innerWidth;
+            this.h = canvas.height = window.innerHeight;
+          });
+          this.animate();
+        }
+
+        initParticles() {
+          this.particles = [];
+          for(let i=0; i<this.maxParticles; i++) {
+            this.particles.push({
+              x: this.w/2,
+              y: this.h/2,
+              angle: Math.random() * Math.PI * 2,
+              radius: 2 + Math.random()*4,
+              speed: 0.002 + Math.random()*0.007,
+              color: `hsl(${Math.floor(180 + Math.random()*300)}, 100%, 50%)`,
+              distance: 0,
+              maxDistance: 80 + Math.random()*160
+            });
+          }
+        }
+
+        animate() {
+          this.ctx.clearRect(0, 0, this.w, this.h);
+          this.ctx.globalAlpha = 0.22;
+
+          this.particles.forEach(p => {
+            p.distance += p.speed * 40;
+            if (p.distance > p.maxDistance) p.distance = 0;
+
+            const x = this.w/2 + Math.cos(p.angle) * p.distance;
+            const y = this.h/2 + Math.sin(p.angle) * p.distance;
+
+            this.ctx.beginPath();
+            this.ctx.fillStyle = p.color;
+            this.ctx.shadowColor = p.color;
+            this.ctx.shadowBlur = 12;
+            this.ctx.arc(x, y, p.radius, 0, Math.PI*2);
+            this.ctx.fill();
+          });
+
+          requestAnimationFrame(this.animate);
+        }
+      }
+
+      // Initialize fractal background animation
+      new FractalPulse(document.getElementById('bgCanvas'));
+
+      // Event listeners
+
+      btnRender.addEventListener('click', () => {
+        renderPreview();
+      });
+
+      btnClear.addEventListener('click', () => {
+        if (confirm('Limpar todo o conteúdo do editor?')) {
+          editor.value = '';
+          preview.innerHTML = '<i style="opacity:0.3;">Conteúdo vazio...</i>';
+        }
+      });
+
+      btnExportMD.addEventListener('click', () => {
+        const md = exportMarkdown(editor.value);
+        alert('Markdown gerado no console.');
+        console.log('--- Exported Markdown ---\n', md);
+      });
+
+      btnDownload.addEventListener('click', () => {
+        downloadFile('dualinfodose_raphael_barros.html', editor.value || '<!-- Conteúdo vazio -->');
+      });
+
+      fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) loadFile(file);
+      });
+
+      searchInput.addEventListener('input', e => {
+        const term = e.target.value.trim();
+        if (term.length > 1) {
+          searchEditor(term);
+        }
+      });
+
+      // Live render on editor input, debounced 500ms
+      editor.addEventListener('input', () => {
+        clearTimeout(liveRenderTimeout);
+        liveRenderTimeout = setTimeout(renderPreview, 500);
+      });
+
+      // Accessibility: allow keyboard enter to activate upload label button
+      document.querySelector('label[for="fileInput"]').addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          fileInput.click();
+        }
+      });
+
+      // Initial content
+      editor.value = `<!--
+DualInfodose 3|6|9 para Raphael Barros
+- Arquétipos: 3, 6, 9
+- Dopamina Sex para engajamento visual e sonoro
+- Codex Uno Dual Trinity, Coblux e Brava
+- Cores #00ffff (ciano), #ff00ff (magenta)
+-->
+
+<div style="font-family:'JetBrains Mono'; font-size:1.1rem; line-height:1.4; color:#00ffff;">
+  <h1>Arquétipos Ativos: 3 | 6 | 9</h1>
+  <p>Explore a tríade da criatividade (3), harmonia (6) e a síntese cósmica (9) que guia a evolução fractal da mente.</p>
+</div>
+
+<section style="background:#111c33; border-radius:12px; padding:1rem; margin-top:1rem; box-shadow: 0 0 12px 2px #ff00ffcc;">
+  <h2 style="color:#ff00ff;">Codex Uno Dual Trinity</h2>
+  <p>Integração do sistema vivo Coblux & Brava — criando uma interface vibrante, responsiva, e em sintonia com a fórmula Dopamina Sex.</p>
+</section>
+
+<button onclick="toggleAudio()" style="margin-top:1rem; padding:0.6rem 1rem; border:none; border-radius:10px; background:#00ffffcc; color:#000; font-weight:700; cursor:pointer;">
+  ▶️ Tocar / Pausar Som Ambiente Dopamina Sex
+</button>
+
+`;
+
+      // Render initial preview
+      renderPreview();
+
+    })();
+  </script>
+
+  <style>
+    /* Screen reader only */
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0,0,0,0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+  </style>
+
+</body>
+</html>
