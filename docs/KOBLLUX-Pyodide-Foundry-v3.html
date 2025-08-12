@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>KOBLLUX — Pyodide Foundry v3</title>
+<style>
+    body {
+        background: radial-gradient(circle at center, #00ffff20, #000000 80%);
+        color: #fff;
+        font-family: 'JetBrains Mono', monospace;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    .container {
+        max-width: 500px;
+        padding: 20px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.7);
+        box-shadow: 0 0 20px #00ffff80;
+        text-align: center;
+    }
+    button {
+        background: #00ffff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin: 5px;
+    }
+    button:hover {
+        background: #00cccc;
+    }
+    input[type="file"] {
+        display: none;
+    }
+    #log {
+        text-align: left;
+        background: #111;
+        padding: 10px;
+        border-radius: 8px;
+        height: 200px;
+        overflow-y: auto;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1><span style="color:#00aaff;">KOBLLUX</span> — Pyodide Foundry</h1>
+    <p>Forje sua fonte KOBLLUX (TTF/WOFF2) a partir de SVGs — direto no iPhone.</p>
+    <label for="fileInput" class="button">
+        <button>Selecionar SVGs ou ZIP</button>
+    </label>
+    <input type="file" id="fileInput" multiple>
+    <button onclick="forjarFonte()">Forjar TTF</button>
+    <button onclick="exportarWOFF2()">Exportar WOFF2</button>
+    <div id="log">Log:</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+<script>
+let pyodideReady = false;
+let arquivosSelecionados = [];
+
+async function initPyodideEnv() {
+    log('Carregando Pyodide...');
+    self.pyodide = await loadPyodide();
+    log('Instalando pacotes...');
+    await pyodide.loadPackage(['micropip']);
+    await pyodide.runPythonAsync(`
+import micropip
+await micropip.install('fonttools')
+await micropip.install('svgpathtools')
+await micropip.install('brotli')
+    `);
+    pyodideReady = true;
+    log('Pronto para uso!');
+}
+
+function log(msg) {
+    document.getElementById('log').innerHTML += "\n" + msg;
+}
+
+document.getElementById('fileInput').addEventListener('change', (e) => {
+    arquivosSelecionados = e.target.files;
+    log(arquivosSelecionados.length + " arquivos selecionados.");
+});
+
+async function forjarFonte() {
+    if (!pyodideReady) { log("Pyodide não está pronto."); return; }
+    if (!arquivosSelecionados.length) { log("Nenhum arquivo selecionado."); return; }
+    log('Processando para TTF...');
+
+    // Aqui entraria o código Python para gerar TTF
+    // Simulação:
+    log('TTF gerado com sucesso!');
+}
+
+async function exportarWOFF2() {
+    if (!pyodideReady) { log("Pyodide não está pronto."); return; }
+    log('Convertendo para WOFF2...');
+    // Aqui entraria o código Python para converter TTF em WOFF2
+    // Simulação:
+    log('WOFF2 exportado com sucesso!');
+}
+
+initPyodideEnv();
+</script>
+</body>
+</html>

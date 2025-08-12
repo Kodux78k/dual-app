@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KOBLLUX — Pyodide Foundry v2 (Single HTML)</title>
+<meta name="theme-color" content="#0a0a0a">
+<style>
+:root{--c1:#00d0ff;--bg:#0a0a0a;--fg:#eaeaea;--mut:#a0a0a8}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Ubuntu,'Helvetica Neue',Arial}
+.container{max-width:880px;margin:0 auto;padding:20px}
+.card{background:#111214;border:1px solid #22252a;border-radius:16px;padding:18px}
+h1{font-size:20px;margin:0 0 8px}
+p{margin:8px 0;color:var(--mut)}
+.btn{appearance:none;border:0;border-radius:999px;padding:10px 16px;background:var(--c1);color:#002029;font-weight:800;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid #2a2f36}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.status{font-family:ui-monospace,Menlo,Consolas,monospace;background:#0f1113;border:1px solid #1e2126;border-radius:12px;padding:10px;height:160px;overflow:auto;font-size:12px}
+.drop{border:1px dashed #2a2f36;border-radius:12px;padding:16px;text-align:center}
+small.tip{color:#8ea0ad}
+.kx{color:#1c66b3;font-weight:800;letter-spacing:.04em}
+hr{border:none;border-top:1px solid #21242a;margin:16px 0}
+.badge{padding:3px 8px;border-radius:8px;border:1px solid #2a2f36;font-size:12px;color:#c8d4db}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h1><span class="kx">KOBLLUX</span> — Pyodide Foundry <small class="badge">v2</small></h1>
+    <p>Forje <b>KOBLLUX Symbols</b> (TTF) a partir de <code>SVGs</code> — direto no iPhone. <span class="badge">single-file</span></p>
+    <div class="drop" id="drop">
+      <input id="file" type="file" accept=".zip,.svg" multiple style="display:none">
+      <button class="btn" id="pick">Selecionar SVGs ou ZIP</button>
+      <button class="btn ghost" id="run" disabled>Forjar fonte</button>
+      <div style="margin-top:8px"><small class="tip">Primeira execução baixa o runtime <b>Pyodide</b> e pacotes (~15–25MB). Depois tende a ficar em cache.</small></div>
+    </div>
+    <hr>
+    <div class="row">
+      <div id="filesInfo" class="badge">0 arquivos</div>
+      <div id="pyInfo" class="badge">Pyodide: aguardando…</div>
+      <div id="ftInfo" class="badge">fonttools/svgpathtools: aguardando…</div>
+    </div>
+    <pre class="status" id="log"></pre>
+  </div>
+</div>
+
+<script>
+const logEl = document.getElementById('log');
+function logln(s){ logEl.textContent += s + '\\n'; logEl.scrollTop = logEl.scrollHeight; }
+function setBadge(id, text){ document.getElementById(id).textContent = text; }
+</script>
+
+<script>
+let pyodideReady = null;
+async function loadPyodideAndPackages(){
+  if (pyodideReady) return pyodideReady;
+  setBadge('pyInfo','Pyodide: baixando…');
+  const pyodide = await loadPyodide({indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.1/full/'});
+  setBadge('pyInfo','Pyodide: ok');
+  logln('Pyodide carregado.');
+
+  // Garantir micropip disponível
+  await pyodide.loadPackage('micropip');
+
+  logln('Instalando pacotes: fonttools, svgpathtools (puro Python)…');
+  setBadge('ftInfo','fonttools/svgpathtools: instalando…');
+  await pyodide.runPythonAsync(`
+import micropip
+await micropip.install(['fonttools==4.53.0','svgpathtools==1.6.1'])
+print('Pacotes instalados.')
+  `);
+  setBadge('ftInfo','fonttools/svgpathtools: ok');
+  logln('Pacotes instalados.');
+  pyodideReady = pyodide;
+  return pyodide;
+}
+</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script>
+
+<script>
+const pickBtn = document.getElementById('pick');
+const runBtn  = document.getElementById('run');
+const fileInput = document.getElementById('file');
+let selectedFiles = [];
+
+pickBtn.addEventListener('click', ()=> fileInput.click());
+fileInput.addEventListener('change', ()=>{
+  selectedFiles = Array.from(fileInput.files || []);
+  document.getElementById('filesInfo').textContent = selectedFiles.length + ' arquivos';
+  runBtn.disabled = selectedFiles.length === 0;
+});
+
+async function readFileAsUint8Array(file){
+  return new Uint8Array(await file.arrayBuffer());
+}
+
+async function prepareFS(pyodide){
+  const FS = pyodide.FS;
+  try { FS.mkdir('/data'); } catch(e){}
+  try { FS.mkdir('/data/svgs'); } catch(e){}
+  // clear old svgs
+  try {
+    const entries = FS.readdir('/data/svgs');
+    for (const e of entries) if (e !== '.' && e !== '..') FS.unlink('/data/svgs/'+e);
+  } catch(e){}
+  for (const f of selectedFiles){
+    const bytes = await readFileAsUint8Array(f);
+    if (f.name.toLowerCase().endsWith('.zip')){
+      FS.writeFile('/data/in.zip', bytes);
+    } else if (f.name.toLowerCase().endsWith('.svg')){
+      FS.writeFile('/data/svgs/'+f.name, bytes);
+    }
+  }
+}
+
+runBtn.addEventListener('click', async ()=>{
+  runBtn.disabled = true;
+  try{
+    const pyodide = await loadPyodideAndPackages();
+    await prepareFS(pyodide);
+    logln('Arquivos copiados para /data.');
+
+    const code = `
+import os, io, zipfile
+from fontTools.fontBuilder import FontBuilder
+from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools.ttLib import TTFont
+import xml.etree.ElementTree as ET
+from svgpathtools import parse_path, Line, QuadraticBezier, CubicBezier, Arc
+
+# unzip if provided
+inzip = "/data/in.zip"
+if os.path.exists(inzip):
+    with zipfile.ZipFile(inzip, "r") as z: z.extractall("/data")
+    # move any *.svg to /data/svgs
+    for root,_,files in os.walk("/data"):
+        for fn in files:
+            if fn.lower().endswith(".svg"):
+                src = os.path.join(root, fn); dst = os.path.join("/data/svgs", os.path.basename(fn))
+                if src != dst:
+                    try: os.replace(src, dst)
+                    except: pass
+
+svg_root = "/data/svgs"
+assert os.path.isdir(svg_root), "Sem pasta /data/svgs"
+
+wanted = [chr(c) for c in range(ord('A'),ord('Z')+1)] + list("0123456789")
+found = {}
+for ch in wanted:
+    fn = os.path.join(svg_root, (ch if ch.isdigit() else ch.upper()) + ".svg")
+    if os.path.exists(fn):
+        found[ch] = fn
+
+if not found: raise RuntimeError("Nenhum SVG encontrado.")
+
+UPM = 1000
+def yflip(y): return UPM - y
+
+def glyph_from_svg(svg_file):
+    tree = ET.parse(svg_file); root = tree.getroot()
+    # collect all paths d=...
+    ds = []
+    for el in root.iter():
+        tag = el.tag.lower()
+        if tag.endswith('path') and el.get('d'):
+            ds.append(el.get('d'))
+    if not ds: raise RuntimeError(f"Sem 'path d' em {svg_file}")
+    pen = TTGlyphPen(None)
+    for d in ds:
+        p = parse_path(d)
+        start = None
+        for seg in p:
+            if start is None:
+                start = seg.start
+                pen.moveTo((start.real, yflip(start.imag)))
+            if isinstance(seg, Line):
+                end = seg.end
+                pen.lineTo((end.real, yflip(end.imag)))
+            elif isinstance(seg, QuadraticBezier):
+                c = seg.control
+                end = seg.end
+                pen.qCurveTo((c.real, yflip(c.imag)), (end.real, yflip(end.imag)))
+            elif isinstance(seg, CubicBezier):
+                # approximate cubic with two quads
+                c1, c2, end = seg.control1, seg.control2, seg.end
+                pen.qCurveTo((c1.real, yflip(c1.imag)), (c2.real, yflip(c2.imag)))
+                pen.qCurveTo((c2.real, yflip(c2.imag)), (end.real, yflip(end.imag)))
+            else:
+                # fallback: line to end
+                end = seg.end
+                pen.lineTo((end.real, yflip(end.imag)))
+        pen.endPath()
+    glyph = pen.glyph()
+    return glyph, 1000
+
+glyph_order = [".notdef"]
+cmap = {}
+advance = {}
+glyf = {}
+
+for ch, path in found.items():
+    gname = ch.upper() if ch.isalpha() else ch
+    glyph, width = glyph_from_svg(path)
+    glyph_order.append(gname)
+    glyf[gname] = glyph
+    advance[gname] = (width, 0)
+    cmap[ord(ch)] = gname
+
+fb = FontBuilder(UPM, isTTF=True)
+fb.setupGlyphOrder(glyph_order)
+fb.setupCharacterMap(cmap)
+fb.setupGlyf(glyf)
+fb.setupHorizontalMetrics(advance)
+fb.setupHorizontalHeader(ascent=800, descent=-200)
+fb.setupOS2(sTypoAscender=800, sTypoDescender=-200, usWinAscent=800, usWinDescent=200)
+fb.setupNameTable({"familyName":"KOBLLUX Symbols","styleName":"Regular","fullName":"KOBLLUX Symbols"})
+fb.setupPost()
+
+out_ttf = "/data/KOBLLUX-SYMBOLS.ttf"
+fb.save(out_ttf)
+print("OK:", out_ttf)
+`
+    logln('Forjando… primeira vez pode levar 30–90s.');
+    const res = await pyodide.runPythonAsync(code);
+    logln(res || 'ok');
+    const data = pyodide.FS.readFile('/data/KOBLLUX-SYMBOLS.ttf');
+    const blob = new Blob([data], {type:'font/ttf'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'KOBLLUX-SYMBOLS.ttf';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+  }catch(err){
+    console.error(err);
+    logln('ERRO: ' + (err.message||err));
+  }finally{
+    runBtn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>
