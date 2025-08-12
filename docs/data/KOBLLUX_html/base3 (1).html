@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOBLLUX GPS The Maker</title>
+<style>
+  :root {
+    --kodux-blue: #4a90e2;
+    --kodux-purple: #8e44ad;
+    --light-gray: #f0f0f0;
+    --dark-gray: #2c2c2c;
+  }
+  body {
+    margin: 0;
+    background-color: var(--light-gray);
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  header {
+    background: linear-gradient(90deg, var(--kodux-blue), var(--kodux-purple));
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  #toolbar {
+    display: flex;
+    align-items: center;
+    background-color: var(--dark-gray);
+    padding: 5px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  #toolbar button {
+    background-color: var(--kodux-blue);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    margin: 0 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+  }
+  #toolbar button:hover {
+    background-color: var(--kodux-purple);
+  }
+  #drawingArea {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    position: relative;
+  }
+  canvas {
+    border: 1px solid #ccc;
+    background-color: white;
+    touch-action: none;
+  }
+  #outputContainer {
+    background-color: #fff;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    font-family: monospace;
+    max-height: 150px;
+    overflow-y: auto;
+  }
+</style>
+</head>
+<body>
+  <header>KOBLLUX GPS The Maker</header>
+  <div id="toolbar">
+    <button id="colorYellow" style="background-color: yellow; color: black;">Amarelo</button>
+    <button id="colorBlue" style="background-color: var(--kodux-blue);">Azul</button>
+    <button id="colorPurple" style="background-color: var(--kodux-purple);">Roxo</button>
+    <button id="eraser">Borracha</button>
+    <button id="clearCanvas">Limpar</button>
+    <button id="generateCode">Gerar Código</button>
+    <button id="copyCode">Copiar Código</button>
+  </div>
+  <main>
+    <div id="drawingArea">
+      <canvas id="paintCanvas" width="360" height="480"></canvas>
+    </div>
+    <div id="outputContainer">
+      <!-- Aqui vai sair o GPS Maker -->
+    </div>
+  </main>
+  <!-- === PARTE 3/3 - Conversão para KOBLLUX PROMPT e copiar === -->
+<script>
+(() => {
+  const btnGenerate = document.getElementById('generatePrompt');
+  const btnCopy = document.getElementById('copyPrompt');
+  const outputContainer = document.getElementById('outputContainer');
+
+  function formatAsKoblluxPrompt(points) {
+    // Se não houver pontos, retorna mensagem simples
+    if (!points || !points.length) {
+      return "🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋\n— Nenhum traço registrado.";
+    }
+
+    // Converte pontos em sequência textual compacta
+    // Ex.: "(x,y,#cor) -> (x,y,#cor) ..."
+    const coords = points.map(p => `(${p.x},${p.y},${p.color})`).join(" → ");
+
+    // Estrutura fixa do prompt
+    return `🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋
+— 𝕊𝕌𝔹𝕊𝕋𝔸ℕ𝕋𝕀𝕍𝕆𝕊: KOBLLUX, LUX, REDE
+— 𝕍𝔼ℝ𝔹𝕆𝕊: GERAR, EXPANDIR, VER
+— 𝔸𝔻𝕁𝔼𝕋𝕀𝕍𝕆𝕊: MUTÁVEL
+— 𝕋𝔼𝕄𝔸𝕊:
+   • Consciência: MENTE
+— 𝔠𝔬𝔬𝔯𝔡𝔢𝔫𝔞𝔡𝔞𝔰:
+${coords}`;
+  }
+
+  // Gera e exibe
+  btnGenerate.addEventListener('click', () => {
+    const points = window.KOBLLUX_DRAW.getPoints();
+    const promptText = formatAsKoblluxPrompt(points);
+    outputContainer.textContent = promptText;
+  });
+
+  // Copia para área de transferência
+  btnCopy.addEventListener('click', () => {
+    const text = outputContainer.textContent.trim();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      btnCopy.textContent = "✅ Copiado!";
+      setTimeout(() => { btnCopy.textContent = "Copiar Prompt"; }, 1500);
+    }).catch(err => {
+      alert("Falha ao copiar: " + err);
+    });
+  });
+})();
+</script>
+<!-- === FIM PARTE 3/3 === -->
+  <!-- === PARTE 3/3 - Conversão para KOBLLUX PROMPT e copiar === -->
+<script>
+(() => {
+  const btnGenerate = document.getElementById('generatePrompt');
+  const btnCopy = document.getElementById('copyPrompt');
+  const outputContainer = document.getElementById('outputContainer');
+
+  function formatAsKoblluxPrompt(points) {
+    // Se não houver pontos, retorna mensagem simples
+    if (!points || !points.length) {
+      return "🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋\n— Nenhum traço registrado.";
+    }
+
+    // Converte pontos em sequência textual compacta
+    // Ex.: "(x,y,#cor) -> (x,y,#cor) ..."
+    const coords = points.map(p => `(${p.x},${p.y},${p.color})`).join(" → ");
+
+    // Estrutura fixa do prompt
+    return `🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋
+— 𝕊𝕌𝔹𝕊𝕋𝔸ℕ𝕋𝕀𝕍𝕆𝕊: KOBLLUX, LUX, REDE
+— 𝕍𝔼ℝ𝔹𝕆𝕊: GERAR, EXPANDIR, VER
+— 𝔸𝔻𝕁𝔼𝕋𝕀𝕍𝕆𝕊: MUTÁVEL
+— 𝕋𝔼𝕄𝔸𝕊:
+   • Consciência: MENTE
+— 𝔠𝔬𝔬𝔯𝔡𝔢𝔫𝔞𝔡𝔞𝔰:
+${coords}`;
+  }
+
+  // Gera e exibe
+  btnGenerate.addEventListener('click', () => {
+    const points = window.KOBLLUX_DRAW.getPoints();
+    const promptText = formatAsKoblluxPrompt(points);
+    outputContainer.textContent = promptText;
+  });
+
+  // Copia para área de transferência
+  btnCopy.addEventListener('click', () => {
+    const text = outputContainer.textContent.trim();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      btnCopy.textContent = "✅ Copiado!";
+      setTimeout(() => { btnCopy.textContent = "Copiar Prompt"; }, 1500);
+    }).catch(err => {
+      alert("Falha ao copiar: " + err);
+    });
+  });
+})();
+</script>
+  
+</body>
+</html>
+<!-- === FIM PARTE 3/3 === -->

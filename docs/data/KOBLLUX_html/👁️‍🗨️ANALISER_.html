@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>OLHO DE HORUS ANALYSER 👁️</title>
+<style>
+  /* Reset básico */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body {
+    background-color: #0b0a19;
+    color: #c3b9ff;
+    font-family: 'Courier New', Courier, monospace;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Barra superior de status */
+  header {
+    background-color: #3c2f81;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
+    user-select: none;
+  }
+  /* Container geral */
+  .container {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+  /* Sidebar */
+  aside {
+    width: 240px;
+    background-color: #1b1860;
+    padding: 20px;
+    overflow-y: auto;
+    border-right: 1px solid #3c2f81;
+  }
+  aside h2 {
+    margin-bottom: 15px;
+    color: #a18aff;
+  }
+  aside label {
+    display: block;
+    margin-bottom: 10px;
+    cursor: pointer;
+    user-select: none;
+  }
+  aside input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #6f6cff;
+  }
+  /* Main conteúdo */
+  main {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #120f2c;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Containers de entrada e saída */
+  .prompt-card {
+    background-color: #2b2a5f; /* fundo mais claro */
+    border: 1px solid #5a52c1;
+    border-radius: 6px;
+    padding: 15px 20px;
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .prompt-card:hover {
+    box-shadow: 0 0 15px #6f6cff;
+  }
+  /* Título de card */
+  .prompt-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+    color: #b1a9ff;
+    user-select: none;
+  }
+  /* Textarea input */
+  #html-input {
+    background-color: #1e1d40; /* fundo do input mais claro */
+    border-radius: 6px;
+    border: none;
+    color: #e6f6ff;
+    font-family: monospace;
+    font-size: 14px;
+    min-height: 260px;
+    resize: vertical;
+    padding: 12px;
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+  /* Botões */
+  .button-row {
+    margin-top: 12px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  button {
+    background-color: #8e44ad;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: #e6f6ff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  button:hover {
+    background-color: #a063ce;
+  }
+  /* Espaço para anotações entre containers */
+  #annotation-space {
+    height: 70vh; /* 70% da altura do viewport */
+    margin: 30px 0;
+    color: #8f86cc;
+    font-style: italic;
+    font-size: 0.9rem;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Output container */
+  #output-container {
+    position: relative;
+    font-family: monospace;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    padding-left: 40px;
+    min-height: 300px;
+    background-color: #1e1d40; /* fundo mais claro para output */
+    border-radius: 6px;
+    border: none;
+    color: #e6f6ff;
+    line-height: 1.5em;
+    tab-size: 2;
+  }
+  /* Números da linha */
+  #line-numbers {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    width: 30px;
+    color: #6a7a9f;
+    font-size: 12px;
+    line-height: 1.5em;
+    user-select: none;
+    text-align: right;
+    pointer-events: none;
+  }
+  /* Faixas de linhas alternadas */
+  #html-output span {
+    display: block;
+    padding-left: 10px;
+  }
+  #html-output span:nth-child(odd) {
+    background-color: rgba(111, 108, 230, 0.1);
+  }
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+    aside {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #3c2f81;
+      padding: 15px;
+    }
+    main {
+      padding: 15px;
+    }
+    .button-row {
+      justify-content: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>OLHO DE HORUS ANALYSER 👁️</div>
+  <div>Usuário: ∆NEPHESH ELYON∆</div>
+</header>
+
+<div class="container">
+  <aside>
+    <h2>Modos de Análise</h2>
+    <label><input type="checkbox" checked value="indent" /> Indentação</label>
+    <label><input type="checkbox" checked value="tags" /> Tags Existentes</label>
+    <label><input type="checkbox" checked value="counts" /> Contagem de Elementos</label>
+    <label><input type="checkbox" checked value="structure" /> Estrutura</label>
+  </aside>
+
+  <main>
+    <section id="input-container" class="prompt-card">
+      <div class="prompt-title">Entrada HTML</div>
+      <textarea id="html-input" placeholder="Cole seu código HTML aqui..."></textarea>
+      <div class="button-row">
+        <button id="btn-paste">Oros Colar</button>
+        <button id="btn-import">Oros Importar</button>
+        <button id="btn-analyze">Oros Analisar</button>
+        <button id="btn-clear">Oros Limpar</button>
+      </div>
+    </section>
+
+    <div id="annotation-space"> <!-- Espaço para anotações / informações futuras --> </div>
+
+    <section id="output-container" class="prompt-card" style="position:relative;">
+      <div class="prompt-title">Saída Formatada</div>
+      <div id="line-numbers"></div>
+      <pre id="html-output"></pre>
+    </section>
+  </main>
+</div>
+
+<input type="file" id="file-input" style="display:none" accept=".html,.htm,text/html" />
+
+<script>
+  const inputArea = document.getElementById('html-input');
+  const outputArea = document.getElementById('html-output');
+  const lineNumbers = document.getElementById('line-numbers');
+
+  const btnPaste = document.getElementById('btn-paste');
+  const btnImport = document.getElementById('btn-import');
+  const btnAnalyze = document.getElementById('btn-analyze');
+  const btnClear = document.getElementById('btn-clear');
+  const fileInput = document.getElementById('file-input');
+
+  const checkboxes = document.querySelectorAll('aside input[type="checkbox"]');
+
+  // Função para identar HTML
+  function indentHTML(html) {
+    const tab = '  ';
+    let result = '';
+    let indent = 0;
+
+    html = html.trim();
+    const tokens = html.replace(/></g, '>\n<').split('\n');
+
+    tokens.forEach(line => {
+      if (line.match(/^<\/\w/)) indent--;
+      result += tab.repeat(Math.max(indent,0)) + line.trim() + '\n';
+      if (line.match(/^<[^\/!][^>]*[^\/]>.*$/)) indent++;
+    });
+
+    return result.trimEnd();
+  }
+
+  // Atualiza números de linha
+  function updateLineNumbers() {
+    const lines = outputArea.textContent.split('\n').length;
+    let numbers = '';
+    for(let i = 1; i <= lines; i++) {
+      numbers += i + '\n';
+    }
+    lineNumbers.textContent = numbers;
+  }
+
+  // Exibe output com faixas de linhas alternadas usando spans
+  function displayWithStripes(text) {
+    const lines = text.split('\n');
+    outputArea.innerHTML = lines.map((line, idx) =>
+      `<span>${line || ' '}</span>`
+    ).join('');
+  }
+
+  // Sincroniza scroll
+  outputArea.addEventListener('scroll', () => {
+    lineNumbers.scrollTop = outputArea.scrollTop;
+  });
+
+  btnPaste.addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      inputArea.value = text;
+    } catch {
+      alert('Falha ao acessar área de transferência.');
+    }
+  });
+
+  btnImport.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      inputArea.value = e.target.result;
+    };
+    reader.readAsText(file);
+  });
+
+  btnAnalyze.addEventListener('click', () => {
+    const rawHTML = inputArea.value;
+    if (!rawHTML.trim()) {
+      alert('Insira algum código HTML para analisar.');
+      return;
+    }
+
+    let formatted = rawHTML;
+
+    if (Array.from(checkboxes).find(cb => cb.value === 'indent' && cb.checked)) {
+      formatted = indentHTML(rawHTML);
+    }
+
+    // Aqui você pode adicionar outras análises conforme checkboxes (tags, counts, etc)
+
+    displayWithStripes(formatted);
+    updateLineNumbers();
+  });
+
+  btnClear.addEventListener('click', () => {
+    inputArea.value = '';
+    outputArea.textContent = '';
+    lineNumbers.textContent = '';
+  });
+</script>
+
+</body>
+</html>

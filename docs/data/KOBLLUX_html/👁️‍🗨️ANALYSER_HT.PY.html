@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>KOBLLUX Dashboard - Analisador Fractal (Linha, Zoom, HTML View)</title>
+<style>
+  :root{
+    --kodux:#8e44ad;
+    --bllue:#1f5f99;
+    --fitlux:#27ae60;
+    --bg:#07070a;
+    --card:#0a1424;
+    --code-font-size:14px;
+    --gutter-width:54px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; font-family:Inter, "Segoe UI", Roboto, Arial; background: radial-gradient(900px 400px at 10% 10%, rgba(74,144,226,0.04), transparent), var(--bg); color:#e6f6ff; padding:18px;}
+  .container{max-width:1200px;margin:0 auto;display:flex;gap:18px;align-items:flex-start}
+  .sidebar{width:260px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,var(--kodux),var(--bllue));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+  .title{color:var(--bllue);font-weight:800;margin-left:10px}
+  header.row{display:flex;align-items:center;gap:12px}
+  .main{flex:1;display:flex;flex-direction:column;gap:14px}
+  .card{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03); box-shadow:0 8px 30px rgba(2,6,15,0.6)}
+  h1{margin:0;color:var(--bllue)}
+  p.meta{margin:6px 0 0 0;color:#bfe6ff;font-size:0.95rem}
+  /* analyzer layout */
+  .analyzer-grid{display:flex;gap:12px;align-items:flex-start}
+  .left-col{flex:1;min-width:420px;display:flex;flex-direction:column;gap:12px}
+  .right-col{width:420px;min-width:320px;display:flex;flex-direction:column;gap:12px}
+  textarea#codeInput{width:100%;min-height:160px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));color:#cfefff;font-family:monospace;font-size:var(--code-font-size);resize:vertical}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  button{cursor:pointer;border-radius:8px;padding:8px 12px;border:none;font-weight:700}
+  .primary{background:var(--kodux);color:#061018}
+  .ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#cfefff}
+  /* result with gutter */
+  .result-wrapper{background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border-radius:10px;padding:8px;border:1px solid rgba(31,95,153,0.06);display:flex}
+  .gutter{width:var(--gutter-width);padding:8px 6px;border-right:1px solid rgba(255,255,255,0.02);color:#9ecff0;font-family:monospace;font-size:calc(var(--code-font-size) - 1px);text-align:right;line-height:1.6;user-select:none}
+  .code-area{flex:1;padding:8px 12px;overflow:auto;white-space:pre; font-family:monospace; font-size:var(--code-font-size); line-height:1.6; color:#a8d0ff}
+  /* tokens */
+  .token-html-tag{color:var(--fitlux); font-weight:700}
+  .token-html-attr{color:var(--bllue); font-weight:600}
+  .token-html-string{color:var(--kodux); font-style:italic}
+  .token-python-keyword{color:#e67e22; font-weight:700}
+  .token-python-string{color:var(--kodux); font-style:italic}
+  .token-python-identifier{color:var(--bllue)}
+  .token-json-key{color:var(--fitlux); font-weight:700}
+  .token-json-string{color:var(--kodux); font-style:italic}
+  .weight-1{opacity:0.6}
+  .weight-2{opacity:0.75}
+  .weight-3{opacity:0.9}
+  .weight-4{opacity:1}
+  /* small panels */
+  .panel{background:#071017;padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.02)}
+  .list{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto}
+  .tag{display:inline-block;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03);color:#dbeeff;font-weight:700}
+  .tree{font-family:monospace;font-size:0.94rem;color:#cfefff}
+  .tree ul{list-style:none;padding-left:12px;margin:6px 0}
+  .tree li{margin:4px 0}
+  .controls-zoom{display:flex;gap:6px;align-items:center}
+  .zoom-btn{background:var(--bllue);color:#fff;padding:6px 8px;border-radius:6px;font-weight:800}
+  .toggle-btn{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#cfefff;padding:6px 8px;border-radius:6px}
+  /* responsive */
+  @media(max-width:980px){
+    .container{
+      flex-direction: column;
+      max-width: 100%;
+      padding: 12px 6px;
+    }
+    .sidebar{
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .analyzer-grid{
+      flex-direction: column;
+      gap: 18px;
+    }
+    .left-col, .right-col {
+      width: 100% !important;
+      min-width: auto !important;
+      max-width: 100%;
+    }
+    .right-col {
+      margin-top: 12px;
+    }
+    .gutter {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <aside class="sidebar card">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="logo">KX</div>
+      <div>
+        <div class="title">KOBLLUX Dashboard</div>
+        <div class="meta" style="color:#9ecff0;font-size:0.88rem">Sistema Fractal Vivo</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px" class="meta">Analisador — linhas numeradas, zoom, HTML View, classes / objetos separados</div>
+  </aside>
+
+  <main class="main">
+    <section class="card">
+      <header class="row">
+        <div>
+          <h1>KOBLLUX • Analisador Fractal</h1>
+          <p class="meta">Cole código (HTML / JSON / Python). Use os controles para analisar, ver árvore HTML, listar classes e objetos, ajustar zoom e alternar números de linha.</p>
+        </div>
+        <div style="margin-left:auto" class="controls-zoom">
+          <button id="toggleLines" class="toggle-btn" title="Alternar números de linha"># Linhas</button>
+          <button id="zoomIn" class="zoom-btn" title="Aumentar fonte">A+</button>
+          <button id="zoomOut" class="zoom-btn" title="Diminuir fonte">A-</button>
+          <button id="resetZoom" class="toggle-btn" title="Resetar zoom">100%</button>
+        </div>
+      </header>
+
+      <div class="analyzer-grid" style="margin-top:12px">
+        <div class="left-col">
+          <textarea id="codeInput" placeholder="Cole seu HTML, JSON ou Python aqui..."></textarea>
+          <div class="controls">
+            <button id="analyzeBtn" class="primary">Analisar</button>
+            <button id="clearBtn" class="ghost">Limpar</button>
+            <button id="exampleBtn" class="ghost">Exemplo Python</button>
+            <button id="viewHtmlBtn" class="ghost">Abrir HTML View</button>
+          </div>
+        </div>
+
+        <div class="right-col">
+          <div class="panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <strong>Resultado — código</strong>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button id="copyResult" class="ghost">Copiar</button>
+                <button id="downloadResult" class="ghost">Salvar</button>
+              </div>
+            </div>
+            <div class="result-wrapper" id="resultWrapper" style="margin-top:10px">
+              <div class="gutter" id="gutter" aria-hidden="true"></div>
+              <div class="code-area" id="codeArea" role="region" aria-label="Código analisado"></div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:10px">
+            <strong>Classes CSS detectadas</strong>
+            <div class="list" id="classList" style="margin-top:8px"><em style="color:#9ecff0">Nenhuma</em></div>
+          </div>
+
+          <div class="panel" style="margin-top:10px">
+            <strong>Objetos / Keys detectados</strong>
+            <div class="list" id="objectList" style="margin-top:8px"><em style="color:#9ecff0">Nenhum</em></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="card" id="htmlViewCard" style="display:none">
+      <header style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>HTML View — Árvore sintática</strong><div style="font-size:0.9rem;color:#9ecff0">Clique para expandir / colapsar</div></div>
+        <div>
+          <button id="closeHtmlView" class="ghost">Fechar View</button>
+        </div>
+      </header>
+      <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:300px" class="tree" id="domTree"></div>
+        <div style="width:320px;min-width:100%">
+          <div style="margin-bottom:8px"><strong>Elemento selecionado</strong></div>
+          <pre class="panel" id="selectedInfo" style="min-height:200px;white-space:pre-wrap">Nenhum elemento selecionado</pre>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ---------- Utilities & original tokenizers (preserved + extended) ---------- */
+const pythonKeywords = new Set([
+  'def','return','if','else','elif','for','while','import','from','as','class','try','except','with','lambda','yield','break','continue',
+  'True','False','None','and','or','not','in','is','pass','global','nonlocal'
+]);
+
+function guessType(text){
+  if (text.trim().startsWith('{') || text.trim().startsWith('[')) return 'json';
+  if (/^\s*<[\w!]/.test(text)) return 'html';
+  if (pythonKeywords.has(text.split(/\s+/)[0])) return 'python';
+  return 'python';
+}
+
+function escapeHTML(str){ return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* Tokenizers (preserve whitespace) */
+function tokenizeHTML(text){
+  const regex = /(<\/?[\w-]+|[\w-]+(?==)|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g;
+  let tokens = []; let last = 0; let m;
+  while ((m = regex.exec(text)) !== null){
+    if (m.index > last){
+      const part = text.slice(last, m.index);
+      part.split(/(\s+)/).forEach(p => { if(p.length) tokens.push({text:p,type:'plain'}) });
+    }
+    const v = m[0]; let type = 'plain';
+    if (/^<\/?[\w-]+/.test(v)) type = 'token-html-tag';
+    else if (/^["']/.test(v)) type = 'token-html-string';
+    else type = 'token-html-attr';
+    tokens.push({text:v, type});
+    last = regex.lastIndex;
+  }
+  if (last < text.length){
+    const tail = text.slice(last);
+    tail.split(/(\s+)/).forEach(p=>{ if(p.length) tokens.push({text:p, type:'plain'}) });
+  }
+  return tokens;
+}
+
+function tokenizeJSON(text){
+  const regex = /("([^"\\]|\\.)*")|(\b(true|false|null)\b)|([\{\}\[\]:,])|(\s+)|(-?\d+(\.\d+)?([eE][+-]?\d+)?)/g;
+  let tokens = []; let m;
+  while ((m = regex.exec(text)) !== null){
+    if (m[1]) tokens.push({text:m[1], type:'token-json-string'});
+    else if (m[3]) tokens.push({text:m[3], type:'token-json-key'});
+    else if (m[5]) tokens.push({text:m[5], type:'token-json-punct'});
+    else if (m[6]) tokens.push({text:m[6], type:'plain'});
+    else if (m[7]) tokens.push({text:m[7], type:'token-python-identifier'});
+  }
+  return tokens;
+}
+
+function tokenizePython(text){
+  const regex = /(\b\w+\b|[^\w\s]+|\s+)/g;
+  let tokens=[]; let m;
+  while ((m = regex.exec(text)) !== null){
+    const v = m[0];
+    if (/^\s+$/.test(v)) tokens.push({text:v,type:'plain'});
+    else if (pythonKeywords.has(v)) tokens.push({text:v,type:'token-python-keyword'});
+    else if (/^['"].*['"]$/.test(v)) tokens.push({text:v,type:'token-python-string'});
+    else if (/^\d+(\.\d+)?$/.test(v)) tokens.push({text:v,type:'token-python-number'});
+    else if (/^[\(\)\[\]\{\}:,\.]$/.test(v)) tokens.push({text:v,type:'plain'});
+    else tokens.push({text:v,type:'token-python-identifier'});
+  }
+  return tokens;
+}
+
+/* frequency / weight (same as before) */
+function calcFrequency(tokens){
+  const freq = {};
+  tokens.forEach(t=>{
+    const key = t.type==='plain'?null:t.text;
+    if (!key) return;
+    freq[key] = (freq[key]||0)+1;
+  });
+  return freq;
+}
+function weightClass(freq, text){
+  const count = freq[text] || 0;
+  if (count > 5) return 'weight-4';
+  if (count > 3) return 'weight-3';
+  if (count > 1) return 'weight-2';
+  return 'weight-1';
+}
+
+/* render tokens into HTML (but not losing whitespace) */
+function renderTokens(tokens){
+  const freq = calcFrequency(tokens);
+  return tokens.map(t=>{
+    if (t.type === 'plain') return escapeHTML(t.text);
+    const w = weightClass(freq, t.text);
+    return `<span class="${t.type} ${w}">${escapeHTML(t.text)}</span>`;
+  }).join('');
+}
+
+/* ---------- UI handlers ---------- */
+const analyzeBtn = document.getElementById('analyzeBtn');
+const codeInput = document.getElementById('codeInput');
+const resultWrapper = document.getElementById('resultWrapper');
+const gutter = document.getElementById('gutter');
+const codeArea = document.getElementById('codeArea');
+const clearBtn = document.getElementById('clearBtn');
+const exampleBtn = document.getElementById('exampleBtn');
+const viewHtmlBtn = document.getElementById('viewHtmlBtn');
+const htmlViewCard = document.getElementById('htmlViewCard');
+const domTree = document.getElementById('domTree');
+const selectedInfo = document.getElementById('selectedInfo');
+const classList = document.getElementById('classList');
+const objectList = document.getElementById('objectList');
+
+let showLines = true;
+let currentTokens = [];
+let currentType = 'python';
+
+/* Line number rendering helper */
+function renderWithLineNumbers(renderedHTML){
+  // split by newline (we used plain whitespace preserved)
+  const raw = renderedHTML.split(/\r?\n/);
+  // build gutter numbers and code lines
+  gutter.innerHTML = raw.map((_,i)=> (showLines? (i+1) : '')).join('\n');
+  codeArea.innerHTML = raw.map(line => line || ' ').join('\n');
+}
+
+/* Analyze action */
+analyzeBtn.addEventListener('click', ()=>{
+  const code = codeInput.value;
+  if (!code.trim()){ alert('Cole algum código para análise.'); return; }
+  const type = guessType(code);
+  currentType = type;
+  let tokens = [];
+  if (type === 'html') tokens = tokenizeHTML(code);
+  else if (type === 'json') tokens = tokenizeJSON(code);
+  else tokens = tokenizePython(code);
+  currentTokens = tokens;
+  const rendered = renderTokens(tokens);
+  renderWithLineNumbers(rendered);
+
+  // extract classes and objects
+  extractClasses(code);
+  extractObjects(code, type);
+});
+
+/* Clear & example */
+clearBtn.addEventListener('click', ()=>{ codeInput.value=''; codeArea.textContent=''; gutter.textContent=''; classList.innerHTML='<em style="color:#9ecff0">Nenhuma</em>'; objectList.innerHTML='<em style="color:#9ecff0">Nenhum</em>'; domTree.innerHTML=''; htmlViewCard.style.display='none'; selectedInfo.textContent='Nenhum elemento selecionado'; });
+exampleBtn.addEventListener('click', ()=>{ codeInput.value = `import random\n\ndef gerar_sequencia_binaria(n_bits):\n    return [random.choice([0, 1]) for _ in range(n_bits)]\n\nsequencia = gerar_sequencia_binaria(16)\nprint("Sequência Quântica Binária:", sequencia)\n`; });
+
+/* Toggle line numbers */
+document.getElementById('toggleLines').addEventListener('click', (e)=>{
+  showLines = !showLines;
+  e.target.classList.toggle('active', showLines);
+  // re-render if we have content
+  if (currentTokens.length) {
+    const rendered = renderTokens(currentTokens);
+    renderWithLineNumbers(rendered);
+  }
+});
+
+/* Zoom controls */
+const zoomIn = document.getElementById('zoomIn');
+const zoomOut = document.getElementById('zoomOut');
+const resetZoom = document.getElementById('resetZoom');
+
+zoomIn.addEventListener('click', ()=> {
+  const cur = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--code-font-size')) || 14;
+  document.documentElement.style.setProperty('--code-font-size', (cur+2) + 'px');
+});
+zoomOut.addEventListener('click', ()=> {
+  const cur = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--code-font-size')) || 14;
+  document.documentElement.style.setProperty('--code-font-size', Math.max(10, cur-2) + 'px');
+});
+resetZoom.addEventListener('click', ()=> {
+  document.documentElement.style.setProperty('--code-font-size', '14px');
+});
+
+/* Copy / Download result */
+document.getElementById('copyResult').addEventListener('click', async ()=>{
+  try{
+    await navigator.clipboard.writeText(codeArea.innerText || codeArea.textContent);
+    alert('Código copiado para a área de transferência.');
+  }catch(e){ alert('Erro ao copiar.'); }
+});
+document.getElementById('downloadResult').addEventListener('click', ()=>{
+  const blob = new Blob([codeInput.value], {type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'kobllux_code.txt'; a.click();
+  setTimeout(()=> URL.revokeObjectURL(url), 30000);
+});
+
+/* ---------- HTML View (DOM tree) ---------- */
+viewHtmlBtn.addEventListener('click', ()=>{
+  const code = codeInput.value;
+  if (!code.trim()){ alert('Cole um HTML válido para abrir a view.'); return; }
+  // attempt to parse
+  try{
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(code, 'text/html');
+    buildDomTree(doc.body || doc);
+    htmlViewCard.style.display = '';
+    window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'});
+  }catch(e){
+    alert('Erro ao parsear HTML: ' + e.message);
+  }
+});
+document.getElementById('closeHtmlView').addEventListener('click', ()=>{ htmlViewCard.style.display='none'; domTree.innerHTML=''; selectedInfo.textContent='Nenhum elemento selecionado'; });
+
+function buildDomTree(root){
+  domTree.innerHTML = '';
+  function walk(node){
+    const li = document.createElement('li');
+    const nodeName = node.nodeName ? node.nodeName.toLowerCase() : '#text';
+    const short = nodeName === '#text' ? ('"'+(node.textContent||'').trim().slice(0,40)+'"') : nodeName;
+    li.innerHTML = `<span style="color:var(--kodux);font-weight:700">${short}</span>`;
+    li.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      // show details
+      const attrs = node.attributes ? Array.from(node.attributes).map(a=>`${a.name}="${a.value}"`).join('\\n') : '';
+      selectedInfo.textContent = `Elemento: ${nodeName}\\n\\n${attrs || '(sem atributos)'}\\n\\nConteúdo:\\n${(node.textContent||'').trim().slice(0,800)}`;
+    });
+    const children = Array.from(node.childNodes || []);
+    if (children.length){
+      const ul = document.createElement('ul');
+      children.forEach(c => {
+        if (c.nodeType === 3 && !c.textContent.trim()) return; // skip empty text nodes
+        ul.appendChild(walk(c));
+      });
+      li.appendChild(ul);
+    }
+    return li;
+  }
+  const ulRoot = document.createElement('ul');
+  ulRoot.appendChild(walk(root));
+  domTree.appendChild(ulRoot);
+}
+
+/* ---------- Extract classes & objects ---------- */
+function extractClasses(code){
+  const classSet = new Set();
+  // find class="..." and class='...'
+  const regex = /class\s*=\s*"(.*?)"|class\s*=\s*'(.*?)'/g;
+  let m;
+  while ((m = regex.exec(code)) !== null){
+    const group = m[1] || m[2] || '';
+    group.split(/\s+/).forEach(c => { if (c) classSet.add(c.trim()) });
+  }
+  // update UI
+  classList.innerHTML = '';
+  if (classSet.size === 0) {
+    classList.innerHTML = '<em style="color:#9ecff0">Nenhuma</em>';
+    return;
+  }
+  Array.from(classSet).sort().forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'tag';
+    el.textContent = c;
+    el.title = 'Clique para copiar';
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', ()=>{ navigator.clipboard.writeText(c); el.style.background='rgba(142,68,173,0.12)'; });
+    classList.appendChild(el);
+  });
+}
+
+function extractObjects(code, type){
+  objectList.innerHTML = '';
+  if (type === 'json'){
+    try{
+      const obj = JSON.parse(code);
+      const keys = [];
+      function collect(o, prefix=''){
+        if (typeof o === 'object' && o !== null){
+          Object.keys(o).forEach(k=>{
+            keys.push(prefix + k);
+            collect(o[k], prefix + k + '.');
+          });
+        }
+      }
+      collect(obj);
+      if (keys.length === 0) objectList.innerHTML = '<em style="color:#9ecff0">Nenhum</em>';
+      else keys.forEach(k => {
+        const d = document.createElement('div'); d.className='tag'; d.textContent=k;
+        d.title='Copiar key'; d.addEventListener('click', ()=>navigator.clipboard.writeText(k));
+        objectList.appendChild(d);
+      });
+      return;
+    }catch(e){
+      objectList.innerHTML = `<em style="color:#ffb3b3">JSON inválido</em>`;
+      return;
+    }
+  }
+  // For JS/Python-like objects: try to find "{...}" literal keys roughly
+  const keySet = new Set();
+  // naive regex for object literal keys: key: value  or "key": value
+  const regex = /(?:"([^"]+)"|'([^']+)'|([A-Za-z_]\w*))\s*:/g;
+  let m;
+  while ((m = regex.exec(code)) !== null){
+    const k = m[1] || m[2] || m[3];
+    if (k) keySet.add(k);
+  }
+  if (keySet.size === 0) objectList.innerHTML = '<em style="color:#9ecff0">Nenhum</em>';
+  else Array.from(keySet).sort().forEach(k=>{
+    const d = document.createElement('div'); d.className='tag'; d.textContent=k;
+    d.title='Copiar key'; d.addEventListener('click', ()=>navigator.clipboard.writeText(k));
+    objectList.appendChild(d);
+  });
+}
+
+/* initial */
+document.documentElement.style.setProperty('--code-font-size', '14px');
+
+</script>
+</body>
+</html>

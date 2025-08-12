@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX GPS The Maker</title>
+<style>
+  :root {
+    --kodux-blue: #4a90e2;
+    --kodux-purple: #8e44ad;
+    --bllue-blue: #0077cc;
+    --bg-dark: #0d0d0d;
+    --bg-header: #1f1f2e;
+    --bg-output: #1a1a26;
+    --btn-bg: #2d2d44;
+    --btn-active-bg: #4444aa;
+    --text-light: #fff;
+    --text-highlight: #ffeb3b;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+  }
+  header {
+    background-color: var(--bg-header);
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  header button, header input[type="color"] {
+    padding: 0.4rem 0.6rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: var(--btn-bg);
+    color: var(--text-light);
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    min-width: 40px;
+  }
+  header button.active,
+  header button:hover {
+    background-color: var(--btn-active-bg);
+  }
+  header button.color-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 2px solid transparent;
+  }
+  header button.color-btn.active {
+    border-color: var(--text-highlight);
+  }
+  #drawingArea {
+    flex: 1;
+    position: relative;
+  }
+  canvas {
+    background: #01020a;
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    border-radius: 6px;
+  }
+  #outputContainer {
+    background: var(--bg-output);
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    overflow-y: auto;
+    max-height: 25vh;
+    white-space: pre-wrap;
+    user-select: text;
+  }
+  footer {
+    background: var(--bg-header);
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  footer button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background: var(--btn-bg);
+    color: var(--text-light);
+    cursor: pointer;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+    min-width: 100px;
+  }
+  footer button:hover {
+    background-color: var(--btn-active-bg);
+  }
+  /* Botão Malha estilo transparente */
+  #toggleGrid {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+  }
+  #toggleGrid.active {
+    opacity: 1;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button id="toolBrush" class="active" title="Pincel">✏️</button>
+  <button id="toolErase" title="Borracha">🩹</button>
+  <input type="color" id="colorPicker" value="#0077cc" title="Selecionar cor" />
+  <button id="colorKODUXBlue" class="color-btn" style="background: var(--kodux-blue)" title="Azul KODUX"></button>
+  <button id="colorKODUXPurple" class="color-btn" style="background: var(--kodux-purple)" title="Roxo KODUX"></button>
+  <button id="colorBLLUEBlue" class="color-btn" style="background: var(--bllue-blue)" title="Azul BLLUE"></button>
+  <button id="toggleGrid" title="Ativar/Desativar Malha" style="background: var(--bllue-blue)">🟦</button>
+  <button id="btnLoadImage" title="Carregar imagem de fundo" style="background: var(--kodux-purple)">🖼️</button>
+</header>
+
+<div id="drawingArea">
+  <canvas id="paintCanvas"></canvas>
+</div>
+
+<footer>
+  <button id="generatePrompt">Gerar Prompt</button>
+  <button id="copyPrompt">Copiar Prompt</button>
+  <button id="btnClearPrompt" style="background: #00ff00; color: #000;">Limpar Prompt</button>
+</footer>
+
+<input type="file" id="fileInput" accept="image/*" style="display:none" />
+
+<pre id="outputContainer" aria-live="polite" aria-label="Área de saída do prompt"></pre>
+
+<script>
+(() => {
+  const canvas = document.getElementById('paintCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let painting = false;
+  let eraseMode = false;
+  let color = getComputedStyle(document.documentElement).getPropertyValue('--bllue-blue').trim() || '#0077cc';
+  let points = [];
+  let showGrid = false;
+  let backgroundImage = null;
+
+  function resizeCanvas() {
+    canvas.width = canvas.clientWidth * window.devicePixelRatio;
+    canvas.height = canvas.clientHeight * window.devicePixelRatio;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    refreshCanvas();
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function startPosition(e) {
+    painting = true;
+    draw(e);
+  }
+  function endPosition() {
+    painting = false;
+    ctx.beginPath();
+  }
+  function draw(e) {
+    if (!painting) return;
+    e.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    if (eraseMode) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 20;
+      ctx.lineCap = 'round';
+
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+
+      points = points.filter(p => {
+        const dx = p.x - x;
+        const dy = p.y - y;
+        return Math.sqrt(dx*dx + dy*dy) > 20;
+      });
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+
+      if (points.length > 0) {
+        const last = points[points.length - 1];
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+
+      points.push({x: x, y: y, color: color});
+    }
+  }
+
+  function redrawAll() {
+    if (points.length === 0) return;
+    ctx.lineCap = 'round';
+    for (let i = 1; i < points.length; i++) {
+      const p1 = points[i-1];
+      const p2 = points[i];
+      ctx.strokeStyle = p2.color;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+  }
+
+  function drawGrid() {
+    if (!showGrid) return;
+    const step = 40;
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 119, 204, 0.2)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += step) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += step) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawBackgroundImage() {
+    if (!backgroundImage) return;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    const cw = canvas.width / window.devicePixelRatio;
+    const ch = canvas.height / window.devicePixelRatio;
+    let iw = backgroundImage.width;
+    let ih = backgroundImage.height;
+    let scale = Math.min(cw / iw, ch / ih);
+    let iwScaled = iw * scale;
+    let ihScaled = ih * scale;
+    let ix = (cw - iwScaled) / 2;
+    let iy = (ch - ihScaled) / 2;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(backgroundImage, ix, iy, iwScaled, ihScaled);
+    ctx.restore();
+  }
+
+  function refreshCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBackgroundImage();
+    redrawAll();
+    drawGrid();
+  }
+
+  // Eventos canvas
+  canvas.addEventListener('mousedown', startPosition);
+  canvas.addEventListener('mouseup', endPosition);
+  canvas.addEventListener('mouseout', endPosition);
+  canvas.addEventListener('mousemove', draw);
+
+  canvas.addEventListener('touchstart', startPosition);
+  canvas.addEventListener('touchend', endPosition);
+  canvas.addEventListener('touchcancel', endPosition);
+  canvas.addEventListener('touchmove', draw, {passive: false});
+
+  // Ferramentas
+  const toolBrush = document.getElementById('toolBrush');
+  const toolErase = document.getElementById('toolErase');
+
+  toolBrush.addEventListener('click', () => {
+    eraseMode = false;
+    updateToolButtons();
+  });
+  toolErase.addEventListener('click', () => {
+    eraseMode = true;
+    updateToolButtons();
+  });
+
+  function updateToolButtons() {
+    toolBrush.classList.toggle('active', !eraseMode);
+    toolErase.classList.toggle('active', eraseMode);
+  }
+
+  // Cores
+  const colorPicker = document.getElementById('colorPicker');
+  colorPicker.addEventListener('input', e => {
+    color = e.target.value;
+    updateColorButtonHighlight(null);
+  });
+
+  function rgbToHex(rgb) {
+    if (!rgb) return '#000000';
+    const res = rgb.match(/\d+/g);
+    if (!res || res.length < 3) return '#000000';
+    return "#" + res.slice(0,3).map(x => {
+      const hex = parseInt(x).toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    }).join("");
+  }
+
+  const colorButtons = [
+    {id: 'colorKODUXBlue', varName: '--kodux-blue'},
+    {id: 'colorKODUXPurple', varName: '--kodux-purple'},
+    {id: 'colorBLLUEBlue', varName: '--bllue-blue'},
+  ];
+
+  function updateColorButtonHighlight(activeId) {
+    colorButtons.forEach(({id}) => {
+      document.getElementById(id).classList.toggle('active', id === activeId);
+    });
+  }
+
+  colorButtons.forEach(({id, varName}) => {
+    document.getElementById(id).addEventListener('click', () => {
+      const c = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+      color = c;
+      colorPicker.value = rgbToHex(c);
+      updateColorButtonHighlight(id);
+    });
+  });
+
+  // Botão para ativar/desativar malha
+  const toggleGridBtn = document.getElementById('toggleGrid');
+  toggleGridBtn.addEventListener('click', () => {
+    showGrid = !showGrid;
+    toggleGridBtn.classList.toggle('active', showGrid);
+    refreshCanvas();
+  });
+
+  // Botão para carregar imagem de fundo
+  const btnLoadImage = document.getElementById('btnLoadImage');
+  const fileInput = document.getElementById('fileInput');
+
+  btnLoadImage.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = evt => {
+      img.onload = () => {
+        backgroundImage = img;
+        refreshCanvas();
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+    // Reset input to allow re-loading same image if needed
+    fileInput.value = '';
+  });
+
+  // Função para formatar prompt
+  const outputContainer = document.getElementById('outputContainer');
+
+  function formatAsKoblluxPrompt(points) {
+    if (!points || points.length === 0) {
+      return "🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋\n— Nenhum traço registrado.";
+    }
+    const grouped = {};
+    points.forEach(p => {
+      if (!grouped[p.color]) grouped[p.color] = [];
+      grouped[p.color].push(`(${Math.round(p.x)},${Math.round(p.y)})`);
+    });
+    let txt = "🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋\n— 𝕊𝕌𝔹𝕊𝕋𝔸ℕ𝕋𝕀𝕍𝕆𝕊: KOBLLUX, LUX, REDE\n— 𝕍𝔼ℝ𝔹𝕆𝕊: GERAR, EXPANDIR, VER\n— 𝔸𝔻𝕁𝔼𝕋𝕀𝕍𝕆𝕊: MUTÁVEL\n— 𝕋𝔼𝕄𝔸𝕊:\n   • Consciência: MENTE\n— 𝕔𝕠𝕠𝕣𝕕𝕖𝕟𝕒𝕕𝕒𝕤:\n";
+    for (const c in grouped) {
+      txt += `  • Cor ${c}:\n    ${grouped[c].join(" → ")}\n`;
+    }
+    return txt;
+  }
+
+  // Botões gerar, copiar e limpar prompt
+  document.getElementById('generatePrompt').addEventListener('click', () => {
+    outputContainer.textContent = formatAsKoblluxPrompt(points);
+  });
+
+  document.getElementById('copyPrompt').addEventListener('click', () => {
+    if (!outputContainer.textContent.trim()) return;
+    navigator.clipboard.writeText(outputContainer.textContent.trim()).then(() => {
+      const btn = document.getElementById('copyPrompt');
+      btn.textContent = "✅ Copiado!";
+      setTimeout(() => btn.textContent = "Copiar Prompt", 1500);
+    });
+  });
+
+  document.getElementById('btnClearPrompt').addEventListener('click', () => {
+    outputContainer.textContent = '';
+  });
+
+  // Expor pontos para debug ou uso externo
+  window.KOBLLUX_DRAW = {
+    getPoints: () => points.slice(),
+  };
+
+  // Inicialização
+  updateToolButtons();
+  updateColorButtonHighlight(null);
+
+})();
+</script>
+
+</body>
+</html>

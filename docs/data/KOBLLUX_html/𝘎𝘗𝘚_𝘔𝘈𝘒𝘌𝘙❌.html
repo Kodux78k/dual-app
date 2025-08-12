@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <title>Hello, World!</title>
+    <h1>KOBLLUX GPS The Maker</h1>
+</header>
+  <div id="mainContainer">
+    <nav id="sidebar" aria-label="Menu lateral de ferramentas">
+      <button id="btnToggleMenu" aria-label="Expandir ou comprimir menu lateral">☰</button>
+      <button class="tool-btn selected" aria-label="Cor amarela" data-color="#ffeb3b" title="Cor amarela">
+        <div class="color-circle yellow"></div>
+    </button>
+      <button class="tool-btn" aria-label="Cor vermelha" data-color="#f44336" title="Cor vermelha">
+        <div class="color-circle red"></div>
+    </button>
+      <button class="tool-btn" aria-label="Cor azul" data-color="#2196f3" title="Cor azul">
+        <div class="color-circle blue"></div>
+    </button>
+      <button class="tool-btn" aria-label="Cor verde" data-color="#4caf50" title="Cor verde">
+        <div class="color-circle green"></div>
+    </button>
+      <button class="tool-btn" aria-label="Cor roxa" data-color="#9c27b0" title="Cor roxa">
+        <div class="color-circle purple"></div>
+    </button>
+      <button class="tool-btn erase" aria-label="Borracha" title="Borracha (apaga desenho)">🧽</button>
+  </nav>
+    <section id="centralArea">
+      <div id="paintContainer" aria-label="Área de pintura">
+        <div id="paintHeader">Área de pintura KOBLLUX</div>
+        <div id="canvasWrapper">
+          <canvas id="drawCanvas" aria-label="Tela para pintura"></canvas>
+      </div>
+    </div>
+      <div id="btnBar" role="toolbar" aria-label="Botões de controle">
+        <button id="btnGenerate" type="button">Gerar código</button>
+        <button id="btnCopy" type="button">Copiar código</button>
+    </div>
+      <pre id="outputContainer" aria-live="polite" aria-label="Código gerado aparecerá aqui">Pinte na tela e clique em "Gerar código" para ver o resultado aqui.
+    </pre>
+  </section>
+</div>
+  <script>
+(() => {
+  const sidebar = document.getElementById("sidebar");
+  const btnToggleMenu = document.getElementById("btnToggleMenu");
+  const toolButtons = [...document.querySelectorAll(".tool-btn")];
+  // Estado mutável para cor e borracha
+  window.KOBLLUX_TOOL = {
+    currentColor: "#ffeb3b", // amarelo padrão
+    eraseMode: false,
+  };
+  // Toggle menu lateral: expandir/comprimir
+  btnToggleMenu.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
+  // Seleção de cor e borracha
+  toolButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.classList.contains("erase")) {
+        window.KOBLLUX_TOOL.eraseMode = true;
+        window.KOBLLUX_TOOL.currentColor = null;
+        toolButtons.forEach((b) => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        return;
+      }
+      window.KOBLLUX_TOOL.eraseMode = false;
+      window.KOBLLUX_TOOL.currentColor = btn.getAttribute("data-color");
+      toolButtons.forEach((b) => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    });
+  });
+})();
+</script>
+  <script>
+(() => {
+  const canvas = document.getElementById("drawCanvas");
+  const ctx = canvas.getContext("2d");
+  const output = document.getElementById("outputContainer");
+  const btnGenerate = document.getElementById("btnGenerate");
+  const btnCopy = document.getElementById("btnCopy");
+  // Ajusta canvas para resolução e tamanho reais (full container)
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * window.devicePixelRatio;
+    canvas.height = rect.height * window.devicePixelRatio;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset transform
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    redrawAll();
+  }
+  window.addEventListener("resize", resizeCanvas);
+  resizeCanvas();
+  // Dados do desenho
+  // Cada ponto: {x, y, color}
+  let drawingPoints = [];
+  // Estado do desenho
+  let drawing = false;
+  // Obtem a cor atual do modo KOBLLUX_TOOL
+  function getCurrentColor() {
+    if (window.KOBLLUX_TOOL.eraseMode) return null;
+    return window.KOBLLUX_TOOL.currentColor || "#ffeb3b";
+  }
+  // Inicia desenho
+  function startDraw(e) {
+    drawing = true;
+    addPoint(e);
+  }
+  // Para desenho
+  function endDraw() {
+    drawing = false;
+    ctx.beginPath();
+  }
+  // Adiciona ponto e desenha no canvas
+  function addPoint(e) {
+    if (!drawing) return;
+    const rect = canvas.getBoundingClientRect();
+    let x, y;
+    if (e.touches) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+    const color = getCurrentColor();
+    if (color === null) {
+      // Borracha: desenha com operação que apaga visualmente
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 15;
+      ctx.lineCap = 'round';
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      // Remove pontos próximos para apagar do array
+      drawingPoints = drawingPoints.filter(p => {
+        const dx = p.x - x;
+        const dy = p.y - y;
+        return Math.sqrt(dx * dx + dy * dy) > 20;
+      });
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 6;
+      ctx.lineCap = 'round';
+      if (drawingPoints.length > 0) {
+        const last = drawingPoints[drawingPoints.length - 1];
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+      drawingPoints.push({x, y, color});
+    }
+  }
+  // Redesenha todo o desenho (útil após resize)
+  function redrawAll() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.globalCompositeOperation = 'source-over';
+    if (drawingPoints.length === 0) return;
+    ctx.lineCap = 'round';
+    for (let i = 1; i < drawingPoints.length; i++) {
+      const p1 = drawingPoints[i-1];
+      const p2 = drawingPoints[i];
+      ctx.strokeStyle = p2.color;
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+  }
+  // Eventos do mouse e touch
+  canvas.addEventListener("mousedown", startDraw);
+  canvas.addEventListener("touchstart", startDraw);
+  canvas.addEventListener("mousemove", addPoint);
+  canvas.addEventListener("touchmove", (e) => { e.preventDefault(); addPoint(e); }, {passive:false});
+  canvas.addEventListener("mouseup", endDraw);
+  canvas.addEventListener("touchend", endDraw);
+  canvas.addEventListener("touchcancel", endDraw);
+  // Geração do texto GPS
+  function generateGPSCode() {
+    if (drawingPoints.length === 0) {
+      output.textContent = "Nenhum desenho para gerar código.";
+      return;
+    }
+    // Agrupar pontos por cor
+    const groups = {};
+    drawingPoints.forEach((p) => {
+      if (!groups[p.color]) groups[p.color] = [];
+      // Arredondar para coordenadas inteiras (x,y)
+      groups[p.color].push({x: Math.round(p.x), y: Math.round(p.y)});
+    });
+    // Montar texto com cores e pontos no padrão KOBLLUX GPS
+    let txt = "=== KOBLLUX GPS The Maker ===\n";
+    for (const color in groups) {
+      const colorName = mapColorToName(color);
+      txt += `Cor ${colorName}: \n`;
+      groups[color].forEach((pt, i) => {
+        txt += `  - Ponto ${i + 1}: (x: ${pt.x}, y: ${pt.y})\n`;
+      });
+      txt += "\n";
+    }
+    output.textContent = txt;
+  }
+  // Mapear código hexadecimal para nome curto (pode expandir conforme paleta)
+  function mapColorToName(hex) {
+    switch (hex.toLowerCase()) {
+      case "#ffeb3b": return "amarelo";
+      case "#f44336": return "vermelho";
+      case "#2196f3": return "azul claro";
+      case "#4caf50": return "verde";
+      case "#9c27b0": return "roxo claro";
+      default: return hex;
+    }
+  }
+  // Copiar código gerado para clipboard
+  btnCopy.addEventListener("click", () => {
+    const text = output.textContent.trim();
+    if (!text || text.startsWith("Pinte") || text.startsWith("Nenhum")) {
+      alert("Nada para copiar. Gere um código primeiro.");
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Código copiado para a área de transferência!");
+    }).catch(() => {
+      alert("Erro ao copiar. Use Ctrl+C manualmente.");
+    });
+  });
+  // Botão gerar código
+  btnGenerate.addEventListener("click", generateGPSCode);
+})();
+</script>
+</body>
+</html>

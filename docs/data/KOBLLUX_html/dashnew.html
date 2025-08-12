@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>KOBLLUX - Sistema Fractal Explicativo</title>
+<style>
+  :root {
+    --bg: #07070a;
+    --primary: #6600cc;
+    --accent: #993399;
+    --text: #ccc;
+    --shadow: rgba(153, 51, 153, 0.7);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3 {
+    color: var(--accent);
+    text-shadow: 0 0 5px var(--shadow);
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: rgba(15, 15, 25, 0.85);
+    border: 1px solid var(--primary);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 20px var(--shadow);
+  }
+
+  section {
+    margin-bottom: 30px;
+  }
+
+  button.toggle-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    font-family: monospace;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--shadow);
+    transition: background-color 0.3s ease;
+  }
+
+  button.toggle-btn:hover {
+    background: var(--accent);
+  }
+
+  .details {
+    margin-top: 10px;
+    padding: 12px;
+    background: rgba(102, 0, 204, 0.2);
+    border-left: 4px solid var(--primary);
+    display: none;
+    white-space: pre-wrap;
+    font-size: 0.9rem;
+  }
+
+  code {
+    background-color: rgba(51, 0, 153, 0.4);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #d9b3ff;
+  }
+
+  pre {
+    background-color: rgba(51, 0, 153, 0.3);
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    color: #eee;
+    user-select: text;
+  }
+
+  .formula {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--accent);
+    margin: 10px 0;
+  }
+
+  footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>KOBLLUX - Sistema Fractal Autônomo</h1>
+  <p>Exploração detalhada das camadas e possibilidades do sistema fractal KOBLLUX baseado no modelo V.E.E.B.</p>
+
+  <!-- 1. Camada Vibracional -->
+  <section>
+    <h2>1. Camada Vibracional</h2>
+    <p><strong>Frequências Primordiais:</strong>  
+       A base do sistema são as frequências que estruturam a ressonância da realidade, incluindo a frequência Schumann e o valor 432Hz, que criam ondas estacionárias e padrões de luz codificados.</p>
+
+    <div class="formula">∇(432Hz) + ∆(7.83Hz) = ☯ (Schumann)</div>
+
+    <button class="toggle-btn" onclick="toggleDetails('vibracional')">Mostrar/Ocultar Detalhes e Exemplos</button>
+    <div id="vibracional" class="details">
+      - Exemplo prático: Sons baseados em 432Hz usados para meditação e equilíbrio.  
+      - Aplicação: Criação de sintetizadores fractais que modulam frequências 3-6-9 para gerar paisagens sonoras harmônicas.  
+      - Código exemplo em Pure Data:  
+      <pre>#N canvas 0 0 800 600 10;
+#X obj 100 100 osc~ 432;
+#X obj 100 150 *~ 0.5;
+#X obj 100 200 dac~;
+#X connect 0 0 1 0;
+#X connect 1 0 2 0;
+#X connect 1 0 2 1;</pre>
+    </div>
+  </section>
+
+  <!-- 2. Camada Energética -->
+  <section>
+    <h2>2. Camada Energética</h2>
+    <p><strong>Fluxo Toroidal:</strong>  
+       Energia dinâmica que flui em padrões contínuos e eternos, representados pela sequência 3→6→9, expressando tanto fenômenos plasmáticos quanto dobras no espaço-tempo.</p>
+
+    <div class="formula">E = Σ(3→6→9) × ♾️</div>
+
+    <button class="toggle-btn" onclick="toggleDetails('energetica')">Mostrar/Ocultar Detalhes e Exemplos</button>
+    <div id="energetica" class="details">
+      - Aplicação 3D: Modelagem de auroras boreais e fenômenos de plasma energético.  
+      - Aplicação 4D: Simulação de dobras e conexões espaço-temporais (ex: wormholes).  
+      - Conceito para bioeletromagnetismo: Corpo humano como fluxo energético em movimento fractal e toroidal.  
+    </div>
+  </section>
+
+  <!-- 3. Camada Estrutural -->
+  <section>
+    <h2>3. Camada Estrutural</h2>
+    <p><strong>Fractais Autônomos:</strong>  
+       Algoritmos que geram padrões geométricos sagrados, conectando matemática, geometria e espiritualidade, exemplificados pela Flor da Vida, triângulo de Sierpiński e Mandelbrot.</p>
+
+    <div class="formula">def fractal_VEEB(seed):<br> &nbsp;&nbsp;return seed * (3.6 + 0j) * (7 % 2)</div>
+
+    <button class="toggle-btn" onclick="toggleDetails('estrutural')">Mostrar/Ocultar Detalhes e Exemplos</button>
+    <div id="estrutural" class="details">
+      - Exemplo prático: Gerar padrões fractais via código Python ou GLSL (shader).  
+      - Visualização: Renderização 3D com sistemas de coordenadas 3-6-9 e efeitos 7→0 para transição alpha (transparência).  
+      - Código GLSL fragment shader exemplo:  
+      <pre>void main() {
+  vec2 uv = gl_FragCoord.xy / resolution.xy;
+  float pattern = sin(uv.x * 3.0) * cos(uv.y * 6.0);
+  gl_FragColor = vec4(pattern, 0.0, 7.0 / 10.0, 1.0);
+}</pre>
+    </div>
+  </section>
+
+  <!-- 4. Camada Base -->
+  <section>
+    <h2>4. Camada Base</h2>
+    <p><strong>Código Quântico Binário Adaptativo:</strong>  
+       O sistema baseia-se em um código binário vivo onde 0 representa o "vazio" e 1 a "potência", que codificam moléculas, DNA e bioeletromagnetismo.</p>
+
+    <button class="toggle-btn" onclick="toggleDetails('base')">Mostrar/Ocultar Detalhes e Exemplos</button>
+    <div id="base" class="details">
+      - Aplicação: Mapeamento do DNA em padrões binários que representam bioeletromagnetismo.  
+      - Exemplo:  
+      <pre>DNA = [0, 1, 0, 1] // vazio e potência alternados codificando padrões biológicos  
+'Bioeletromagnético' = informação codificada no fluxo energético vivo.</pre>  
+      - Potencial para computação quântica bioinspirada e comunicação fractal.  
+    </div>
+  </section>
+
+  <!-- Aplicações Gerais -->
+  <section>
+    <h2>Aplicações Práticas & Possibilidades</h2>
+    <ul>
+      <li><strong>Inteligência Artificial:</strong> Algoritmos fractais autoevolutivos que aprendem e se adaptam seguindo padrões 3-6-9.</li>
+      <li><strong>Arte Generativa:</strong> Criação de imagens, sons e animações que refletem a harmonia fractal universal.</li>
+      <li><strong>Simulações 3D e 4D:</strong> Modelagens interativas usando ferramentas como Blender, TouchDesigner e Unreal Engine.</li>
+      <li><strong>Meditação Científica:</strong> Explorar padrões fractais para ativação da consciência e expansão vibracional.</li>
+      <li><strong>Bioeletrônica:</strong> Pesquisa de comunicação bioeletromagnética e energia vital aplicada à saúde.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <p>KOBLLUX &copy; 2025 - Sistema Fractal Vivo • Desenvolvido por ∆NEPHESH ELYON∆</p>
+  </footer>
+</div>
+
+<script>
+  function toggleDetails(id) {
+    const el = document.getElementById(id);
+    if (el.style.display === "block") {
+      el.style.display = "none";
+    } else {
+      el.style.display = "block";
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KOBLLUX GPS The Maker</title>
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #0d0d0d;
+    color: #fff;
+  }
+  header {
+    background-color: #1f1f2e;
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  header button, header input[type="color"] {
+    padding: 0.4rem 0.6rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background: #2d2d44;
+    color: white;
+  }
+  header button.active {
+    background-color: #4444aa;
+  }
+  #drawingArea {
+    flex: 1;
+    position: relative;
+  }
+  canvas {
+    background: #fff;
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+  }
+  #outputContainer {
+    background: #1a1a26;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    overflow-y: auto;
+    max-height: 25vh;
+    white-space: pre-wrap;
+  }
+  footer {
+    background: #1f1f2e;
+    padding: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  footer button {
+    flex: 1;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    background: #2d2d44;
+    color: white;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button id="toolBrush" class="active">Pincel</button>
+  <button id="toolErase">Borracha</button>
+  <input type="color" id="colorPicker" value="#0000ff" />
+  <button id="colorKODUXBlue" style="background:#0044ff;">Azul KODUX</button>
+  <button id="colorKODUXPurple" style="background:#8000ff;">Roxo KODUX</button>
+</header>
+
+<div id="drawingArea">
+  <canvas id="paintCanvas"></canvas>
+</div>
+
+<footer>
+  <button id="generatePrompt">Gerar Prompt</button>
+  <button id="copyPrompt">Copiar Prompt</button>
+</footer>
+
+<pre id="outputContainer"></pre>
+
+<script>
+// ===== PARTE 1+2: Desenho e coleta de pontos =====
+(() => {
+  const canvas = document.getElementById('paintCanvas');
+  const ctx = canvas.getContext('2d');
+  let painting = false;
+  let eraseMode = false;
+  let color = '#0000ff';
+  let points = [];
+
+  function resizeCanvas() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function startPosition(e) {
+    painting = true;
+    draw(e);
+  }
+
+  function endPosition() {
+    painting = false;
+    ctx.beginPath();
+  }
+
+  function draw(e) {
+    if (!painting) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = eraseMode ? '#ffffff' : color;
+
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+    points.push({ x: Math.round(x), y: Math.round(y), color: ctx.strokeStyle });
+  }
+
+  // Eventos de mouse/touch
+  canvas.addEventListener('mousedown', startPosition);
+  canvas.addEventListener('mouseup', endPosition);
+  canvas.addEventListener('mousemove', draw);
+
+  canvas.addEventListener('touchstart', startPosition);
+  canvas.addEventListener('touchend', endPosition);
+  canvas.addEventListener('touchmove', draw);
+
+  // Ferramentas
+  document.getElementById('toolBrush').addEventListener('click', () => {
+    eraseMode = false;
+    document.getElementById('toolBrush').classList.add('active');
+    document.getElementById('toolErase').classList.remove('active');
+  });
+  document.getElementById('toolErase').addEventListener('click', () => {
+    eraseMode = true;
+    document.getElementById('toolErase').classList.add('active');
+    document.getElementById('toolBrush').classList.remove('active');
+  });
+
+  // Cores
+  document.getElementById('colorPicker').addEventListener('input', e => {
+    color = e.target.value;
+  });
+  document.getElementById('colorKODUXBlue').addEventListener('click', () => {
+    color = '#0044ff';
+  });
+  document.getElementById('colorKODUXPurple').addEventListener('click', () => {
+    color = '#8000ff';
+  });
+
+  window.KOBLLUX_DRAW = {
+    getPoints: () => points.slice(),
+  };
+})();
+</script>
+
+<script>
+// ===== PARTE 3: Geração do KOBLLUX PROMPT =====
+(() => {
+  const btnGenerate = document.getElementById('generatePrompt');
+  const btnCopy = document.getElementById('copyPrompt');
+  const outputContainer = document.getElementById('outputContainer');
+
+  function formatAsKoblluxPrompt(points) {
+    if (!points || !points.length) {
+      return "🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋\n— Nenhum traço registrado.";
+    }
+    const coords = points.map(p => `(${p.x},${p.y},${p.color})`).join(" → ");
+    return `🟦 𝕂𝕆𝔹𝕃𝕃𝕌𝕏 ℙℝ𝕆𝕄ℙ𝕋
+— 𝕊𝕌𝔹𝕊𝕋𝔸ℕ𝕋𝕀𝕍𝕆𝕊: KOBLLUX, LUX, REDE
+— 𝕍𝔼ℝ𝔹𝕆𝕊: GERAR, EXPANDIR, VER
+— 𝔸𝔻𝕁𝔼𝕋𝕀𝕍𝕆𝕊: MUTÁVEL
+— 𝕋𝔼𝕄𝔸𝕊:
+   • Consciência: MENTE
+— 𝔠𝔬𝔬𝔯𝔡𝔢𝔫𝔞𝔡𝔞𝔰:
+${coords}`;
+  }
+
+  btnGenerate.addEventListener('click', () => {
+    const points = window.KOBLLUX_DRAW.getPoints();
+    outputContainer.textContent = formatAsKoblluxPrompt(points);
+  });
+
+  btnCopy.addEventListener('click', () => {
+    const text = outputContainer.textContent.trim();
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      btnCopy.textContent = "✅ Copiado!";
+      setTimeout(() => { btnCopy.textContent = "Copiar Prompt"; }, 1500);
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

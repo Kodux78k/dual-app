@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KOBLLUX Dashboard — Vortex Protocol</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --fg: #f5f5f5;
+  --accent: #ffdd33;
+  --muted: #888;
+  --kodux: #ff8800;
+  --bllue: #00ccff;
+  --radius: 8px;
+  --space: 12px;
+}
+.theme-light {
+  --bg: #fafafa;
+  --fg: #0a0a0a;
+  --accent: #cc7700;
+  --muted: #666;
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+}
+header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space);
+  background: var(--kodux);
+  color: var(--fg);
+}
+header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+header small {
+  color: var(--muted);
+}
+main {
+  padding: var(--space);
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: var(--space);
+}
+aside {
+  border-left: 1px solid var(--muted);
+  padding-left: var(--space);
+}
+.vortex-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.vortex-btn.active {
+  animation: spin 4s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@media (max-width:880px) {
+  main { grid-template-columns: 1fr; }
+  aside { border-left: none; padding-left: 0; }
+}
+code {
+  background: rgba(255,255,255,0.05);
+  display: block;
+  padding: var(--space);
+  border-radius: var(--radius);
+  white-space: pre-wrap;
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>KX — KOBLLUX Dashboard</h1>
+  <small>Vortex Protocol</small>
+</header>
+<main>
+  <section>
+    <button id="vortex-btn" class="vortex-btn" aria-pressed="false">🌀</button>
+    <p>Ativações: <span id="count">0</span></p>
+    <code id="log">// Log de ativações</code>
+  </section>
+  <aside>
+    <h2>Fractal</h2>
+    <ul>
+      <li>⚡️ Pulso</li>
+      <li>🌀 Movimento</li>
+      <li>⚫️ Núcleo</li>
+      <li>3×6×9×7 → ♾</li>
+    </ul>
+    <button id="copy-btn">Copiar Código</button>
+    <button id="export-btn">Exportar Código</button>
+    <button id="theme-btn">Alternar Tema</button>
+  </aside>
+</main>
+<script>
+const vortexBtn = document.getElementById('vortex-btn');
+const countEl = document.getElementById('count');
+const logEl = document.getElementById('log');
+const copyBtn = document.getElementById('copy-btn');
+const exportBtn = document.getElementById('export-btn');
+const themeBtn = document.getElementById('theme-btn');
+
+let count = Number(localStorage.getItem('koblluxCount') || 0);
+countEl.textContent = count;
+
+vortexBtn.addEventListener('click', () => {
+  const active = vortexBtn.classList.toggle('active');
+  vortexBtn.setAttribute('aria-pressed', active);
+  if (active) {
+    count++;
+    localStorage.setItem('koblluxCount', count);
+    countEl.textContent = count;
+    logEl.textContent += `\nAtivação ${count} — ${new Date().toLocaleString()}`;
+  }
+});
+
+copyBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(logEl.textContent)
+    .then(() => alert('Código copiado!'));
+});
+
+exportBtn.addEventListener('click', () => {
+  const lines = Array.from(logEl.textContent.split('\n'));
+  const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'kobllux-log.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+themeBtn.addEventListener('click', () => {
+  document.body.classList.toggle('theme-light');
+});
+</script>
+</body>
+</html>

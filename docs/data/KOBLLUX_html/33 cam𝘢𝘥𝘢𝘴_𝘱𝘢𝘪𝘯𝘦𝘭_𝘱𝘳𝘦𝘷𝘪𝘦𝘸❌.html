@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>InfoDOS — KOBLLUX • Visualizador Fractal (33 Camadas)</title>
+<style>
+  :root {
+    --bg: #06060a;
+    --panel: #071420;
+    --glass: rgba(255,255,255,0.03);
+    --kodux: #8e44ad;
+    --bllue: #4a90e2;
+    --fitlux: #27ae60;
+    --accent: #ffd166;
+    --max-layers: 33;
+    --min-font: 16px; /* evita zoom em iOS */
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: Inter, 'Segoe UI', Roboto, system-ui, sans-serif;
+    background: radial-gradient(900px 400px at 10% 10%, rgba(74,144,226,0.04), transparent), var(--bg);
+    color: #e6f6ff;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    font-size: var(--min-font);
+  }
+
+  header {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--bllue);
+    font-size: 1.05rem;
+  }
+
+  /* Controle no header */
+  .controls {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  input[type=file] {
+    display: none;
+  }
+
+  .btn {
+    background: var(--bllue);
+    color: #041017;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.25s ease;
+  }
+
+  .btn:hover {
+    background: var(--kodux);
+    color: #fff;
+  }
+
+  .btn.ghost {
+    background: transparent;
+    color: #cfefff;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .btn.ghost:hover {
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* Botão aba ferramentas */
+  .btn.toolsToggle {
+    background: var(--fitlux);
+    color: #0b260a;
+  }
+
+  .btn.toolsToggle:hover {
+    background: #1a8a30;
+    color: #fff;
+  }
+
+  main {
+    width: 100%;
+    max-width: 1200px;
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 12px;
+    position: relative;
+  }
+
+  /* Layer Panel (esquerda) */
+  #layerPanel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.03);
+    min-height: 480px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 10px;
+  }
+
+  .panelHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .groups {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .groupBadge {
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: var(--glass);
+    font-weight: 800;
+    color: #dbeeff;
+    user-select: none;
+  }
+
+  .layerGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    align-items: stretch;
+    overflow: auto;
+    padding-top: 6px;
+  }
+
+  .layer {
+    background: rgba(255,255,255,0.02);
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 88px;
+    border: 1px solid rgba(255,255,255,0.02);
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .layer:hover {
+    background-color: rgba(74,144,226,0.1);
+    box-shadow: 0 0 15px rgba(74,144,226,0.5);
+  }
+
+  .layer .idx {
+    font-weight: 900;
+    color: var(--fitlux);
+    font-size: 1.1rem;
+  }
+
+  .layer .name {
+    font-size: 0.9rem;
+    color: #e6f6ff;
+    word-break: break-word;
+  }
+
+  .layer .tag {
+    font-size: 0.75rem;
+    color: #bfe6ff;
+    user-select: text;
+  }
+
+  .layer.empty {
+    opacity: 0.45;
+  }
+
+  /* Right panel (memória) */
+  aside {
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.03);
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  aside h3 {
+    margin: 0 0 8px 0;
+    color: var(--kodux);
+    user-select: none;
+  }
+
+  .stored-list {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stored-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    user-select: none;
+  }
+
+  .stored-item .meta {
+    font-size: 0.78rem;
+    color: #bcdff5;
+  }
+
+  .small {
+    font-size: 0.85rem;
+    color: #9ecff0;
+  }
+
+  /* Janela modal InfoDOS preview */
+  #windowLayer {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 86vw;
+    max-width: 1100px;
+    height: 78vh;
+    min-width: 480px;
+    min-height: 360px;
+    border-radius: 12px;
+    background: linear-gradient(180deg,#071017, #04121a);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    border: 3px solid rgba(74,144,226,0.14);
+    display: flex;
+    flex-direction: column;
+    z-index: 999;
+  }
+
+  #winHeader {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    cursor: grab;
+    background: linear-gradient(90deg, rgba(142,68,173,0.14), rgba(74,144,226,0.06));
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+    user-select: none;
+  }
+
+  #winTitle {
+    font-weight: 900;
+    color: #e6f6ff;
+  }
+
+  /* Balls controls */
+  .ballWrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ball {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+    user-select: none;
+    transition: transform 0.25s ease;
+  }
+
+  .ball:hover {
+    transform: translateY(-3px);
+  }
+
+  .ball.close {
+    background: linear-gradient(180deg,#ff6b6b,#ff3b3b);
+    color: white;
+  }
+
+  .ball.open {
+    background: linear-gradient(180deg,#ffd166,#ffc42b);
+    color: #041017;
+  }
+
+  .ball.ext {
+    background: linear-gradient(180deg,#4a90e2,#2f6fb7);
+    color: white;
+  }
+
+  #winBody {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  #previewPane {
+    flex: 1;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  #previewFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: white;
+  }
+
+  #sidePanel {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sideBlock {
+    background: rgba(255,255,255,0.02);
+    padding: 8px;
+    border-radius: 8px;
+    min-height: 40px;
+  }
+
+  /* Painel Ferramentas (nova aba lateral secundária) */
+  #toolsPanel {
+    position: fixed;
+    top: 70px;
+    right: 12px;
+    width: 300px;
+    max-height: 80vh;
+    background: var(--panel);
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(74,144,226,0.6);
+    border: 1px solid rgba(74,144,226,0.5);
+    padding: 12px;
+    color: #cce8ff;
+    display: none;
+    flex-direction: column;
+    user-select: none;
+    z-index: 1100;
+  }
+
+  #toolsPanel h2 {
+    margin: 0 0 10px 0;
+    color: var(--fitlux);
+  }
+
+  #toolsPanel p {
+    font-size: 0.9rem;
+    line-height: 1.3;
+  }
+
+  #toolsPanel button.closeTools {
+    align-self: flex-end;
+    background: var(--kodux);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  #toolsPanel button.closeTools:hover {
+    background: #6e2da1;
+  }
+
+  /* Small responsive tweaks */
+  @media (max-width: 760px) {
+    main {
+      grid-template-columns: 1fr;
+    }
+    #windowLayer {
+      width: 94vw;
+      height: 78vh;
+      min-width: 320px;
+    }
+    aside {
+      height: auto;
+    }
+    #toolsPanel {
+      width: 90vw;
+      top: 60px;
+      right: 5vw;
+      max-height: 70vh;
+    }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--bllue), var(--kodux));
+    border-radius: 12px;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>InfoDOS — KOBLLUX • Visualizador Fractal (33 Camadas)</h1>
+  <div class="controls">
+    <label class="btn" for="fileInput">Selecionar HTMLs</label>
+    <input id="fileInput" type="file" accept=".html,.htm" multiple />
+    <button id="dirBtn" class="btn ghost">Abrir pasta (se suportado)</button>
+    <button id="saveMem" class="btn">Salvar → Memória</button>
+    <button id="toolsToggleBtn" class="btn toolsToggle" title="Abrir / Fechar Ferramentas">Ferramentas</button>
+  </div>
+</header>
+<main>
+  <section id="layerPanel">
+    <div class="panelHeader">
+      <div class="groups">
+        <div class="groupBadge">3×6×9×7</div>
+        <div class="small">Fractal • 33 Camadas • Cronologia</div>
+      </div>
+      <div class="small">Dividido em 3 grupos — 11 camadas cada (Origem / Integração / Retorno)</div>
+    </div>
+    <div class="layerGrid" id="layerGrid">
+      <!-- 33 slots serão injetados aqui -->
+    </div>
+  </section>
+  <aside>
+    <h3>Memória • IndexedDB</h3>
+    <div class="sideBlock">
+      <div style="display:flex;gap:8px">
+        <button id="refreshMem" class="btn ghost">Atualizar</button>
+        <button id="clearMem" class="btn ghost">Limpar</button>
+      </div>
+    </div>
+    <div class="stored-list sideBlock" id="storedList">Carregando...</div>
+    <div class="sideBlock">
+      <div style="font-weight:800">Legenda</div>
+      <div class="small">Clique numa camada para abrir o arquivo (ou atribuir). Clique com botão direito para remover/editar etiqueta.</div>
+    </div>
+  </aside>
+</main>
+
+<!-- Janela modal InfoDOS preview -->
+<div id="windowLayer" role="application" aria-label="Janela InfoDOS">
+  <div id="winHeader">
+    <div id="winTitle">Preview • Süm♾️ü2</div>
+    <div class="ballWrap">
+      <div class="ball close" id="btnClose" title="Fechar pré-visualização">✕</div>
+      <div class="ball open" id="btnOpenNew" title="Abrir em nova aba">⤢</div>
+      <div class="ball ext" id="btnToggleInfo" title="Alternar painel info">ⓘ</div>
+    </div>
+  </div>
+  <div id="winBody">
+    <div id="previewPane" aria-live="polite">
+      <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+    </div>
+    <div id="sidePanel">
+      <div class="sideBlock">
+        <div style="font-weight:900">Camada ativa</div>
+        <div id="activeInfo" class="small">Nenhuma</div>
+      </div>
+      <div class="sideBlock" style="flex:1;overflow:auto">
+        <div style="font-weight:900;margin-bottom:6px">Ações rápidas</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button id="assignActive" class="btn">Atribuir arquivo selecionado → Camada</button>
+          <button id="saveActiveMem" class="btn ghost">Salvar Camada ativa → Memória</button>
+          <button id="clearActive" class="btn ghost">Remover Camada ativa</button>
+        </div>
+      </div>
+      <div class="sideBlock" id="fractalLegend">
+        <div style="font-weight:900">Fractal • Cronologia</div>
+        <div class="small">Grupos: I (1-11) Origem • II (12-22) Integração • III (23-33) Retorno</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Painel Ferramentas -->
+<div id="toolsPanel" role="region" aria-label="Painel de Ferramentas">
+  <button class="closeTools" title="Fechar painel Ferramentas">×</button>
+  <h2>Ferramentas</h2>
+  <p>Aqui você pode adicionar suas ferramentas futuras para auxiliar na visualização, manipulação e integração dos arquivos HTML fractais.</p>
+  <p>Este painel é expansível para múltiplas funcionalidades, como análise, edição avançada, ou integração com outros sistemas.</p>
+</div>
+
+<script>
+  // InfoDOS KOBLLUX — JS
+  const MAX_LAYERS = 33;
+  const GROUP_SIZE = 11;
+
+  // Finalzinho puro KOBLLUX JS
+
+// DOM Elements (continuação)
+const saveMemBtn = document.getElementById('saveMem');
+const refreshMemBtn = document.getElementById('refreshMem');
+const clearMemBtn = document.getElementById('clearMem');
+const storedList = document.getElementById('storedList');
+const layerGrid = document.getElementById('layerGrid');
+const toolsToggleBtn = document.getElementById('toolsToggleBtn');
+const toolsPanel = document.getElementById('toolsPanel');
+const closeToolsBtn = toolsPanel.querySelector('.closeTools');
+  
+
+// Estado simples
+let layers = Array(MAX_LAYERS).fill(null);
+
+// Função para renderizar slots das camadas
+function renderLayers() {
+  layerGrid.innerHTML = '';
+  for(let i=0; i<MAX_LAYERS; i++) {
+    const layer = document.createElement('div');
+    layer.className = 'layer' + (layers[i] ? '' : ' empty');
+    layer.dataset.idx = i + 1;
+    layer.innerHTML = `
+      <div class="idx">${i + 1}</div>
+      <div class="name">${layers[i]?.name || 'vazio'}</div>
+      <div class="tag">${layers[i]?.tag || ''}</div>
+    `;
+    layerGrid.appendChild(layer);
+  }
+}
+
+// Fechar janela modal preview
+  btnClose.addEventListener('click', () => {
+    windowLayer.classList.remove('active');
+    activeLayerIndex = null;
+    renderLayers();
+    updateActiveInfo();
+  });
+
+  // Abrir preview em nova aba
+  btnOpenNew.addEventListener('click', () => {
+    if(activeLayerIndex === null) return;
+    const layer = layers[activeLayerIndex];
+    if(layer && layer.content) {
+      const newWindow = window.open();
+      newWindow.document.write(layer.content);
+      newWindow.document.close();
+    }
+  });
+
+  // Alternar painel ferramentas
+  function toggleToolsPanel() {
+    const isVisible = toolsPanel.style.display === 'flex';
+    toolsPanel.style.display = isVisible ? 'none' : 'flex';
+  }
+  toolsToggleBtn.addEventListener('click', toggleToolsPanel);
+  closeToolsBtn.addEventListener('click', () => {
+    toolsPanel.style.display = 'none';
+  });
+
+  // Inicialização
+  renderLayers();
+  updateActiveInfo();
+
+  // Aqui você pode implementar salvar/recuperar IndexedDB e outras funções
+</script>
+</body>
+</html>
