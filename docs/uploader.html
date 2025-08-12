@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KOBLLUX – Forge Web</title>
+<style>
+:root{color-scheme:dark light}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto; margin:0; padding:24px; background:#0b0b0c; color:#eaeaea}
+.card{max-width:720px; margin:0 auto; background:#121214; border:1px solid #232327; border-radius:16px; padding:20px}
+h1{font-size:20px;margin:0 0 12px}
+p{opacity:.9}
+label.input{display:block;border:1px dashed #2a2a31;border-radius:12px;padding:18px;text-align:center;cursor:pointer}
+input[type=file]{display:none}
+#status{margin-top:12px;font-size:14px;opacity:.9}
+button{appearance:none;border:0;border-radius:999px;padding:10px 16px;background:#00d0ff;color:#002029;font-weight:700;cursor:pointer}
+progress{width:100%;height:10px}
+footer{opacity:.6;margin-top:16px;font-size:12px}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>KOBLLUX – Forge Web</h1>
+    <p>Envie seu <code>svgs.zip</code> com <strong>svgs/*.svg</strong>. O servidor compila a fonte e devolve um <code>fonts.zip</code>.</p>
+    <label class="input">
+      <input id="file" type="file" accept=".zip" />
+      Toque para selecionar seu <strong>svgs.zip</strong>
+    </label>
+    <div style="display:flex;gap:10px;margin-top:12px">
+      <button id="go" disabled>Forjar</button>
+      <button id="demo" type="button">Baixar modelo de ZIP</button>
+    </div>
+    <div id="status"></div>
+    <progress id="prog" max="100" value="0" style="display:none"></progress>
+    <footer>API esperada: <code>POST /forge</code> (multipart <code>file</code>). Configure a URL no código abaixo.</footer>
+  </div>
+<script>
+const API_URL = location.origin + "/forge"; // ajuste se hospedar API separada
+const fileInput = document.getElementById('file');
+const go = document.getElementById('go');
+const statusEl = document.getElementById('status');
+const prog = document.getElementById('prog');
+const demo = document.getElementById('demo');
+
+fileInput.addEventListener('change', () => {
+  go.disabled = !fileInput.files.length;
+});
+
+demo.addEventListener('click', () => {
+  // Baixa um ZIP de exemplo (svgs/ com A.svg, 0.svg etc) hospedado no próprio site (coloque o arquivo na raiz se quiser)
+  location.href = "KOBLLUX-ONLY-FONT-PACK-vFINAL.zip";
+});
+
+go.addEventListener('click', async () => {
+  if (!fileInput.files.length) return;
+  const fd = new FormData();
+  fd.append('file', fileInput.files[0]);
+
+  statusEl.textContent = "Enviando…";
+  prog.style.display = 'block';
+  prog.value = 5;
+
+  try{
+    const res = await fetch(API_URL, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error("Erro na forja: " + res.status);
+    statusEl.textContent = "Compilando…";
+    prog.value = 50;
+
+    const blob = await res.blob();
+    prog.value = 100;
+    statusEl.textContent = "Pronto! Baixando fontes…";
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = "KOBLLUX-fonts.zip";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  }catch(err){
+    statusEl.textContent = "Falhou: " + err.message;
+    prog.style.display = 'none';
+  }
+});
+</script>
+</body>
+</html>
