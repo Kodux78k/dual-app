@@ -23,7 +23,7 @@
       font-family:'Montserrat',sans-serif;
       background: linear-gradient(to bottom, #000, #1a1a1a);
       color:#f0f;
-      height:100vh; overflow:hidden;
+      height:100dvh; overflow:hidden;
       display:flex; align-items:center; justify-content:center;
       padding-top:0; position:relative;
       opacity:0; animation:fadeInBody 1.8s ease forwards;
@@ -123,20 +123,12 @@
     /* BG */
     body { background: linear-gradient(to top, rgba(68, 68, 68, 0.4),rgba(255, 255, 255, 0.6)); }
     .fake-bg{
-      position: fixed; top:0; left:0; width:100vw; height:100vh;
+      position: fixed; top:0; left:0; width:100vw; height:100dvh;
       object-fit: cover; object-position: center; z-index: -2; opacity: .24; pointer-events: none; transition: opacity .5s ease;
     }
 
     /* ===== Injeção KBLX (mantida) ===== */
-    #kblxLogBtn{
-      /* AGORA VISÍVEL e menor, com ícone coerente  */
-      display:block;
-      position:fixed; top:14px; left:20px; z-index:2001;
-      font-size:14px; line-height:1;
-      background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));
-      color:#fff; border:none; padding:7px 9px; border-radius:9px; cursor:pointer;
-      box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px);
-    }
+    
     #kblxLogPanel{
       position:fixed; top:108px; left:20px; width:320px; max-height:50vh;
       display:none; z-index:2000; overflow:auto;
@@ -183,12 +175,7 @@
     #kblxCmdHelp code{ background:rgba(255,255,255,.06); padding:2px 6px; border-radius:6px }
 
     /* Botão do rodapé (agora é toggle de UI) */
-    #openBgOptionsBtn{
-      position:fixed; bottom:16px; right:16px; z-index:2001;
-      border:none; border-radius:10px; color:#fff;
-      background:rgba(0,0,0,0.40); padding:8px 10px; font-size:16px;
-      backdrop-filter:blur(6px); box-shadow:0 6px 20px rgba(0,0,0,.35);
-    }
+    
     #openBgOptionsBtn:hover{ background:rgba(0,0,0,0.55); }
 
     /* Painel BG (flutuante completo) */
@@ -208,9 +195,245 @@
     /* remove o upload duplicado que ficava logo abaixo do login */
     .login-container > div .upload-btn { display:none !important; }
   </style>
+<style>
+#openBgOptionsBtn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 20px !important;
+  z-index: 2001 !important;
+}
+</style>
+<style>
+/* === Unificar estilo dos botões topo + layout sem rolagem === */
+html, body {
+  height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* Visual unificado (mesmo do openBgOptionsBtn) */
+#kblxLogBtn, #openBgOptionsBtn {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 7px 9px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+}
+
+/* Alinhamento e posições */
+#kblxLogBtn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 20px !important;
+  z-index: 2001 !important;
+}
+#openBgOptionsBtn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 20px !important;
+  z-index: 2001 !important;
+}
+</style>
+<style>
+/* === Patch: lock viewport & remove overscroll/scrollbars === */
+html, body {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+body::-webkit-scrollbar { display: none !important; }
+* { overscroll-behavior: contain; }
+.center-group { max-height: calc(100dvh - 120px); overflow: hidden; }
+</style>
+<style>
+/* Equalize top alignment for log + eye */
+#kblxLogBtn, #openBgOptionsBtn {
+  top: 14px !important;
+  height: auto !important;
+  line-height: 1 !important;
+}
+</style>
+<style>
+/* === Clamp & Neutralize (no scroll, no overshoot) === */
+:root, html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: clip !important; /* modern equivalent of hidden for visual overflow */
+  overscroll-behavior: none !important;
+}
+
+body {
+  /* Ensure no accidental extra spacing from line-height baseline on body */
+  line-height: 1.2;
+}
+
+/* Neutralize bottom margins/paddings on key containers */
+.center-group,
+#panel,
+#miniPlayerContainer,
+#kblxLogPanel,
+#kblxCmdPal,
+#kblxIframeOverlay {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  max-height: 100dvh !important;
+}
+
+/* Clamp all first-level children to viewport height (excluding fixed overlays which already ignore flow) */
+body > * {
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+/* Avoid accidental page growth from images/videos default display */
+img, video, canvas {
+  max-height: 100dvh;
+}
+
+/* Ensure our eye stays perfectly aligned with the log */
+#kblxLogBtn, #openBgOptionsBtn {
+  top: 14px !important;
+}
+
+/* Optional: if any legacy footer spacer exists, collapse it */
+.footer, #footer, .page-footer, .spacer, .bottom-spacer {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+</style>
+<style>
+/* === Estilo unificado para o botão ☍ (#uploadHTML) === */
+#uploadHTML {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 7px 9px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0.8;
+}
+#uploadHTML:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+</style>
+<style>
+/* === Ajuste posição do botão 💊 toggleMiniPlayer === */
+#toggleMiniPlayer {
+  position: relative;
+  top: -33px !important;
+}
+</style>
+<style>
+/* === Estilo de background nos botões aplicado ao toggleMiniPlayer === */
+#toggleMiniPlayer {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 7px 9px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0.8;
+}
+#toggleMiniPlayer:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+</style>
+<style>
+/* === Ajuste: reduzir tamanho do 💊 toggleMiniPlayer === */
+#toggleMiniPlayer {
+  font-size: 12px !important;
+  padding: 5px 7px !important;
+}
+
+
+/* === Visibilidade por estado de login === */
+/* Por padrão (não logado): esconder log e upload BG; manter olho visível */
+body:not(.logged-in) #kblxLogBtn { display: none !important; }
+body:not(.logged-in) .upload-btn { display: none !important; }
+
+/* Quando logado: mostrar normalmente */
+body.logged-in #kblxLogBtn,
+body.logged-in .upload-btn { display: inline-flex !important; }
+</style>
+<style>
+/* === Estilo do botão ☍ BG dentro do loginBox === */
+#bgUploadBtn.upload-btn {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 7px 9px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0.9;
+  margin-left: 8px;
+}
+#bgUploadBtn.upload-btn:hover { opacity: 1; transform: translateY(-1px); }
+</style>
+<style>
+/* === Alinhamento óptico dos botões dentro do loginBox === */
+#loginBox {
+  /* não forço layout global, apenas permito que os botões do topo se alinhem bem */
+}
+#loginBox #kblxLogBtn,
+#loginBox #bgUploadBtn.upload-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  height: 32px !important;
+  padding: 6px 10px !important;
+  font-size: 13px !important;
+  line-height: 1 !important;
+}
+#loginBox #kblxLogBtn { margin-right: 10px !important; }
+#loginBox #bgUploadBtn.upload-btn { margin-right: 6px !important; }
+</style>
+<style>
+/* === Estilo translúcido para #uploadHTMLBtn === */
+#uploadHTMLBtn {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 7px 9px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0.9;
+}
+#uploadHTMLBtn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+</style>
 </head>
 
-<body>
+<body class="logged-in">
 
 <!-- Painel mini -->
 <div id="miniPlayerContainer" role="region" aria-label="Painel de Ativações">
@@ -253,7 +476,7 @@
 </div>
 
 <!-- Pílulas -->
-<button id="kblxLogBtn" title="Logs">🧾</button>
+
 <div id="kblxLogPanel" role="region" aria-label="Painel de Logs">
   <strong>◉ LOG</strong>
   <div id="kblxLogActions">
@@ -761,13 +984,16 @@
     "Htmn":"Editor-html-0.html","Html":"Editor-html-1.html","ht":"Editor-html-2.html","pf":"pref-0.html",
     "MRR":"menu-RR.html","R90":"dual-infodose-v4-simbiose-final.html",
     "s00":"symbiote-editor.html",
-    "SV7":"symbiote-editor-pro-v7.html",
     "sv1":"symbiote-editor-pro.html",
     "sv2":"symbiote-editor-pro-v2.html",
     "sv3":"symbiote-editor-pro-v3.html",
     "sv4":"symbiote-editor-pro-v4.html",
     "sv5":"symbiote-editor-pro-v5.html",
-    "sv6":"symbiote-editor-pro-v6.html"
+    "sv6":"symbiote-editor-pro-v6.html",
+    "sv7":"symbiote-editor-pro-v7.html",
+    "sv8":"symbiote-editor-pro-v8.html",
+    "sv9":"symbiote-editor-pro-v9.html"
+    
   };
 
   function playButtonSound() {
@@ -842,8 +1068,8 @@
   const lockScroll = () => {
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
-    document.documentElement.style.height = '100vh';
-    document.body.style.height = '100vh';
+    document.documentElement.style.height = '100dvh';
+    document.body.style.height = '100dvh';
     window.scrollTo(0, 0);
   };
 
@@ -929,6 +1155,38 @@
     try { const res = await fetch(pref, { method:'HEAD' }); if(res.ok){ window.kblxOpenVisor(pref); return; } } catch(e){}
     window.kblxOpenVisor(fallback);
   }
+</script>
+
+
+<script>
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  function setFakeBgFromFile(file){
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e){
+      const url = e.target.result;
+      // Seta como CSS var para manter compatibilidade com seu sistema
+      document.documentElement.style.setProperty('--bg', `url('${url}')`);
+      // dispara evento para integrações já existentes
+      document.dispatchEvent(new CustomEvent('fakebg-selected', { detail: { url } }));
+    };
+    reader.readAsDataURL(file);
+  }
+  function init(){
+    const btn = byId('bgUploadBtn');
+    const input = byId('fakeBgInput');
+    if(btn && input){
+      btn.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => setFakeBgFromFile(input.files && input.files[0]));
+    }
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 
 </body>
