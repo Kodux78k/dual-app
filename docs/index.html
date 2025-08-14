@@ -437,6 +437,88 @@ body.logged-in .upload-btn { display: inline-flex !important; }
 #toggleMiniPlayer { pointer-events: auto !important; z-index: 2002 !important; }
 </style>
 
+  <!-- Final override for refined layout and styles -->
+  <style>
+    html, body {
+      height: 100dvh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+      overscroll-behavior: none !important;
+    }
+    /* dynamic background with lighten overlay */
+    body {
+      background: linear-gradient(to top, rgba(68,68,68,0.4), rgba(255,255,255,0.6)), var(--bg) !important;
+    }
+    /* Hide the global log button from injection */
+    #kblxLogBtn {
+      display: none !important;
+    }
+    /* Eye (UI toggle) styling and position */
+    #openBgOptionsBtn {
+      position: fixed !important;
+      top: 14px !important;
+      left: 20px !important;
+      z-index: 2001 !important;
+      font-size: 14px !important;
+      line-height: 1 !important;
+      padding: 7px 9px !important;
+      border: none !important;
+      border-radius: 10px !important;
+      color: #fff !important;
+      background: rgba(0,0,0,0.40) !important;
+      backdrop-filter: blur(6px) !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+      opacity: 0.8;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    #openBgOptionsBtn:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+    /* Mini player unify style */
+    #toggleMiniPlayer {
+      font-size: 14px !important;
+      line-height: 1 !important;
+      padding: 7px 9px !important;
+      border: none !important;
+      border-radius: 10px !important;
+      color: #fff !important;
+      background: rgba(0,0,0,0.40) !important;
+      backdrop-filter: blur(6px) !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+      opacity: 0.8;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    #toggleMiniPlayer:hover {
+      opacity: 1;
+      transform: translateY(-1px);
+    }
+    /* Unified style for upload buttons, including login BG upload */
+    #uploadHTMLBtn,
+    .upload-btn,
+    #bgUploadBtn.upload-btn {
+      font-size: 14px !important;
+      line-height: 1 !important;
+      padding: 7px 9px !important;
+      border: none !important;
+      border-radius: 10px !important;
+      color: #fff !important;
+      background: rgba(0,0,0,0.40) !important;
+      backdrop-filter: blur(6px) !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+      opacity: 0.9 !important;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    #uploadHTMLBtn:hover,
+    .upload-btn:hover,
+    #bgUploadBtn.upload-btn:hover {
+      opacity: 1 !important;
+      transform: translateY(-1px) !important;
+    }
+    /* Show/hide BG upload based on login state */
+    body:not(.logged-in) #bgUploadBtn { display: none !important; }
+    body.logged-in #bgUploadBtn { display: inline-flex !important; }
+  </style>
 </head>
 
 <body class="logged-in">
@@ -545,6 +627,12 @@ body.logged-in .upload-btn { display: inline-flex !important; }
 
     <input type="file" id="uploadHTML" accept=".html" style="display:none" />
     <button id="uploadHTMLBtn">☍</button>
+
+    <!-- BG upload inside login (visible only when logged in) -->
+    <div class="bg-upload-wrapper">
+      <button id="bgUploadBtn" class="upload-btn" title="Alterar BG" onclick="document.getElementById('imgUploadLogin').click()">⧈</button>
+      <input type="file" id="imgUploadLogin" accept="image/*" style="display:none" onchange="trocarImagem(event)">
+    </div>
 
     <div id="messageBox"></div>
     <div id="buyTokens"><button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button></div>
