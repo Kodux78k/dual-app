@@ -1,0 +1,855 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Symbiote Editor — HTML/CSS/JS Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark">
+  <style>
+    :root{
+      --bg: #0b0d10;
+      --bg-2: #12161b;
+      --fg: #e6eef8;
+      --muted:#9ab;
+      --brand:#69f;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --err:#ef4444;
+      --card:#151a21;
+      --border:#263241;
+      --tab:#0f1318;
+      --shadow: rgba(0,0,0,.3);
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb; --bg-2:#fff; --fg:#0c1220; --muted:#556; --brand:#335dff;
+        --ok:#0a8f3c; --warn:#a86a00; --err:#b00020; --card:#fff; --border:#dfe5ef; --tab:#f0f3f9; --shadow: rgba(0,0,0,.08);
+      }
+    }
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--fg); background:linear-gradient(180deg,var(--bg),var(--bg-2));
+      font: 14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    /* Layout */
+    .app{
+      display:grid; grid-template-rows: auto 1fr auto; height:100%; gap:8px;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    header{
+      position:sticky; top:0; z-index:10; background:rgba(0,0,0,.2);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    header .row{
+      display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+    }
+    .title{font-weight:700; letter-spacing:.3px}
+    .badge{font-size:12px; padding:2px 8px; border-radius:999px; background:var(--tab); color:var(--muted); border:1px solid var(--border)}
+    .actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    button, .btn{
+      -webkit-tap-highlight-color: transparent;
+      border:1px solid var(--border); background:var(--card); color:var(--fg);
+      padding:10px 12px; border-radius:12px; font-weight:600; font-size:14px;
+      box-shadow:0 1px 0 var(--shadow); cursor:pointer;
+    }
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .ghost{background:transparent}
+    .danger{border-color: color-mix(in oklab, var(--err) 50%, var(--border)); color: var(--err)}
+    .ok{border-color: color-mix(in oklab, var(--ok) 50%, var(--border)); color: var(--ok)}
+    .brand{border-color: color-mix(in oklab, var(--brand) 50%, var(--border)); color:var(--brand)}
+    .pill{border-radius:999px; padding-inline:14px}
+    .hidden{display:none !important}
+    main{padding:0 max(12px, env(safe-area-inset-left)); padding-right:max(12px, env(safe-area-inset-right));}
+    .tabs{
+      display:grid; grid-template-columns:1fr; gap:10px; height:100%;
+    }
+    .panel{
+      min-height: 58vh; background:var(--card); border:1px solid var(--border); border-radius:16px;
+      overflow:hidden; display:flex; flex-direction:column;
+    }
+    .panel header{
+      position:static; background:transparent; border-bottom:1px solid var(--border);
+    }
+    .panel header .row{padding:10px 12px}
+    .panel .content{flex:1; min-height:0; display:flex; flex-direction:column}
+    /* Editors / Preview */
+    .editor{flex:1; min-height:300px}
+    .split{display:flex; gap:10px; flex-wrap:wrap}
+    .split > *{flex:1 1 320px}
+    .preview-wrap{flex:1; min-height:300px; background:var(--tab); border-top:1px solid var(--border)}
+    iframe.preview{width:100%; height:100%; border:0; background:#fff}
+    /* Tabbar bottom */
+    nav.tabbar{
+      position:sticky; bottom:0; z-index:10; background:rgba(0,0,0,.2);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-top:1px solid var(--border);
+    }
+    .tabbar .row{display:flex; gap:8px; padding:8px max(12px, env(safe-area-inset-left)); padding-right:max(12px, env(safe-area-inset-right))}
+    .tab{flex:1; text-align:center; padding:10px 6px; border-radius:12px; background:var(--card); border:1px solid var(--border); font-weight:600}
+    .tab[aria-selected="true"]{outline:2px solid var(--brand)}
+    /* Lists & blocks */
+    .list{padding:10px; display:grid; gap:8px}
+    .item{
+      display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--tab);
+      padding:10px; border-radius:12px; border:1px solid var(--border);
+    }
+    .item .meta{display:flex; flex-direction:column; gap:4px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12.5px}
+    .muted{color:var(--muted)}
+    .grid{display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:8px}
+    .kpi{background:var(--tab); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center}
+    .kpi b{font-size:18px}
+    /* SÜMBÜS overlay styles (aplicados dentro do iframe também) */
+    .symbus *{outline:1px dashed rgba(80,140,255,.45); outline-offset:-.5px}
+    .symbus [id]{box-shadow: inset 0 0 0 2px rgba(255,165,0,.35)}
+    .symbus [data-block]{background-image: linear-gradient(135deg, rgba(102,153,255,.12) 25%, transparent 25%, transparent 50%, rgba(102,153,255,.12) 50%, rgba(102,153,255,.12) 75%, transparent 75%, transparent);
+      background-size:16px 16px}
+    /* Utilities */
+    .row-wrap{display:flex; gap:8px; flex-wrap:wrap}
+    input[type="file"]{display:none}
+    label.file{display:inline-flex; align-items:center; gap:8px; cursor:pointer}
+    .small{font-size:12px}
+    .right{margin-left:auto}
+    .toast{
+      position: fixed; left:50%; transform: translateX(-50%);
+      bottom: calc(60px + env(safe-area-inset-bottom));
+      padding:10px 14px; background:var(--card); border:1px solid var(--border); border-radius:999px; box-shadow:0 10px 30px var(--shadow);
+      z-index:99;
+    }
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+  <!-- Ace Editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.min.js" integrity="" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-html.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-one_dark.min.js"></script>
+  <!-- Prettier -->
+  <script src="https://unpkg.com/prettier@3.2.5/standalone.js"></script>
+  <script src="https://unpkg.com/prettier@3.2.5/plugins/html.js"></script>
+  <script src="https://unpkg.com/prettier@3.2.5/plugins/babel.js"></script>
+  <script src="https://unpkg.com/prettier@3.2.5/plugins/postcss.js"></script>
+  <!-- jsdiff -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.2.0/diff.min.js"></script>
+  <!-- JSZip + FileSaver -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="row">
+      <div class="title">Symbiote Editor <span class="badge">Mobile</span></div>
+      <div class="actions">
+        <label class="file btn pill brand">
+          <input id="fileInput" type="file" accept=".html,.htm,.txt" />
+          📤 Upload
+        </label>
+        <button id="btnSave" class="btn pill">💾 Salvar</button>
+        <button id="btnFormat" class="btn pill brand">✨ Identar</button>
+        <button id="btnCopy" class="btn pill">📋 Copiar</button>
+        <button id="btnSymbus" class="btn pill">🧬 SÜMBÜS: ON</button>
+        <button id="btnReset" class="btn pill ghost danger">↩️ Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="tabs" role="tablist" aria-label="Áreas">
+      <!-- Panel: Editor -->
+      <section class="panel" id="panel-editor" role="tabpanel" aria-labelledby="tab-editor">
+        <header><div class="row">
+          <div class="title">Editor</div>
+          <div class="actions row-wrap">
+            <button id="btnInsertBlockMarkers" class="btn small">🏷️ Marcar Blocos</button>
+            <button id="btnFind" class="btn small">🔎 Buscar &lt;div&gt;</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="split">
+            <div>
+              <div class="small muted" style="padding:8px 10px">index.html</div>
+              <div id="editorHtml" class="editor"></div>
+            </div>
+            <div>
+              <div class="small muted" style="padding:8px 10px">global.css</div>
+              <div id="editorCss" class="editor"></div>
+            </div>
+            <div>
+              <div class="small muted" style="padding:8px 10px">global.js</div>
+              <div id="editorJs" class="editor"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Preview -->
+      <section class="panel" id="panel-preview" role="tabpanel" aria-labelledby="tab-preview">
+        <header><div class="row">
+          <div class="title">Preview</div>
+          <div class="actions row-wrap">
+            <button id="btnReloadPreview" class="btn small">♻️ Recarregar</button>
+            <button id="btnToggleSymbus2" class="btn small">🧬 SÜMBÜS (toggle)</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="preview-wrap"><iframe id="preview" class="preview" title="Pré-visualização"></iframe></div>
+        </div>
+      </section>
+
+      <!-- Panel: Blocos -->
+      <section class="panel" id="panel-blocks" role="tabpanel" aria-labelledby="tab-blocks">
+        <header><div class="row">
+          <div class="title">Blocos</div>
+          <div class="actions row-wrap">
+            <button id="btnRefreshBlocks" class="btn small">🔁 Atualizar Índice</button>
+            <button id="btnPromoteSelected" class="btn small brand">🧱 Promover → componente</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="list" id="blocksList"></div>
+        </div>
+      </section>
+
+      <!-- Panel: Patches -->
+      <section class="panel" id="panel-patches" role="tabpanel" aria-labelledby="tab-patches">
+        <header><div class="row">
+          <div class="title">Patches</div>
+          <div class="actions row-wrap">
+            <button id="btnGenPatch" class="btn small">🪄 Gerar Patch</button>
+            <button id="btnApplyPatch" class="btn small ok">📥 Aplicar Patch</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="grid" style="padding:10px">
+            <textarea id="patchInput" class="mono" rows="10" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px" placeholder="Cole aqui um patch (unified diff) para aplicar no HTML atual..."></textarea>
+            <textarea id="patchOutput" class="mono" rows="10" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px" placeholder="Patch gerado aparecerá aqui."></textarea>
+          </div>
+          <div class="list">
+            <div class="kpi"><div class="muted small">Blocos detectados</div><b id="kpiBlocks">0</b></div>
+            <div class="kpi"><div class="muted small">Componentes</div><b id="kpiComps">0</b></div>
+            <div class="kpi"><div class="muted small">Tamanho HTML (KB)</div><b id="kpiSize">0</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Export -->
+      <section class="panel" id="panel-export" role="tabpanel" aria-labelledby="tab-export">
+        <header><div class="row">
+          <div class="title">Exportar</div>
+          <div class="actions row-wrap">
+            <button id="btnExportZip" class="btn small brand">📦 Exportar ZIP</button>
+            <button id="btnCopyIndex" class="btn small">📋 Copiar index.html</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="list">
+            <div class="item">
+              <div class="meta">
+                <div class="small muted">Modo SÜMBÜS</div>
+                <div class="mono">On/Off: afeta apenas o <em>preview</em>, não altera o HTML exportado.</div>
+              </div>
+              <button id="btnToggleSymbus3" class="btn small">🧬 Toggle</button>
+            </div>
+            <div class="item">
+              <div class="meta">
+                <div class="small muted">README</div>
+                <div class="mono" id="readmePreview">Será incluído no ZIP com instruções de build/componentes.</div>
+              </div>
+              <button id="btnShowReadme" class="btn small">👁️ Ver</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="tabbar">
+    <div class="row" role="tablist" aria-label="Navegação">
+      <button class="tab" id="tab-editor" data-target="panel-editor" aria-selected="true">✏️ Editor</button>
+      <button class="tab" id="tab-preview" data-target="panel-preview" aria-selected="false">👁️ Preview</button>
+      <button class="tab" id="tab-blocks" data-target="panel-blocks" aria-selected="false">🧩 Blocos</button>
+      <button class="tab" id="tab-patches" data-target="panel-patches" aria-selected="false">🧷 Patches</button>
+      <button class="tab" id="tab-export" data-target="panel-export" aria-selected="false">⬇️ Export</button>
+    </div>
+  </nav>
+</div>
+
+<div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = (q, el=document) => el.querySelector(q);
+  const $$ = (q, el=document) => Array.from(el.querySelectorAll(q));
+  const toast = (msg, ms=1500) => {
+    const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), ms);
+  };
+
+  const state = {
+    originalHtml: '',
+    currentHtml: '',
+    extraCss: '',
+    extraJs: '',
+    blocks: [],
+    components: [], // { name, css, js, htmlStub }
+    symbiosisOn: true,
+    lastSavedAt: 0,
+  };
+
+  /* ---------- Tabs ---------- */
+  $$('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab').forEach(b => b.setAttribute('aria-selected', 'false'));
+      btn.setAttribute('aria-selected', 'true');
+      const target = btn.dataset.target;
+      $$('.panel').forEach(p => p.id === target ? p.classList.remove('hidden') : p.classList.add('hidden'));
+    });
+  });
+  // start with only Editor visible
+  $$('#panel-preview, #panel-blocks, #panel-patches, #panel-export').forEach(p=>p.classList.add('hidden'));
+
+  /* ---------- Ace Editors ---------- */
+  const editorHtml = ace.edit('editorHtml', { theme: 'ace/theme/one_dark', mode: 'ace/mode/html', fontSize: 14, showPrintMargin:false });
+  const editorCss  = ace.edit('editorCss',  { theme: 'ace/theme/one_dark', mode: 'ace/mode/css',  fontSize: 14, showPrintMargin:false });
+  const editorJs   = ace.edit('editorJs',   { theme: 'ace/theme/one_dark', mode: 'ace/mode/javascript', fontSize: 14, showPrintMargin:false });
+  [editorHtml, editorCss, editorJs].forEach(ed => {
+    ed.session.setUseWrapMode(true);
+    ed.setOptions({ scrollPastEnd: 0.5 });
+  });
+
+  const saveLocal = () => {
+    localStorage.setItem('symb_editor_state', JSON.stringify({
+      currentHtml: state.currentHtml,
+      extraCss: state.extraCss,
+      extraJs: state.extraJs,
+      symbiosisOn: state.symbiosisOn,
+      components: state.components
+    }));
+    state.lastSavedAt = Date.now();
+    updateKPIs();
+  };
+  const loadLocal = () => {
+    const raw = localStorage.getItem('symb_editor_state');
+    if(!raw) return false;
+    try {
+      const data = JSON.parse(raw);
+      state.currentHtml = data.currentHtml || '';
+      state.extraCss = data.extraCss || '';
+      state.extraJs = data.extraJs || '';
+      state.symbiosisOn = !!data.symbiosisOn;
+      state.components = data.components || [];
+      editorHtml.setValue(state.currentHtml || sampleHTML(), -1);
+      editorCss.setValue(state.extraCss || '/* CSS global opcional */', -1);
+      editorJs.setValue(state.extraJs || '// JS global opcional', -1);
+      $('#btnSymbus').textContent = '🧬 SÜMBÜS: ' + (state.symbiosisOn ? 'ON' : 'OFF');
+      parseAndRefresh();
+      return true;
+    } catch(e){ console.warn(e); return false; }
+  };
+
+  /* ---------- Sample HTML ---------- */
+  function sampleHTML(){
+    return `<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Meu Projeto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --brand:#335dff }
+    body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin:0 }
+    header{ padding:20px; background:linear-gradient(90deg,#335dff,#69f); color:white }
+    main{ padding:16px }
+    .card{ border:1px solid #e4e8f0; border-radius:12px; padding:16px; margin:12px 0 }
+    .btn{ background:#335dff; color:#fff; border:0; padding:10px 14px; border-radius:10px }
+  </style>
+</head>
+<body>
+  <header id="topo">
+    <h1>Olá, Symbiote 👋</h1>
+    <p class="lead">Este é um exemplo inicial para editar e promover blocos a componentes.</p>
+  </header>
+
+  <main id="conteudo">
+    <section id="hero" class="card">
+      <h2>Hero</h2>
+      <p>Um parágrafo dentro do bloco <strong>#hero</strong>.</p>
+      <button class="btn" onclick="alert('Oi!')">Ação</button>
+      <script>
+        // JS inline no bloco hero
+        console.log('Hero carregado');
+      </script>
+      <style>
+        #hero{ background:#f6f9ff }
+      </style>
+    </section>
+
+    <section id="features" class="card">
+      <h2>Recursos</h2>
+      <ul>
+        <li>Edição HTML</li>
+        <li>SÜMBÜS Toggle</li>
+        <li>Promover → componente</li>
+      </ul>
+    </section>
+
+    <footer id="rodape" class="card">
+      <small>© Você</small>
+    </footer>
+  </main>
+</body>
+</html>`;
+  }
+
+  /* ---------- Preview ---------- */
+  const previewFrame = $('#preview');
+  function writePreview(){
+    const doc = previewFrame.contentDocument;
+    let html = editorHtml.getValue();
+    // injeta CSS/JS globais
+    if(state.extraCss.trim()){
+      html = html.replace('</head>', `<style id="__global_css__">\n${state.extraCss}\n</style></head>`);
+    }
+    if(state.extraJs.trim()){
+      html = html.replace('</body>', `<script id="__global_js__">\n${state.extraJs}\n</script></body>`);
+    }
+    // SÜMBÜS overlay
+    if(state.symbiosisOn){
+      const symCss = `
+      <style id="__symbus__">
+        html.symbus, html.symbus body{ height:auto !important; }
+        .symbus *{ outline:1px dashed rgba(80,140,255,.45); outline-offset:-.5px }
+        .symbus [id]{ box-shadow: inset 0 0 0 2px rgba(255,165,0,.35) }
+        [data-block]{ background-image: linear-gradient(135deg, rgba(102,153,255,.12) 25%, transparent 25%, transparent 50%, rgba(102,153,255,.12) 50%, rgba(102,153,255,.12) 75%, transparent 75%, transparent); background-size:16px 16px }
+      </style>`;
+      html = html.replace('</head>', symCss + '</head>');
+    }
+    doc.open();
+    doc.write(html);
+    doc.close();
+    if(state.symbiosisOn){
+      previewFrame.contentDocument.documentElement.classList.add('symbus');
+      // Marcar blocos no preview com data-block
+      state.blocks.forEach(b=>{
+        const el = selectByDescriptor(previewFrame.contentDocument, b.selector);
+        if(el){ el.setAttribute('data-block', b.uid); }
+      });
+    }
+  }
+
+  /* ---------- Parser & Blocks ---------- */
+  function hash(str){
+    // djb2
+    let h=5381, i=str.length;
+    while(i) h = (h*33) ^ str.charCodeAt(--i);
+    return (h>>>0).toString(36);
+  }
+  function descriptorFor(el){
+    const tag = el.tagName.toLowerCase();
+    const id = el.id ? `#${el.id}` : '';
+    const cls = el.classList.length ? '.'+Array.from(el.classList).join('.') : '';
+    return `${tag}${id}${cls}`;
+  }
+  function isBlockCandidate(el){
+    if(!el || el.nodeType!==1) return false;
+    const tag = el.tagName.toLowerCase();
+    if(el.id) return true;
+    if(['section','article','nav','header','footer','main'].includes(tag)) return true;
+    if(tag==='div' && el.classList.length) return true;
+    return false;
+  }
+  function selectByDescriptor(doc, desc){
+    try{
+      if(desc.includes('#') || desc.includes('.')) return doc.querySelector(desc);
+      return doc.getElementsByTagName(desc)[0] || null;
+    }catch(e){ return null; }
+  }
+  function parseBlocks(html){
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_ELEMENT, null);
+    const blocks = [];
+    let node;
+    while(node = walker.nextNode()){
+      if(isBlockCandidate(node)){
+        const outer = node.outerHTML;
+        const uid = hash(outer);
+        blocks.push({
+          uid,
+          name: descriptorFor(node),
+          selector: descriptorFor(node),
+          outerHTML: outer
+        });
+      }
+    }
+    return blocks;
+  }
+
+  function updateBlocksUI(){
+    const list = $('#blocksList'); list.innerHTML = '';
+    state.blocks.forEach(b=>{
+      const item = document.createElement('div');
+      item.className='item';
+      item.innerHTML = `
+        <div class="meta">
+          <div><b class="mono">${escapeHtml(b.name)}</b></div>
+          <div class="small muted">uid: ${b.uid}</div>
+        </div>
+        <div class="row-wrap">
+          <button class="btn small" data-act="focus">✏️ Editar</button>
+          <button class="btn small brand" data-act="promote">🧱 Promover</button>
+          <button class="btn small" data-act="copy">📋 Copiar</button>
+          <button class="btn small danger" data-act="remove">🗑️ Remover</button>
+        </div>
+      `;
+      // Wire
+      item.querySelectorAll('button').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const act = btn.dataset.act;
+          if(act==='focus') focusBlock(b);
+          if(act==='promote') promoteBlock(b);
+          if(act==='copy'){ navigator.clipboard.writeText(b.outerHTML); toast('outerHTML do bloco copiado'); }
+          if(act==='remove'){ removeBlock(b); }
+        });
+      });
+      list.appendChild(item);
+    });
+    $('#kpiBlocks').textContent = String(state.blocks.length);
+    $('#kpiComps').textContent = String(state.components.length);
+    $('#kpiSize').textContent = (state.currentHtml.length/1024|0);
+  }
+
+  function parseAndRefresh(){
+    state.currentHtml = editorHtml.getValue();
+    state.blocks = parseBlocks(state.currentHtml);
+    updateBlocksUI();
+    writePreview();
+    saveLocalDebounced();
+  }
+
+  const saveLocalDebounced = debounce(saveLocal, 500);
+  [editorHtml, editorCss, editorJs].forEach(ed => {
+    ed.session.on('change', () => {
+      if(ed === editorHtml) parseAndRefresh();
+      else {
+        state.extraCss = editorCss.getValue();
+        state.extraJs = editorJs.getValue();
+        writePreview();
+        saveLocalDebounced();
+      }
+    });
+  });
+
+  /* ---------- Find/Focus Block ---------- */
+  function focusBlock(b){
+    // Heurística: procura por id primeiro
+    const idMatch = b.selector.match(/#([A-Za-z0-9\-\_:.]+)/);
+    let start = 0, end=0;
+    const html = editorHtml.getValue();
+    if(idMatch){
+      const id = idMatch[1];
+      const idx = html.indexOf(`id="${id}"`);
+      if(idx>=0){
+        // expandir para o início da tag
+        const tagStart = html.lastIndexOf('<', idx);
+        start = tagStart>=0? tagStart : idx;
+        // aproxima fim pelo fechamento do mesmo tag (ingênuo)
+        const tagName = b.selector.split('#')[0];
+        const closeIdx = html.indexOf(`</${tagName}`, idx);
+        end = closeIdx>start ? closeIdx + tagName.length + 3 : start + b.outerHTML.length;
+      } else {
+        // fallback: busca outerHTML (pode falhar se formatado diferente)
+        const j = html.indexOf(b.outerHTML);
+        if(j>=0){ start=j; end=j+b.outerHTML.length; }
+      }
+    } else {
+      const j = html.indexOf(b.outerHTML);
+      if(j>=0){ start=j; end=j+b.outerHTML.length; }
+    }
+    setEditorSelection(editorHtml, start, end);
+    // highlight no preview
+    highlightPreviewBlock(b);
+    toast('Bloco focado no editor e preview');
+  }
+
+  function setEditorSelection(ed, start, end){
+    const Range = ace.require('ace/range').Range;
+    const session = ed.session;
+    const startPos = session.getDocument().indexToPosition(start, 0);
+    const endPos   = session.getDocument().indexToPosition(end, 0);
+    ed.focus();
+    ed.selection.setRange(new Range(startPos.row, startPos.column, endPos.row, endPos.column), true);
+    ed.scrollToLine(startPos.row, true, true, function(){});
+  }
+
+  function highlightPreviewBlock(b){
+    const doc = previewFrame.contentDocument;
+    if(!doc) return;
+    $$('.__hl', doc).forEach(el=>el.classList.remove('__hl'));
+    const el = selectByDescriptor(doc, b.selector);
+    if(el){
+      el.classList.add('__hl');
+      const style = doc.getElementById('__inline_hl__') || (()=>{const s=doc.createElement('style'); s.id='__inline_hl__'; doc.head.appendChild(s); return s;})();
+      style.textContent = `.__hl{ outline:3px solid rgba(255,0,128,.6) !important }`;
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+  }
+
+  /* ---------- Promote to Component ---------- */
+  function promoteBlock(b){
+    const name = prompt('Nome do componente (kebab-case):', b.name.replace(/[.#]/g,'-').replace(/^-+/, 'comp-'));
+    if(!name) return;
+    // construir doc a partir do HTML atual
+    const parser = new DOMParser(); const doc = parser.parseFromString(editorHtml.getValue(), 'text/html');
+    const el = selectByDescriptor(doc, b.selector);
+    if(!el){ toast('Bloco não encontrado para promover'); return; }
+    // extrair styles/scripts internos
+    const styles = Array.from(el.querySelectorAll('style'));
+    const scripts = Array.from(el.querySelectorAll('script'));
+    let css = styles.map(s=>s.textContent).join('\n\n');
+    let jsInline = scripts.map(s=>s.textContent).join('\n\n');
+
+    // remove estilos/scripts internos do bloco
+    styles.forEach(s=>s.remove());
+    scripts.forEach(s=>s.remove());
+
+    // html restante do bloco
+    const innerHtml = el.outerHTML;
+
+    // criar JS do componente (se não houver script, cria injetor)
+    let js = jsInline.trim();
+    if(!js){
+      js = `(function(){
+  const html = \`${sanitizeTemplate(innerHtml)}\`;
+  function mount(){
+    var host = document.getElementById('${name}-mount');
+    if(host){ host.outerHTML = html; }
+  }
+  if(document.readyState!=='loading') mount();
+  else document.addEventListener('DOMContentLoaded', mount);
+})();`;
+    }
+
+    // substituir bloco no index por stub
+    const stub = `<div id="${name}-mount" data-component="${name}"></div>
+<link rel="stylesheet" href="components/${name}.css">
+<script defer src="components/${name}.js"></script>`;
+
+    // No doc, substituir o elemento original pelo stub
+    const stubNode = doc.createElement('div');
+    stubNode.innerHTML = stub;
+    el.replaceWith(...stubNode.childNodes);
+
+    // atualizar state.components (substitui se existir)
+    const existing = state.components.find(c=>c.name===name);
+    const comp = { name, css, js, htmlStub: stub };
+    if(existing){ Object.assign(existing, comp); }
+    else state.components.push(comp);
+
+    // atualizar HTML editor e estado
+    const newHTML = '<!doctype html>\n' + doc.documentElement.outerHTML;
+    editorHtml.setValue(newHTML, -1);
+    parseAndRefresh();
+    toast(`Componente "${name}" criado`);
+  }
+
+  function sanitizeTemplate(str){
+    return String(str)
+      .replace(/`/g, '\\`')
+      .replace(/\$\{/g, '\\${')
+      .replace(/<\/script>/gi, '<\\/script>');
+  }
+
+  /* ---------- Remove Block ---------- */
+  function removeBlock(b){
+    if(!confirm('Remover este bloco do HTML?')) return;
+    const parser = new DOMParser(); const doc = parser.parseFromString(editorHtml.getValue(), 'text/html');
+    const el = selectByDescriptor(doc, b.selector);
+    if(el){ el.remove(); editorHtml.setValue('<!doctype html>\n'+doc.documentElement.outerHTML, -1); parseAndRefresh(); toast('Bloco removido'); }
+  }
+
+  /* ---------- Format (Prettier) ---------- */
+  async function formatAll(){
+    try{
+      const html = prettier.format(editorHtml.getValue(), { parser:'html', plugins: prettierPlugins });
+      const css  = prettier.format(editorCss.getValue(),  { parser:'css', plugins: prettierPlugins });
+      const js   = prettier.format(editorJs.getValue(),   { parser:'babel', plugins: prettierPlugins });
+      editorHtml.setValue(html, -1);
+      editorCss.setValue(css, -1);
+      editorJs.setValue(js, -1);
+      parseAndRefresh();
+      toast('Código identado com Prettier ✨');
+    }catch(e){ console.error(e); toast('Falha ao formatar'); }
+  }
+  const prettierPlugins = window.prettierPlugins || [window.prettierPluginsHtml, window.prettierPluginsBabel, window.prettierPluginsPostcss].filter(Boolean);
+
+  /* ---------- Patches ---------- */
+  function genPatch(){
+    if(!window.Diff && !window.JsDiff){ toast('jsdiff não carregado'); return; }
+    const lib = window.JsDiff || window.Diff;
+    const patch = lib.createPatch('index.html', state.originalHtml || '', editorHtml.getValue(), 'original', 'atual');
+    $('#patchOutput').value = patch;
+    toast('Patch gerado');
+  }
+  function applyPatch(){
+    if(!window.Diff && !window.JsDiff){ toast('jsdiff não carregado'); return; }
+    const lib = window.JsDiff || window.Diff;
+    const patch = $('#patchInput').value;
+    try{
+      const result = lib.applyPatch(editorHtml.getValue(), patch);
+      if(result===false){ toast('Não foi possível aplicar o patch'); return; }
+      editorHtml.setValue(result, -1);
+      parseAndRefresh();
+      toast('Patch aplicado');
+    }catch(e){ console.error(e); toast('Erro ao aplicar patch'); }
+  }
+
+  /* ---------- Export ZIP ---------- */
+  async function exportZip(){
+    const zip = new JSZip();
+    // index.html atual com CSS/JS global referenciados inline (mantém como está no editor)
+    const index = editorHtml.getValue();
+    zip.file('index.html', index);
+    // components
+    if(state.components.length){
+      const dir = zip.folder('components');
+      for(const c of state.components){
+        dir.file(`${c.name}.css`, c.css || '');
+        dir.file(`${c.name}.js`,  c.js  || '');
+      }
+    }
+    // README
+    const readme = makeReadme();
+    zip.file('README.md', readme);
+
+    const blob = await zip.generateAsync({type:'blob'});
+    saveAs(blob, 'symbiote-export.zip');
+    toast('ZIP exportado 📦');
+  }
+
+  function makeReadme(){
+    const list = state.components.map(c=>`- ${c.name}\n  - CSS: components/${c.name}.css\n  - JS: components/${c.name}.js`).join('\n');
+    return `# Export do Symbiote Editor
+
+## Como usar
+Abra \`index.html\` no navegador ou hospede no seu servidor. Os componentes foram referenciados com \`<link>\` e \`<script defer>\`.
+
+## Componentes
+${list || '- (nenhum componente gerado)'}
+
+## Observações
+- O modo SÜMBÜS afeta apenas o preview durante a edição.
+- Os arquivos \`global.css\` e \`global.js\` são aplicados no preview; você pode incorporá-los no index antes de exportar se desejar.
+`;
+  }
+
+  /* ---------- Utils ---------- */
+  function escapeHtml(s){ return s.replace(/[&<>'"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  function debounce(fn, wait=300){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; }
+
+  /* ---------- Event Wiring ---------- */
+  $('#fileInput').addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const text = await file.text();
+    state.originalHtml = text;
+    editorHtml.setValue(text, -1);
+    parseAndRefresh();
+    toast('Arquivo carregado');
+  });
+
+  $('#btnSave').addEventListener('click', ()=>{ saveLocal(); toast('Salvo localmente'); });
+  $('#btnReset').addEventListener('click', ()=>{
+    if(!confirm('Resetar para o último arquivo importado?')) return;
+    if(state.originalHtml){
+      editorHtml.setValue(state.originalHtml, -1);
+      parseAndRefresh();
+      toast('Reset concluído');
+    } else {
+      toast('Não há original carregado');
+    }
+  });
+
+  const toggleSymb = ()=>{ state.symbiosisOn = !state.symbiosisOn; $('#btnSymbus').textContent = '🧬 SÜMBÜS: ' + (state.symbiosisOn?'ON':'OFF'); writePreview(); };
+  $('#btnSymbus').addEventListener('click', toggleSymb);
+  $('#btnToggleSymbus2').addEventListener('click', toggleSymb);
+  $('#btnToggleSymbus3').addEventListener('click', toggleSymb);
+
+  $('#btnFormat').addEventListener('click', formatAll);
+  $('#btnCopy').addEventListener('click', ()=>{ navigator.clipboard.writeText(editorHtml.getValue()); toast('HTML copiado'); });
+  $('#btnReloadPreview').addEventListener('click', writePreview);
+
+  $('#btnRefreshBlocks').addEventListener('click', ()=>{ parseAndRefresh(); toast('Índice de blocos atualizado'); });
+  $('#btnPromoteSelected').addEventListener('click', ()=>{
+    if(!state.blocks.length){ toast('Nenhum bloco'); return; }
+    // usa o primeiro selecionado no preview (uid via prompt simples)
+    const uid = prompt('UID do bloco para promover (veja na lista):', state.blocks[0].uid);
+    const b = state.blocks.find(x=>x.uid===uid);
+    if(b) promoteBlock(b); else toast('UID não encontrado');
+  });
+
+  $('#btnGenPatch').addEventListener('click', genPatch);
+  $('#btnApplyPatch').addEventListener('click', applyPatch);
+
+  $('#btnExportZip').addEventListener('click', exportZip);
+  $('#btnCopyIndex').addEventListener('click', ()=>{ navigator.clipboard.writeText(editorHtml.getValue()); toast('index.html copiado'); });
+
+  $('#btnFind').addEventListener('click', ()=>{
+    const idx = editorHtml.getValue().indexOf('<div');
+    if(idx>=0){
+      setEditorSelection(editorHtml, idx, idx+4);
+      toast('Primeiro <div> destacado');
+    } else toast('Nenhum <div> encontrado');
+  });
+
+  $('#btnInsertBlockMarkers').addEventListener('click', ()=>{
+    // Insere comentários marcadores ao redor de blocos detectados (opcional)
+    const html = editorHtml.getValue();
+    let doc = new DOMParser().parseFromString(html, 'text/html');
+    let changed = false;
+    state.blocks.forEach(b=>{
+      const el = selectByDescriptor(doc, b.selector);
+      if(el && !el.previousSibling?.nodeValue?.includes('BLOCK:'+b.uid)){
+        const before = doc.createComment('BLOCK:'+b.uid);
+        const after  = doc.createComment('/BLOCK:'+b.uid);
+        el.parentNode.insertBefore(before, el);
+        el.parentNode.insertBefore(after, el.nextSibling);
+        changed = true;
+      }
+    });
+    if(changed){
+      editorHtml.setValue('<!doctype html>\n'+doc.documentElement.outerHTML, -1);
+      parseAndRefresh();
+      toast('Marcadores inseridos');
+    } else toast('Sem alterações');
+  });
+
+  $('#btnShowReadme').addEventListener('click', ()=>{
+    alert(makeReadme());
+  });
+
+  /* ---------- Init ---------- */
+  function init(){
+    const restored = loadLocal();
+    if(!restored){
+      state.originalHtml = sampleHTML();
+      editorHtml.setValue(state.originalHtml, -1);
+      editorCss.setValue('/* CSS global opcional */', -1);
+      editorJs.setValue('// JS global opcional', -1);
+      parseAndRefresh();
+    }
+    // Aumenta área dos editores em mobile ao focar
+    [editorHtml, editorCss, editorJs].forEach(ed=>{
+      ed.container.addEventListener('focusin', ()=>document.body.classList.add('kbd'), {passive:true});
+      ed.container.addEventListener('focusout', ()=>document.body.classList.remove('kbd'), {passive:true});
+    });
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
