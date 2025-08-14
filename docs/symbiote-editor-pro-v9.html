@@ -1,0 +1,362 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark">
+  <title>Symbiote Editor PRO v6 — FINAL</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    html{overflow-x:hidden}
+    :root{
+      --bg:#0b0d10; --bg-2:#12161b; --card:#151a21; --tab:#0f1318; --fg:#e6eef8;
+      --muted:#9ab; --brand:#69f; --border:#263241; --shadow: rgba(0,0,0,.3);
+      --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f6f7fb; --bg-2:#fff; --card:#fff; --tab:#f1f5fb; --fg:#0c1220; --muted:#556; --brand:#335dff; --border:#dfe5ef; --shadow: rgba(0,0,0,.08); }
+    }
+    body{
+      margin:0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      font:14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background:linear-gradient(180deg,var(--bg),var(--bg-2)); color:var(--fg);
+      padding:16px; padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+    .app{display:grid; gap:12px; grid-template-rows:auto 1fr auto; min-height:calc(100vh - 32px)}
+    header.appbar{
+      position:sticky; top:0; z-index:10; background:rgba(0,0,0,.25);
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid var(--border);
+      border-radius:14px; padding:10px 12px;
+    }
+    .row{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+    .title{font-weight:900}
+    .badge{font-size:12px; padding:2px 8px; border-radius:999px; background:var(--tab); color:var(--muted); border:1px solid var(--border)}
+    .actions{display:flex; gap:6px; flex-wrap:wrap}
+    button,.btn{
+      -webkit-tap-highlight-color:transparent; border:1px solid var(--border);
+      background:var(--card); color:var(--fg); padding:10px 12px; border-radius:12px;
+      font-weight:700; font-size:14px; box-shadow:0 1px 0 var(--shadow); cursor:pointer
+    }
+    button.small{font-size:12px; padding:8px 10px}
+    .pill{border-radius:999px; padding-inline:14px}
+    .brand{border-color:color-mix(in oklab,var(--brand) 50%, var(--border)); color:var(--brand)}
+    main{display:grid; gap:12px}
+    .panel{
+      background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+      display:flex; flex-direction:column; min-height:40vh; content-visibility:auto; contain-intrinsic-size:600px;
+    }
+    .panel > .phead{padding:10px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+    .content{flex:1; min-height:0; display:flex; flex-direction:column}
+    .split{display:flex; flex-wrap:wrap; gap:8px; padding:8px}
+    .split > *{flex:1 1 320px; min-width: 0}
+    .editor{min-height:260px; border:1px solid var(--border); border-radius:12px; overflow:hidden}
+    .label{padding:6px 8px; color:var(--muted); font-size:12px}
+    .preview-wrap{flex:1; min-height:260px; border-top:1px solid var(--border); background:var(--tab)}
+    iframe.preview{width:100%; height:100%; border:0; background:#fff; display:block}
+    .list{padding:12px; display:grid; gap:8px}
+    .item{display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--tab); padding:10px; border-radius:12px; border:1px solid var(--border)}
+    .mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace; font-size:12.8px}
+    pre,code{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace}
+    pre{background:var(--tab); border:1px solid var(--border); border-radius:10px; padding:10px; overflow:auto; overflow-wrap:anywhere; white-space:pre}
+    /* Ace editor look */
+    .ace_editor{ font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace!important; font-size:13px!important; line-height:1.55!important; }
+    .ace_gutter{ background:var(--tab)!important; color:var(--muted)!important; border-right:1px solid var(--border)!important }
+    .tabbar{position:sticky; bottom:0; z-index:10; display:grid; grid-template-columns:repeat(6,1fr); gap:6px}
+    .tab{padding:10px 6px; text-align:center; border:1px solid var(--border); border-radius:12px; background:var(--card); font-weight:800}
+    .tab[aria-selected="true"]{outline:2px solid var(--brand)}
+    .hidden{display:none !important}
+    .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom)); padding:10px 14px; background:var(--card); border:1px solid var(--border); border-radius:999px; box-shadow:0 10px 30px var(--shadow); z-index:99}
+    .symbus img, .symbus video, .symbus canvas {max-width:100%; height:auto}
+  </style>
+
+  <!-- Lazy libs (defer) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-html.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-one_dark.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.2.0/diff.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/htmlhint@1.1.0/dist/htmlhint.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/csstree/2.3.1/csstree.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <header class="appbar">
+    <div class="row">
+      <div class="title">Symbiote Editor <span class="badge">PRO v6</span></div>
+      <div class="actions">
+        <label class="btn pill brand"><input id="fileInput" type="file" accept=".html,.htm,.txt"> 📤 Upload</label>
+        <button id="btnSave" class="btn pill">💾 Salvar</button>
+        <button id="btnFormatAll" class="btn pill brand">✨ Formatar Tudo</button>
+        <button id="btnValidate" class="btn pill">🔍 HTML</button>
+        <button id="btnValidateCss" class="btn pill">🎯 CSS</button>
+        <button id="btnCopy" class="btn pill">📋 Copiar HTML</button>
+        <button id="btnSymbus" class="btn pill" data-on="1">🧬 SÜMBÜS: ON</button>
+        <button id="btnReset" class="btn pill">↩️ Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- PRD / Requisitos -->
+    <section class="panel" id="panel-prd">
+      <div class="phead"><div class="title">PRD — Requisitos</div></div>
+      <div class="content">
+        <div class="list mono" style="font-size:12.2px">
+          <div class="item">1. **Código colorido** (Ace) HTML/CSS/JS, wrap com indent guides.</div>
+          <div class="item">2. Documento ocupa 100% (padding ≥ 16 px) — **sem overflow-x**.</div>
+          <div class="item">3. Preview com `srcdoc` + `injectGlobals(css, js)` com guarda.</div>
+          <div class="item">4. Toggle **SÜMBÜS** só no preview; export limpo.</div>
+          <div class="item">5. Validação: HTMLHint + heurística CSS (csstree).</div>
+          <div class="item">6. Export ZIP (index.html, global.css, global.js, README.md).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Editor -->
+    <section class="panel" id="panel-editor">
+      <div class="phead"><div class="title">Editor</div></div>
+      <div class="content">
+        <div class="split">
+          <div><div class="label mono">index.html</div><div id="editorHtml" class="editor"></div></div>
+          <div><div class="label mono">global.css</div><div id="editorCss" class="editor"></div></div>
+          <div><div class="label mono">global.js</div><div id="editorJs" class="editor"></div></div>
+        </div>
+        <div class="list">
+          <div class="item"><div class="mono small">Validação HTML</div><button id="btnRunHtmlHint" class="btn small">▶</button></div>
+          <pre id="htmlHintOut" class="mono" style="max-height:160px"></pre>
+          <div class="item"><div class="mono small">Validação CSS</div><button id="btnRunCssLint" class="btn small">▶</button></div>
+          <pre id="cssLintOut" class="mono" style="max-height:160px"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview -->
+    <section class="panel" id="panel-preview">
+      <div class="phead"><div class="title">Preview</div></div>
+      <div class="content"><div class="preview-wrap"><iframe id="preview" class="preview" title="Pré-visualização"></iframe></div></div>
+    </section>
+
+    <!-- Blocos -->
+    <section class="panel" id="panel-blocks">
+      <div class="phead"><div class="title">Blocos (Árvore)</div></div>
+      <div class="content"><pre id="blocksOut" class="mono" style="padding:12px; margin:0; flex:1">—</pre></div>
+    </section>
+
+    <!-- Export -->
+    <section class="panel" id="panel-export">
+      <div class="phead"><div class="title">Exportar</div></div>
+      <div class="content">
+        <div class="list">
+          <button id="btnExportZip" class="btn brand">📦 Exportar ZIP</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" role="tablist" aria-label="Navegação">
+    <button class="tab" data-target="#panel-prd" aria-selected="true">📄 PRD</button>
+    <button class="tab" data-target="#panel-editor">✏️ Editor</button>
+    <button class="tab" data-target="#panel-preview">👁️ Preview</button>
+    <button class="tab" data-target="#panel-blocks">🧩 Blocos</button>
+    <button class="tab" data-target="#panel-export">⬇️ Export</button>
+  </nav>
+</div>
+
+<!-- Sample kept SAFE in <template> -->
+<template id="sample-html">
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Landing simples</title>
+  <style>
+    :root{ --brand:#335dff }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial }
+    .wrap{ max-width:720px; margin:0 auto; padding:20px }
+    header{ padding:20px; background:linear-gradient(90deg,#335dff,#69f); color:#fff }
+    .card{ border:1px solid #e4e8f0; border-radius:12px; padding:16px; margin:12px 0 }
+    ul{ padding-left:18px }
+  </style>
+</head>
+<body>
+  <header><div class="wrap"><h1>Symbiote 👋</h1></div></header>
+  <main class="wrap">
+    <section class="card"><h2>Recursos</h2><ul><li>Edição</li><li>SÜMBÜS</li><li>Blocos</li></ul></section>
+    <section class="card"><h2>Exemplo</h2><pre><code>&lt;section class="card"&gt;...&lt;/section&gt;</code></pre></section>
+  </main>
+  <footer class="wrap"><small>© Você</small></footer>
+</body>
+</html>
+</template>
+
+<div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  const $ = (q,el=document)=>el.querySelector(q);
+  const $$ = (q,el=document)=>Array.from(el.querySelectorAll(q));
+  const toast = (msg,ms=1200)=>{const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.add('hidden'),ms)};
+
+  /* Tabs */
+  $$('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+    $$('.tab').forEach(b=>b.setAttribute('aria-selected', b===btn?'true':'false'));
+    $$('.panel').forEach(p=>p.classList.toggle('hidden', '#'+p.id !== btn.dataset.target));
+  }));
+  $$('.panel').forEach(p=>p.classList.toggle('hidden','#'+p.id!=='#panel-prd'));
+
+  /* Ace init */
+  function ready(){
+    const baseOpts={ theme:'ace/theme/one_dark', fontSize:14, showPrintMargin:false };
+    const editorHtml = ace.edit('editorHtml', { ...baseOpts, mode:'ace/mode/html' });
+    const editorCss  = ace.edit('editorCss',  { ...baseOpts, mode:'ace/mode/css' });
+    const editorJs   = ace.edit('editorJs',   { ...baseOpts, mode:'ace/mode/javascript' });
+
+    [editorHtml,editorCss,editorJs].forEach(ed=>{
+      ed.session.setUseWrapMode(true);
+      ed.setOptions({ tabSize:2, useSoftTabs:true, displayIndentGuides:true, indentedSoftWrap:true, wrap:'free' });
+    });
+
+    /* Sample content (formatted with Prettier if available) */
+    const tpl = $('#sample-html').innerHTML.trim();
+    const sampleCSS = '/* CSS global opcional */';
+    const sampleJS  = '// JS global opcional';
+
+    function prettierOr(raw, parser){
+      try{ return window.prettier.format(raw, {parser, plugins:window.prettierPlugins}); }
+      catch(_e){ return raw; }
+    }
+    editorHtml.setValue(prettierOr(tpl,'html'), -1);
+    editorCss.setValue(prettierOr(sampleCSS,'css'), -1);
+    editorJs.setValue(prettierOr(sampleJS,'babel'), -1);
+
+    const preview = $('#preview');
+
+    function injectGlobals(html, css, js){
+      // Ensure head/body exist
+      if(!html.includes('</head>')) html = html.replace(/<html(.*?)>/i, '<html$1><head></head>');
+      if(!html.includes('</body>')) html = html + '<body></body>';
+      if(css && css.trim()) html = html.replace('</head>', `<style id="__global_css__">\n${css}\n</style></head>`);
+      if(js  && js.trim())  html = html.replace('</body>', `<script id="__global_js__">\n${js}\n</script></body>`);
+      return html;
+    }
+
+    function writePreview(){
+      let html = editorHtml.getValue();
+      html = injectGlobals(html, editorCss.getValue(), editorJs.getValue());
+      const symCss = `<style id="__symbus__">.symbus *{outline:1px dashed rgba(80,140,255,.45);outline-offset:-.5px}[data-block]{background-image:linear-gradient(135deg,rgba(102,153,255,.12) 25%,transparent 25%,transparent 50%,rgba(102,153,255,.12) 50%,rgba(102,153,255,.12) 75%,transparent 75%,transparent); background-size:16px 16px}</style>`;
+      html = html.replace('</head>', symCss + '</head>');
+      preview.srcdoc = html; // no document.write
+      preview.addEventListener('load', ()=>{
+        const doc = preview.contentDocument;
+        // SÜMBÜS toggle
+        if($('#btnSymbus').dataset.on === '1') doc.documentElement.classList.add('symbus');
+        else doc.documentElement.classList.remove('symbus');
+        // Overflow guard inside preview
+        const fix = doc.createElement('style'); fix.textContent='img,video,canvas{max-width:100%;height:auto}'; doc.head.appendChild(fix);
+        // Parse blocks
+        parseBlocks(doc);
+      }, {once:true});
+    }
+
+    function parseBlocks(doc){
+      const root = doc && doc.body; const out=[];
+      const isCand = el => el.id || ['section','article','nav','header','footer','main','aside'].includes(el.tagName.toLowerCase()) || (el.tagName.toLowerCase()==='div' && el.classList.length);
+      (function walk(el, depth=0){
+        Array.from(el.children||[]).forEach(ch=>{ if(ch.nodeType!==1) return;
+          if(isCand(ch)){
+            const tag=ch.tagName.toLowerCase();
+            const id = ch.id ? '#' + ch.id : '';
+            const cls = ch.classList.length ? '.' + Array.from(ch.classList).join('.') : '';
+            out.push('  '.repeat(depth) + tag + id + cls);
+            walk(ch, depth+1);
+          }else{ walk(ch, depth); }
+        });
+      })(root,0);
+      $('#blocksOut').textContent = out.join('\n') || '—';
+    }
+
+    const debounce=(fn,ms=220)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
+    const writeDebounced = debounce(writePreview, 220);
+    [editorHtml,editorCss,editorJs].forEach(ed=>ed.session.on('change', writeDebounced));
+    writePreview();
+
+    // Buttons
+    $('#btnFormatAll').addEventListener('click',()=>{
+      try{
+        editorHtml.setValue(window.prettier.format(editorHtml.getValue(),{parser:'html',plugins:window.prettierPlugins}),-1);
+        editorCss.setValue(window.prettier.format(editorCss.getValue(), {parser:'css', plugins:window.prettierPlugins}),-1);
+        editorJs.setValue(window.prettier.format(editorJs.getValue(),  {parser:'babel',plugins:window.prettierPlugins}),-1);
+        writePreview(); toast('Formatado');
+      }catch(_e){ toast('Prettier indisponível'); }
+    });
+    $('#btnCopy').addEventListener('click',()=>{ navigator.clipboard.writeText(editorHtml.getValue()); toast('HTML copiado'); });
+    $('#btnSave').addEventListener('click',()=>{ localStorage.setItem('symb_pro_v6_final', JSON.stringify({h:editorHtml.getValue(), c:editorCss.getValue(), j:editorJs.getValue()})); toast('Salvo local'); });
+    $('#btnReset').addEventListener('click',()=>{ localStorage.removeItem('symb_pro_v6_final'); location.reload(); });
+    $('#btnValidate').addEventListener('click',()=>{ try{
+      const res = window.HTMLHint.verify(editorHtml.getValue()); const lines = res.map(r=>`L${r.line}:${r.col} ${r.rule.id} — ${r.message}`);
+      $('#htmlHintOut').textContent = lines.join('\n') || 'OK';
+    }catch(_e){ toast('HTMLHint indisponível'); } });
+    $('#btnValidateCss').addEventListener('click',()=>$('#btnRunCssLint').click());
+    $('#btnRunCssLint').addEventListener('click',()=>{
+      try{
+        const ast = csstree.parse(editorCss.getValue(), {positions:true, parseValue:true});
+        let issues = 0; csstree.walk(ast, function(node){ if(node.type==='Declaration' && (!node.value || node.value.type==='Raw')) issues++; });
+        $('#cssLintOut').textContent = issues ? `Avisos heurísticos: ${issues}` : 'OK';
+      }catch(e){ $('#cssLintOut').textContent = 'Erro de parse CSS'; }
+    });
+    $('#btnSymbus').addEventListener('click',()=>{
+      const on = $('#btnSymbus').dataset.on === '1'; $('#btnSymbus').dataset.on = on ? '0':'1'; $('#btnSymbus').textContent = on ? '🧬 SÜMBÜS: OFF' : '🧬 SÜMBÜS: ON';
+      writePreview();
+    });
+
+    // Upload simple
+    $('#fileInput').addEventListener('change', async (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const txt = await f.text(); editorHtml.setValue(prettierOr(txt,'html'), -1); writePreview();
+    });
+
+    // Export ZIP
+    $('#btnExportZip').addEventListener('click', async ()=>{
+      const zip = new JSZip();
+      const index = editorHtml.getValue();
+      const css = editorCss.getValue();
+      const js  = editorJs.getValue();
+      const readme = [
+        '# Export do Symbiote Editor PRO v6 — FINAL',
+        '',
+        '- index.html  → sua página base',
+        '- global.css  → CSS global injetado',
+        '- global.js   → JS global injetado',
+        '',
+        'Obs.: O preview usa <iframe srcdoc>. Na produção, a injeção de CSS/JS deve ser integrada ao seu build.'
+      ].join('\n');
+      zip.file('index.html', index);
+      zip.file('global.css', css);
+      zip.file('global.js', js);
+      zip.file('README.md', readme);
+      const blob = await zip.generateAsync({type:'blob'});
+      saveAs(blob, 'symbiote-export.zip');
+    });
+  }
+
+  if(document.readyState === 'complete'){ ready(); }
+  else window.addEventListener('load', ready);
+})();
+</script>
+<!-- Prettier (HTML/CSS/JS) -->
+<script src="https://unpkg.com/prettier@3.2.5/standalone.js" defer></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/html.js" defer></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/postcss.js" defer></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/babel.js" defer></script>
+</body>
+</html>
