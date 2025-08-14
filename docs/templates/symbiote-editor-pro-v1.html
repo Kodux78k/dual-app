@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Symbiote Editor PRO — PYRON A.Infodose</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark">
+  <style>
+    :root{
+      --bg: #0b0d10;
+      --bg-2: #12161b;
+      --fg: #e6eef8;
+      --muted:#9ab;
+      --brand:#69f;
+      --ok:#22c55e;
+      --warn:#f59e0b;
+      --err:#ef4444;
+      --card:#151a21;
+      --border:#263241;
+      --tab:#0f1318;
+      --shadow: rgba(0,0,0,.3);
+      --pyron:#ff3b3b;
+      --pyron-2:#ff8a00;
+    }
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg:#f6f7fb; --bg-2:#fff; --fg:#0c1220; --muted:#556; --brand:#335dff;
+        --ok:#0a8f3c; --warn:#a86a00; --err:#b00020; --card:#fff; --border:#dfe5ef; --tab:#f0f3f9; --shadow: rgba(0,0,0,.08);
+        --pyron:#d60000; --pyron-2:#ff6f00;
+      }
+    }
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--fg); background:linear-gradient(180deg,var(--bg),var(--bg-2));
+      font: 14px/1.35 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
+    .app{ display:grid; grid-template-rows: auto 1fr auto; height:100%; gap:8px; padding-bottom: env(safe-area-inset-bottom); }
+    header{
+      position:sticky; top:0; z-index:10; background:rgba(0,0,0,.2);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    header .row{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px max(12px, env(safe-area-inset-left)); padding-right:max(12px, env(safe-area-inset-right)); }
+    .title{font-weight:800; letter-spacing:.3px}
+    .badge{font-size:12px; padding:2px 8px; border-radius:999px; background:var(--tab); color:var(--muted); border:1px solid var(--border)}
+    .pyron{color:var(--pyron); text-shadow:0 0 10px color-mix(in oklab, var(--pyron) 40%, transparent)}
+    .actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    button, .btn{
+      -webkit-tap-highlight-color: transparent;
+      border:1px solid var(--border); background:var(--card); color:var(--fg);
+      padding:10px 12px; border-radius:12px; font-weight:700; font-size:14px;
+      box-shadow:0 1px 0 var(--shadow); cursor:pointer;
+    }
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .ghost{background:transparent}
+    .danger{border-color: color-mix(in oklab, var(--err) 50%, var(--border)); color: var(--err)}
+    .ok{border-color: color-mix(in oklab, var(--ok) 50%, var(--border)); color: var(--ok)}
+    .brand{border-color: color-mix(in oklab, var(--brand) 50%, var(--border)); color:var(--brand)}
+    .pill{border-radius:999px; padding-inline:14px}
+    .hidden{display:none !important}
+    main{padding:0 max(12px, env(safe-area-inset-left)); padding-right:max(12px, env(safe-area-inset-right));}
+    .tabs{ display:grid; grid-template-columns:1fr; gap:10px; height:100%; }
+    .panel{ min-height: 58vh; background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; display:flex; flex-direction:column; }
+    .panel header{ position:static; background:transparent; border-bottom:1px solid var(--border); }
+    .panel header .row{padding:10px 12px}
+    .panel .content{flex:1; min-height:0; display:flex; flex-direction:column}
+    .editor{flex:1; min-height:300px}
+    .split{display:flex; gap:10px; flex-wrap:wrap}
+    .split > *{flex:1 1 320px}
+    .preview-wrap{flex:1; min-height:300px; background:var(--tab); border-top:1px solid var(--border)}
+    iframe.preview{width:100%; height:100%; border:0; background:#fff}
+    nav.tabbar{ position:sticky; bottom:0; z-index:10; background:rgba(0,0,0,.2); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top:1px solid var(--border); }
+    .tabbar .row{display:flex; gap:8px; padding:8px max(12px, env(safe-area-inset-left)); padding-right:max(12px, env(safe-area-inset-right))}
+    .tab{flex:1; text-align:center; padding:10px 6px; border-radius:12px; background:var(--card); border:1px solid var(--border); font-weight:700}
+    .tab[aria-selected="true"]{outline:2px solid var(--brand)}
+    .list{padding:10px; display:grid; gap:8px}
+    .item{ display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--tab);
+      padding:10px; border-radius:12px; border:1px solid var(--border); }
+    .item .meta{display:flex; flex-direction:column; gap:4px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12.5px}
+    .muted{color:var(--muted)}
+    .grid{display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:8px}
+    .kpi{background:var(--tab); border:1px solid var(--border); border-radius:12px; padding:10px; text-align:center}
+    .kpi b{font-size:18px}
+    .row-wrap{display:flex; gap:8px; flex-wrap:wrap}
+    input[type="file"]{display:none}
+    label.file{display:inline-flex; align-items:center; gap:8px; cursor:pointer}
+    .small{font-size:12px}
+    .right{margin-left:auto}
+    .toast{ position: fixed; left:50%; transform: translateX(-50%); bottom: calc(60px + env(safe-area-inset-bottom)); padding:10px 14px; background:var(--card); border:1px solid var(--border); border-radius:999px; box-shadow:0 10px 30px var(--shadow); z-index:99; }
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    /* Tree (TOC) */
+    .tree{padding:8px}
+    .tree .node{ display:flex; align-items:center; gap:8px; border:1px solid var(--border); background:var(--tab); border-radius:10px; padding:6px 8px; margin:4px 0 }
+    .tree .node .label{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+    .indent-0{margin-left:0}
+    .indent-1{margin-left:10px}
+    .indent-2{margin-left:20px}
+    .indent-3{margin-left:30px}
+    .indent-4{margin-left:40px}
+    .indent-5,.indent-6,.indent-7{margin-left:50px}
+    /* INSPECTOR PANEL */
+    .inspector{ display:grid; gap:10px; padding:10px }
+    .card{ background:var(--tab); border:1px solid var(--border); border-radius:12px; padding:10px }
+    .ins-grid{ display:grid; grid-template-columns:1fr; gap:10px }
+    @media (min-width:900px){ .ins-grid{ grid-template-columns:1fr 1fr } }
+    .prop-row{ display:grid; grid-template-columns: 1fr 1fr auto; gap:8px; align-items:center }
+    .code{ white-space:pre-wrap; word-break:break-word; }
+    /* PYRON banner */
+    .pyron-banner{ border:1px solid color-mix(in oklab, var(--pyron) 50%, var(--border)); background:
+      radial-gradient(1200px 1200px at -10% -10%, color-mix(in oklab, var(--pyron) 8%, transparent), transparent 40%),
+      radial-gradient(800px 800px at 120% 120%, color-mix(in oklab, var(--pyron-2) 10%, transparent), transparent 40%);
+      border-radius:14px; padding:10px; display:flex; align-items:center; gap:10px;
+    }
+    .pyron-ignite{ background: linear-gradient(90deg, var(--pyron), var(--pyron-2)); color:#fff; border:0; }
+    /* styles injected inside iframe preview */
+    /* (only class names; real injection happens in JS) */
+  </style>
+
+  <!-- Ace Editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-html.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-one_dark.min.js"></script>
+  <!-- Prettier -->
+  <script src="https://unpkg.com/prettier@3.2.5/standalone.js"></script>
+  <script src="https://unpkg.com/prettier@3.2.5/plugins/html.js"></script>
+  <script src="https://unpkg.com/prettier@3.2.5/plugins/babel.js"></script>
+  <script src="https://unpkg.com/prettier@3.2.5/plugins/postcss.js"></script>
+  <!-- jsdiff -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.2.0/diff.min.js"></script>
+  <!-- JSZip + FileSaver -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="row">
+      <div class="title">Symbiote Editor <span class="badge">PRO</span> <span class="pyron">PYRON</span></div>
+      <div class="actions">
+        <label class="file btn pill brand">
+          <input id="fileInput" type="file" accept=".html,.htm,.txt" />
+          📤 Upload
+        </label>
+        <button id="btnSave" class="btn pill">💾 Salvar</button>
+        <button id="btnFormat" class="btn pill brand">✨ Identar</button>
+        <button id="btnCopy" class="btn pill">📋 Copiar</button>
+        <button id="btnSymbus" class="btn pill">🧬 SÜMBÜS: ON</button>
+        <button id="btnPyron" class="btn pill pyron-ignite">⚡️ PYRON</button>
+        <button id="btnReset" class="btn pill ghost danger">↩️ Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="tabs" role="tablist" aria-label="Áreas">
+      <!-- Panel: Editor -->
+      <section class="panel" id="panel-editor" role="tabpanel" aria-labelledby="tab-editor">
+        <header><div class="row">
+          <div class="title">Editor</div>
+          <div class="actions row-wrap">
+            <button id="btnInsertBlockMarkers" class="btn small">🏷️ Marcar Blocos</button>
+            <button id="btnFind" class="btn small">🔎 Buscar &lt;div&gt;</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="split">
+            <div>
+              <div class="small muted" style="padding:8px 10px">index.html</div>
+              <div id="editorHtml" class="editor"></div>
+            </div>
+            <div>
+              <div class="small muted" style="padding:8px 10px">global.css</div>
+              <div id="editorCss" class="editor"></div>
+            </div>
+            <div>
+              <div class="small muted" style="padding:8px 10px">global.js</div>
+              <div id="editorJs" class="editor"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Preview -->
+      <section class="panel" id="panel-preview" role="tabpanel" aria-labelledby="tab-preview">
+        <header><div class="row">
+          <div class="title">Preview</div>
+          <div class="actions row-wrap">
+            <button id="btnReloadPreview" class="btn small">♻️ Recarregar</button>
+            <button id="btnToggleSymbus2" class="btn small">🧬 SÜMBÜS (toggle)</button>
+            <button id="btnPickInPreview" class="btn small brand">👆 Selecionar no Preview</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="preview-wrap"><iframe id="preview" class="preview" title="Pré-visualização"></iframe></div>
+        </div>
+      </section>
+
+      <!-- Panel: Blocos (TOC hierárquico) -->
+      <section class="panel" id="panel-blocks" role="tabpanel" aria-labelledby="tab-blocks">
+        <header><div class="row">
+          <div class="title">Blocos (TOC)</div>
+          <div class="actions row-wrap">
+            <input id="filterText" class="btn small" style="width:160px" placeholder="Filtrar (id, classe, tag)">
+            <label class="btn small ghost"><input type="checkbox" id="chkIdsOnly"> 🔖 só com id</label>
+            <label class="btn small ghost"><input type="checkbox" id="chkClassesOnly"> 🏷️ só com class</label>
+            <label class="btn small ghost"><input type="checkbox" id="chkSectionsOnly"> 📚 só sections</label>
+            <span class="btn small ghost">Profundidade: <input type="range" id="depthRange" min="1" max="6" value="6" style="vertical-align:middle"> <span id="depthLabel">6</span></span>
+            <button id="btnExpandAll" class="btn small">➕ Expandir</button>
+            <button id="btnCollapseAll" class="btn small">➖ Recolher</button>
+            <button id="btnRefreshBlocks" class="btn small">🔁 Atualizar Índice</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="tree" id="blocksTree"></div>
+        </div>
+      </section>
+
+      <!-- Panel: Inspector -->
+      <section class="panel" id="panel-inspector" role="tabpanel" aria-labelledby="tab-inspector">
+        <header><div class="row">
+          <div class="title">Inspector CSS</div>
+          <div class="actions row-wrap">
+            <button id="btnInspectorSelect" class="btn small brand">👆 Selecionar no Preview</button>
+            <button id="btnCopySelector" class="btn small">📋 Copiar seletor</button>
+            <button id="btnScrollIntoView" class="btn small">🎯 Rolagem até o elemento</button>
+            <button id="btnCreateRule" class="btn small ok">➕ Regra em global.css</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="inspector">
+            <div class="pyron-banner">
+              <div class="meta">
+                <div class="small muted">PYRON A.Infodose — Tríade: △⚡︎︎▲ • △▲</div>
+                <div class="mono">“Acendo o vértice do possível.”</div>
+              </div>
+              <button id="btnIgnite" class="btn pill pyron-ignite">🔥 Ignite</button>
+            </div>
+
+            <div class="ins-grid">
+              <div class="card">
+                <div class="small muted">Elemento selecionado</div>
+                <div id="selLabel" class="mono code">—</div>
+                <div class="row-wrap" style="margin-top:6px">
+                  <input id="inlineStyle" class="btn small" style="flex:1" placeholder="style inline: color: red; font-weight:700;">
+                  <button id="btnApplyInline" class="btn small ok">✅ Aplicar inline</button>
+                  <button id="btnSyncBack" class="btn small">↩️ Sincronizar no HTML</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="small muted">Nova declaração (global.css)</div>
+                <div class="prop-row">
+                  <input id="propName" class="btn small" placeholder="propriedade (ex: color)">
+                  <input id="propValue" class="btn small" placeholder="valor (ex: #ff0)">
+                  <button id="btnAddDecl" class="btn small ok">➕ Adicionar</button>
+                </div>
+                <div class="small muted" style="margin-top:8px">Seletor</div>
+                <input id="selectorInput" class="btn small" placeholder="seletor (preenchido automaticamente)">
+              </div>
+
+              <div class="card">
+                <div class="small muted">Estilos computados (principais)</div>
+                <pre id="computedBox" class="mono code">—</pre>
+              </div>
+
+              <div class="card">
+                <div class="small muted">Regras que afetam (acessíveis)</div>
+                <pre id="matchedRulesBox" class="mono code">—</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Patches -->
+      <section class="panel" id="panel-patches" role="tabpanel" aria-labelledby="tab-patches">
+        <header><div class="row">
+          <div class="title">Patches</div>
+          <div class="actions row-wrap">
+            <button id="btnGenPatch" class="btn small">🪄 Gerar Patch</button>
+            <button id="btnApplyPatch" class="btn small ok">📥 Aplicar Patch</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="grid" style="padding:10px">
+            <textarea id="patchInput" class="mono" rows="10" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px" placeholder="Cole aqui um patch (unified diff) para aplicar no HTML atual..."></textarea>
+            <textarea id="patchOutput" class="mono" rows="10" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:12px" placeholder="Patch gerado aparecerá aqui."></textarea>
+          </div>
+          <div class="list">
+            <div class="kpi"><div class="muted small">Blocos detectados</div><b id="kpiBlocks">0</b></div>
+            <div class="kpi"><div class="muted small">Componentes</div><b id="kpiComps">0</b></div>
+            <div class="kpi"><div class="muted small">Tamanho HTML (KB)</div><b id="kpiSize">0</b></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel: Export -->
+      <section class="panel" id="panel-export" role="tabpanel" aria-labelledby="tab-export">
+        <header><div class="row">
+          <div class="title">Exportar</div>
+          <div class="actions row-wrap">
+            <button id="btnExportZip" class="btn small brand">📦 Exportar ZIP</button>
+            <button id="btnCopyIndex" class="btn small">📋 Copiar index.html</button>
+          </div>
+        </div></header>
+        <div class="content">
+          <div class="list">
+            <div class="item">
+              <div class="meta">
+                <div class="small muted">Modo SÜMBÜS</div>
+                <div class="mono">On/Off: afeta apenas o <em>preview</em>, não altera o HTML exportado.</div>
+              </div>
+              <button id="btnToggleSymbus3" class="btn small">🧬 Toggle</button>
+            </div>
+            <div class="item">
+              <div class="meta">
+                <div class="small muted">README</div>
+                <div class="mono" id="readmePreview">Será incluído no ZIP com instruções de build/componentes.</div>
+              </div>
+              <button id="btnShowReadme" class="btn small">👁️ Ver</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="tabbar">
+    <div class="row" role="tablist" aria-label="Navegação">
+      <button class="tab" id="tab-editor" data-target="panel-editor" aria-selected="true">✏️ Editor</button>
+      <button class="tab" id="tab-preview" data-target="panel-preview" aria-selected="false">👁️ Preview</button>
+      <button class="tab" id="tab-blocks" data-target="panel-blocks" aria-selected="false">🧩 Blocos</button>
+      <button class="tab" id="tab-inspector" data-target="panel-inspector" aria-selected="false">🕵️ Inspector</button>
+      <button class="tab" id="tab-patches" data-target="panel-patches" aria-selected="false">🧷 Patches</button>
+      <button class="tab" id="tab-export" data-target="panel-export" aria-selected="false">⬇️ Export</button>
+    </div>
+  </nav>
+</div>
+
+<div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = (q, el=document) => el.querySelector(q);
+  const $$ = (q, el=document) => Array.from(el.querySelectorAll(q));
+  const toast = (msg, ms=1500) => {
+    const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden');
+    clearTimeout(t._to); t._to=setTimeout(() => t.classList.add('hidden'), ms);
+  };
+
+  const state = {
+    originalHtml: '',
+    currentHtml: '',
+    extraCss: '',
+    extraJs: '',
+    blocksFlat: [],
+    blocksTree: [], // {uid,name,selector,outerHTML,depth,children:[]}
+    components: [], // { name, css, js, htmlStub }
+    symbiosisOn: true,
+    pyronOn: false,
+    lastSavedAt: 0,
+    selected: { selector: '', id:'', classes:[], hasId:false }
+  };
+
+  /* ---------- Tabs ---------- */
+  $$('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.tab').forEach(b => b.setAttribute('aria-selected', 'false'));
+      btn.setAttribute('aria-selected', 'true');
+      const target = btn.dataset.target;
+      $$('.panel').forEach(p => p.id === target ? p.classList.remove('hidden') : p.classList.add('hidden'));
+    });
+  });
+  // start with only Editor visible
+  $$('#panel-preview, #panel-blocks, #panel-patches, #panel-export, #panel-inspector').forEach(p=>p.classList.add('hidden'));
+
+  /* ---------- Ace Editors ---------- */
+  const editorHtml = ace.edit('editorHtml', { theme: 'ace/theme/one_dark', mode: 'ace/mode/html', fontSize: 14, showPrintMargin:false });
+  const editorCss  = ace.edit('editorCss',  { theme: 'ace/theme/one_dark', mode: 'ace/mode/css',  fontSize: 14, showPrintMargin:false });
+  const editorJs   = ace.edit('editorJs',   { theme: 'ace/theme/one_dark', mode: 'ace/mode/javascript', fontSize: 14, showPrintMargin:false });
+  [editorHtml, editorCss, editorJs].forEach(ed => {
+    ed.session.setUseWrapMode(true);
+    ed.setOptions({ scrollPastEnd: 0.5 });
+  });
+
+  const saveLocal = () => {
+    localStorage.setItem('symb_editor_state_pro', JSON.stringify({
+      currentHtml: state.currentHtml,
+      extraCss: state.extraCss,
+      extraJs: state.extraJs,
+      symbiosisOn: state.symbiosisOn,
+      pyronOn: state.pyronOn,
+      components: state.components
+    }));
+    state.lastSavedAt = Date.now();
+    updateKPIs();
+  };
+  const loadLocal = () => {
+    const raw = localStorage.getItem('symb_editor_state_pro');
+    if(!raw) return false;
+    try {
+      const data = JSON.parse(raw);
+      state.currentHtml = data.currentHtml || '';
+      state.extraCss = data.extraCss || '';
+      state.extraJs = data.extraJs || '';
+      state.symbiosisOn = !!data.symbiosisOn;
+      state.pyronOn = !!data.pyronOn;
+      state.components = data.components || [];
+      editorHtml.setValue(state.currentHtml || sampleHTML(), -1);
+      editorCss.setValue(state.extraCss || '/* CSS global opcional */', -1);
+      editorJs.setValue(state.extraJs || '// JS global opcional', -1);
+      $('#btnSymbus').textContent = '🧬 SÜMBÜS: ' + (state.symbiosisOn ? 'ON' : 'OFF');
+      $('#btnPyron').textContent = state.pyronOn ? '⚡️ PYRON ON' : '⚡️ PYRON';
+      parseAndRefresh();
+      return true;
+    } catch(e){ console.warn(e); return false; }
+  };
+
+  /* ---------- Sample HTML ---------- */
+  function sampleHTML(){
+    return `<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>Meu Projeto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{ --brand:#335dff }
+    body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; margin:0 }
+    header{ padding:20px; background:linear-gradient(90deg,#335dff,#69f); color:white }
+    main{ padding:16px }
+    .card{ border:1px solid #e4e8f0; border-radius:12px; padding:16px; margin:12px 0 }
+    .btn{ background:#335dff; color:#fff; border:0; padding:10px 14px; border-radius:10px }
+  </style>
+</head>
+<body>
+  <header id="topo">
+    <h1>Olá, Symbiote 👋</h1>
+    <p class="lead">Exemplo para Inspector + TOC hierárquico.</p>
+  </header>
+
+  <main id="conteudo">
+    <section id="hero" class="card">
+      <h2>Hero</h2>
+      <p>Um parágrafo dentro do bloco <strong>#hero</strong>.</p>
+      <button class="btn" onclick="alert('Oi!')">Ação</button>
+      <script>
+        // JS inline no bloco hero
+        console.log('Hero carregado');
+      </script>
+      <style>
+        #hero{ background:#f6f9ff }
+      </style>
+    </section>
+
+    <section id="features" class="card">
+      <h2>Recursos</h2>
+      <ul>
+        <li>Edição HTML</li>
+        <li>SÜMBÜS Toggle</li>
+        <li>Promover → componente</li>
+        <li>Inspector CSS</li>
+        <li>TOC hierárquico</li>
+      </ul>
+    </section>
+
+    <footer id="rodape" class="card">
+      <small>© Você</small>
+    </footer>
+  </main>
+</body>
+</html>`;
+  }
+
+  /* ---------- Preview ---------- */
+  const previewFrame = $('#preview');
+
+  function writePreview(){
+    const doc = previewFrame.contentDocument;
+    let html = editorHtml.getValue();
+
+    // injeta CSS/JS globais
+    if(state.extraCss.trim()){
+      html = html.replace('</head>', `<style id="__global_css__">\n${state.extraCss}\n</style></head>`);
+    }
+    if(state.extraJs.trim()){
+      html = html.replace('</body>', `<script id="__global_js__">\n${state.extraJs}\n</script></body>`);
+    }
+
+    // SÜMBÜS overlay
+    if(state.symbiosisOn){
+      const symCss = `
+      <style id="__symbus__">
+        html.symbus, html.symbus body{ height:auto !important; }
+        .symbus *{ outline:1px dashed rgba(80,140,255,.45); outline-offset:-.5px }
+        .symbus [id]{ box-shadow: inset 0 0 0 2px rgba(255,165,0,.35) }
+        [data-block]{ background-image: linear-gradient(135deg, rgba(102,153,255,.12) 25%, transparent 25%, transparent 50%, rgba(102,153,255,.12) 50%, rgba(102,153,255,.12) 75%, transparent 75%, transparent); background-size:16px 16px }
+        .__sel__{ outline:3px solid rgba(255,0,128,.6) !important }
+      </style>`;
+      html = html.replace('</head>', symCss + '</head>');
+    } else {
+      const baseCss = `<style id="__sel__">.__sel__{ outline:3px solid rgba(255,0,128,.6) !important }</style>`;
+      html = html.replace('</head>', baseCss + '</head>');
+    }
+
+    // script de seleção no preview
+    const selScript = `
+<script id="__selector__">
+(function(){
+  function cssPath(el){
+    if(!el || el.nodeType!==1) return '';
+    const path=[];
+    while(el && el.nodeType===1 && el !== document){
+      let seg = el.tagName.toLowerCase();
+      if(el.id){ seg += '#'+el.id; path.unshift(seg); break; }
+      const cls = el.classList && el.classList.length ? '.'+Array.from(el.classList).slice(0,2).join('.') : '';
+      // nth-of-type apenas se houver irmãos do mesmo tag
+      let nth='';
+      if(el.parentElement){
+        const sibs = Array.from(el.parentElement.children).filter(c=>c.tagName===el.tagName);
+        if(sibs.length>1){ nth = ':nth-of-type('+(sibs.indexOf(el)+1)+')'; }
+      }
+      path.unshift(seg + cls + nth);
+      el = el.parentElement;
+    }
+    return path.join(' > ');
+  }
+  function highlight(el){
+    document.querySelectorAll('.__sel__').forEach(n=>n.classList.remove('__sel__'));
+    if(el) el.classList.add('__sel__');
+  }
+  document.addEventListener('click', function(e){
+    if(window.__pickMode__){
+      e.preventDefault(); e.stopPropagation();
+      const el=e.target;
+      const msg = {type:'sym-select', selector: cssPath(el), id: el.id||'', classes: Array.from(el.classList||[])};
+      try{ window.parent.postMessage(msg, '*'); }catch(err){}
+      highlight(el);
+    }
+  }, true);
+
+  window.addEventListener('message', function(ev){
+    const d=ev.data||{};
+    if(d.type==='sym-highlight'){ try{ const el=document.querySelector(d.selector); highlight(el); }catch(_e){} }
+    if(d.type==='sym-pick'){ window.__pickMode__ = !!d.on; }
+    if(d.type==='sym-apply-inline'){
+      try{
+        const el=document.querySelector(d.selector);
+        if(el){ el.setAttribute('style', d.style||''); highlight(el); }
+      }catch(_e){}
+    }
+  });
+})();
+</script>`;
+
+    html = html.replace('</body>', selScript + '</body>');
+
+    doc.open(); doc.write(html); doc.close();
+
+    if(state.symbiosisOn){
+      previewFrame.contentDocument.documentElement.classList.add('symbus');
+    }
+    // marcar blocos data-block
+    state.blocksFlat.forEach(b=>{
+      const el = selectByDescriptor(previewFrame.contentDocument, b.selector);
+      if(el){ el.setAttribute('data-block', b.uid); }
+    });
+  }
+
+  /* ---------- Parser & Blocks (Tree) ---------- */
+  function hash(str){
+    let h=5381, i=str.length;
+    while(i) h = (h*33) ^ str.charCodeAt(--i);
+    return (h>>>0).toString(36);
+  }
+  function descriptorFor(el){
+    const tag = el.tagName.toLowerCase();
+    const id = el.id ? `#${el.id}` : '';
+    const cls = el.classList.length ? '.'+Array.from(el.classList).join('.') : '';
+    return `${tag}${id}${cls}`;
+  }
+  function isBlockCandidate(el){
+    if(!el || el.nodeType!==1) return false;
+    const tag = el.tagName.toLowerCase();
+    if(el.id) return true;
+    if(['section','article','nav','header','footer','main','aside'].includes(tag)) return true;
+    if(tag==='div' && el.classList.length) return true;
+    return false;
+  }
+  function selectByDescriptor(doc, desc){
+    try{
+      if(desc.includes('#') || desc.includes('.')) return doc.querySelector(desc);
+      return doc.getElementsByTagName(desc)[0] || null;
+    }catch(e){ return null; }
+  }
+
+  function parseTree(html){
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const outFlat = [];
+    function walk(el, depth=0){
+      Array.from(el.children).forEach(child=>{
+        if(child.nodeType!==1) return;
+        let node=null;
+        if(isBlockCandidate(child)){
+          const outer = child.outerHTML;
+          node = {
+            uid: hash(outer),
+            name: descriptorFor(child),
+            selector: descriptorFor(child),
+            outerHTML: outer,
+            depth,
+            children:[]
+          };
+          outFlat.push(node);
+        }
+        // percorre filhos
+        const container = node ? node : {children:[]};
+        const beforeLen = container.children.length;
+        walk(child, depth+ (node?1:0));
+        // se houve children mas não é node, ignora relação
+        if(node){
+          // reconstroi filhos verdadeiros: aqueles com depth === node.depth+1 e que são descendentes diretos
+          // para simplificar, já que estamos em DFS, os filhos imediatos foram adicionados com depth+1
+          // mas não precisamos checar ancestrais aqui — exibição é baseada em depth
+        }
+      });
+    }
+    walk(doc.body, 0);
+    return outFlat;
+  }
+
+  function renderTree(){
+    const container = $('#blocksTree');
+    container.innerHTML = '';
+    const filterTxt = ($('#filterText').value||'').trim().toLowerCase();
+    const idsOnly = $('#chkIdsOnly').checked;
+    const classesOnly = $('#chkClassesOnly').checked;
+    const sectionsOnly = $('#chkSectionsOnly').checked;
+    const maxDepth = parseInt($('#depthRange').value,10);
+
+    const frag = document.createDocumentFragment();
+    state.blocksFlat.forEach(b=>{
+      if(b.depth > maxDepth) return;
+      const nm = b.name.toLowerCase();
+      if(filterTxt && !nm.includes(filterTxt)) return;
+      if(idsOnly && !b.name.includes('#')) return;
+      if(classesOnly && !b.name.includes('.')) return;
+      if(sectionsOnly && !/^(section|article|nav|header|footer|main|aside)/.test(b.name)) return;
+
+      const node = document.createElement('div');
+      node.className = 'node indent-'+Math.min(b.depth,5);
+      node.innerHTML = `
+        <div class="label mono">${escapeHtml(b.name)}</div>
+        <div class="row-wrap">
+          <button class="btn small" data-act="focus">✏️</button>
+          <button class="btn small brand" data-act="promote">🧱</button>
+          <button class="btn small" data-act="copy">📋</button>
+          <button class="btn small" data-act="hi">🎯</button>
+        </div>
+      `;
+      node.querySelectorAll('button').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const act = btn.dataset.act;
+          if(act==='focus') focusBlock(b);
+          if(act==='promote') promoteBlock(b);
+          if(act==='copy'){ navigator.clipboard.writeText(b.outerHTML); toast('outerHTML do bloco copiado'); }
+          if(act==='hi'){ highlightPreviewBlock(b); }
+        });
+      });
+      node.dataset.uid = b.uid;
+      frag.appendChild(node);
+    });
+    container.appendChild(frag);
+    updateKPIs();
+  }
+
+  function updateKPIs(){
+    $('#kpiBlocks').textContent = String(state.blocksFlat.length);
+    $('#kpiComps').textContent = String(state.components.length);
+    $('#kpiSize').textContent = (state.currentHtml.length/1024|0);
+  }
+
+  function parseAndRefresh(){
+    state.currentHtml = editorHtml.getValue();
+    state.blocksFlat = parseTree(state.currentHtml);
+    renderTree();
+    writePreview();
+    saveLocalDebounced();
+  }
+
+  const saveLocalDebounced = debounce(saveLocal, 500);
+  [editorHtml, editorCss, editorJs].forEach(ed => {
+    ed.session.on('change', () => {
+      if(ed === editorHtml) parseAndRefresh();
+      else {
+        state.extraCss = editorCss.getValue();
+        state.extraJs = editorJs.getValue();
+        writePreview();
+        saveLocalDebounced();
+      }
+    });
+  });
+
+  /* ---------- Focus/Highlight ---------- */
+  function focusBlock(b){
+    const idMatch = b.selector.match(/#([A-Za-z0-9\-\_:.]+)/);
+    let start = 0, end=0;
+    const html = editorHtml.getValue();
+    if(idMatch){
+      const id = idMatch[1];
+      const idx = html.indexOf(`id="${id}"`);
+      if(idx>=0){
+        const tagStart = html.lastIndexOf('<', idx);
+        start = tagStart>=0? tagStart : idx;
+        const tagName = b.selector.split('#')[0];
+        const closeIdx = html.indexOf(`</${tagName}`, idx);
+        end = closeIdx>start ? closeIdx + tagName.length + 3 : start + b.outerHTML.length;
+      } else {
+        const j = html.indexOf(b.outerHTML);
+        if(j>=0){ start=j; end=j+b.outerHTML.length; }
+      }
+    } else {
+      const j = html.indexOf(b.outerHTML);
+      if(j>=0){ start=j; end=j+b.outerHTML.length; }
+    }
+    setEditorSelection(editorHtml, start, end);
+    highlightPreviewBlock(b);
+    toast('Bloco focado no editor e preview');
+  }
+
+  function setEditorSelection(ed, start, end){
+    const Range = ace.require('ace/range').Range;
+    const session = ed.session;
+    const startPos = session.getDocument().indexToPosition(start, 0);
+    const endPos   = session.getDocument().indexToPosition(end, 0);
+    ed.focus();
+    ed.selection.setRange(new Range(startPos.row, startPos.column, endPos.row, endPos.column), true);
+    ed.scrollToLine(startPos.row, true, true, function(){});
+  }
+
+  function highlightPreviewBlock(b){
+    const doc = previewFrame.contentDocument;
+    if(!doc) return;
+    $$('.__hl', doc).forEach(el=>el.classList.remove('__hl'));
+    const el = selectByDescriptor(doc, b.selector);
+    if(el){
+      el.classList.add('__hl');
+      const style = doc.getElementById('__inline_hl__') || (()=>{const s=doc.createElement('style'); s.id='__inline_hl__'; doc.head.appendChild(s); return s;})();
+      style.textContent = `.__hl{ outline:3px solid rgba(255,0,128,.6) !important }`;
+      el.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+    // enviar mensagem para selecionar também
+    try{ previewFrame.contentWindow.postMessage({type:'sym-highlight', selector:b.selector}, '*'); }catch(_e){}
+  }
+
+  /* ---------- Promote to Component ---------- */
+  function promoteBlock(b){
+    const name = prompt('Nome do componente (kebab-case):', b.name.replace(/[.#]/g,'-').replace(/^-+/, 'comp-'));
+    if(!name) return;
+    const parser = new DOMParser(); const doc = parser.parseFromString(editorHtml.getValue(), 'text/html');
+    const el = selectByDescriptor(doc, b.selector);
+    if(!el){ toast('Bloco não encontrado para promover'); return; }
+    const styles = Array.from(el.querySelectorAll('style'));
+    const scripts = Array.from(el.querySelectorAll('script'));
+    let css = styles.map(s=>s.textContent).join('\n\n');
+    let jsInline = scripts.map(s=>s.textContent).join('\n\n');
+    styles.forEach(s=>s.remove());
+    scripts.forEach(s=>s.remove());
+    const innerHtml = el.outerHTML;
+    let js = jsInline.trim();
+    if(!js){
+      js = `(function(){
+  const html = \`${sanitizeTemplate(innerHtml)}\`;
+  function mount(){
+    var host = document.getElementById('${name}-mount');
+    if(host){ host.outerHTML = html; }
+  }
+  if(document.readyState!=='loading') mount();
+  else document.addEventListener('DOMContentLoaded', mount);
+})();`;
+    }
+    const stub = `<div id="${name}-mount" data-component="${name}"></div>
+<link rel="stylesheet" href="components/${name}.css">
+<script defer src="components/${name}.js"></script>`;
+    const stubNode = doc.createElement('div');
+    stubNode.innerHTML = stub;
+    el.replaceWith(...stubNode.childNodes);
+    const existing = state.components.find(c=>c.name===name);
+    const comp = { name, css, js, htmlStub: stub };
+    if(existing){ Object.assign(existing, comp); }
+    else state.components.push(comp);
+    const newHTML = '<!doctype html>\n' + doc.documentElement.outerHTML;
+    editorHtml.setValue(newHTML, -1);
+    parseAndRefresh();
+    toast(`Componente "${name}" criado`);
+  }
+
+  function sanitizeTemplate(str){
+    return String(str)
+      .replace(/`/g, '\\`')
+      .replace(/\$\{/g, '\\${')
+      .replace(/<\/script>/gi, '<\\/script>');
+  }
+
+  /* ---------- Remove Block (opcional via TOC antigo) ---------- */
+  function removeBlock(b){
+    if(!confirm('Remover este bloco do HTML?')) return;
+    const parser = new DOMParser(); const doc = parser.parseFromString(editorHtml.getValue(), 'text/html');
+    const el = selectByDescriptor(doc, b.selector);
+    if(el){ el.remove(); editorHtml.setValue('<!doctype html>\n'+doc.documentElement.outerHTML, -1); parseAndRefresh(); toast('Bloco removido'); }
+  }
+
+  /* ---------- Format (Prettier) ---------- */
+  async function formatAll(){
+    try{
+      const html = prettier.format(editorHtml.getValue(), { parser:'html', plugins: prettierPlugins });
+      const css  = prettier.format(editorCss.getValue(),  { parser:'css', plugins: prettierPlugins });
+      const js   = prettier.format(editorJs.getValue(),   { parser:'babel', plugins: prettierPlugins });
+      editorHtml.setValue(html, -1);
+      editorCss.setValue(css, -1);
+      editorJs.setValue(js, -1);
+      parseAndRefresh();
+      toast('Código identado com Prettier ✨');
+    }catch(e){ console.error(e); toast('Falha ao formatar'); }
+  }
+  const prettierPlugins = window.prettierPlugins || [window.prettierPluginsHtml, window.prettierPluginsBabel, window.prettierPluginsPostcss].filter(Boolean);
+
+  /* ---------- Patches ---------- */
+  function genPatch(){
+    const lib = window.JsDiff || window.Diff;
+    const patch = lib.createPatch('index.html', state.originalHtml || '', editorHtml.getValue(), 'original', 'atual');
+    $('#patchOutput').value = patch;
+    toast('Patch gerado');
+  }
+  function applyPatch(){
+    const lib = window.JsDiff || window.Diff;
+    const patch = $('#patchInput').value;
+    try{
+      const result = lib.applyPatch(editorHtml.getValue(), patch);
+      if(result===false){ toast('Não foi possível aplicar o patch'); return; }
+      editorHtml.setValue(result, -1);
+      parseAndRefresh();
+      toast('Patch aplicado');
+    }catch(e){ console.error(e); toast('Erro ao aplicar patch'); }
+  }
+
+  /* ---------- Export ZIP ---------- */
+  async function exportZip(){
+    const zip = new JSZip();
+    const index = editorHtml.getValue();
+    zip.file('index.html', index);
+    if(state.components.length){
+      const dir = zip.folder('components');
+      for(const c of state.components){
+        dir.file(`${c.name}.css`, c.css || '');
+        dir.file(`${c.name}.js`,  c.js  || '');
+      }
+    }
+    const readme = makeReadme();
+    zip.file('README.md', readme);
+    const blob = await zip.generateAsync({type:'blob'});
+    saveAs(blob, 'symbiote-export.zip');
+    toast('ZIP exportado 📦');
+  }
+
+  function makeReadme(){
+    const list = state.components.map(c=>`- ${c.name}\n  - CSS: components/${c.name}.css\n  - JS: components/${c.name}.js`).join('\n');
+    return `# Export do Symbiote Editor PRO
+
+## Como usar
+Abra \`index.html\` no navegador ou hospede no seu servidor. Os componentes foram referenciados com \`<link>\` e \`<script defer>\`.
+
+## Componentes
+${list || '- (nenhum componente gerado)'}
+
+## Observações
+- O modo SÜMBÜS afeta apenas o preview durante a edição.
+- Os arquivos \`global.css\` e \`global.js\` são aplicados no preview; você pode incorporá-los no index antes de exportar se desejar.
+- Inspector CSS permite criar regras direto no \`global.css\`.
+`;
+  }
+
+  /* ---------- Inspector CSS ---------- */
+  const inspector = {
+    selector: '',
+    id: '',
+    classes: [],
+  };
+
+  function setPickMode(on){
+    try{ previewFrame.contentWindow.postMessage({type:'sym-pick', on}, '*'); }catch(_e){}
+    toast(on ? 'Toque no elemento no Preview' : 'Seleção encerrada');
+  }
+
+  window.addEventListener('message', (ev)=>{
+    const d = ev.data || {};
+    if(d.type === 'sym-select'){
+      inspector.selector = d.selector;
+      inspector.id = d.id; inspector.classes = d.classes||[];
+      state.selected = { selector: d.selector, id: d.id, classes: d.classes||[], hasId: !!d.id };
+      $('#selLabel').textContent = `${d.selector || '(sem seletor)'}`;
+      $('#selectorInput').value = d.selector || '';
+      loadComputedAndRules(d.selector);
+      // mudar para aba Inspector automaticamente
+      switchTab('panel-inspector');
+    }
+  });
+
+  function switchTab(panelId){
+    $$('.panel').forEach(p => p.id === panelId ? p.classList.remove('hidden') : p.classList.add('hidden'));
+    $$('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.target===panelId ? 'true':'false'));
+  }
+
+  function getIframeEl(selector){
+    try{ return previewFrame.contentDocument.querySelector(selector); }catch(_e){ return null; }
+  }
+
+  function loadComputedAndRules(selector){
+    const el = getIframeEl(selector);
+    if(!el){ $('#computedBox').textContent = '—'; $('#matchedRulesBox').textContent='—'; return; }
+    const style = previewFrame.contentWindow.getComputedStyle(el);
+    const keys = [
+      'display','position','top','left','right','bottom','zIndex',
+      'width','height','padding','margin','border','borderRadius','boxShadow',
+      'color','background','backgroundColor','opacity','font','fontSize','fontWeight','lineHeight',
+      'grid','flex','alignItems','justifyContent','gap','transform'
+    ];
+    const computed = keys.map(k=>`${k}: ${style[k]||''}`).join('\n');
+    $('#computedBox').textContent = computed;
+
+    // matched rules (acessíveis)
+    const out = [];
+    try{
+      const doc = previewFrame.contentDocument;
+      const sheets = Array.from(doc.styleSheets);
+      sheets.forEach(sheet=>{
+        let rules;
+        try{ rules = sheet.cssRules; }catch(_e){ return; } // CORS
+        Array.from(rules||[]).forEach(r=>{
+          if(r.selectorText){
+            try{
+              if(el.matches(r.selectorText)){
+                out.push(`${r.selectorText} {\n  ${r.style.cssText}\n}`);
+              }
+            }catch(_e){}
+          } else if(r.type===CSSRule.MEDIA_RULE){
+            const mr = r; Array.from(mr.cssRules||[]).forEach(rr=>{
+              if(rr.selectorText){ try{ if(el.matches(rr.selectorText)){ out.push(`@media ${mr.media.mediaText} { ${rr.selectorText} { ${rr.style.cssText} } }`); } }catch(_e){} }
+            });
+          }
+        });
+      });
+    }catch(_e){}
+    $('#matchedRulesBox').textContent = out.length ? out.join('\n\n') : '(Sem regras acessíveis ou bloqueadas por CORS)';
+  }
+
+  // Apply inline style from input
+  $('#btnApplyInline').addEventListener('click', ()=>{
+    const sel = inspector.selector || $('#selectorInput').value;
+    const st = ($('#inlineStyle').value||'').trim();
+    if(!sel){ toast('Selecione um elemento primeiro'); return; }
+    try{
+      previewFrame.contentWindow.postMessage({type:'sym-apply-inline', selector: sel, style: st}, '*');
+      toast('Inline aplicado (Preview)');
+    }catch(_e){}
+  });
+
+  // Sync inline style back into editor HTML
+  $('#btnSyncBack').addEventListener('click', ()=>{
+    const sel = inspector.selector || $('#selectorInput').value;
+    if(!sel){ toast('Selecione um elemento primeiro'); return; }
+    const targetEl = getIframeEl(sel);
+    if(!targetEl){ toast('Elemento não encontrado no Preview'); return; }
+    // Só sincronamos automaticamente se tiver id (para evitar substituir elemento errado)
+    if(!targetEl.id){ toast('Adicione um id ao elemento para sincronizar com segurança'); return; }
+    const parser = new DOMParser(); const doc = parser.parseFromString(editorHtml.getValue(), 'text/html');
+    const el = doc.getElementById(targetEl.id);
+    if(!el){ toast('Elemento com esse id não encontrado no HTML'); return; }
+    el.setAttribute('style', targetEl.getAttribute('style')||'');
+    editorHtml.setValue('<!doctype html>\n'+doc.documentElement.outerHTML, -1);
+    parseAndRefresh();
+    toast('Inline sincronizado para o HTML');
+  });
+
+  // Create CSS rule into global.css
+  $('#btnAddDecl').addEventListener('click', ()=>{
+    const prop = ($('#propName').value||'').trim(); const val = ($('#propValue').value||'').trim();
+    let sel = ($('#selectorInput').value||'').trim() || inspector.selector;
+    if(!sel){ toast('Defina um seletor'); return; }
+    if(!prop || !val){ toast('Preencha propriedade e valor'); return; }
+    const rule = `${sel} {\n  ${prop}: ${val};\n}\n`;
+    const cur = editorCss.getValue(); editorCss.setValue(cur + '\n' + rule, -1);
+    state.extraCss = editorCss.getValue();
+    writePreview();
+    toast('Regra adicionada a global.css');
+  });
+
+  $('#btnCreateRule').addEventListener('click', ()=>{
+    const sel = inspector.selector || $('#selectorInput').value;
+    if(!sel){ toast('Selecione um elemento'); return; }
+    const rule = `${sel} {\n  /* sua declaração aqui */\n}\n`;
+    editorCss.setValue(editorCss.getValue() + '\n' + rule, -1);
+    state.extraCss = editorCss.getValue();
+    writePreview();
+    toast('Regra base criada em global.css');
+  });
+
+  $('#btnCopySelector').addEventListener('click', ()=>{
+    const sel = inspector.selector || $('#selectorInput').value;
+    if(!sel){ toast('Nada selecionado'); return; }
+    navigator.clipboard.writeText(sel); toast('Seletor copiado');
+  });
+
+  $('#btnScrollIntoView').addEventListener('click', ()=>{
+    const sel = inspector.selector || $('#selectorInput').value;
+    const el = getIframeEl(sel);
+    if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); highlightInPreview(sel); }
+  });
+
+  function highlightInPreview(selector){
+    try{ previewFrame.contentWindow.postMessage({type:'sym-highlight', selector}, '*'); }catch(_e){}
+  }
+
+  // Pick buttons
+  $('#btnInspectorSelect').addEventListener('click', ()=> setPickMode(true));
+  $('#btnPickInPreview').addEventListener('click', ()=> { switchTab('panel-inspector'); setPickMode(true); });
+
+  /* ---------- Controls: TOC ---------- */
+  $('#filterText').addEventListener('input', renderTree);
+  $('#chkIdsOnly').addEventListener('change', renderTree);
+  $('#chkClassesOnly').addEventListener('change', renderTree);
+  $('#chkSectionsOnly').addEventListener('change', renderTree);
+  $('#depthRange').addEventListener('input', ()=>{
+    $('#depthLabel').textContent = $('#depthRange').value; renderTree();
+  });
+  $('#btnExpandAll').addEventListener('click', ()=>{ $('#depthRange').value=6; $('#depthLabel').textContent='6'; renderTree(); });
+  $('#btnCollapseAll').addEventListener('click', ()=>{ $('#depthRange').value=1; $('#depthLabel').textContent='1'; renderTree(); });
+
+  /* ---------- Utils ---------- */
+  function escapeHtml(s){ return (s||'').replace(/[&<>'"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  function debounce(fn, wait=300){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; }
+
+  /* ---------- Event Wiring (geral) ---------- */
+  $('#fileInput').addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; if(!file) return;
+    const text = await file.text();
+    state.originalHtml = text;
+    editorHtml.setValue(text, -1);
+    parseAndRefresh();
+    toast('Arquivo carregado');
+  });
+
+  $('#btnSave').addEventListener('click', ()=>{ saveLocal(); toast('Salvo localmente'); });
+  $('#btnReset').addEventListener('click', ()=>{
+    if(!confirm('Resetar para o último arquivo importado?')) return;
+    if(state.originalHtml){
+      editorHtml.setValue(state.originalHtml, -1);
+      parseAndRefresh();
+      toast('Reset concluído');
+    } else {
+      toast('Não há original carregado');
+    }
+  });
+
+  const toggleSymb = ()=>{ state.symbiosisOn = !state.symbiosisOn; $('#btnSymbus').textContent = '🧬 SÜMBÜS: ' + (state.symbiosisOn?'ON':'OFF'); writePreview(); };
+  $('#btnSymbus').addEventListener('click', toggleSymb);
+  $('#btnToggleSymbus2').addEventListener('click', toggleSymb);
+  $('#btnToggleSymbus3').addEventListener('click', toggleSymb);
+
+  // PYRON: só estética/tema + animações leves
+  $('#btnPyron').addEventListener('click', ()=>{
+    state.pyronOn = !state.pyronOn;
+    document.documentElement.style.setProperty('--brand', state.pyronOn ? 'var(--pyron-2)' : getComputedStyle(document.documentElement).getPropertyValue('--brand'));
+    $('#btnPyron').textContent = state.pyronOn ? '⚡️ PYRON ON' : '⚡️ PYRON';
+    toast(state.pyronOn ? 'PYRON energizado ⚡️' : 'PYRON desativado');
+  });
+  $('#btnIgnite').addEventListener('click', ()=>{
+    state.pyronOn = true; $('#btnPyron').textContent = '⚡️ PYRON ON';
+    toast('Ignition: vértice do possível aceso 🔥');
+  });
+
+  $('#btnFormat').addEventListener('click', formatAll);
+  $('#btnCopy').addEventListener('click', ()=>{ navigator.clipboard.writeText(editorHtml.getValue()); toast('HTML copiado'); });
+  $('#btnReloadPreview').addEventListener('click', writePreview);
+
+  $('#btnRefreshBlocks').addEventListener('click', ()=>{ parseAndRefresh(); toast('Índice de blocos atualizado'); });
+
+  $('#btnGenPatch').addEventListener('click', genPatch);
+  $('#btnApplyPatch').addEventListener('click', applyPatch);
+
+  $('#btnExportZip').addEventListener('click', exportZip);
+  $('#btnCopyIndex').addEventListener('click', ()=>{ navigator.clipboard.writeText(editorHtml.getValue()); toast('index.html copiado'); });
+
+  $('#btnFind').addEventListener('click', ()=>{
+    const idx = editorHtml.getValue().indexOf('<div');
+    if(idx>=0){
+      setEditorSelection(editorHtml, idx, idx+4);
+      toast('Primeiro <div> destacado');
+    } else toast('Nenhum <div> encontrado');
+  });
+
+  $('#btnInsertBlockMarkers').addEventListener('click', ()=>{
+    const html = editorHtml.getValue();
+    let doc = new DOMParser().parseFromString(html, 'text/html');
+    let changed = false;
+    state.blocksFlat.forEach(b=>{
+      const el = selectByDescriptor(doc, b.selector);
+      if(el && !el.previousSibling?.nodeValue?.includes('BLOCK:'+b.uid)){
+        const before = doc.createComment('BLOCK:'+b.uid);
+        const after  = doc.createComment('/BLOCK:'+b.uid);
+        el.parentNode.insertBefore(before, el);
+        el.parentNode.insertBefore(after, el.nextSibling);
+        changed = true;
+      }
+    });
+    if(changed){
+      editorHtml.setValue('<!doctype html>\n'+doc.documentElement.outerHTML, -1);
+      parseAndRefresh();
+      toast('Marcadores inseridos');
+    } else toast('Sem alterações');
+  });
+
+  $('#btnShowReadme').addEventListener('click', ()=>{ alert(makeReadme()); });
+
+  /* ---------- Init ---------- */
+  function init(){
+    const restored = loadLocal();
+    if(!restored){
+      state.originalHtml = sampleHTML();
+      editorHtml.setValue(state.originalHtml, -1);
+      editorCss.setValue('/* CSS global opcional */', -1);
+      editorJs.setValue('// JS global opcional', -1);
+      parseAndRefresh();
+    }
+    [editorHtml, editorCss, editorJs].forEach(ed=>{
+      ed.container.addEventListener('focusin', ()=>document.body.classList.add('kbd'), {passive:true});
+      ed.container.addEventListener('focusout', ()=>document.body.classList.remove('kbd'), {passive:true});
+    });
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
