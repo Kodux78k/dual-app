@@ -1,0 +1,294 @@
+
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark">
+  <title>Symbiote Editor PRO v6 — Mobile Optimized</title>
+  <style>
+    /* ===== Reset + Mobile Safety ===== */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    html{overflow-x:hidden}
+    body{
+      margin:0; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";
+      background:linear-gradient(180deg,#0b0d10,#12161b); color:#e6eef8;
+      padding:16px; padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+    :root{
+      --bg:#0b0d10; --bg-2:#12161b; --card:#151a21; --tab:#0f1318; --fg:#e6eef8;
+      --muted:#9ab; --brand:#69f; --border:#263241; --shadow: rgba(0,0,0,.3);
+      --ok:#22c55e; --warn:#f59e0b; --err:#ef4444;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f6f7fb; --bg-2:#fff; --card:#fff; --tab:#f1f5fb; --fg:#0c1220; --muted:#556; --brand:#335dff; --border:#dfe5ef; --shadow: rgba(0,0,0,.08); }
+      body{ background:linear-gradient(180deg,#f6f7fb,#ffffff) }
+    }
+    .app{display:grid; gap:12px; grid-template-rows:auto 1fr auto; min-height:calc(100vh - 32px)}
+    header.appbar{
+      position:sticky; top:0; z-index:10; background:rgba(0,0,0,.25);
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid var(--border);
+      border-radius:14px; padding:10px 12px;
+    }
+    .row{display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+    .title{font-weight:900}
+    .badge{font-size:12px; padding:2px 8px; border-radius:999px; background:var(--tab); color:var(--muted); border:1px solid var(--border)}
+    .actions{display:flex; gap:6px; flex-wrap:wrap}
+    button,.btn{
+      -webkit-tap-highlight-color:transparent; border:1px solid var(--border);
+      background:var(--card); color:var(--fg); padding:10px 12px; border-radius:12px;
+      font-weight:700; font-size:14px; box-shadow:0 1px 0 var(--shadow); cursor:pointer
+    }
+    button.small{font-size:12px; padding:8px 10px}
+    .pill{border-radius:999px; padding-inline:14px}
+    .brand{border-color:color-mix(in oklab,var(--brand) 50%, var(--border)); color:var(--brand)}
+    main{display:grid; gap:12px}
+    .panel{
+      background:var(--card); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+      display:flex; flex-direction:column; min-height:40vh; content-visibility:auto; contain-intrinsic-size:600px;
+    }
+    .panel > .phead{padding:10px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap}
+    .content{flex:1; min-height:0; display:flex; flex-direction:column}
+    .split{display:flex; flex-wrap:wrap; gap:8px; padding:8px}
+    .split > *{flex:1 1 320px; min-width: 0}
+    .editor{min-height:260px; border:1px solid var(--border); border-radius:12px; overflow:hidden}
+    .label{padding:6px 8px; color:var(--muted); font-size:12px}
+    .preview-wrap{flex:1; min-height:260px; border-top:1px solid var(--border); background:var(--tab)}
+    iframe.preview{width:100%; height:100%; border:0; background:#fff; display:block}
+    .list{padding:12px; display:grid; gap:8px}
+    .item{display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--tab); padding:10px; border-radius:12px; border:1px solid var(--border)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace; font-size:12.5px}
+    pre,code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+    pre{background:var(--tab); border:1px solid var(--border); border-radius:10px; padding:10px; overflow:auto; overflow-wrap:anywhere; white-space:pre}
+    .tabbar{position:sticky; bottom:0; z-index:10; display:grid; grid-template-columns:repeat(6,1fr); gap:6px}
+    .tab{padding:10px 6px; text-align:center; border:1px solid var(--border); border-radius:12px; background:var(--card); font-weight:800}
+    .tab[aria-selected="true"]{outline:2px solid var(--brand)}
+    .hidden{display:none !important}
+    .toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(16px + env(safe-area-inset-bottom)); padding:10px 14px; background:var(--card); border:1px solid var(--border); border-radius:999px; box-shadow:0 10px 30px var(--shadow); z-index:99}
+    /* Prevent horizontal overflow from images/iframes inside preview content */
+    .symbus img, .symbus video, .symbus canvas {max-width:100%; height:auto}
+  </style>
+
+  <!-- Lazy libs (defer) -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/ace.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-html.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-css.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/mode-javascript.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.7/theme-one_dark.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.2.0/diff.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/htmlhint@1.1.0/dist/htmlhint.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/csstree/2.3.1/csstree.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <header class="appbar">
+    <div class="row">
+      <div class="title">Symbiote Editor <span class="badge">PRO v6</span></div>
+      <div class="actions">
+        <label class="btn pill brand"><input id="fileInput" type="file" accept=".html,.htm,.txt"> 📤 Upload</label>
+        <button id="btnSave" class="btn pill">💾 Salvar</button>
+        <button id="btnFormat" class="btn pill brand">✨ Identar</button>
+        <button id="btnValidate" class="btn pill">🔍 HTML</button>
+        <button id="btnValidateCss" class="btn pill">🎯 CSS</button>
+        <button id="btnCopy" class="btn pill">📋 Copiar</button>
+        <button id="btnSymbus" class="btn pill">🧬 SÜMBÜS: ON</button>
+        <button id="btnReset" class="btn pill">↩️ Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Editor -->
+    <section class="panel" id="panel-editor">
+      <div class="phead"><div class="title">Editor</div></div>
+      <div class="content">
+        <div class="split">
+          <div><div class="label mono">index.html</div><div id="editorHtml" class="editor"></div></div>
+          <div><div class="label mono">global.css</div><div id="editorCss" class="editor"></div></div>
+          <div><div class="label mono">global.js</div><div id="editorJs" class="editor"></div></div>
+        </div>
+        <div class="list">
+          <div class="item"><div class="mono small">Validação HTML</div><button id="btnRunHtmlHint" class="btn small">▶</button></div>
+          <pre id="htmlHintOut" class="mono" style="max-height:180px"></pre>
+          <div class="item"><div class="mono small">Validação CSS</div><button id="btnRunCssLint" class="btn small">▶</button></div>
+          <pre id="cssLintOut" class="mono" style="max-height:180px"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Preview -->
+    <section class="panel" id="panel-preview">
+      <div class="phead"><div class="title">Preview</div></div>
+      <div class="content"><div class="preview-wrap"><iframe id="preview" class="preview" title="Pré-visualização"></iframe></div></div>
+    </section>
+
+    <!-- Blocos (árvore simples) -->
+    <section class="panel" id="panel-blocks">
+      <div class="phead"><div class="title">Blocos</div></div>
+      <div class="content"><div class="list mono" id="blocksList">—</div></div>
+    </section>
+
+    <!-- Export -->
+    <section class="panel" id="panel-export">
+      <div class="phead"><div class="title">Exportar</div></div>
+      <div class="content">
+        <div class="list">
+          <div class="item"><div class="mono">ChangeGuard: <span id="deltaInfo">—</span></div><button id="btnRecalc" class="btn small">↻</button></div>
+          <button id="btnExportZip" class="btn brand">📦 Exportar ZIP</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" role="tablist" aria-label="Navegação">
+    <button class="tab" data-target="#panel-editor" aria-selected="true">✏️ Editor</button>
+    <button class="tab" data-target="#panel-preview">👁️ Preview</button>
+    <button class="tab" data-target="#panel-blocks">🧩 Blocos</button>
+    <button class="tab" data-target="#panel-export">⬇️ Export</button>
+  </nav>
+</div>
+
+<div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  const $ = (q,el=document)=>el.querySelector(q);
+  const $$ = (q,el=document)=>Array.from(el.querySelectorAll(q));
+  const toast = (msg,ms=1200)=>{const t=$('#toast');t.textContent=msg;t.classList.remove('hidden');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.add('hidden'),ms)};
+
+  /* Tabs */
+  $$('.tab').forEach(btn=>btn.addEventListener('click',()=>{
+    $$('.tab').forEach(b=>b.setAttribute('aria-selected', b===btn?'true':'false'));
+    $$('.panel').forEach(p=>p.classList.toggle('hidden', '#'+p.id !== btn.dataset.target));
+  }));
+  $$('.panel').forEach(p=>p.classList.toggle('hidden','#'+p.id!=='#panel-editor'));
+
+  /* Ace init (after libs load) */
+  function ready(){
+    const editorHtml = ace.edit('editorHtml',{ theme:'ace/theme/one_dark', mode:'ace/mode/html', fontSize:14, showPrintMargin:false });
+    const editorCss  = ace.edit('editorCss', { theme:'ace/theme/one_dark', mode:'ace/mode/css',  fontSize:14, showPrintMargin:false });
+    const editorJs   = ace.edit('editorJs',  { theme:'ace/theme/one_dark', mode:'ace/mode/javascript', fontSize:14, showPrintMargin:false });
+    [editorHtml,editorCss,editorJs].forEach(ed=>{ ed.session.setUseWrapMode(true); ed.setOptions({scrollPastEnd:.5}); });
+
+    const sample = `<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Landing simples</title>
+  <style>
+    :root{ --brand:#335dff }
+    body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial }
+    .wrap{ max-width:720px; margin:0 auto; padding:20px }
+    header{ padding:20px; background:linear-gradient(90deg,#335dff,#69f); color:#fff }
+    .card{ border:1px solid #e4e8f0; border-radius:12px; padding:16px; margin:12px 0 }
+    ul{ padding-left:18px }
+  </style>
+</head>
+<body>
+  <header><div class="wrap"><h1>Symbiote 👋</h1></div></header>
+  <main class="wrap">
+    <section class="card"><h2>Recursos</h2><ul><li>Edição</li><li>SÜMBÜS</li><li>Blocos</li></ul></section>
+    <section class="card"><h2>Exemplo</h2><pre><code>&lt;section class="card"&gt;...&lt;/section&gt;</code></pre></section>
+  </main>
+  <footer class="wrap"><small>© Você</small></footer>
+</body>
+</html>`;
+
+    const stateKey='symb_editor_state_pro_v6_opt';
+    const saved = JSON.parse(localStorage.getItem(stateKey) || '{}');
+    editorHtml.setValue(saved.html || sample, -1);
+    editorCss.setValue(saved.css || '/* CSS global opcional */', -1);
+    editorJs.setValue(saved.js || '// JS global opcional', -1);
+
+    const preview = $('#preview');
+    function writePreview(){
+      let html = editorHtml.getValue();
+      if(editorCss.getValue().trim()){
+        html = html.replace('</head>', `<style id="__global_css__">\n${editorCss.getValue()}\n</style></head>`);
+      }
+      if(editorJs.getValue().trim()){
+        html = html.replace('</body>', `<script id="__global_js__">\n${editorJs.getValue()}\n</script></body>`);
+      }
+      const symCss = `<style id="__symbus__">.symbus *{outline:1px dashed rgba(80,140,255,.45);outline-offset:-.5px}[data-block]{background-image:linear-gradient(135deg,rgba(102,153,255,.12) 25%,transparent 25%,transparent 50%,rgba(102,153,255,.12) 50%,rgba(102,153,255,.12) 75%,transparent 75%,transparent); background-size:16px 16px}</style>`;
+      html = html.replace('</head>', symCss + '</head>');
+      const doc = preview.contentDocument; doc.open(); doc.write(html); doc.close();
+      if($('#btnSymbus').dataset.on === '1'){ preview.contentDocument.documentElement.classList.add('symbus'); }
+      // Prevent horizontal overflow inside preview content
+      const fix = preview.contentDocument.createElement('style'); fix.textContent='img,video,canvas{max-width:100%;height:auto}'; preview.contentDocument.head.appendChild(fix);
+      parseBlocks();
+    }
+
+    function parseBlocks(){
+      const root = preview.contentDocument && preview.contentDocument.body; if(!root){ $('#blocksList').textContent='—'; return; }
+      const out=[];
+      const isCand = el => el.id || ['section','article','nav','header','footer','main','aside'].includes(el.tagName.toLowerCase()) || (el.tagName.toLowerCase()==='div' && el.classList.length);
+      (function walk(el, depth=0){
+        Array.from(el.children||[]).forEach(ch=>{ if(ch.nodeType!==1) return;
+          if(isCand(ch)){
+            const tag=ch.tagName.toLowerCase();
+            const id = ch.id ? '#' + ch.id : '';
+            const cls = ch.classList.length ? '.' + Array.from(ch.classList).join('.') : '';
+            out.push('  '.repeat(depth) + tag + id + cls);
+            walk(ch, depth+1);
+          }else{ walk(ch, depth); }
+        });
+      })(root,0);
+      $('#blocksList').textContent = out.join('\n') || '—';
+    }
+
+    function saveLocal(){
+      localStorage.setItem(stateKey, JSON.stringify({html:editorHtml.getValue(), css:editorCss.getValue(), js:editorJs.getValue()}));
+    }
+    const debounce=(fn,ms=300)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
+    const writeDebounced = debounce(writePreview, 200);
+    [editorHtml,editorCss,editorJs].forEach(ed=>ed.session.on('change', ()=>{ writeDebounced(); saveLocal(); }));
+
+    /* Wire UI */
+    $('#btnFormat').addEventListener('click',()=>{
+      try{ const formatted = window.prettier.format(editorHtml.getValue(), {parser:'html', plugins:window.prettierPlugins}); editorHtml.setValue(formatted,-1); }
+      catch(e){ toast('Prettier indisponível'); }
+    });
+    $('#btnCopy').addEventListener('click',()=>{ navigator.clipboard.writeText(editorHtml.getValue()); toast('HTML copiado'); });
+    $('#btnSave').addEventListener('click',()=>{ saveLocal(); toast('Salvo'); });
+    $('#btnReset').addEventListener('click',()=>{ localStorage.removeItem(stateKey); location.reload(); });
+
+    $('#btnValidate').addEventListener('click',()=>{ try{
+      const res = window.HTMLHint.verify(editorHtml.getValue()); const lines = res.map(r=>`L${r.line}:${r.col} ${r.rule.id} — ${r.message}`);
+      $('#htmlHintOut').textContent = lines.join('\n') || 'OK';
+    }catch(_e){ toast('HTMLHint indisponível'); } });
+
+    $('#btnValidateCss').addEventListener('click',()=>$('#btnRunCssLint').click());
+    $('#btnRunCssLint').addEventListener('click',()=>{
+      try{
+        const ast = csstree.parse(editorCss.getValue(), {positions:true, parseValue:true});
+        let issues = 0; csstree.walk(ast, function(node){ if(node.type==='Declaration' && (!node.value || node.value.type==='Raw')) issues++; });
+        $('#cssLintOut').textContent = issues ? `Avisos heurísticos: ${issues}` : 'OK';
+      }catch(e){ $('#cssLintOut').textContent = 'Erro de parse CSS'; }
+    });
+
+    $('#btnSymbus').addEventListener('click',()=>{
+      const on = $('#btnSymbus').dataset.on === '1'; $('#btnSymbus').dataset.on = on ? '0':'1'; $('#btnSymbus').textContent = on ? '🧬 SÜMBÜS: OFF' : '🧬 SÜMBÜS: ON';
+      writePreview();
+    });
+
+    /* Initial render */
+    writePreview();
+  }
+
+  // Wait for all defer scripts
+  if(document.readyState === 'complete'){ ready(); }
+  else window.addEventListener('load', ready);
+})();
+</script>
+<!-- Prettier (loaded late to avoid blocking) -->
+<script src="https://unpkg.com/prettier@3.2.5/standalone.js" defer></script>
+<script src="https://unpkg.com/prettier@3.2.5/plugins/html.js" defer></script>
+</body>
+</html>
