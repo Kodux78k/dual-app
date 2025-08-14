@@ -143,13 +143,7 @@
     #kblxLogActions{ display:flex; gap:8px; margin-top:8px }
     #kblxLogActions button{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:6px 10px; cursor:pointer }
 
-    #kblxPeopleBtn{
-      position:fixed; top:146px; left:50%; transform:translateX(-50%);
-      z-index:2001; font-size:20px; width:44px; height:44px; padding:0;
-      background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));
-      color:#fff; border:none; border-radius:50%; cursor:pointer;
-      box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px);
-    }
+    #kblxPeopleBtn{position:fixed; top:166px; left:50%; transform:translateX(-50%);z-index:2001; padding:10px; border-radius:50%; border:none; cursor:pointer;background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));box-shadow:0 10px 30px rgba(0,0,0,.45);backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);}
     #kblxIframeOverlay{ position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55) }
     #kblxIframeBox{
       position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
@@ -519,6 +513,73 @@ body.logged-in .upload-btn { display: inline-flex !important; }
     body:not(.logged-in) #bgUploadBtn { display: none !important; }
     body.logged-in #bgUploadBtn { display: inline-flex !important; }
   </style>
+<style>
+
+/* === Login actions (upload BG + pill) centralizados === */
+.login-actions{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+  margin-top:4px;
+}
+.login-container .pill-in-login{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+  color:#fff;
+  background: linear-gradient(90deg, #8882f8, #c277f2);
+  box-shadow: 0 0 12px rgba(140,102,255,0.6);
+}
+
+/* === Botão de LOG posicionado === */
+#kblxLogBtn{
+  position:fixed !important;
+  top:33px !important;
+  left:56px !important;
+  z-index:2002 !important;
+  padding:7px 9px !important;
+  border:none !important;
+  border-radius:10px !important;
+  color:#fff !important;
+  background:rgba(0,0,0,0.40) !important;
+  backdrop-filter:blur(6px) !important;
+  box-shadow:0 6px 20px rgba(0,0,0,.35) !important;
+  line-height:1 !important;
+}
+
+</style>
+<style>
+
+/* === KBLX People Pill (fora do login) — referência === */
+#kblxPeopleBtn{position:fixed; top:166px; left:50%; transform:translateX(-50%);z-index:2001; padding:10px; border-radius:50%; border:none; cursor:pointer;background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));box-shadow:0 10px 30px rgba(0,0,0,.45);backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);}
+#kblxPeopleBtn:hover{ transform:translateX(-50%) scale(1.06) }
+
+/* === Overlay/Visor mínimo === */
+#kblxIframeOverlay{ position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55) }
+#kblxIframeBox{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:88vw; max-width:400px; height:72vh; max-height:360px;
+  background:rgba(0,0,0,0.35); border-radius:16px; overflow:hidden;
+  box-shadow:0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
+  border:1px solid rgba(255,255,255,.08);
+}
+#kblxIframeBox header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:8px 12px; color:#fff;
+  background:linear-gradient(90deg, rgba(0,255,255,.22), rgba(255,0,255,.16));
+}
+#kblxIframe{ width:100%; height:calc(72vh - 46px); border:0; display:block; background:#000 }
+#kblxResize{ position:absolute; right:0; bottom:0; width:20px; height:20px; cursor:nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.35) 51%); opacity:.65; }
+
+</style>
 </head>
 
 <body class="logged-in">
@@ -574,8 +635,6 @@ body.logged-in .upload-btn { display: inline-flex !important; }
   <div id="kblxLogLines"></div>
 </div>
 
-<button id="kblxPeopleBtn" title="Abrir iFrame">💊</button>
-
 <div id="kblxIframeOverlay" aria-hidden="true">
   <div id="kblxIframeBox" role="dialog" aria-modal="true" aria-label="Visor Integrado">
     <header id="kblxDragBar">
@@ -629,10 +688,7 @@ body.logged-in .upload-btn { display: inline-flex !important; }
     <button id="uploadHTMLBtn">☍</button>
 
     <!-- BG upload inside login (visible only when logged in) -->
-    <div class="bg-upload-wrapper">
-      <button id="bgUploadBtn" class="upload-btn" title="Alterar BG" onclick="document.getElementById('imgUploadLogin').click()">⧈</button>
-      <input type="file" id="imgUploadLogin" accept="image/*" style="display:none" onchange="trocarImagem(event)">
-    </div>
+    <div class="login-actions">  <button id="bgUploadBtn" class="upload-btn" title="Alterar BG"           onclick="document.getElementById('imgUploadLogin').click()">⧈</button>  <input type="file" id="imgUploadLogin" accept="image/*" style="display:none" onchange="trocarImagem(event)">  </div>
 
     <div id="messageBox"></div>
     <div id="buyTokens"><button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button></div>
@@ -866,9 +922,9 @@ body.logged-in .upload-btn { display: inline-flex !important; }
     function toggleIframe(){ (overlay.style.display==='block') ? closeIframe() : openIframe(); }
 
     btnPeople.addEventListener('click', async ()=>{
-      if(!iframe.src || iframe.src==='about:blank') await resolveAndOpenDefault();
-      else toggleIframe();
-    });
+  if(!iframe.src || iframe.src==='about:blank') openIframe('Ativar_Dual_Gen.html');
+  else toggleIframe();
+});
     btnClose.addEventListener('click', closeIframe);
     btnPop.addEventListener('click', ()=>{
       try{ window.open(iframe.src || 'about:blank','_blank'); kblxLog('Abrindo em nova guia.'); }catch(e){}
@@ -1323,6 +1379,25 @@ body.logged-in .upload-btn { display: inline-flex !important; }
   }
 })();
 </script>
+
+
+<script>
+(function(){
+  const btn = document.getElementById('kblxLogBtn');
+  const panel = document.getElementById('kblxLogPanel');
+  if(btn && panel){
+    btn.addEventListener('click', ()=>{
+      panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+    });
+  }
+})();
+</script>
+
+
+<button id="kblxPeopleBtn" title="Abrir iFrame"><img src="assets/icons/SiimbyOS0.png" alt="Open Visor" style="width:28px;height:28px;display:block;border-radius:50%;"></button>
+
+
+<script>(function(){const PREFERRED='Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html';const btn=document.getElementById('kblxPeopleBtn');const overlay=document.getElementById('kblxIframeOverlay');const iframe=document.getElementById('kblxIframe');function show(){overlay.style.display='block';}window.kblxOpenVisor=function(url){ if(url) iframe.src=url; show(); };if(btn){btn.addEventListener('click',()=>{ if(!iframe.src||iframe.src==='about:blank'){window.kblxOpenVisor(PREFERRED);}else{overlay.style.display=(overlay.style.display==='block')?'none':'block';} });}})();</script>
 
 </body>
 </html>
