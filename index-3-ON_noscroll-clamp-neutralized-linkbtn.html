@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Central - Dual Infodose</title>
+
+  <!-- metas / assets -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet"/>
+
+  <!-- libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+
+  <!-- ======= SEU CSS ORIGINAL (mantido) + pequenos retoques ======= -->
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { overscroll-behavior: none; }
+    body {
+      font-family:'Montserrat',sans-serif;
+      background: linear-gradient(to bottom, #000, #1a1a1a);
+      color:#f0f;
+      height:100dvh; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      padding-top:0; position:relative;
+      opacity:0; animation:fadeInBody 1.8s ease forwards;
+    }
+    @keyframes fadeInBody { to { opacity:1 } }
+
+    :root { --bg: linear-gradient(to bottom, #000, #1a1a1a); --text: #444; --fast:.4s; --med:.8s; --slow:1.8s; }
+    body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+    body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+    body.vibe  { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+
+    html,body{width:100%;height:100%;overflow:hidden}
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      padding:0;background:var(--bg);color:var(--text);
+      transition:background var(--slow),color var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+    .center-group{ z-index:99; display:flex; flex-direction:column; align-items:center; gap:1rem; padding:20px; }
+    .logo-container{ width:249px; animation:glow 3s ease-in-out infinite alternate; cursor:pointer; position:relative; }
+    .logo-container object{ width:100%; display:block }
+    @keyframes glow{ from{filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #f0f)} to{filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 35px #f0f)} }
+
+    .infodose{ font-size:1.4em; font-weight:300; animation:fadeIn 1.5s forwards 1s; opacity:0; }
+    .infodose strong{ font-weight:600 }
+    @keyframes fadeIn { to { opacity:0.8 } }
+
+    .login-container{
+      width:248px; padding:0.8rem; background:rgba(0,0,0,0.6);
+      border:2px solid transparent; border-radius:24px; backdrop-filter:blur(8px);
+      display:flex; flex-direction:column; gap:1rem; opacity:0; transition:opacity .3s; pointer-events:none;
+    }
+    .login-container.active { opacity:0.8; pointer-events:auto; }
+    .login-container input{
+      width:100%; background:rgba(255,255,255,0.05); border:none; border-bottom:1px solid rgba(255,255,255,0.3);
+      padding:0.6rem; font-size:1em; font-weight:300; color:#fff; outline:none; text-align:center; transition: background .3s; border-radius:10px;
+    }
+    .login-container input:focus{ background:rgba(255,255,255,0.1) }
+
+    .btn-container{ display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-full{
+      position:relative; z-index:3; overflow:hidden; padding:0.8rem 1.5rem;
+      background:rgba(255,255,255,0.05); border:none; border-radius:20px;
+      font-size:1em; font-weight:600; color:#fff; cursor:pointer;
+      transition: transform 0.3s, background 0.3s; flex:1 1 auto; min-width:100px;
+    }
+    .btn-full::before{
+      content:""; position:absolute; inset:0; padding:2px; background:linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
+      border-radius:20px; z-index:-1; -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite:xor; mask-composite:exclude;
+    }
+    .btn-full:hover{ transform:scale(1.05); background:rgba(255,255,255,0.15); }
+
+    .logout-area{ display:none; margin-top:0.3rem; text-align:center; }
+    .logout-area .username{ font-weight:700; color:#fff; margin-bottom:1rem; font-size:1.1em; opacity:0.8; }
+    .logout-area .btn-full{ background:rgba(255,50,50,0.1); color:#f55; }
+    .logout-area .btn-full::before{ background:linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5)); }
+
+    #messageBox{ display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
+    #buyTokens{ display:none; }
+    #buyTokens button{
+      width:100%; padding:0.8rem 0; background:rgba(255,255,255,0.05);
+      border:2px solid transparent; border-image: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5)) 1;
+      border-radius:20px; font-size:1em; font-weight:600; color:#fff; cursor:pointer; transition: transform .3s, background .3s;
+    }
+    #buyTokens button:hover{ transform:scale(1.05); background:rgba(255,255,255,0.15); }
+
+    #decoderBox{
+      display:none; position:fixed; top:42px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,0.6); padding:1rem; border-radius:20px; backdrop-filter:blur(8px); z-index:20000; text-align:center;
+    }
+    #decoderBox input{ padding:0.6rem; width:200px; text-align:center; border-radius:10px; border:none; font-size:1em; }
+
+    #toggleDecoderBtn{
+      position: fixed; left:50%; transform: translateX(-50%); z-index: 19;
+      padding: 0.3rem 0.7rem; border:none; border-radius:20px; background: rgba(255,255,255,0.15);
+      color:#444; font-weight:bold; font-size:0.95em; cursor:pointer; backdrop-filter: blur(6px);
+      border:2px solid transparent; box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(255,0,255,0.2); transition: all 0.3s ease;
+    }
+    #toggleDecoderBtn:hover{ transform: translateX(-50%) scale(1.05); background: rgba(0,255,255,0.2); }
+
+    /* Painel mini (LocalStorage/Logs/Fetched) */
+    #miniPlayerContainer{ position: fixed; top: 89px; left: 50%; transform: translateX(-50%); z-index: 9999; width: 80vw; max-width: 400px; font-size: 0.9rem; }
+    #toggleMiniPlayer{ background: linear-gradient(90deg, #8882f8, #c277f2); color:white; padding:8px 18px; border-radius:16px; border:none; box-shadow:0 0 12px rgba(140,102,255,0.8); cursor:pointer; font-weight:700; user-select:none; transition: transform 0.2s ease; width:48px; height:48px; font-size:1.6rem; display:flex; align-items:center; justify-content:center; }
+    #toggleMiniPlayer:hover{ transform: scale(1.1); }
+    #panel{ margin-top:12px; background: rgba(25,25,35,0.9); border-radius:18px; box-shadow:0 0 15px #7f52ff88; padding:16px; max-height:360px; overflow-y:auto; display:none; backdrop-filter: blur(6px); }
+    #panel h2{ margin: 0 0 8px; font-weight:700; font-size:1.1rem; color:#d8b9ff; border-bottom:1px solid #6e4de7; padding-bottom:4px; }
+    #panel pre{ background:#222; border-radius:12px; padding:12px; margin:8px 0 16px; white-space:pre-wrap; word-break:break-word; font-size:0.85rem; max-height:100px; overflow-y:auto; }
+    #panel .actionBtn{ background: linear-gradient(45deg, #d97aff, #60e3ff); border:none; border-radius:12px; padding:6px 14px; color:#121212; font-weight:700; cursor:pointer; margin-top:6px; user-select:none; transition: background-color .25s ease; }
+    #panel .actionBtn:hover{ background: linear-gradient(45deg, #e0b8ff, #94f0ff); }
+    #logBtn, .log-pill, .pill-log, .old-log { display:none !important; }
+    #miniPlayerContainer, #centralPill, .old-center-button { display:none !important; } /* (mantém ocultos legados) */
+
+    /* BG */
+    body { background: linear-gradient(to top, rgba(68, 68, 68, 0.4),rgba(255, 255, 255, 0.6)); }
+    .fake-bg{
+      position: fixed; top:0; left:0; width:100vw; height:100dvh;
+      object-fit: cover; object-position: center; z-index: -2; opacity: .24; pointer-events: none; transition: opacity .5s ease;
+    }
+
+    /* ===== Injeção KBLX (mantida) ===== */
+    
+    #kblxLogPanel{
+      position:fixed; top:108px; left:20px; width:320px; max-height:50vh;
+      display:none; z-index:2000; overflow:auto;
+      background:rgba(0,0,0,0.66); color:#cfe; border-radius:14px; padding:10px 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.08);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:.92rem;
+    }
+    #kblxLogPanel strong{ color:#ff00ff }
+    #kblxLogLines > div{ padding:4px 0; border-bottom:1px dashed rgba(255,255,255,.08) }
+    #kblxLogActions{ display:flex; gap:8px; margin-top:8px }
+    #kblxLogActions button{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.08); border-radius:8px; padding:6px 10px; cursor:pointer }
+
+    #kblxPeopleBtn{
+      position:fixed; top:146px; left:50%; transform:translateX(-50%);
+      z-index:2001; font-size:20px; width:44px; height:44px; padding:0;
+      background: linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85));
+      color:#fff; border:none; border-radius:50%; cursor:pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(6px);
+    }
+    #kblxIframeOverlay{ position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55) }
+    #kblxIframeBox{
+      position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      width:88vw; max-width:400px; height:72vh; min-width:auto; max-height:360px;
+      background:rgba(0,0,0,0.35); border-radius:16px; overflow:hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.45); backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,.08);
+    }
+    #kblxIframeBox header{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:8px 12px; color:#fff; background:linear-gradient(90deg, rgba(0,255,255,.22), rgba(255,0,255,.16));
+      cursor:move;
+    }
+    #kblxIframeClose, #kblxIframePop, #kblxIframeReload{ background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px; }
+    #kblxIframe{ width:100%; height:calc(72vh - 46px); border:0; display:block; background:#000 }
+    #kblxResize{ position:absolute; right:0; bottom:0; width:20px; height:20px; cursor:nwse-resize; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.35) 51%); opacity:.65; }
+
+    #kblxCmdPal{ position:fixed; inset:0; display:none; z-index:2100; background:rgba(0,0,0,.6); align-items:flex-start; justify-content:center; padding-top:12vh; }
+    #kblxCmdBox{ width:min(820px, 92vw); background:#0f1220; border:1px solid rgba(255,255,255,.08); border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.45); overflow:hidden; }
+    #kblxCmdBox header{ padding:10px 14px; color:#ccd; font-weight:700; background:rgba(255,255,255,.04) }
+    #kblxCmdInput{ width:100%; font-size:16px; color:#fff; background:transparent; border:0; outline:0; padding:14px; font-family:ui-monospace, monospace; }
+    #kblxCmdHelp{ padding:8px 14px; color:#aab; font-size:.9rem; border-top:1px solid rgba(255,255,255,.08) }
+    #kblxCmdHelp code{ background:rgba(255,255,255,.06); padding:2px 6px; border-radius:6px }
+
+    /* Botão do rodapé (agora é toggle de UI) */
+    
+    #openBgOptionsBtn:hover{ background:rgba(0,0,0,0.55); }
+
+    /* Painel BG (flutuante completo) */
+    #userBgOptions{
+      position:fixed; right:16px; bottom:62px; z-index:2000;
+      background:rgba(0,0,0,0.80); color:#fff; padding:12px; border-radius:12px;
+      display:none; flex-direction:column; gap:10px; width:min(320px, 92vw);
+      border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(8px);
+    }
+    #userBgOptions button{
+      background: rgba(255, 255, 255, 0.08); border:none; border-radius:10px; padding:0.5rem 1rem; color:#fff; cursor:pointer; font-size:0.95em; transition: background .3s, transform .3s;
+    }
+    #userBgOptions button:hover{ background: rgba(255,255,255,0.15); transform: scale(1.03); }
+    #userBgOptions .thumbnails img{ width:64px; height:40px; border-radius:6px; border:2px solid transparent; cursor:pointer; opacity:0.75; transition:all .2s ease; }
+    #userBgOptions .thumbnails img:hover{ border-color:#fff; opacity:1 }
+
+    /* remove o upload duplicado que ficava logo abaixo do login */
+    .login-container > div .upload-btn { display:none !important; }
+  </style>
+<style>
+#openBgOptionsBtn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 64px !important;
+  z-index: 2001 !important;
+}
+</style>
+<style>
+/* === Unificar estilo dos botões topo + layout sem rolagem === */
+html, body {
+  height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+
+/* Visual unificado (mesmo do openBgOptionsBtn) */
+#kblxLogBtn, #openBgOptionsBtn {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 7px 9px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+}
+
+/* Alinhamento e posições */
+#kblxLogBtn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 20px !important;
+  z-index: 2001 !important;
+}
+#openBgOptionsBtn {
+  position: fixed !important;
+  top: 14px !important;
+  left: 64px !important;
+  z-index: 2001 !important;
+}
+</style>
+<style>
+/* === Patch: lock viewport & remove overscroll/scrollbars === */
+html, body {
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+body::-webkit-scrollbar { display: none !important; }
+* { overscroll-behavior: contain; }
+.center-group { max-height: calc(100dvh - 120px); overflow: hidden; }
+</style>
+<style>
+/* Equalize top alignment for log + eye */
+#kblxLogBtn, #openBgOptionsBtn {
+  top: 14px !important;
+  height: auto !important;
+  line-height: 1 !important;
+}
+</style>
+<style>
+/* === Clamp & Neutralize (no scroll, no overshoot) === */
+:root, html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: clip !important; /* modern equivalent of hidden for visual overflow */
+  overscroll-behavior: none !important;
+}
+
+body {
+  /* Ensure no accidental extra spacing from line-height baseline on body */
+  line-height: 1.2;
+}
+
+/* Neutralize bottom margins/paddings on key containers */
+.center-group,
+#panel,
+#miniPlayerContainer,
+#kblxLogPanel,
+#kblxCmdPal,
+#kblxIframeOverlay {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  max-height: 100dvh !important;
+}
+
+/* Clamp all first-level children to viewport height (excluding fixed overlays which already ignore flow) */
+body > * {
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+}
+
+/* Avoid accidental page growth from images/videos default display */
+img, video, canvas {
+  max-height: 100dvh;
+}
+
+/* Ensure our eye stays perfectly aligned with the log */
+#kblxLogBtn, #openBgOptionsBtn {
+  top: 14px !important;
+}
+
+/* Optional: if any legacy footer spacer exists, collapse it */
+.footer, #footer, .page-footer, .spacer, .bottom-spacer {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+</style>
+<style>
+/* === Estilo unificado para o botão ☍ === */
+button:contains("☍"), .link-btn, #linkBtn {
+  font-size: 14px !important;
+  line-height: 1 !important;
+  padding: 7px 9px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: rgba(0,0,0,0.40) !important;
+  backdrop-filter: blur(6px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35) !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0.8;
+}
+button:contains("☍"):hover, .link-btn:hover, #linkBtn:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+</style>
+</head>
+
+<body>
+
+<!-- Painel mini -->
+<div id="miniPlayerContainer" role="region" aria-label="Painel de Ativações">
+  <button id="toggleMiniPlayer" aria-expanded="false" aria-controls="panel" title="Abrir painel de ativações">💊</button>
+  <div id="panel" tabindex="0">
+    <div class="section" id="localStorageSection">
+      <h2>🗄️ LocalStorage</h2>
+      <pre id="localStorageContent">Carregando...</pre>
+      <button class="actionBtn" id="clearLocalStorageBtn" title="Limpar LocalStorage">Limpar LocalStorage</button>
+    </div>
+    <div class="section" id="logsSection">
+      <h2>📜 Logs Recentes</h2>
+      <pre id="logsContent">Nenhum log registrado.</pre>
+      <button class="actionBtn" id="clearLogsBtn" title="Limpar logs">Limpar Logs</button>
+    </div>
+    <div class="section" id="fetchSection">
+      <h2>🌐 Fetch & IA Acionada</h2>
+      <pre id="fetchContent">Nenhum fetch recente.</pre>
+      <div class="small-info" id="iaUsedInfo">IA atual: Nenhuma</div>
+      <button class="actionBtn" id="clearFetchBtn" title="Limpar dados fetch">Limpar Dados Fetch</button>
+    </div>
+  </div>
+</div>
+
+<!-- BG de fundo -->
+<img id="bgImage" class="fake-bg" src="about:blank" alt="" />
+
+<!-- Botão (rodapé) agora é toggle geral de UI -->
+<button id="openBgOptionsBtn" title="Mostrar/Ocultar UI">👁</button>
+
+<!-- Painel de opções de BG (flutuante) -->
+<div id="userBgOptions" style="display:none; flex-direction:column; gap:8px;">
+  <div class="row">
+    <button class="upload-btn" id="panelUploadBtn">⧈ Upload</button>
+    <input type="file" id="imgUpload" accept="image/*" style="display:none;">
+    <button id="cycleBtn">🔁 Ciclar</button>
+    <button id="clearHistoryBtn" style="background:#c00;">🗑 Limpar histórico</button>
+  </div>
+  <div id="bgHistory" class="thumbnails" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+</div>
+
+<!-- Pílulas -->
+<button id="kblxLogBtn" title="Logs">🧾</button>
+<div id="kblxLogPanel" role="region" aria-label="Painel de Logs">
+  <strong>◉ LOG</strong>
+  <div id="kblxLogActions">
+    <button id="kblxCopyLog" title="Copiar">Copiar</button>
+    <button id="kblxClearLog" title="Limpar">Limpar</button>
+  </div>
+  <div id="kblxLogLines"></div>
+</div>
+
+<button id="kblxPeopleBtn" title="Abrir iFrame">💊</button>
+
+<div id="kblxIframeOverlay" aria-hidden="true">
+  <div id="kblxIframeBox" role="dialog" aria-modal="true" aria-label="Visor Integrado">
+    <header id="kblxDragBar">
+      <span class="title">Visor Integrado</span>
+      <span style="flex:1"></span>
+      <button id="kblxIframeReload" title="Recarregar">↻</button>
+      <button id="kblxIframePop" title="Abrir em nova guia">⤴︎</button>
+      <button id="kblxIframeClose" aria-label="Fechar">×</button>
+    </header>
+    <iframe id="kblxIframe" src="about:blank" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    <div id="kblxResize" title="Redimensionar"></div>
+  </div>
+</div>
+
+<div id="kblxCmdPal">
+  <div id="kblxCmdBox">
+    <header>Comandos KBLX</header>
+    <input id="kblxCmdInput" placeholder="Digite um comando. Ex.: -o dual-book.html" spellcheck="false" />
+    <div id="kblxCmdHelp">
+      <div>Atalhos: <code>Ctrl/Cmd + K</code> abre; <code>Esc</code> fecha; <code>Ctrl/Cmd + L</code> log; <code>Ctrl/Cmd + O</code> visor.</div>
+      <div style="margin-top:6px">Comandos: <code>-o &lt;url&gt;</code> (abre no iFrame), <code>open &lt;url&gt;</code>, <code>close</code>, <code>reload</code>, <code>log on|off</code>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- UI central -->
+<div class="center-group">
+  <div class="logo-container" id="logoDual">
+    <div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
+    <object data="assets/icons/Dual-Orb-e2.png" type="image/png"></object>
+  </div>
+  <div class="infodose">dual.<strong>Infodose</strong></div>
+
+  <div class="login-container" id="loginBox">
+    <input type="text" id="user" placeholder="Usuário" required>
+    <input type="password" id="pass" placeholder="Senha" required>
+    <button class="btn-full" id="submitBtn">Entrar</button>
+
+    <!-- REMOVIDO o bloco antigo de upload duplicado -->
+
+    <div id="decoderBox">
+      <input type="text" id="codeInput" placeholder="Digite o selo...">
+      <button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+    </div>
+
+    <button id="toggleDecoderBtn">
+      <img src="assets/icons/KBLX-pack/SuS-logo-1.PNG" alt="SuS Logo" style="height:24px; vertical-align:middle;">
+    </button>
+
+    <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+    <button id="uploadHTMLBtn">☍</button>
+
+    <div id="messageBox"></div>
+    <div id="buyTokens"><button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button></div>
+    <div class="logout-area">
+      <div id="loggedUsername" class="username"></div>
+      <button id="logoutBtn" class="btn-full">Desconectar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======= JS: Painel mini ======= -->
+<script>
+  // Toggle painel
+  const toggleBtn = document.getElementById('toggleMiniPlayer');
+  const panel = document.getElementById('panel');
+  toggleBtn.addEventListener('click', () => {
+    const isVisible = panel.style.display === 'block';
+    panel.style.display = isVisible ? 'none' : 'block';
+    toggleBtn.setAttribute('aria-expanded', isVisible ? 'false' : 'true');
+    if (!isVisible) { loadLocalStorage(); loadLogs(); loadFetch(); }
+  });
+  const localStorageContent = document.getElementById('localStorageContent');
+  const clearLocalStorageBtn = document.getElementById('clearLocalStorageBtn');
+  function loadLocalStorage() {
+    if (localStorage.length === 0) { localStorageContent.textContent = 'LocalStorage vazio.'; return; }
+    let content = '';
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      let value = localStorage.getItem(key);
+      try { value = JSON.stringify(JSON.parse(value), null, 2); } catch { }
+      content += `${key}: ${value}\n\n`;
+    }
+    localStorageContent.textContent = content.trim();
+  }
+  clearLocalStorageBtn.addEventListener('click', () => {
+    if (confirm('Confirma limpar todo o LocalStorage?')) {
+      localStorage.clear(); loadLocalStorage(); addLog('LocalStorage limpo pelo usuário.');
+    }
+  });
+  let logs = [];
+  function addLog(text) {
+    const now = new Date().toLocaleTimeString();
+    logs.push(`[${now}] ${text}`); if (logs.length > 30) logs.shift();
+    if (panel.style.display === 'block') loadLogs();
+  }
+  const logsContent = document.getElementById('logsContent');
+  const clearLogsBtn = document.getElementById('clearLogsBtn');
+  function loadLogs() { logsContent.textContent = logs.length ? logs.join('\n') : 'Nenhum log registrado.'; }
+  clearLogsBtn.addEventListener('click', () => { if (confirm('Limpar todos os logs?')) { logs = []; loadLogs(); } });
+  let fetchData = []; let iaAtual = 'Nenhuma';
+  function addFetchData(url, iaName, responseSample) {
+    iaAtual = iaName;
+    const now = new Date().toLocaleTimeString();
+    fetchData.push(`[${now}] URL: ${url}\nIA: ${iaName}\nResposta: ${responseSample}`);
+    if (fetchData.length > 10) fetchData.shift();
+    if (panel.style.display === 'block') loadFetch();
+  }
+  const fetchContent = document.getElementById('fetchContent');
+  const iaUsedInfo = document.getElementById('iaUsedInfo');
+  const clearFetchBtn = document.getElementById('clearFetchBtn');
+  function loadFetch() {
+    if (fetchData.length === 0) { fetchContent.textContent = 'Nenhum fetch recente.'; iaUsedInfo.textContent = 'IA atual: Nenhuma'; return; }
+    fetchContent.textContent = fetchData.join('\n\n'); iaUsedInfo.textContent = 'IA atual: ' + iaAtual;
+  }
+  clearFetchBtn.addEventListener('click', () => { if (confirm('Limpar dados de fetch?')) { fetchData=[]; iaAtual='Nenhuma'; loadFetch(); } });
+  addLog('Painel carregado.'); addFetchData('https://api.exemplo.com/gpt4', 'GPT-4', '{"result":"ok"}');
+</script>
+
+<!-- ======= JS: BG (upload/ciclar/histórico) ======= -->
+<script>
+  // keys e imagens fixas
+  const BG_KEY = "bgImageSource"; const BG_HISTORY_KEY = "bgImageHistory"; const FILTER_KEY = "bgImageFilter";
+  const imagensFixas = [
+    'assets/styles/themes/bgs/Hyperbolic-ASCII-BG.JPG',
+    'assets/styles/themes/bgs/Nebula-Galaxy.png',
+    'assets/styles/themes/bgs/Circuit-Spirit.jpg',
+    'assets/styles/themes/bgs/Temple-Net.png'
+  ];
+  let indexAtual = 0;
+
+  const bg = document.getElementById('bgImage');
+  const cycleBtn = document.getElementById('cycleBtn');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  const bgHistoryContainer = document.getElementById('bgHistory');
+  const userBgOptions = document.getElementById('userBgOptions');
+  const openBgOptionsBtn = document.getElementById('openBgOptionsBtn'); // agora é toggle geral da UI
+  const panelUploadBtn = document.getElementById('panelUploadBtn');
+  const imgUpload = document.getElementById('imgUpload');
+
+  function logMistico(msg){ if (window.logMistico) window.logMistico(msg); else console.log("◉", msg); }
+
+  // UPLOAD (painel)
+  panelUploadBtn.addEventListener('click', ()=> imgUpload.click());
+  function trocarImagem(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) { setBG(e.target.result, true); logMistico("Imagem BG atualizada 🖼️"); event.target.value = ""; };
+    reader.readAsDataURL(file);
+  }
+  imgUpload.addEventListener('change', trocarImagem);
+
+  // Ciclar / Limpar
+  cycleBtn.addEventListener('click', () => {
+    indexAtual = (indexAtual + 1) % imagensFixas.length;
+    setBG(imagensFixas[indexAtual], true);
+    logMistico("🔁 BG ciclado");
+  });
+  clearHistoryBtn.addEventListener('click', () => {
+    if (!confirm("Tem certeza que deseja apagar todo o histórico de imagens?")) return;
+    localStorage.removeItem(BG_HISTORY_KEY);
+    localStorage.setItem(BG_KEY, imagensFixas[0]);
+    bg.src = imagensFixas[0];
+    renderHistory();
+    logMistico("🗑 Histórico de BG apagado");
+  });
+
+  // BG helpers
+  function setBG(src, salvarHistorico = false) {
+    bg.src = src; localStorage.setItem(BG_KEY, src);
+    if (salvarHistorico) {
+      let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+      if (!history.includes(src)) { history.push(src); localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history)); }
+      renderHistory();
+    }
+  }
+  function renderHistory() {
+    bgHistoryContainer.innerHTML = "";
+    const history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+    history.forEach(src => {
+      const thumb = document.createElement("img");
+      thumb.src = src; thumb.style.width = "58px"; thumb.style.height = "38px";
+      thumb.style.objectFit = "cover"; thumb.style.cursor = "pointer";
+      thumb.style.border = "2px solid transparent"; thumb.style.borderRadius = "4px";
+      thumb.addEventListener("click", () => { setBG(src, false); logMistico("📷 BG trocado via histórico"); });
+      const wrap = document.createElement("div"); wrap.style.position = "relative"; wrap.style.display = "inline-block"; wrap.appendChild(thumb);
+      const rm = document.createElement("button"); rm.textContent = "✕"; rm.title="Remover";
+      Object.assign(rm.style,{position:"absolute",top:"-6px",right:"-6px",width:"18px",height:"18px",border:"none",borderRadius:"50%",fontSize:"11px",cursor:"pointer",background:"rgba(0,0,0,0.6)",color:"#fff"});
+      rm.addEventListener("click", (ev) => { ev.stopPropagation(); removeFromHistory(src); });
+      wrap.appendChild(rm); bgHistoryContainer.appendChild(wrap);
+    });
+  }
+  function removeFromHistory(src) {
+    let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+    history = history.filter(s => s !== src);
+    localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history));
+    renderHistory();
+    logMistico("🗑 Miniatura removida do histórico");
+  }
+  function loadUserBG() {
+    const savedSrc = localStorage.getItem(BG_KEY) || imagensFixas[0];
+    const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
+    bg.src = savedSrc; bg.style.filter = savedFilter; renderHistory();
+  }
+  window.addEventListener('load', loadUserBG);
+</script>
+
+<!-- ======= JS: KBLX / visor / log / palette ======= -->
+<script>
+  (function(){
+    const $ = (s, r=document) => r.querySelector(s);
+    const logLines = $('#kblxLogLines');
+
+    function kblxLog(msg){
+      const line = document.createElement('div');
+      const t = new Date();
+      line.textContent = '[' + t.toLocaleTimeString() + '] ' + msg;
+      logLines.prepend(line);
+      try {
+        const arr = JSON.parse(localStorage.getItem('kblx.log')||'[]');
+        arr.unshift(line.textContent);
+        localStorage.setItem('kblx.log', JSON.stringify(arr.slice(0, 500)));
+      } catch(e){}
+    }
+    window.kblxLog = kblxLog;
+
+    // restaura logs
+    try {
+      (JSON.parse(localStorage.getItem('kblx.log')||'[]')).reverse().forEach(t=>{
+        const d=document.createElement('div'); d.textContent=t; logLines.appendChild(d);
+      });
+    } catch(e){}
+
+    const logBtn = $('#kblxLogBtn');
+    const logPanel = $('#kblxLogPanel');
+    const copyBtn = $('#kblxCopyLog');
+    const clearBtn = $('#kblxClearLog');
+
+    function toggleLogPanel(force){
+      const show = force !== undefined ? !!force : (logPanel.style.display !== 'block');
+      logPanel.style.display = show ? 'block' : 'none';
+      localStorage.setItem('kblx.log.visible', show ? '1' : '0');
+    }
+    logBtn.addEventListener('click', ()=> toggleLogPanel());
+    copyBtn.addEventListener('click', async ()=>{
+      let text = Array.from(logLines.children).map(n=>n.textContent).join('\n');
+      try{ await navigator.clipboard.writeText(text); }catch(e){}
+      kblxLog('Logs copiados.');
+    });
+    clearBtn.addEventListener('click', ()=>{
+      logLines.innerHTML='';
+      localStorage.removeItem('kblx.log');
+      kblxLog('Logs limpos.');
+    });
+    if(localStorage.getItem('kblx.log.visible') === '1'){ logPanel.style.display='block'; }
+
+    // visor
+    const overlay = $('#kblxIframeOverlay');
+    const box = $('#kblxIframeBox');
+    const dragBar = $('#kblxDragBar');
+    const iframe = $('#kblxIframe');
+    const btnPeople = $('#kblxPeopleBtn');
+    const btnClose = $('#kblxIframeClose');
+    const btnPop = $('#kblxIframePop');
+    const btnReload = $('#kblxIframeReload');
+    const resizeHandle = $('#kblxResize');
+
+    function openIframe(src){
+      if (src) iframe.src = src;
+      overlay.style.display = 'block';
+      overlay.setAttribute('aria-hidden','false');
+      localStorage.setItem('kblx.iframe.visible', '1');
+      if(iframe.src && iframe.src !== 'about:blank') localStorage.setItem('kblx.iframe.src', iframe.src);
+      kblxLog('iFrame aberto' + (src? ' → ' + src : ''));
+    }
+    function closeIframe(){
+      overlay.style.display = 'none';
+      overlay.setAttribute('aria-hidden','true');
+      localStorage.setItem('kblx.iframe.visible', '0');
+      kblxLog('iFrame fechado.');
+    }
+    function toggleIframe(){ (overlay.style.display==='block') ? closeIframe() : openIframe(); }
+
+    btnPeople.addEventListener('click', async ()=>{
+      if(!iframe.src || iframe.src==='about:blank') await resolveAndOpenDefault();
+      else toggleIframe();
+    });
+    btnClose.addEventListener('click', closeIframe);
+    btnPop.addEventListener('click', ()=>{
+      try{ window.open(iframe.src || 'about:blank','_blank'); kblxLog('Abrindo em nova guia.'); }catch(e){}
+    });
+    btnReload.addEventListener('click', ()=>{
+      try{ iframe.contentWindow.location.reload(); kblxLog('Recarregando iFrame.'); }catch(e){ iframe.src = iframe.src; }
+    });
+    overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeIframe(); });
+
+    // arrastar
+    (function enableDrag(){
+      let startX, startY, oX=0, oY=0;
+      function onDown(e){
+        const rect = box.getBoundingClientRect();
+        oX = rect.left; oY = rect.top;
+        startX = e.clientX; startY = e.clientY;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      }
+      function onMove(e){
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        box.style.left = (oX + dx) + 'px';
+        box.style.top  = (oY + dy) + 'px';
+        box.style.transform = 'translate(0,0)';
+      }
+      function onUp(){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      dragBar.addEventListener('mousedown', onDown);
+    })();
+
+    // redimensionar
+    (function enableResize(){
+      let startX, startY, startW, startH;
+      function onDown(e){
+        e.preventDefault();
+        const rect = box.getBoundingClientRect();
+        startX = e.clientX; startY = e.clientY;
+        startW = rect.width; startH = rect.height;
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
+      }
+      function onMove(e){
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const w = Math.max(480, startW + dx);
+        const h = Math.max(360, startH + dy);
+        box.style.width  = w + 'px';
+        box.style.height = h + 'px';
+        iframe.style.height = (h - 46) + 'px';
+      }
+      function onUp(){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      resizeHandle.addEventListener('mousedown', onDown);
+    })();
+
+    // teclado
+    document.addEventListener('keydown', (e)=>{
+      const mod = e.ctrlKey || e.metaKey;
+      if(mod && e.key.toLowerCase() === 'l'){ e.preventDefault(); toggleLogPanel(); }
+      if(mod && e.key.toLowerCase() === 'o'){ e.preventDefault(); toggleIframe(); }
+      if(mod && e.key.toLowerCase() === 'k'){ e.preventDefault(); toggleCmdPal(); }
+      if(e.key === 'Escape'){
+        if($('#kblxCmdPal').style.display==='block'){ toggleCmdPal(false); return; }
+        if(overlay.style.display==='block'){ closeIframe(); return; }
+        if(logPanel.style.display==='block'){ toggleLogPanel(false); return; }
+      }
+    });
+
+    // restaurar iframe estado
+    (function restoreIframe(){
+      const saved = localStorage.getItem('kblx.iframe.src');
+      if(saved) iframe.src = saved;
+      if(localStorage.getItem('kblx.iframe.visible') === '1'){
+        overlay.style.display='block'; overlay.setAttribute('aria-hidden','false');
+      }
+    })();
+
+    // -o via URL
+    (function openFromURL(){
+      try{
+        const p = new URLSearchParams(window.location.search);
+        const hash = window.location.hash.slice(1);
+        let target = null;
+        if(p.get('o')) target = p.get('o');
+        else if(p.get('open')) target = p.get('open');
+        else if(p.get('iframe')) target = p.get('iframe');
+        if(!target && hash){
+          const parts = hash.split('&').map(s=>s.trim());
+          for(const part of parts){
+            if(part.startsWith('-o=')) target = part.slice(3);
+            else if(part.startsWith('o=')) target = part.slice(2);
+          }
+        }
+        if(target){ openIframe(target); }
+      }catch(e){}
+    })();
+
+    // Command Palette
+    const cmdPal = $('#kblxCmdPal');
+    const cmdInput = $('#kblxCmdInput');
+    function toggleCmdPal(force){
+      const show = force !== undefined ? !!force : (cmdPal.style.display !== 'flex');
+      cmdPal.style.display = show ? 'flex' : 'none';
+      if(show){ cmdInput.focus(); cmdInput.select(); }
+    }
+    cmdPal.addEventListener('click', (e)=>{ if(e.target===cmdPal) toggleCmdPal(false); });
+    cmdInput.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){ const v = cmdInput.value.trim(); handleCommand(v); }
+    });
+    function handleCommand(v){
+      if(!v){ toggleCmdPal(false); return; }
+      const parts = v.split(/\s+/);
+      if(parts[0] === '-o' || parts[0] === 'open'){
+        const url = parts.slice(1).join(' ');
+        if(url){ openIframe(url); kblxLog('Comando: abrir → ' + url); }
+        toggleCmdPal(false); return;
+      }
+      if(parts[0] === 'close'){ closeIframe(); toggleCmdPal(false); return; }
+      if(parts[0] === 'reload'){ document.getElementById('kblxIframeReload').click(); toggleCmdPal(false); return; }
+      if(parts[0] === 'log'){ const s=(parts[1]||'').toLowerCase(); if(s==='on') toggleLogPanel(true); else if(s==='off') toggleLogPanel(false); toggleCmdPal(false); return; }
+      kblxLog('Comando desconhecido: ' + v); toggleCmdPal(false);
+    }
+
+    kblxLog('KBLX injetado. Use Ctrl/Cmd+K para comandos, -o para abrir URLs no visor.');
+  })();
+</script>
+
+<!-- ======= JS: Login / Decoder / Upload HTML ======= -->
+<script type="module">
+  const loginBox   = document.getElementById('loginBox');
+  const userInput  = document.getElementById('user');
+  const passInput  = document.getElementById('pass');
+  const submitBtn  = document.getElementById('submitBtn');
+  const messageBox = document.getElementById('messageBox');
+  const buyArea    = document.getElementById('buyTokens');
+  const buyBtn     = document.getElementById('buyIFTBtn');
+  const logoutArea = document.querySelector('.logout-area');
+  const logoutBtn  = document.getElementById('logoutBtn');
+  const loggedUser = document.getElementById('loggedUsername');
+  const logoDual   = document.getElementById('logoDual');
+  const storedKey  = 'infodose_user';
+
+  const decoderBox = document.getElementById('decoderBox');
+  const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+  const uploadInput = document.getElementById('uploadHTML');
+  const uploadBtn   = document.getElementById('uploadHTMLBtn');
+
+  const USERS_JSON = 'users/usersid.json';
+  const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
+
+  // === CODE MAP (usando exatamente os caminhos que você trouxe) ===
+  window.CODE_MAP = {
+    "DUAL":"menu.html","KBX":"menu-x-1.html","ATVR":"render-response.html","ATVD":"decodificador.html",
+    "1991":"menu-x-1-E-19-E-9re-1.html","DBK":"dual-book-12.html","IMN":"index-manifestado.html","IMNN":"index-manifestado-tangle.html",
+    "BTS":"botao-simbolico.html","SBK":"SmbS-book-4.html","SBL":"SmbS-book-2.html","KDX":"menu-x-1-E-19-E-9_refatorado_final.html",
+    "KDI":"menu-integrado-kobllux.html","1992":"menu-x-1-E-19-E-9re-2.html","KDF":"menu-x-1-E-8.html","KDB":"menu-x-1-E-10.html",
+    "KDJ":"menu-x-1-E-19-E-9_renderresponse-final.html","HTM":"KBLX-HTML-v4.1-FULLSCREEN-SEPARADOR.html",
+    "MN6":"menu-x-1-E-6.html","MN7":"menu-x-1-E-7.html","MN8":"menu-x-1-E-8.html","MN9":"menu-x-1-E-9.html","MN10":"menu-x-1-E-10.html","MN11e":"menu-x-1-E-11e.html",
+    "MN12":"menu-x-1-E-12.html","MN13":"menu-final-com-pulso.html","MN14":"menu-pulso-final.html","MN15":"menu-x-1-E-15.html","19E9":"menu-x-1-E-19-E-9.html",
+    "19E10":"menu-x-1-E-19-E-10.html","19E11":"menu-x-1-E-19-E-11.html","MN19":"menu-x-1-E-19.html","19E8":"menu-x-1-E-19-E-8.html","19E0":"menu-x-1-E-19-E-0.html",
+    "19921":"menu-x-1-E-19-E-9re-2-1.html","19922":"menu-x-1-E-19-E-9re-2-2.html","19923":"menu-x-1-E-19-E-9re-2-3.html","19924":"menu-x-1-E-19-E-9re-2-4.html","19925":"menu-x-1-E-19-E-9re-2-5.html","19926":"menu-x-1-E-19-E-9re-2-6.html","19927":"menu-x-1-E-19-E-9re-2-7.html","19928":"menu-x-1-E-19-E-9re-2-8.html",
+    "9231":"menu-x-1-E-19-E-9-2re-3-1.html","9232":"menu-x-1-E-19-E-9-2re-3-2.html","9233":"menu-x-1-E-19-E-9-2re-3-3.html",
+    "9241":"menu-x-1-E-19-E-9-2re-4-1.html","9242":"menu-x-1-E-19-E-9-2re-4-2.html","9243":"menu-x-1-E-19-E-9-2re-4-3.html","9244":"menu-x-1-E-19-E-9-2re-4-4.html",
+    "920":"menu-x-1-E-19-E-9re-2-FINAL-0e-2-bgvar.html","92F0":"menu-x-1-E-19-E-9re-2-FINAL-0.html","F0E":"menu-x-1-E-19-E-9re-2-FINAL-0e.html","F01":"menu-x-1-E-19-E-9re-2-FINAL-0e-1.html","F02":"menu-x-1-E-19-E-9re-2-FINAL-0e-2.html","F03":"menu-x-1-E-19-E-9re-2-FINAL-0e-3.html",
+    "F30":"menu-x-1-E-19-E-9re-2-FINAL-0e-3e-0.html","F31":"menu-x-1-E-19-E-9re-2-FINAL-0e-3e-1.html","F32":"menu-x-1-E-19-E-9re-2-FINAL-0e-3e-2.html","F33":"menu-x-1-E-19-E-9re-2-FINAL-0e-3e-3.html","F34":"menu-x-1-E-19-E-9re-2-FINAL-0e-3e-4.html",
+    "F10":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0.html","F11":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1.html","F12":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-2.html","F13":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-3.html","F14":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-4.html","F15":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-5.html","F16":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-6.html",
+    "100":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1-0.html","101":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ATUALIZADO.html","102":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO.html",
+    "103":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO-INTEGRADO.html","104":"menu-x-KBLUX-SYM-renderResponse-GLOWED.html","105":"RENDERRESPONSE-refinado-MODIFICADO.html","106":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-RESPONSIVO-BOTOES.html","107":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-TRINITY-ARCHE.html",
+    "108":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-0.html","109":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1.html","1102":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-2.html","110":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0.html",
+    "111":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-1.html","112":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-2.html","113":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-3.html","114":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-4.html","115":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-5.html","116":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-6.html","117":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-7.html","118":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-8.html",
+    "119":"dual-app-renderResponse-SEPARADA.html","120":"dual-app-renderResponse-UNIFICADA.html","121":"dual-app-renderResponse-UNIFICADA-COMPACTO.html","1000":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-0.html",
+    "1001":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-1.html","1002":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2.html","1002A":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2a.html","1003":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-3.html",
+    "1008":"dualapp-renderResponse-Trinity-subblocos-integrado.html","1005":"menu-integrado-renderResponse-v1-final.html","1006":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-0.html",
+    "AR1":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-1.html","AR2":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-2.html","AR3":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-3.html","AR4":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-4.html",
+    "AR5":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-5.html","AR6":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6.html","AR7":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-7.html","AR8":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-8.html","AR9":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-9.html",
+    "R10":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-10.html","R60":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-0.html","R61":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-1.html","R62":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-2.html","R63":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3.html",
+    "R64":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-4.html","R65":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-5.html","R66":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-6.html",
+    "999":"dual-infodose-v3-toggle-advanced.html","666":"dual-infodose-v2-renderResponse-simbio-ajustado.html","333":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix.html",
+    "990":"dual-infodose-v3-refatorado-patch-0.html","991":"dual-infodose-v3-refatorado-patch-1.html","992":"dual-infodose-v3-refatorado-patch-2.html","E99":"dual-infodose-v3-refatorado-patch.html",
+    "993":"dual-infodose-v3-refatorado-patch-3.html","994":"dual-infodose-v3-refatorado-patch-4.html","995":"dual-infodose-v3-refatorado-patch-5.html","996":"dual-infodose-v3-refatorado-patch-6.html","997":"dual-infodose-v3-refatorado-patch-7.html","998y":"dual-infodose-v3-refatorado-patch-8.html",
+    "129":"dual-app-990e-12.html","139":"dual-app-990e-13.html","90e":"dual-app-990e.html","90":"dual-app-990.html","139e":"dual-app-990e-13-E.html","149":"dual-app-990e-14.html","159":"dual-app-990e-15.html","169":"dual-app-990e-16.html","179":"dual-app-990e-17.html","189":"dual-app-990e-18.html","ADV":"ADV-gen.html",
+    "R630":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html","R631":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html","R632":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html","R633":"menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-1.html",
+    "R16":"dual-app-990e-16-REFATORADO.html","R160":"dual-app-990e-16-RE-0.html","R169":"dual-app-990e-16_voice_only_voicebtn_fixed.html",
+    "1690":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH.html","1691":"dual-app-990e-16_injected.html","1692":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH_v2.html","1693":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH_v3.html","1694":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH_v4.html","1695":"dual-app-990e-16-refatorado.html","1696":"dual-app-990e-16-upload.html","1697":"dual-app-990e-16-upload-integrado.html","1698":"dual-app-990e-16_injected_with_ativacoes_synced.html",
+    "6900":"dual-app-990e-16-cleaned.html","6901":"dual-app-990e-16.min.html","6902":"dual-app-990e-16-singlefile-min-v2.html","6903":"dual-app-990e-16-singlefile-min.html","6904":"dual-app-990e-16-MASTER.html","6905":"dual-app-990e-16.SYMBOLIC-OFFLINE.html","6906":"dual-app-990e-16.MASTER+KOBLLUX.html","6907":"dual-app-990e-16.MASTER+DIAG.html","6908":"dual-app-990e-16.MASTER.html",
+    "6909":"metalux-font-only-0.html","6910":"metalux-font-only.html","6911":"metalux-font-first-BLUE.html","6912":"metalux-svg-only-BLUE.html","6913":"metalux-font-first.html","6914":"uploader.html","6915":"dual-app-990e-16.singlefile.html","6916":"dual-app-990e-16.MASTER+RUNES.html","6917":"dual-app-990e-16.cleaned.html","6918":"metalux-font-only-KOBLLUX.html",
+    "6920":"dual-app-990e-16.SuperPatch.v6.always.html","6921":"dual-app-990e-16.SuperPatch.v6.always.min.html","6922":"dual-app-990e-16.SuperPatch.v6.toggle.html","6923":"dual-app-990e-16.SuperPatch.v6.toggle.min.html",
+    "6924":"dual-app-990e-16.SuperPatch.v6.1.always.html","6925":"dual-app-990e-16.SuperPatch.v6.1.always.min.html","6926":"dual-app-990e-16.SuperPatch.v6.1.toggle.html","6927":"dual-app-990e-16.SuperPatch.v6.1.toggle.min.html",
+    "6928":"dual-app-990e-16.SuperPatch.v6.2.always.html","6929":"dual-app-990e-16.SuperPatch.v6.2.always.min.html","6930":"dual-app-990e-16.SuperPatch.v6.2.toggle.html","6931":"dual-app-990e-16.SuperPatch.v6.2.toggle.min.html",
+    "6932":"dual-app-990e-16.SuperPatch.v6.2.1.always.html","6933":"dual-app-990e-16.SuperPatch.v6.2.1.toggle.html",
+    "6934":"dual-app-990e-16.SuperPatch.v6.2.2.always.html","6935":"dual-app-990e-16.SuperPatch.v6.2.2.toggle.html",
+    "6936":"dual-app-990e-16.SuperPatch.v6.2.3.always.html","6937":"dual-app-990e-16.SuperPatch.v6.2.3.toggle.html",
+    "6938":"dual-app-990e-16.SuperPatch.v6.2.4.always.html","6939":"dual-app-990e-16.SuperPatch.v6.2.4.toggle.html",
+    "6940":"dual-app-990e-16.SuperPatch.v6.2.5.always.html","6941":"dual-app-990e-16.SuperPatch.v6.2.5.toggle.html",
+    "6942":"dual-app-990e-16.SuperPatch.v6.2.6.always.html","6943":"dual-app-990e-16.SuperPatch.v6.2.6.toggle.html",
+    "6944":"dual-app-990e-16.SuperPatch.v6.2.7.always.html","6945":"dual-app-990e-16.SuperPatch.v6.2.7.toggle.html",
+    "6946":"dual-app-990e-16.SuperPatch.v6.2.8.always.html","6947":"dual-app-990e-16.SuperPatch.v6.2.8.toggle.html",
+    "6948":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle.html","6949":"dual-app-990e-16.SuperPatch.v6.2.9.1.toggle.html","6950":"dual-app-990e-16.SuperPatch.v6.2.9.2.always.html","6951":"dual-app-990e-16.SuperPatch.v6.2.9.3.toggle.html","6952":"dual-app-990e-16.SuperPatch.v6.2.9.4.toggle.html",
+    "6953":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle-0.html","6954":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle-1.html","6955":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle-2.html",
+    "6956":"dual-app.symbus-toggle-default-on.html","6957":"dual-app.symbus-toggle-default-on-0.html","6958":"dual-app.symbus-toggle-default-on.20250813-232847.html",
+    "Htmbl":"Template_Analyzer_Dual_0.html","htb1":"KOBLLUX-Pyodide-Foundry.html","htb2":"KOBLLUX-Pyodide-Foundry-v2.html","htb3":"KOBLLUX-Pyodide-Foundry-v3.html",
+    "Htmn":"Editor-html-0.html","Html":"Editor-html-1.html","ht":"Editor-html-2.html","pf":"pref-0.html",
+    "MRR":"menu-RR.html","R90":"dual-infodose-v4-simbiose-final.html",
+    "s00":"symbiote-editor.html",
+    "sv1":"symbiote-editor-pro.html",
+    "sv2":"symbiote-editor-pro-v2.html",
+    "sv3":"symbiote-editor-pro-v3.html",
+    "sv4":"symbiote-editor-pro-v4.html",
+    "sv5":"symbiote-editor-pro-v5.html",
+    "sv6":"symbiote-editor-pro-v6.html"
+  };
+
+  function playButtonSound() {
+    const sound = new Audio('assets/sounds/uiSamples/back-action.wav');
+    sound.volume = 0.7;
+    sound.play().catch(() => {});
+  }
+
+  toggleDecoderBtn.addEventListener('click', () => {
+    playButtonSound();
+    const isVisible = decoderBox.style.display === 'block';
+    decoderBox.style.display = isVisible ? 'none' : 'block';
+    gsap.fromTo(decoderBox, { opacity: 0, y: -20 }, { opacity: isVisible ? 0 : 1, y: 0, duration: 0.4, ease: "power2.out" });
+  });
+
+  uploadBtn.addEventListener('click', () => { playButtonSound(); uploadInput.click(); });
+  uploadInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file && file.name.endsWith('.html')) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const content = ev.target.result;
+        const blob = new Blob([content], { type: 'text/html' });
+        const blobUrl = URL.createObjectURL(blob);
+        alert('Página carregada com sucesso! Redirecionando...');
+        setTimeout(() => { window.location.href = blobUrl; }, 1000);
+      };
+      reader.readAsText(file);
+    } else { alert("Por favor, selecione um arquivo .html válido."); }
+  });
+
+  async function resolveTemplatePath(path){
+    // tenta original
+    try{ const r = await fetch(path,{method:'HEAD'}); if(r.ok) return path; }catch(e){}
+    // tenta com/sem templates/
+    if(path.startsWith('templates/')){
+      const alt = path.replace(/^templates\//,'');
+      try{ const r2 = await fetch(alt,{method:'HEAD'}); if(r2.ok) return alt; }catch(e){}
+    }else{
+      const alt = 'templates/' + path;
+      try{ const r3 = await fetch(alt,{method:'HEAD'}); if(r3.ok) return alt; }catch(e){}
+    }
+    return path; // fallback
+  }
+
+  window.decodeSymbolicCode = async () => {
+    playButtonSound();
+    const code = document.getElementById('codeInput').value.trim().toUpperCase();
+    const dest0 = window.CODE_MAP[code];
+    if (!dest0) { alert('Selo desconhecido ou não registrado.'); return; }
+    const dest = await resolveTemplatePath(dest0);
+
+    try { const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav'); audio.volume = 0.6; audio.play().catch(() => {}); } catch(e){}
+    gsap.to('.logo-container', { scale: 0.8, duration: 0.9, ease: 'power3.out' });
+    gsap.to('.infodose', { scale: 0, duration: 0.9, ease: 'power3.out' });
+    gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
+    gsap.to('body', {
+      opacity: 0, duration: 0.9, ease: 'power2.inOut',
+      onComplete: () => { setTimeout(() => { window.location.href = dest; }, 60); }
+    });
+  };
+
+  const goToIndex = () => {
+    const audio = new Audio('assets/sounds/suave_portal.mp3');
+    audio.volume = 1; audio.play().catch(() => {});
+    gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+    gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+    gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+    setTimeout(() => { window.location.href = 'index.html'; }, 1399);
+  };
+
+  const lockScroll = () => {
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.height = '100dvh';
+    document.body.style.height = '100dvh';
+    window.scrollTo(0, 0);
+  };
+
+  function showLoginUI() {
+    loginBox.classList.add('active');
+    userInput.style.display  = '';
+    passInput.style.display  = '';
+    submitBtn.style.display  = '';
+    logoutArea.style.display = 'none';
+    buyArea.style.display    = 'none';
+    messageBox.style.display = 'none';
+  }
+  function showLogoutUI(user) {
+    loginBox.classList.add('active');
+    userInput.style.display  = 'none';
+    passInput.style.display  = 'none';
+    submitBtn.style.display  = 'none';
+    logoutArea.style.display = 'block';
+    loggedUser.textContent   = user ? `${user}` : '';
+    buyArea.style.display    = 'none';
+    messageBox.style.display = 'none';
+  }
+
+  window.addEventListener('load', () => {
+    lockScroll();
+    const stored = localStorage.getItem(storedKey);
+    stored ? showLogoutUI(stored) : showLoginUI();
+  });
+
+  submitBtn.addEventListener('click', async () => {
+    const rawUser = userInput.value.trim();
+    const u = rawUser.toLowerCase();
+    const p = passInput.value.trim();
+    if (!u || !p) {
+      showLoginUI(); messageBox.textContent = 'Por favor, preencha usuário e senha.'; messageBox.style.display = 'block'; return;
+    }
+    try {
+      const res = await fetch(USERS_JSON);
+      if (!res.ok) throw new Error('Falha ao carregar credenciais.');
+      const creds = await res.json();
+      if (creds[u] && creds[u] === p) {
+        localStorage.setItem(storedKey, rawUser);
+        goToIndex();
+      } else {
+        showLoginUI();
+        messageBox.textContent = creds[u] ? 'Senha incorreta para usuário mestre.' : 'Usuário ainda não conectado com o pulso.';
+        messageBox.style.display = 'block'; buyArea.style.display = 'block';
+      }
+    } catch (err) {
+      showLoginUI(); messageBox.textContent = err.message; messageBox.style.display = 'block'; buyArea.style.display = 'block';
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => { localStorage.removeItem(storedKey); showLoginUI(); });
+  logoDual.addEventListener('click', () => { const user = localStorage.getItem(storedKey); if (user) goToIndex(); });
+  buyBtn.addEventListener('click', () => { window.location.href = PIX_LINK; });
+
+  /* Toggle geral: botão do rodapé (👁) alterna login + pílula central */
+  let uiHidden = false;
+  openBgOptionsBtn.addEventListener('click', () => {
+    uiHidden = !uiHidden;
+    document.getElementById('loginBox').style.display = uiHidden ? 'none' : '';
+    document.getElementById('kblxPeopleBtn').style.display = uiHidden ? 'none' : '';
+    openBgOptionsBtn.textContent = uiHidden ? '🙈' : '👁';
+    if (uiHidden) document.getElementById('userBgOptions').style.display = 'none';
+  });
+
+  /* Atalho: abrir painel BG pelo ⧈ do LOGIN (quando existir) */
+  // (No HTML final removi aquele bloco duplicado; se você recolocar, basta apontar pra esse toggle)
+  const openPanelFromLogin = () => {
+    const p = document.getElementById('userBgOptions');
+    p.style.display = (p.style.display === 'flex') ? 'none' : 'flex';
+  };
+  // se quiser disparar via teclado:
+  document.addEventListener('keydown', (e)=>{
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==='b'){ e.preventDefault(); openPanelFromLogin(); }
+  });
+
+  /* Visor default */
+  async function resolveAndOpenDefault(){
+    const pref = 'templates/Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html';
+    const fallback = 'Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html';
+    try { const res = await fetch(pref, { method:'HEAD' }); if(res.ok){ window.kblxOpenVisor(pref); return; } } catch(e){}
+    window.kblxOpenVisor(fallback);
+  }
+</script>
+
+</body>
+</html>
