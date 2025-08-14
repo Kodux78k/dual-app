@@ -431,6 +431,12 @@ body.logged-in .upload-btn { display: inline-flex !important; }
   transform: translateY(-1px);
 }
 </style>
+
+<style>
+/* ensure 💊 is clickable and above */
+#toggleMiniPlayer { pointer-events: auto !important; z-index: 2002 !important; }
+</style>
+
 </head>
 
 <body class="logged-in">
@@ -989,11 +995,7 @@ body.logged-in .upload-btn { display: inline-flex !important; }
     "sv3":"symbiote-editor-pro-v3.html",
     "sv4":"symbiote-editor-pro-v4.html",
     "sv5":"symbiote-editor-pro-v5.html",
-    "sv6":"symbiote-editor-pro-v6.html",
-    "sv7":"symbiote-editor-pro-v7.html",
-    "sv8":"symbiote-editor-pro-v8.html",
-    "sv9":"symbiote-editor-pro-v9.html"
-    
+    "sv6":"symbiote-editor-pro-v6.html"
   };
 
   function playButtonSound() {
@@ -1182,6 +1184,51 @@ body.logged-in .upload-btn { display: inline-flex !important; }
     }
   }
   if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+
+<script>
+// === Hook: ensure 💊 opens the Visor iFrame ===
+(function(){
+  function byId(id){ return document.getElementById(id); }
+  // Fallback resolveAndOpenDefault if not present
+  if (typeof window.resolveAndOpenDefault !== 'function') {
+    window.resolveAndOpenDefault = async function resolveAndOpenDefault(){
+      const pref = 'templates/Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html';
+      const fallback = 'Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html';
+      try {
+        const res = await fetch(pref, { method: 'HEAD' });
+        if (res.ok) { window.kblxOpenVisor && window.kblxOpenVisor(pref); return; }
+      } catch(e){}
+      window.kblxOpenVisor && window.kblxOpenVisor(fallback);
+    };
+  }
+
+  function init(){
+    var btn = byId('toggleMiniPlayer');
+    if (!btn) return;
+    // ensure it's not a submit button
+    try { btn.setAttribute('type', 'button'); } catch(e){}
+    // raise above other layers if needed
+    try { btn.style.zIndex = '2002'; } catch(e){}
+    btn.addEventListener('click', function(ev){
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (typeof window.resolveAndOpenDefault === 'function') {
+        window.resolveAndOpenDefault();
+      } else if (typeof window.kblxOpenVisor === 'function') {
+        // final fallback straight to fallback path
+        window.kblxOpenVisor('Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
