@@ -506,6 +506,29 @@ Position: fixed;
   padding:2px; /* espessura da borda gradiente */
 }
 </style>
+
+<style>
+
+/* ⭮ Inline Upload (☍) next to central icon */
+.upload-inline-btn{
+  position:fixed; z-index:9999;
+  width:36px; height:36px; line-height:36px; text-align:center;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.08);
+  background:#fff;
+  color:#444; font-size:18px; font-weight:600;
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+  transition:transform .12s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+  opacity:.96;
+}
+.upload-inline-btn:hover{ transform:translateY(-1px); background:#f7f7f7; border-color:rgba(0,0,0,.12) }
+.upload-inline-btn:active{ transform:translateY(0) scale(.98) }
+/* prefers reduced motion */
+@media (prefers-reduced-motion:reduce){
+  .upload-inline-btn{ transition:none }
+}
+
+</style>
 </head>
 <body>
 
