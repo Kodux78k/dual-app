@@ -506,86 +506,6 @@ Position: fixed;
   padding:2px; /* espessura da borda gradiente */
 }
 </style>
-
-<!-- ⬇️ Dual VoiceBtn Loaders + Opacidade por contexto -->
-<style>
-  :root{ --g1:#F0F; --g2:#0FF; --blurBg: blur(10px) saturate(120%); }
-  /* host */
-  #voiceBtn{
-    position:relative; display:inline-flex; align-items:center; justify-content:center;
-    width:48px; height:48px; border-radius:50%;
-    background: rgba(0,0,0,.22);
-    backdrop-filter: var(--blurBg); -webkit-backdrop-filter: var(--blurBg);
-    border: 0; outline: 0; isolation:isolate;
-    opacity:.4; transition: opacity .25s ease; /* inativo */
-  }
-  #voiceBtn.active{ opacity:.9; } /* ativo */
-  #voiceBtn::before{ /* borda gradiente com mask */
-    content:""; position:absolute; inset:-2px; border-radius:50%;
-    background: linear-gradient(45deg, var(--g1), var(--g2));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    padding:2px; z-index:-1; opacity:.9;
-  }
-  /* loader core (4 variações) */
-  .dual-loader{ --size:26px; --stroke:2px; position:relative; width:var(--size); height:var(--size); display:inline-block; }
-  .dual-loader .ring,.dual-loader .dash,.dual-loader .dots,.dual-loader .wave{ position:absolute; inset:0 }
-  .dual-loader .ring{
-    background: conic-gradient(from 90deg, var(--g1), var(--g2));
-    border-radius:50%;
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px));
-            mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px));
-    animation: spin 6s linear infinite;
-  }
-  .dual-loader .dash{
-    left:50%; top:50%; width:64%; height:var(--stroke);
-    background: linear-gradient(90deg, var(--g1), var(--g2)); transform: translate(-50%,-50%);
-    border-radius:999px; animation: breathe 2.6s ease-in-out infinite;
-  }
-  .dual-loader .dots{ transform: rotate(-90deg); }
-  .dual-loader .dots i{
-    --i:0; position:absolute; left:50%; top:50%; width:4px; height:4px; border-radius:50%;
-    background: conic-gradient(var(--g1), var(--g2));
-    -webkit-mask: radial-gradient(circle,#000 62%,transparent 63%);
-            mask: radial-gradient(circle,#000 62%,transparent 63%);
-    opacity:.75;
-    transform: rotate(calc(var(--i)*51deg)) translate(calc(6px + var(--i)*2px)) rotate(calc(var(--i)*-51deg));
-    animation: dotPulse 4.2s linear infinite; animation-delay: calc(var(--i)*.55s);
-  }
-  /* UNO */
-  .dual-loader.uno .dots{ animation: orbit 4.2s linear infinite; }
-  /* SIMBIO */
-  .dual-loader.simbio .ring{ animation-duration: 7.2s; filter: blur(.2px); opacity:.8 }
-  .dual-loader.simbio::after{
-    content:""; position:absolute; inset:3px; border-radius:50%;
-    background: conic-gradient(from -90deg, var(--g2), var(--g1));
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px));
-            mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px));
-    animation: spinRev 5.5s linear infinite; opacity:.65;
-  }
-  /* PULSO */
-  .dual-loader.pulso .wave{
-    background: radial-gradient(circle at center, rgba(255,255,255,.0) 40%, rgba(255,255,255,0) 41%);
-    animation: pulseWave 2.4s ease-out infinite;
-  }
-  /* COBLUX */
-  .dual-loader.coblux .ring{ animation-duration: 2.4s; filter: drop-shadow(0 0 6px rgba(0,255,255,.35)) drop-shadow(0 0 10px rgba(255,0,255,.25)); }
-  .dual-loader.coblux .dash{ opacity:.68; }
-  /* acessibilidade */
-  @media (prefers-reduced-motion: reduce){ .dual-loader *{ animation: none !important } }
-  /* keyframes */
-  @keyframes spin { to { transform: rotate(360deg) } }
-  @keyframes spinRev { to { transform: rotate(-360deg) } }
-  @keyframes breathe { 0%,100%{opacity:.85} 50%{opacity:1} }
-  @keyframes orbit { to { transform: rotate(270deg) } }
-  @keyframes dotPulse { 0%,70%{ opacity:.55; transform:scale(.92)} 76%,84%{ opacity:1; transform:scale(1.16)} 100%{ opacity:.7; transform:scale(.96)} }
-  @keyframes pulseWave {
-    0%   { box-shadow: 0 0 0 0 rgba(255,255,255,.10), 0 0 0 0 rgba(0,255,255,.12), 0 0 0 0 rgba(255,0,255,.12) }
-    70%  { box-shadow: 0 0 0 10px rgba(255,255,255,0), 0 0 0 20px rgba(0,255,255,0), 0 0 0 30px rgba(255,0,255,0) }
-    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0), 0 0 0 0 rgba(0,255,255,0), 0 0 0 0 rgba(255,0,255,0) }
-  }
-</style>
-
 </head>
 <body>
 
@@ -1538,103 +1458,145 @@ window.addEventListener('load', loadUserBG);
   })();
   </script>
 
+<style>
+/* Skins pro di-loader (visor) — mais lentas */
+.di-loader.skin-a .di-ring {
+  animation-duration: 12s; /* antes 6s */
+  filter: drop-shadow(0 0 8px rgba(0,255,255,.35)) drop-shadow(0 0 12px rgba(255,0,255,.25));
+}
+.di-loader.skin-a .di-stroke { opacity:.9 }
 
-<!-- ⬇️ VoiceBtn Loader wiring (12s + APIs + opacidade por contexto) -->
+.di-loader.skin-b .di-ring {
+  animation-duration: 6.4s; /* antes 3.2s */
+  filter: saturate(140%) blur(.2px);
+}
+.di-loader.skin-b .di-dots i {
+  transform: rotate(calc(var(--i)*51deg)) translate(calc(9px + var(--i)*2.6px)) rotate(calc(var(--i)*-51deg));
+}
+
+.di-loader.skin-c .di-ring { animation-duration: 17s; /* antes 8.5s */ }
+.di-loader.skin-c .di-stroke { animation-duration: 3.2s; /* antes 1.6s */ }
+.di-loader.skin-c .di-dots { animation: di-orbit 11.2s linear infinite; /* antes 5.6s */ }
+
+.di-loader.skin-d .di-ring { animation-duration: 4.4s; /* antes 2.2s */ }
+.di-loader.skin-d .di-stroke { opacity:.6 }
+
+@media (prefers-reduced-motion:reduce){
+  .di-loader.skin-a .di-ring,
+  .di-loader.skin-b .di-ring,
+  .di-loader.skin-c .di-ring,
+  .di-loader.skin-d .di-ring { animation: none !important; }
+}
+</style>
+
 <script>
+/* Visor: clique alterna skins do di-loader, sem afetar o open/close */
 (function(){
-  const BTN_ID = 'voiceBtn';
-  const CYCLE_MS = 12000; // 12s
-  const MODES = ['uno','simbio','pulso','coblux'];
+  const btn = document.getElementById('kblxPeopleBtn');
+  if (!btn) return;
 
-  function mkLoader(mode='uno'){
-    const el = document.createElement('span');
-    el.className = 'dual-loader ' + mode;
-    el.setAttribute('aria-hidden','true');
-    el.innerHTML = `
-      <span class="ring"></span>
-      <span class="dash"></span>
-      <span class="dots">
-        <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i>
-        <i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i>
-      </span>
-      <span class="wave"></span>
-    `;
-    return el;
+  const skins = ['skin-a','skin-b','skin-c','skin-d'];
+
+  function getLoader(){
+    return btn.querySelector('.di-loader');
+  }
+  function currentSkinIndex(loader){
+    const cls = loader.className;
+    for (let i=0;i<skins.length;i++){
+      if (cls.includes(skins[i])) return i;
+    }
+    return -1;
+  }
+  function applySkin(loader, idx){
+    skins.forEach(s => loader.classList.remove(s));
+    loader.classList.add(skins[idx]);
+    // micro tap feedback
+    btn.animate(
+      [{ transform:'translateX(-50%) scale(1)' }, { transform:'translateX(-50%) scale(1.06)' }, { transform:'translateX(-50%) scale(1)' }],
+      { duration:180, easing:'ease-out' }
+    );
   }
 
-  function applyToVoiceBtn(){
-    const btn = document.getElementById(BTN_ID);
-    if(!btn) return false;
+  // inicializa com skin-a se nenhuma
+  const init = () => {
+    const loader = getLoader();
+    if (!loader) return;
+    if (currentSkinIndex(loader) === -1) loader.classList.add('skin-a');
 
-    // visual: estado inicial inativo
-    btn.classList.remove('active');
-    btn.style.opacity = ''; // usar CSS padrão
-
-    // remove conteúdo anterior e injeta loader UNO
-    btn.innerHTML = '';
-    const host = mkLoader('uno');
-    btn.appendChild(host);
-    btn.dataset.loaderMode = 'uno';
-
-    // rotação automática
-    let idx = 0;
-    if(btn._loaderTimer) clearInterval(btn._loaderTimer);
-    btn._loaderTimer = setInterval(()=>{
-      idx = (idx+1)%MODES.length;
-      const mode = MODES[idx];
-      btn.dataset.loaderMode = mode;
-      host.className = 'dual-loader ' + mode;
-      // antiflicker
-      host.style.opacity = '0.001';
-      requestAnimationFrame(()=>{ host.style.opacity = ''; });
-    }, CYCLE_MS);
-
-    // APIs públicas
-    const map = { 'UNO':'uno','SIMBIO':'simbio','PULSO':'pulso','COBLUX':'coblux' };
-    window.setVoiceBtnMode = (key)=>{
-      const mode = (map[(key||'').toUpperCase()] || 'uno');
-      btn.dataset.loaderMode = mode;
-      host.className = 'dual-loader ' + mode;
-      return mode;
-    };
-    window.setVoiceBtnActive = (on)=>{
-      if(on){ btn.classList.add('active'); }
-      else  { btn.classList.remove('active'); }
-      return btn.classList.contains('active');
+    // clique/touch alterna
+    const advance = (e) => {
+      // se o clique veio do overlay open/close, não impedir; só troca skin também
+      const l = getLoader();
+      if (!l) return;
+      const i = currentSkinIndex(l);
+      const next = (i + 1) % skins.length;
+      applySkin(l, next);
     };
 
-    // Integra com logMistico se existir
-    const oldLog = window.logMistico;
-    window.logMistico = function(msg){
-      try{
-        const s = (msg||'').toString();
-        const up = s.toUpperCase();
-        if(up.includes('LOADER:')){
-          const token = up.split('LOADER:')[1].trim();
-          window.setVoiceBtnMode(token);
-        }
-        if(up.includes('STATE:')){
-          const token = up.split('STATE:')[1].trim();
-          const on = /ON|ATIVO|ACTIVE|REC|GRAVANDO/.test(token);
-          window.setVoiceBtnActive(on);
-        }
-      }catch(e){}
-      if(typeof oldLog === 'function') oldLog.apply(this, arguments);
-    };
+    btn.addEventListener('click', advance);       // além de abrir/fechar o visor, já troca skin
+    btn.addEventListener('touchend', advance, { passive:true });
+  };
 
-    // Interatividade natural: hover/focus deixam ativo
-    btn.addEventListener('pointerenter', ()=>btn.classList.add('active'));
-    btn.addEventListener('pointerleave', ()=>btn.classList.remove('active'));
-    btn.addEventListener('focusin', ()=>btn.classList.add('active'));
-    btn.addEventListener('focusout', ()=>btn.classList.remove('active'));
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
 
-    return true;
+<script>
+/* Visor: clique alterna skins do di-loader, sem afetar o open/close */
+(function(){
+  const btn = document.getElementById('kblxPeopleBtn');
+  if (!btn) return;
+
+  const skins = ['skin-a','skin-b','skin-c','skin-d'];
+
+  function getLoader(){
+    return btn.querySelector('.di-loader');
+  }
+  function currentSkinIndex(loader){
+    const cls = loader.className;
+    for (let i=0;i<skins.length;i++){
+      if (cls.includes(skins[i])) return i;
+    }
+    return -1;
+  }
+  function applySkin(loader, idx){
+    skins.forEach(s => loader.classList.remove(s));
+    loader.classList.add(skins[idx]);
+    // micro tap feedback
+    btn.animate(
+      [{ transform:'translateX(-50%) scale(1)' }, { transform:'translateX(-50%) scale(1.06)' }, { transform:'translateX(-50%) scale(1)' }],
+      { duration:180, easing:'ease-out' }
+    );
   }
 
-  // tenta agora e após DOM pronto
-  if(!applyToVoiceBtn()){
-    document.addEventListener('DOMContentLoaded', applyToVoiceBtn);
-    setTimeout(applyToVoiceBtn, 1200);
+  // inicializa com skin-a se nenhuma
+  const init = () => {
+    const loader = getLoader();
+    if (!loader) return;
+    if (currentSkinIndex(loader) === -1) loader.classList.add('skin-a');
+
+    // clique/touch alterna
+    const advance = (e) => {
+      // se o clique veio do overlay open/close, não impedir; só troca skin também
+      const l = getLoader();
+      if (!l) return;
+      const i = currentSkinIndex(l);
+      const next = (i + 1) % skins.length;
+      applySkin(l, next);
+    };
+
+    btn.addEventListener('click', advance);       // além de abrir/fechar o visor, já troca skin
+    btn.addEventListener('touchend', advance, { passive:true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();
 </script>
