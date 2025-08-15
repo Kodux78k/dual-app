@@ -402,6 +402,110 @@ Position: fixed;
 
   </style>
       <!-- body {background: transparent !important; !-->
+<style>
+/* === Dual Infodose Loader (mínimo) === */
+.di-loader{ --di-size:42px; --di-gold:#F2C75C; --di-stroke:2px;
+  position:relative; width:var(--di-size); height:var(--di-size); display:inline-block;}
+.di-ring{ position:absolute; inset:0; border:var(--di-stroke) solid var(--di-gold);
+  border-radius:50%; will-change:transform; animation:di-spin 6s linear infinite;}
+.di-stroke{ position:absolute; left:50%; top:50%; width:62%; height:var(--di-stroke);
+  background:var(--di-gold); transform:translate(-50%,-50%); border-radius:999px;
+  animation:di-breathe 2.4s ease-in-out infinite;}
+.di-dots{ position:absolute; inset:0; transform:rotate(-90deg); animation:di-orbit 4.2s linear infinite;}
+.di-dots i{ --i:0; position:absolute; left:50%; top:50%; width:4px; height:4px; border-radius:50%;
+  background:var(--di-gold); opacity:.55;
+  transform: rotate(calc(var(--i)*51deg)) translate(calc(7px + var(--i)*2.2px)) rotate(calc(var(--i)*-51deg));
+  animation:di-pulse 4.2s linear infinite; animation-delay:calc(var(--i) * .6s);}
+@keyframes di-orbit{ to{ transform:rotate(270deg);} }
+@keyframes di-spin{ to{ transform:rotate(360deg);} }
+@keyframes di-breathe{ 0%,100%{ opacity:.9 } 50%{ opacity:1 } }
+@keyframes di-pulse{ 0%,70%{ opacity:.45; transform:scale(.92) } 76%,84%{ opacity:1; transform:scale(1.18) } 100%{ opacity:.6; transform:scale(.96) } }
+@media (prefers-reduced-motion:reduce){ .di-ring,.di-stroke,.di-dots,.di-dots i{ animation:none; } }
+</style>
+<style>
+/* === Dual Infodose Loader — minimal + gradient palette === */
+:root{
+  --di-g1:#F0F; /* magenta */
+  --di-g2:#0FF; /* cyan */
+}
+/* Reduce size */
+.di-loader{ --di-size:36px; --di-stroke:2px; position:relative; width:var(--di-size); height:var(--di-size); display:inline-block; }
+
+/* Ring with gradient stroke using mask */
+.di-ring{
+  position:absolute; inset:0;
+  background: conic-gradient(from 90deg, var(--di-g1), var(--di-g2));
+  border-radius:50%;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px), #000 100%);
+          mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px), #000 100%);
+  will-change:transform;
+  animation:di-spin 6s linear infinite;
+}
+
+/* Central stroke (—) with soft breathe */
+.di-stroke{
+  position:absolute; left:50%; top:50%;
+  width:64%; height:var(--di-stroke);
+  background: linear-gradient(90deg, var(--di-g1), var(--di-g2));
+  transform:translate(-50%,-50%); border-radius:999px;
+  animation:di-breathe 2.4s ease-in-out infinite;
+}
+
+/* Spiral dots — each with a step across the gradient */
+.di-dots{ position:absolute; inset:0; transform:rotate(-90deg); animation:di-orbit 4.2s linear infinite; }
+.di-dots i{
+  --i:0; position:absolute; left:50%; top:50%;
+  width:4px; height:4px; border-radius:50%;
+  /* interpolate by using a conic gradient + mask for crisp circle */
+  background: conic-gradient(var(--di-g1), var(--di-g2));
+  -webkit-mask: radial-gradient(circle, #000 62%, transparent 63%);
+          mask: radial-gradient(circle, #000 62%, transparent 63%);
+  opacity:.75;
+  transform: rotate(calc(var(--i)*51deg)) translate(calc(7px + var(--i)*2.2px)) rotate(calc(var(--i)*-51deg));
+  animation:di-pulse 4.2s linear infinite; animation-delay:calc(var(--i) * .6s);
+}
+/* Slight hue shift per dot using filter as a cheap trick for variance */
+.di-dots i:nth-child(1){ filter:hue-rotate(0deg) }
+.di-dots i:nth-child(2){ filter:hue-rotate(20deg) }
+.di-dots i:nth-child(3){ filter:hue-rotate(40deg) }
+.di-dots i:nth-child(4){ filter:hue-rotate(60deg) }
+.di-dots i:nth-child(5){ filter:hue-rotate(80deg) }
+.di-dots i:nth-child(6){ filter:hue-rotate(100deg) }
+.di-dots i:nth-child(7){ filter:hue-rotate(120deg) }
+
+@keyframes di-orbit{ to{ transform:rotate(270deg);} }
+@keyframes di-spin{ to{ transform:rotate(360deg);} }
+@keyframes di-breathe{ 0%,100%{ opacity:.9 } 50%{ opacity:1 } }
+@keyframes di-pulse{ 0%,70%{ opacity:.55; transform:scale(.92) } 76%,84%{ opacity:1; transform:scale(1.15) } 100%{ opacity:.7; transform:scale(.96) } }
+@media (prefers-reduced-motion:reduce){
+  .di-ring,.di-stroke,.di-dots,.di-dots i{ animation:none; }
+}
+
+/* === Button enhancements (gradient border + blur background) === */
+#kblxPeopleBtn{
+  position:fixed; /* preserva o posicionamento existente */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.20) !important;
+  border: none;
+  border-radius: 50%;
+  isolation:isolate;
+  overflow: visible;
+}
+#kblxPeopleBtn::before{
+  content:"";
+  position:absolute; inset:-2px;
+  border-radius:inherit;
+  background: linear-gradient(45deg, var(--di-g1), var(--di-g2));
+  z-index:-1;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  padding:2px; /* espessura da borda gradiente */
+}
+</style>
 </head>
 <body>
 
@@ -1275,7 +1379,14 @@ window.addEventListener('load', loadUserBG);
   <!-- Botão que abre o visor integrado (KBLX People) -->
   <button id="kblxPeopleBtn" title="Abrir Visor Integrado"
           style="position:fixed; top:166px; left:50%; transform:translateX(-50%); z-index:10001; padding:10px; border-radius:50%; border:none; cursor:pointer; background:linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85)); box-shadow:0 10px 30px rgba(0,0,0,.45); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);">
-    <img src="assets/icons/SiimbyOS0.png" alt="Abrir visor" style="width:28px; height:28px; display:block; border-radius:50%;">
+    <span class="di-loader" aria-hidden="true">
+  <span class="di-ring"></span>
+  <span class="di-stroke"></span>
+  <span class="di-dots">
+    <i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i>
+    <i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i>
+  </span>
+</span>
   </button>
 
   <!-- Overlay e iFrame do visor integrado -->
