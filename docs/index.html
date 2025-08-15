@@ -407,7 +407,8 @@ Position: fixed;
 
 
 <div id="miniPlayerContainer" role="region" aria-label="Painel de Ativações">
-  <button id="toggleMiniPlayer" aria-expanded="false" aria-controls="panel" title="Abrir painel de ativações">💊</button>
+  <!-- O botão de pílula foi ocultado em favor do visor integrado -->
+  <button id="toggleMiniPlayer" aria-expanded="false" aria-controls="panel" title="Abrir painel de ativações" style="display:none;">💊</button>
 
   <div id="panel" tabindex="0">
     <div class="section" id="localStorageSection">
@@ -1025,9 +1026,10 @@ Position: fixed;
   <img id="bgImage" class="fake-bg" src="about:blank" alt="" />
 
 
- <!-- botão que abre o painel de opções -->
-<!-- Botão que alterna exibição de login e visor; começa com ícone de olho aberto -->
-<button id="openBgOptionsBtn" style=" border:1px var(--bg); color:var(--text); background:rgba(0,0,0,0.3); padding:3px; border-radius:50%;" title="Ocultar/mostrar interface">👁</button>
+<!-- Botão que alterna exibição de login/logout e visor; foi reposicionado 60px acima da borda -->
+<button id="openBgOptionsBtn" 
+        style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); border:1px var(--bg); color:var(--text); background:rgba(0,0,0,0.3); padding:3px; border-radius:50%;" 
+        title="Ocultar/mostrar interface">👁</button>
 
 <!-- painel de opções -->
 <div id="userBgOptions" style="display:none; flex-direction:column; gap:8px; background:rgba(0,0,0,0.8); padding:10px; border-radius:8px; max-width:320px;">
@@ -1078,32 +1080,30 @@ function logMistico(msg) {
 function toggleUserOptions() {
   userBgOptions.style.display = (userBgOptions.style.display === 'flex') ? 'none' : 'flex';
 }
-// Substitui o antigo toggle: este botão agora alterna a visibilidade da interface (login, painel)
-// e atualiza o ícone 👁/🙈. Quando oculto, o login e botões relevantes são escondidos, e o painel é fechado.
+// O botão openBgOptionsBtn agora controla a exibição do login e do visor, além de alternar seu próprio ícone.
 let uiHidden = false;
 openBgOptionsBtn.addEventListener('click', () => {
   uiHidden = !uiHidden;
-  // Alterna a visibilidade da caixa de login, se existir
   const loginBoxEl = document.getElementById('loginBox');
+  const logoutAreaEl = document.querySelector('.logout-area');
   if (loginBoxEl) {
     loginBoxEl.style.display = uiHidden ? 'none' : '';
   }
-  // Algum template possui o botão kblxPeopleBtn; esconda-o se existir para evitar UI flutuante
-  const kblxPeopleBtnEl = document.getElementById('kblxPeopleBtn');
-  if (kblxPeopleBtnEl) {
-    kblxPeopleBtnEl.style.display = uiHidden ? 'none' : '';
+  if (logoutAreaEl) {
+    logoutAreaEl.style.display = uiHidden ? 'none' : '';
   }
-  // Altera o texto do botão entre o olho aberto e o macaco cobrindo os olhos
+  // Esconde/mostra o botão do visor, se existir
+  const visorBtn = document.getElementById('kblxPeopleBtn');
+  if (visorBtn) {
+    visorBtn.style.display = uiHidden ? 'none' : '';
+  }
+  // Atualiza o texto do ícone do botão (olho aberto ou macaco escondendo os olhos)
   openBgOptionsBtn.textContent = uiHidden ? '🙈' : '👁';
-  // Sempre feche o painel de opções quando ocultar o login
+  // Se a interface for ocultada, feche o painel de BG se estiver aberto
   if (uiHidden) {
     if (userBgOptions) {
       userBgOptions.style.display = 'none';
     }
-  } else {
-    // Quando reexibindo a UI, você pode reabrir o painel se desejar
-    // Para restaurar o comportamento antigo de toggle imediato, descomente a linha abaixo:
-    // toggleUserOptions();
   }
 });
 
@@ -1244,5 +1244,80 @@ window.addEventListener('load', loadUserBG);
     toggleMiniPlayer.innerText = showing ? "💊" : "💊";
   });
 </script>
+  <!-- Botão que abre o visor integrado (KBLX People) -->
+  <button id="kblxPeopleBtn" title="Abrir Visor Integrado"
+          style="position:fixed; top:166px; left:50%; transform:translateX(-50%); z-index:10001; padding:10px; border-radius:50%; border:none; cursor:pointer; background:linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85)); box-shadow:0 10px 30px rgba(0,0,0,.45); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);">
+    <img src="assets/icons/SiimbyOS0.png" alt="Abrir visor" style="width:28px; height:28px; display:block; border-radius:50%;">
+  </button>
+
+  <!-- Overlay e iFrame do visor integrado -->
+  <div id="kblxIframeOverlay" style="position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55);">
+    <div id="kblxIframeBox" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:88vw; max-width:400px; height:72vh; background:rgba(0,0,0,0.35); border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.45); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.08);">
+      <header id="kblxDragBar" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 12px; color:#fff; background:linear-gradient(90deg, rgba(0,255,255,.22), rgba(255,0,255,.16)); cursor:move;">
+        <span class="title">Visor Integrado</span>
+        <span style="flex:1;"></span>
+        <button id="kblxIframeReload" title="Recarregar" style="background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;">↻</button>
+        <button id="kblxIframePop" title="Abrir em nova guia" style="background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;">⤴︎</button>
+        <button id="kblxIframeClose" aria-label="Fechar" style="background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;">×</button>
+      </header>
+      <iframe id="kblxIframe" src="about:blank" loading="lazy" referrerpolicy="no-referrer" style="width:100%; height:calc(72vh - 46px); border:0; display:block; background:#000;"></iframe>
+      <div id="kblxResize" title="Redimensionar" style="position:absolute; right:0; bottom:0; width:20px; height:20px; cursor:nwse-resize; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.35) 51%); opacity:.65;"></div>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    const PREFERRED = 'Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html';
+    const btn = document.getElementById('kblxPeopleBtn');
+    const overlay = document.getElementById('kblxIframeOverlay');
+    const iframe = document.getElementById('kblxIframe');
+    const reloadBtn = document.getElementById('kblxIframeReload');
+    const popBtn = document.getElementById('kblxIframePop');
+    const closeBtn = document.getElementById('kblxIframeClose');
+    function show() {
+      if (overlay) overlay.style.display = 'block';
+    }
+    function hide() {
+      if (overlay) overlay.style.display = 'none';
+    }
+    window.kblxOpenVisor = function(url) {
+      if (url) {
+        iframe.src = url;
+      }
+      show();
+    };
+    if (btn) {
+      btn.addEventListener('click', () => {
+        if (!iframe.src || iframe.src === 'about:blank') {
+          window.kblxOpenVisor(PREFERRED);
+        } else {
+          if (overlay.style.display === 'block') {
+            hide();
+          } else {
+            show();
+          }
+        }
+      });
+    }
+    if (closeBtn) {
+      closeBtn.addEventListener('click', hide);
+    }
+    if (reloadBtn) {
+      reloadBtn.addEventListener('click', () => {
+        try {
+          iframe.contentWindow.location.reload();
+        } catch (e) {
+          iframe.src = iframe.src;
+        }
+      });
+    }
+    if (popBtn) {
+      popBtn.addEventListener('click', () => {
+        window.open(iframe.src || PREFERRED, '_blank');
+      });
+    }
+  })();
+  </script>
+
 </body>
 </html>
