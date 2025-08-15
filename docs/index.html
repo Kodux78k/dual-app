@@ -668,6 +668,9 @@ Position: fixed;
       <div>  <!-- Botão de upload -->
   <button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
   <input type="file" id="imgUpload" accept="image/*" onchange="trocarImagem(event)">
+    <input type="file" id="uploadHTML" accept=".html" style="display:none" />
+  <button id="uploadHTMLBtn">☍</button>
+    
 </div>
         <div id="decoderBox">
     <input type="text" id="codeInput" placeholder="Digite o selo...">
@@ -676,9 +679,7 @@ Position: fixed;
   <button id="toggleDecoderBtn">
   <img src="assets/icons/KBLX-pack/SuS-logo-1.PNG" alt="SuS Logo" style="height: 24px; vertical-align: middle;">
 </button>
-  <input type="file" id="uploadHTML" accept=".html" style="display:none" />
-  <button id="uploadHTMLBtn">☍</button>
-      
+    
       <div id="messageBox"></div>
       <div id="buyTokens">
         <button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
