@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>HTML Inspector & Editor — Dual Tools</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#0f151c; --ink:#e8f0ff; --muted:#9fb3c8;
+    --accent:#59c1ff; --accent2:#b17aff; --border:#1f2a36; --ok:#2ecc71; --warn:#ffbd2e; --err:#ff5c80;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  a{color:var(--accent)}
+  .app{display:grid;grid-template-rows:auto 1fr auto; height:100%}
+  header{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0f141a,#0c1015)}
+  header .left, header .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  h1{font-size:14px;margin:0;letter-spacing:.08em;opacity:.9}
+  .btn{appearance:none;border:1px solid var(--border);background:var(--panel);color:var(--ink);padding:6px 10px;border-radius:10px;cursor:pointer;font-size:12px}
+  .btn:hover{border-color:#2a3949}
+  .btn.primary{background:linear-gradient(180deg,#13202b,#101820);border-color:#254156}
+  .btn.warn{border-color:#5a4100;background:#211a00}
+  .btn.ok{border-color:#164c2b;background:#0b2216}
+  .btn:active{transform:translateY(1px)}
+  .btn.icon{display:inline-flex;align-items:center;gap:6px}
+  .btn.small{padding:4px 8px;font-size:11px}
+  .hidden{display:none !important}
+
+  .grid{display:grid;grid-template-columns: 340px 1fr; gap:10px; padding:10px; height:100%}
+  aside{border-right:1px solid var(--border);padding-right:10px;overflow:auto}
+  main{display:grid;grid-template-rows: auto 1fr; gap:10px; overflow:hidden}
+  .panes{display:grid;grid-template-columns:1fr 1fr 1fr; gap:10px; height:100%}
+  .pane{display:grid;grid-template-rows:auto 1fr auto; border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--panel); min-height:120px}
+  .pane header{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0f151c,#0f141a)}
+  .pane header h3{margin:0;font-size:12px;letter-spacing:.06em;opacity:.9}
+  .pane .toolbar{display:flex;gap:6px;align-items:center}
+  .codewrap{position:relative;height:100%;display:grid;grid-template-columns:1fr;overflow:hidden}
+  .editor{width:100%;height:100%;resize:none;background:#0b1015;color:#e8f0ff;border:none;padding:12px 16px;font-family:var(--mono); font-size:12.5px; line-height:1.5; tab-size:2; outline:none; overflow:auto}
+  .linenums{position:absolute;left:0;top:0;bottom:0;width:44px;background:#0a0f14;border-right:1px solid #14202b;color:#5c768f;font-family:var(--mono);font-size:12.5px;line-height:1.5;padding:12px 6px;text-align:right;user-select:none;pointer-events:none}
+  .editor.has-lines{padding-left:56px}
+  .status{padding:6px 10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .tag{border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:10px;color:var(--muted)}
+  .list{display:grid;gap:6px}
+  .card{border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--panel)}
+  .card h4{margin:0 0 6px 0;font-size:12px;color:var(--muted)}
+  pre.meta{margin:0;white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;color:#cfe2ff;background:#0b1015;border:1px dashed var(--border);padding:8px;border-radius:8px}
+  .analysis{display:grid;gap:10px}
+  .analysis .kv{display:grid;grid-template-columns:120px 1fr; gap:6px; font-size:12px}
+  iframe.preview{width:100%;height:100%;border:none;background:white;border-top:1px solid var(--border)}
+  .split{display:grid;grid-template-columns:1fr 1fr; gap:10px; overflow:hidden}
+  .hl{color:#7bdff9}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+  .pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:11px;color:var(--muted)}
+  footer{border-top:1px solid var(--border);padding:6px 10px;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;align-items:center}
+  .kbd{font-family:var(--mono);border:1px solid var(--border);padding:1px 5px;border-radius:6px;background:#0a0f14}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="left">
+      <h1>HTML Inspector & Editor</h1>
+      <button class="btn small" id="btnOpen">Abrir HTML</button>
+      <input type="file" id="fileInput" accept=".html,.htm,.txt" class="hidden"/>
+      <button class="btn small" id="btnPaste">Colar HTML</button>
+      <button class="btn small" id="btnCopyAll">Copiar HTML</button>
+      <button class="btn small ok" id="btnExport">Exportar HTML</button>
+    </div>
+    <div class="right">
+      <span class="pill">Auto‑indentar: <span id="indentMode">2 espaços</span></span>
+      <button class="btn small" id="btnBeautifyAll">Auto‑indentar tudo</button>
+      <button class="btn small" id="btnPreview">Pré‑visualizar ▶</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside>
+      <div class="analysis">
+        <div class="card">
+          <h4>Resumo</h4>
+          <div class="kv"><div>Doctype:</div><div id="aDoctype">—</div></div>
+          <div class="kv"><div>Título:</div><div id="aTitle">—</div></div>
+          <div class="kv"><div>Scripts:</div><div id="aScripts">—</div></div>
+          <div class="kv"><div>Styles:</div><div id="aStyles">—</div></div>
+          <div class="kv"><div>Links:</div><div id="aLinks">—</div></div>
+          <div class="kv"><div>Imagens:</div><div id="aImgs">—</div></div>
+        </div>
+        <div class="card">
+          <h4>Externos</h4>
+          <pre class="meta" id="aExternals">(nenhum)</pre>
+        </div>
+        <div class="card">
+          <h4>Tips</h4>
+          <ul style="margin:6px 0 0 16px; padding:0; color:#c7d7ea; font-size:12px;">
+            <li><span class="kbd">Tab</span>/<span class="kbd">Shift+Tab</span> para indentar</li>
+            <li><span class="kbd">Ctrl/Cmd+Z</span> desfaz • <span class="kbd">Ctrl/Cmd+Y</span> refaz</li>
+            <li>Use “Auto‑indentar tudo” após colar HTML cru</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="panes">
+        <section class="pane" id="paneHTML">
+          <header>
+            <h3>HTML</h3>
+            <div class="toolbar">
+              <button class="btn small" data-action="undo" data-target="html">Desfazer</button>
+              <button class="btn small" data-action="redo" data-target="html">Refazer</button>
+              <button class="btn small" data-action="beautify" data-target="html">Auto‑indentar</button>
+            </div>
+          </header>
+          <div class="codewrap">
+            <div class="linenums" id="linesHTML"></div>
+            <textarea class="editor has-lines" id="editorHTML" spellcheck="false"></textarea>
+          </div>
+          <div class="status">
+            <span id="statusHTML" class="muted">—</span>
+            <span class="tag">⌘/Ctrl+Z / ⌘/Ctrl+Y</span>
+          </div>
+        </section>
+
+        <section class="pane" id="paneCSS">
+          <header>
+            <h3>CSS (inline)</h3>
+            <div class="toolbar">
+              <button class="btn small" data-action="undo" data-target="css">Desfazer</button>
+              <button class="btn small" data-action="redo" data-target="css">Refazer</button>
+              <button class="btn small" data-action="beautify" data-target="css">Auto‑indentar</button>
+            </div>
+          </header>
+          <div class="codewrap">
+            <div class="linenums" id="linesCSS"></div>
+            <textarea class="editor has-lines" id="editorCSS" spellcheck="false"></textarea>
+          </div>
+          <div class="status">
+            <span id="statusCSS">—</span>
+            <span class="tag">Tab/Shift+Tab</span>
+          </div>
+        </section>
+
+        <section class="pane" id="paneJS">
+          <header>
+            <h3>JavaScript (inline)</h3>
+            <div class="toolbar">
+              <button class="btn small" data-action="undo" data-target="js">Desfazer</button>
+              <button class="btn small" data-action="redo" data-target="js">Refazer</button>
+              <button class="btn small" data-action="beautify" data-target="js">Auto‑indentar</button>
+            </div>
+          </header>
+          <div class="codewrap">
+            <div class="linenums" id="linesJS"></div>
+            <textarea class="editor has-lines" id="editorJS" spellcheck="false"></textarea>
+          </div>
+          <div class="status">
+            <span id="statusJS">—</span>
+            <span class="tag">Auto‑save</span>
+          </div>
+        </section>
+      </div>
+
+      <div class="split">
+        <section class="pane">
+          <header>
+            <h3>Preview</h3>
+            <div class="toolbar">
+              <button class="btn small" id="btnRefresh">Atualizar</button>
+            </div>
+          </header>
+          <iframe class="preview" id="preview" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+          <div class="status"><span>Pré-visualização segura (sandbox)</span><span class="tag">srcdoc</span></div>
+        </section>
+
+        <section class="pane">
+          <header>
+            <h3>Documento Final</h3>
+            <div class="toolbar">
+              <button class="btn small" id="btnCompose">Recompor HTML</button>
+              <button class="btn small" id="btnCopyFinal">Copiar</button>
+            </div>
+          </header>
+          <div class="codewrap">
+            <div class="linenums" id="linesOUT"></div>
+            <textarea class="editor has-lines" id="editorOUT" spellcheck="false"></textarea>
+          </div>
+          <div class="status"><span id="statusOUT">—</span><span class="tag">Somente leitura (editável se quiser)</span></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div>Dual Tools — Visualizador/Editor offline (sem libs externas)</div>
+    <div><span class="tag">Ctrl/Cmd+S salva local</span></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  // ---------- Utilities
+  const $ = (s, r=document)=>r.querySelector(s);
+  const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
+  const editors = {
+    html: { ta: $('#editorHTML'), lines: $('#linesHTML'), status: $('#statusHTML'), undo:[], redo:[] },
+    css:  { ta: $('#editorCSS'),  lines: $('#linesCSS'),  status: $('#statusCSS'),  undo:[], redo:[] },
+    js:   { ta: $('#editorJS'),   lines: $('#linesJS'),   status: $('#statusJS'),   undo:[], redo:[] },
+    out:  { ta: $('#editorOUT'),  lines: $('#linesOUT'),  status: $('#statusOUT'),  undo:[], redo:[] }
+  };
+  const LS_KEY = 'dual_html_editor_state';
+
+  // ---------- Line numbers
+  function updateLines(key){
+    const ed = editors[key];
+    const count = (ed.ta.value.split('\\n').length)||1;
+    ed.lines.textContent = Array.from({length:count}, (_,i)=>String(i+1)).join('\\n');
+  }
+  Object.keys(editors).forEach(k=>{
+    editors[k].ta.addEventListener('scroll', ()=>{
+      editors[k].lines.scrollTop = editors[k].ta.scrollTop;
+    });
+    editors[k].ta.addEventListener('input', ()=>{
+      updateLines(k); pushUndo(k);
+      edStatus(k, `${editors[k].ta.value.length} chars`);
+      autoSave();
+    });
+  });
+
+  // ---------- Indentation (Tab / Shift+Tab; auto on Enter)
+  function handleKey(e, key){
+    const ta = editors[key].ta;
+    if (e.key==='Tab'){
+      e.preventDefault();
+      const start = ta.selectionStart, end = ta.selectionEnd;
+      const sel = ta.value.slice(start, end);
+      if (e.shiftKey){
+        const before = ta.value.slice(0, start);
+        const after  = ta.value.slice(end);
+        const lines = sel.split('\\n').map(line=>line.replace(/^  /,'')); // unindent 2 spaces
+        ta.value = before + lines.join('\\n') + after;
+        ta.selectionStart = start; ta.selectionEnd = start + lines.join('\\n').length;
+      } else {
+        const before = ta.value.slice(0, start);
+        const after  = ta.value.slice(end);
+        ta.value = before + '  ' + sel + after;
+        ta.selectionStart = start + 2; ta.selectionEnd = end + 2;
+      }
+      updateLines(key); pushUndo(key); autoSave();
+    } else if (e.key==='Enter'){
+      const pos = ta.selectionStart;
+      const from = ta.value.lastIndexOf('\\n', pos-1)+1;
+      const to = pos;
+      const line = ta.value.slice(from, to);
+      const indent = (line.match(/^\s+/) || [''])[0];
+      setTimeout(()=>{
+        const p = ta.selectionStart, q = ta.selectionEnd;
+        ta.setRangeText(indent, p, q, 'end');
+      }, 0);
+    }
+  }
+  Object.keys(editors).forEach(k=>{
+    editors[k].ta.addEventListener('keydown', (e)=>handleKey(e,k));
+  });
+
+  // ---------- Undo/Redo stacks
+  function pushUndo(key){
+    const ed = editors[key];
+    const val = ed.ta.value;
+    if (!ed.undo.length || ed.undo[ed.undo.length-1]!==val){
+      ed.undo.push(val);
+      if (ed.undo.length>100) ed.undo.shift();
+      ed.redo.length = 0;
+    }
+  }
+  function doUndo(key){
+    const ed = editors[key];
+    if (ed.undo.length>1){
+      const cur = ed.undo.pop();
+      ed.redo.push(cur);
+      ed.ta.value = ed.undo[ed.undo.length-1] || '';
+      updateLines(key); autoSave();
+    }
+  }
+  function doRedo(key){
+    const ed = editors[key];
+    if (ed.redo.length){
+      const val = ed.redo.pop();
+      ed.undo.push(val);
+      ed.ta.value = val; updateLines(key); autoSave();
+    }
+  }
+
+  // Buttons undo/redo/beautify per pane
+  $$('.pane .toolbar [data-action]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const act = btn.getAttribute('data-action');
+      const key = btn.getAttribute('data-target');
+      if (act==='undo') doUndo(key);
+      if (act==='redo') doRedo(key);
+      if (act==='beautify') beautify(key);
+    });
+  });
+
+  // ---------- Simple beautifiers
+  function beautify(key){
+    let s = editors[key].ta.value;
+    if (key==='html') s = prettyHTML(s);
+    if (key==='css')  s = prettyCSS(s);
+    if (key==='js')   s = prettyJS(s);
+    editors[key].ta.value = s;
+    updateLines(key); pushUndo(key); autoSave();
+  }
+  function prettyHTML(html){
+    // minimal pretty printer
+    const voids = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
+    html = html.replace(/>\\s+</g, '><').replace(/\\n+/g,''); // collapse
+    let out = '', indent=0;
+    html.split(/(<[^>]+>)/g).filter(Boolean).forEach(tok=>{
+      if (tok.startsWith('<')){
+        if (/^<\\//.test(tok)){ indent = Math.max(0, indent-1); }
+        out += '  '.repeat(indent) + tok + '\\n';
+        if (!/^<\\//.test(tok) && !/\\/\\s*>$/.test(tok)){
+          const tag = (tok.match(/^<\\s*([a-zA-Z0-9-]+)/)||[])[1];
+          if (tag && !voids.has(tag.toLowerCase()) && !tok.endsWith('/>')) indent++;
+        }
+      } else if (tok.trim()){
+        out += '  '.repeat(indent) + tok.trim() + '\\n';
+      }
+    });
+    return out.trim();
+  }
+  function prettyCSS(css){
+    css = css.replace(/\\s+/g,' ');
+    css = css.replace(/\\s*{\\s*/g,' {\\n  ').replace(/;\\s*/g,';\\n  ').replace(/\\s*}\\s*/g,'\\n}\\n');
+    css = css.replace(/\\n\\s*\\n/g,'\\n');
+    return css.trim();
+  }
+  function prettyJS(js){
+    // naive: line after { } ; and maintain indentation by braces
+    js = js.replace(/\\r/g,'');
+    js = js.replace(/;\\s*/g,';\\n').replace(/\\{\\s*/g,'{\\n').replace(/\\}\\s*/g,'\\n}\\n');
+    let out='', indent=0;
+    js.split(/\\n/).forEach(line=>{
+      line=line.trim();
+      if (!line) return;
+      if (/^\\}/.test(line)) indent = Math.max(0, indent-1);
+      out += '  '.repeat(indent)+line+'\\n';
+      if (/{\\s*$/.test(line)) indent++;
+    });
+    return out.trim();
+  }
+
+  // ---------- Compose document and analysis
+  function compose(){
+    const docHTML = editors.html.ta.value;
+    const docCSS  = editors.css.ta.value;
+    const docJS   = editors.js.ta.value;
+
+    // Build minimal HTML if only fragments are provided
+    let final = '';
+    if (/<!doctype/i.test(docHTML)){
+      final = docHTML;
+    } else {
+      final = `<!DOCTYPE html>\\n<html>\\n<head>\\n<meta charset="utf-8">\\n<title>Document</title>\\n<style>\\n${docCSS}\\n</style>\\n</head>\\n<body>\\n${docHTML}\\n<script>\\n${docJS}\\n</script>\\n</body>\\n</html>`;
+    }
+    editors.out.ta.value = final;
+    updateLines('out');
+    edStatus('out', final.length+' chars');
+    return final;
+  }
+
+  function analyze(html){
+    const d = new DOMParser().parseFromString(html, 'text/html');
+    $('#aDoctype').textContent = (d.doctype ? d.doctype.name : 'html');
+    $('#aTitle').textContent = d.title || '(sem título)';
+    const scripts = [...d.querySelectorAll('script')];
+    const styles  = [...d.querySelectorAll('style,link[rel="stylesheet"]')];
+    const links   = [...d.querySelectorAll('a[href]')];
+    const imgs    = [...d.querySelectorAll('img')];
+    $('#aScripts').textContent = scripts.length + ` (externos: ${scripts.filter(s=>s.src).length})`;
+    $('#aStyles').textContent  = styles.length + ` (links: ${styles.filter(s=>s.tagName==='LINK').length})`;
+    $('#aLinks').textContent   = links.length;
+    $('#aImgs').textContent    = imgs.length;
+    const externals = [];
+    scripts.forEach(s=>{ if (s.src) externals.push('<script src=\"'+s.src+'\">'); });
+    d.querySelectorAll('link[rel="stylesheet"]').forEach(l=>externals.push('<link rel=\"stylesheet\" href=\"'+l.href+'\">'));
+    $('#aExternals').textContent = externals.join('\\n') || '(nenhum)';
+  }
+
+  function edStatus(key, txt){ editors[key].status.textContent = txt; }
+
+  // ---------- Load / Split
+  function splitHTML(raw){
+    const d = new DOMParser().parseFromString(raw, 'text/html');
+    const head = d.head ? d.head.innerHTML : '';
+    const body = d.body ? d.body.innerHTML : '';
+    const inlineCSS = [...d.querySelectorAll('style')].map(s=>s.textContent).join('\\n\\n/* --- */\\n\\n');
+    const inlineJS  = [...d.querySelectorAll('script:not([src])')].map(s=>s.textContent).join('\\n\\n// --- \\n\\n');
+    editors.html.ta.value = prettyHTML('<head>\\n'+head+'\\n</head>\\n<body>\\n'+body+'\\n</body>');
+    editors.css.ta.value  = prettyCSS(inlineCSS||'');
+    editors.js.ta.value   = prettyJS(inlineJS||'');
+    ['html','css','js'].forEach(k=>{ updateLines(k); pushUndo(k); edStatus(k, editors[k].ta.value.length+' chars'); });
+    analyze(raw);
+    autoSave();
+  }
+
+  // ---------- IO Handlers
+  $('#btnOpen').addEventListener('click', ()=>$('#fileInput').click());
+  $('#fileInput').addEventListener('change', async (e)=>{
+    const f = e.target.files[0]; if(!f) return;
+    const txt = await f.text();
+    splitHTML(txt);
+    editors.out.ta.value=''; updateLines('out');
+  });
+  $('#btnPaste').addEventListener('click', async ()=>{
+    try{
+      const txt = await navigator.clipboard.readText();
+      if (txt) splitHTML(txt);
+    }catch(e){ alert('Não consegui ler do clipboard.');}
+  });
+  $('#btnCopyAll').addEventListener('click', async ()=>{
+    const s = compose();
+    try{ await navigator.clipboard.writeText(s); edStatus('out','copiado!'); }catch(e){ alert('Falhou ao copiar.'); }
+  });
+  $('#btnCompose').addEventListener('click', ()=>compose());
+  $('#btnCopyFinal').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(editors.out.ta.value||compose()); edStatus('out','copiado!'); }catch(e){ alert('Falhou ao copiar.'); }
+  });
+  $('#btnExport').addEventListener('click', ()=>{
+    const s = compose();
+    const blob = new Blob([s], {type:'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'export.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+  $('#btnBeautifyAll').addEventListener('click', ()=>{ ['html','css','js'].forEach(beautify); });
+  $('#btnPreview').addEventListener('click', ()=>{
+    const s = compose();
+    $('#preview').srcdoc = s;
+  });
+  $('#btnRefresh').addEventListener('click', ()=>$('#preview').srcdoc = compose());
+
+  // Undo/Redo via keyboard
+  document.addEventListener('keydown', (e)=>{
+    const active = document.activeElement;
+    const key = Object.keys(editors).find(k => editors[k].ta===active);
+    if (!key) return;
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){ e.preventDefault(); doUndo(key); }
+    if ((e.ctrlKey||e.metaKey) && (e.key.toLowerCase()==='y' || (e.shiftKey && e.key.toLowerCase()==='z'))){ e.preventDefault(); doRedo(key); }
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); autoSave(true); }
+  });
+
+  // ---------- AutoSave/Load
+  function autoSave(force){
+    const data = {
+      html: editors.html.ta.value,
+      css:  editors.css.ta.value,
+      js:   editors.js.ta.value,
+      out:  editors.out.ta.value
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    if (force) alert('Salvo localmente.');
+  }
+  (function bootstrap(){
+    const saved = localStorage.getItem(LS_KEY);
+    if (saved){
+      try{
+        const data = JSON.parse(saved);
+        editors.html.ta.value = data.html||'';
+        editors.css.ta.value  = data.css||'';
+        editors.js.ta.value   = data.js||'';
+        editors.out.ta.value  = data.out||'';
+        ['html','css','js','out'].forEach(k=>{ updateLines(k); pushUndo(k); edStatus(k, editors[k].ta.value.length+' chars'); });
+      }catch(e){}
+    }
+  })();
+
+})();</script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Dual‑App Starter</title>
+<style>
+:root{
+  /* Paleta Dual */
+  --bg:#0b0f14; --panel:#0f151c; --text:#e8f0ff; --muted:#9fb3c8;
+  --accent:#59c1ff; --accent2:#b17aff; --border:#1f2a36;
+  --ok:#2ecc71; --warn:#ffbd2e; --err:#ff5c80;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+  --sticky-h: 64px; /* será ajustado via JS */
+}
+*{box-sizing:border-box}
+html,body{height:100%; margin:0; background:var(--bg); color:var(--text);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; -webkit-text-size-adjust:100%;}
+
+.app{display:flex;flex-direction:column; min-height:100vh;}
+@supports (height:100dvh){ .app{ min-height:100dvh; } }
+
+/* Appbar Dual */
+.appbar{
+  position:sticky; top:0; z-index:10;
+  padding:12px 16px calc(12px + var(--safe-t));
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#10151c 0%, #0d1218 60%, #0b0f14 100%);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.brand{display:flex; align-items:center; gap:10px}
+.brand .logo{
+  width:22px; height:22px; border-radius:6px;
+  background: conic-gradient(from 210deg, var(--accent), var(--accent2));
+  box-shadow: 0 0 20px rgba(89,193,255,.25), 0 0 32px rgba(177,122,255,.18);
+}
+.appbar h1{font-size:15px; letter-spacing:.1em; text-transform:uppercase; margin:0; color:#dfeaff}
+.appbar .actions{display:flex; gap:8px; flex-wrap:wrap}
+
+/* Cards Dual */
+.card{border:1px solid var(--border); border-radius:14px; background:var(--panel); overflow:hidden}
+.card>header{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 12px; border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,#0f151c,#0f141a);
+}
+.card>header h3{font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; margin:0; color:#cfe2ff}
+
+/* Conteúdo */
+.main{
+  display:flex; flex-direction:column; gap:12px; padding:12px 12px 16px;
+  padding-bottom: calc(var(--sticky-h) + 20px + var(--safe-b));
+}
+
+/* Botões Dual */
+.btn{
+  appearance:none; border:1px solid var(--border); background:var(--panel); color:var(--text);
+  padding:10px 12px; border-radius:12px; min-height:44px; font-size:14px; cursor:pointer;
+}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:linear-gradient(180deg,#13202b,#101820); border-color:#254156; box-shadow:0 0 0 0 rgba(89,193,255,.35);}
+.btn.primary:focus{outline:none; box-shadow:0 0 0 3px rgba(89,193,255,.25);}
+.btn.ok{background:#0b2216; border-color:#164c2b}
+.btn.ghost{background:transparent;}
+
+/* Inputs / Code */
+.input, textarea.input{
+  width:100%; border:1px solid #14202b; background:#0b1015; color:var(--text);
+  border-radius:12px; padding:12px 14px; font-size:14px;
+}
+textarea.input{min-height:160px; resize:vertical; font-family:var(--mono); line-height:1.55; tab-size:2;
+  word-break:break-word; overflow-wrap:anywhere;}
+
+.code{font-family:var(--mono); background:#0b1015; border:1px solid #14202b; border-radius:12px; padding:12px; overflow:auto}
+
+/* Preview */
+.preview{width:100%; height:50vh; border:none; background:white; border:1px solid var(--border); border-radius:12px}
+@supports (height:100dvh){ .preview{ height:50dvh; } }
+
+/* Stickybar Dual */
+.stickybar{
+  position:fixed; left:0; right:0; bottom:0; z-index:20;
+  display:flex; gap:8px; justify-content:space-between; align-items:center; flex-wrap:wrap;
+  border-top:1px solid var(--border);
+  background:linear-gradient(180deg, rgba(11,15,20,.75), rgba(11,15,20,.92));
+  backdrop-filter:blur(10px);
+  padding:10px 12px calc(10px + var(--safe-b));
+  min-height:var(--sticky-h);
+}
+
+/* Badges/Tags Dual */
+.badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:11px;color:var(--muted)}
+
+/* Highlight leve (opcional) */
+.hl{white-space:pre; font-family:var(--mono); padding:12px; border:1px solid #14202b; border-radius:12px; background:#0b1015; overflow:auto; display:none}
+.hl.on{display:block}
+.tok-tag{color:#7bdff9}
+.tok-attr{color:#ffe28a}
+.tok-str{color:#b5e88a}
+.tok-comm{color:#7f92a8}
+.tok-num{color:#fba3ff}
+.tok-key{color:#59c1ff}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="appbar" role="banner">
+    <div class="brand"><div class="logo" aria-hidden="true"></div><h1>Dual‑App</h1></div>
+    <div class="actions" role="group" aria-label="Ações do app">
+      <button class="btn ghost" id="btnGhost">Ghost</button>
+      <button class="btn ok" id="btnOk">OK</button>
+      <button class="btn primary" id="btnPrimary">Primário</button>
+    </div>
+  </header>
+
+  <main class="main" role="main">
+    <!-- Card: Entrada -->
+    <section class="card" aria-labelledby="c1">
+      <header><h3 id="c1">Entrada</h3><span class="badge">Dual Theme</span></header>
+      <div class="content" style="padding:12px">
+        <label for="txt" class="badge" style="border-color:#254156;color:#a9c8ff">Prompt</label>
+        <textarea id="txt" class="input" placeholder="Digite aqui..."></textarea>
+      </div>
+    </section>
+
+    <!-- Card: Preview -->
+    <section class="card" aria-labelledby="c2">
+      <header><h3 id="c2">Preview</h3></header>
+      <div style="padding:12px">
+        <iframe class="preview" id="preview" sandbox="allow-scripts allow-forms allow-same-origin" title="Preview"></iframe>
+      </div>
+    </section>
+
+    <!-- Card: Código (com highlight leve) -->
+    <section class="card" aria-labelledby="c3">
+      <header>
+        <h3 id="c3">Código</h3>
+        <div class="actions">
+          <button class="btn" id="btnHL">Highlight</button>
+          <button class="btn" id="btnCopy">Copiar</button>
+        </div>
+      </header>
+      <div style="padding:12px; display:grid; gap:8px">
+        <textarea id="code" class="input" placeholder="Cole código aqui..."></textarea>
+        <pre id="hl" class="hl"></pre>
+      </div>
+    </section>
+  </main>
+
+  <div class="stickybar" role="contentinfo" aria-label="Barra de ações fixa">
+    <button class="btn" id="btnBack">Voltar</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="btnPreview">Pré‑visualizar</button>
+      <button class="btn primary" id="btnContinue">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const root = document.documentElement;
+  const sticky = document.querySelector('.stickybar');
+  const txt = document.getElementById('txt');
+  const preview = document.getElementById('preview');
+  const code = document.getElementById('code');
+  const hl = document.getElementById('hl');
+
+  /* Altura dinâmica da sticky bar */
+  function setStickyH(px){ root.style.setProperty('--sticky-h', px+'px'); }
+  function measure(){ if(!sticky) return; setStickyH(Math.max(44, Math.round(sticky.getBoundingClientRect().height))); }
+  const throttle = (fn, t=100)=>{ let p=0; return ()=>{ const n=Date.now(); if(n-p>t){ p=n; fn(); } } };
+  const onResize = throttle(measure, 100);
+  window.addEventListener('resize', onResize, {passive:true});
+  window.addEventListener('orientationchange', ()=>setTimeout(measure, 120));
+  document.addEventListener('DOMContentLoaded', ()=>setTimeout(measure, 80));
+  if (window.visualViewport){ window.visualViewport.addEventListener('resize', onResize); }
+  if (window.MutationObserver && sticky){
+    new MutationObserver(()=>setTimeout(measure,50)).observe(sticky,{childList:true,subtree:true});
+  }
+
+  /* Preview simplificado */
+  document.getElementById('btnPreview').addEventListener('click', ()=>{
+    const body = txt.value ? '<pre style="white-space:pre-wrap;font-family:var(--mono);margin:0">'+
+      txt.value.replace(/[&<>]/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;' }[s]))+'</pre>' : '<em>Sem conteúdo.</em>';
+    preview.srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Preview</title></head><body>${body}</body></html>`;
+  });
+
+  /* Highlight leve (regex-based) */
+  const esc = s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  function hlHTML(src){
+    let s = esc(src);
+    s = s.replace(/(&lt;!--[\\s\\S]*?--&gt;)/g, '<span class="tok-comm">$1</span>');
+    s = s.replace(/(&lt;\\/?[a-zA-Z0-9\\-:]+)([^&]*?)(&gt;)/g, function(_, tag, attrs, end){
+      attrs = attrs.replace(/([a-zA-Z-:]+)=(\".*?\"|'.*?'|[^\"\\s>]+)/g, function(__, a, v){
+        return '<span class="tok-attr">'+a+'</span>='+'<span class="tok-str">'+esc(v)+'</span>';
+      });
+      return '<span class="tok-tag">'+tag+'</span>'+attrs+'<span class="tok-tag">'+end+'</span>';
+    });
+    return s;
+  }
+  function updateHL(){ hl.innerHTML = hlHTML(code.value); }
+  document.getElementById('btnHL').addEventListener('click', ()=>{ hl.classList.toggle('on'); updateHL(); });
+  code.addEventListener('input', updateHL);
+
+  /* Copiar código */
+  document.getElementById('btnCopy').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(code.value||''); alert('Copiado!'); }catch(e){ alert('Falhou ao copiar'); }
+  });
+
+  /* Placeholders */
+  document.getElementById('btnBack').addEventListener('click', ()=>history.back());
+  document.getElementById('btnOk')?.addEventListener('click', ()=>alert('OK'));
+  document.getElementById('btnPrimary')?.addEventListener('click', ()=>alert('Primário'));
+  document.getElementById('btnGhost')?.addEventListener('click', ()=>alert('Ghost'));
+
+  measure();
+})();
+</script>
+</body>
+</html>

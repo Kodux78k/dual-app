@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>HTML Inspector & Editor — v2.1 Mobile</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#0f151c; --ink:#e8f0ff; --muted:#9fb3c8;
+    --accent:#59c1ff; --accent2:#b17aff; --border:#1f2a36; --ok:#2ecc71; --warn:#ffbd2e; --err:#ff5c80;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif}
+  h1,h2,h3,h4,p{margin:0}
+  .landing{display:flex;flex-direction:column;min-height:100%}
+  .hero{padding:16px 16px 12px;background:linear-gradient(180deg,#0f141a,#0c1015);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20}
+  .title{font-size:16px;letter-spacing:.08em;margin-bottom:8px}
+  .sub{font-size:12px;color:var(--muted)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .btn{appearance:none;border:1px solid var(--border);background:var(--panel);color:var(--ink);
+       padding:10px 12px;border-radius:12px;cursor:pointer;font-size:14px;min-height:44px}
+  .btn.primary{background:linear-gradient(180deg,#13202b,#101820);border-color:#254156}
+  .btn.ok{border-color:#164c2b;background:#0b2216}
+  .btn.warn{border-color:#5a4100;background:#211a00}
+  .btn.ghost{opacity:.75}
+  .btn:active{transform:translateY(1px)}
+  .grid{display:flex;flex-direction:column;gap:12px;padding:12px}
+  .card{border:1px solid var(--border);border-radius:14px;background:var(--panel);overflow:hidden}
+  .card>header{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#0f151c,#0f141a)}
+  .card>header h3{font-size:13px;letter-spacing:.06em}
+  .pill{border:1px solid var(--border);border-radius:999px;padding:4px 10px;font-size:12px;color:var(--muted)}
+  .section{padding:12px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .editor{width:100%;min-height:180px;max-height:50vh;overflow:auto;resize:vertical;background:#0b1015;color:#e8f0ff;border:1px solid #14202b;border-radius:12px;padding:12px 14px;font-family:var(--mono);font-size:13.5px;line-height:1.55;tab-size:2}
+  .hlwrap{position:relative}
+  .hlview{margin-top:8px;border:1px solid #14202b;border-radius:12px;padding:12px 14px;background:#0b1015;overflow:auto;font-family:var(--mono);font-size:13.5px;line-height:1.55;white-space:pre;display:none}
+  .hlview.on{display:block}
+  .tabbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .tab{padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:#0d131a;font-size:12px;min-height:36px}
+  .tab.active{border-color:#254156;background:#101a24}
+  .tiny{font-size:11px;color:var(--muted)}
+  .chip{border:1px solid var(--border);border-radius:999px;padding:2px 8px;font-size:11px;color:var(--muted)}
+  .toolbar{display:flex;gap:6px;flex-wrap:wrap}
+  .toolbar .btn{min-height:36px;padding:6px 10px;font-size:12px}
+  .field{display:flex;gap:6px}
+  .field input{flex:1;min-width:120px;border:1px solid #14202b;background:#0b1015;color:#e8f0ff;border-radius:10px;padding:10px 12px;font-size:14px}
+  .stickybar{position:sticky;bottom:0;left:0;right:0;display:flex;gap:8px;justify-content:space-between;background:rgba(12,16,22,.8);backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:10px 12px;z-index:30}
+  .split{display:grid;gap:10px}
+  .preview{width:100%;height:50vh;border:none;background:white;border:1px solid var(--border);border-radius:12px}
+  .list{display:grid;gap:6px}
+  .li{display:flex;gap:8px;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:10px;padding:8px 10px;background:#0b1015}
+  .ok{color:var(--ok)} .warn{color:var(--warn)} .err{color:var(--err)}
+  .mono{font-family:var(--mono)}
+  .hint{color:#c7d7ea}
+  .ghost{opacity:.6}
+
+  /* Syntax highlight (leve) */
+  .tok-tag{color:#7bdff9}
+  .tok-attr{color:#ffe28a}
+  .tok-str{color:#b5e88a}
+  .tok-comm{color:#7f92a8}
+  .tok-num{color:#fba3ff}
+  .tok-key{color:#59c1ff}
+
+  /* --- v2.1a: mobile typography & bottom spacing fixes --- */
+  html, body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .landing { padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px)); }
+  .grid { padding-bottom: 8px; }
+  .tiny { line-height: 1.45; }
+  .list .li span { line-height: 1.45; }
+  .preview { border-radius: 12px; }
+  /* Ensure stickybar doesn't cover content & uses safe area */
+  .stickybar { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
+  /* Improve readability of last sections */
+  .section:last-child { padding-bottom: 16px; }
+  /* Prevent overflow causing ugly wrap at end */
+  .hlview, .editor { word-break: break-word; overflow-wrap: anywhere; }
+
+
+  /* --- v2.1b: robust safe-area + sticky reservation + dvh fallback --- */
+  :root{
+    --safe: env(safe-area-inset-bottom, 0px);
+    --sticky-h: 64px; /* approx sticky bar height */
+  }
+  html, body {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+  }
+  /* Use dynamic viewport on iOS 16+ to avoid 100vh bugs */
+  .landing{
+    min-height: 100vh;
+  }
+  @supports (height: 100dvh){
+    .landing{ min-height: 100dvh; }
+  }
+  /* Reserve space so sticky bar never overlaps content */
+  .landing{
+    padding-bottom: calc(var(--sticky-h) + 16px + var(--safe));
+  }
+  .stickybar{
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding-bottom: calc(10px + var(--safe));
+    padding-top: 10px;
+    min-height: var(--sticky-h);
+    box-sizing: border-box;
+  }
+  /* Ensure scrollable area ends above sticky */
+  .grid{ padding-bottom: 8px; }
+  .section:last-child{ padding-bottom: 18px; }
+  /* More resilient wrapping at bottom */
+  .hlview, .editor { word-break: break-word; overflow-wrap: anywhere; }
+  /* Preview height respects mobile viewport changes */
+  .preview{ height: 50vh; }
+  @supports (height: 100dvh){
+    .preview{ height: 50dvh; }
+  }
+
+</style>
+</head>
+<body>
+<div class="landing">
+  <div class="hero">
+    <div class="title">HTML Inspector & Editor — v2.1 (Mobile)</div>
+    <div class="sub">Abas com renomear/duplicar/fechar • busca/replace • highlight leve • export .zip com assets.</div>
+    <div class="actions">
+      <button class="btn" id="btnOpen">Abrir</button>
+      <input type="file" id="fileInput" accept=".html,.htm,.txt" class="ghost" style="display:none"/>
+      <button class="btn" id="btnPaste">Colar</button>
+      <button class="btn" id="btnCopyAll">Copiar</button>
+      <button class="btn ok" id="btnExport">Exportar HTML</button>
+      <button class="btn primary" id="btnExportZip">Exportar .zip</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- HTML Pane -->
+    <section class="card" id="paneHTML">
+      <header>
+        <h3>HTML</h3>
+        <div class="toolbar">
+          <button class="btn" data-action="undo" data-target="html">Desfazer</button>
+          <button class="btn" data-action="redo" data-target="html">Refazer</button>
+          <button class="btn" data-action="beautify" data-target="html">Auto‑indentar</button>
+          <button class="btn" id="btnHLhtml">Highlight</button>
+        </div>
+      </header>
+      <div class="section">
+        <div class="field" style="margin-bottom:8px">
+          <input id="findHTML" placeholder="Buscar no HTML"/>
+          <input id="replHTML" placeholder="Substituir por"/>
+          <button class="btn" data-find="html" data-op="prev">◀</button>
+          <button class="btn" data-find="html" data-op="next">▶</button>
+          <button class="btn" data-find="html" data-op="replace">Subst.</button>
+          <button class="btn" data-find="html" data-op="replaceAll">Tudo</button>
+        </div>
+        <div class="hlwrap">
+          <textarea class="editor" id="editorHTML" spellcheck="false" placeholder="Cole seu HTML aqui..."></textarea>
+          <pre class="hlview" id="hlHTML"></pre>
+        </div>
+        <div class="tiny">Dica: cole um documento completo ou um trecho; a recomposição tratará CSS/JS inline.</div>
+      </div>
+    </section>
+
+    <!-- CSS Pane with tabs + manage -->
+    <section class="card" id="paneCSS">
+      <header>
+        <h3>CSS (abas)</h3>
+        <div class="toolbar">
+          <button class="btn" id="btnAddStyle">+ Style</button>
+          <button class="btn" id="btnRenStyle">Renomear</button>
+          <button class="btn" id="btnDupStyle">Duplicar</button>
+          <button class="btn warn" id="btnDelStyle">Fechar</button>
+          <button class="btn" id="btnHLcss">Highlight</button>
+        </div>
+      </header>
+      <div class="section">
+        <div class="tabbar" id="tabsCSS"></div>
+        <div class="field" style="margin-bottom:8px">
+          <input id="findCSS" placeholder="Buscar no CSS"/>
+          <input id="replCSS" placeholder="Substituir por"/>
+          <button class="btn" data-find="css" data-op="prev">◀</button>
+          <button class="btn" data-find="css" data-op="next">▶</button>
+          <button class="btn" data-find="css" data-op="replace">Subst.</button>
+          <button class="btn" data-find="css" data-op="replaceAll">Tudo</button>
+        </div>
+        <div class="hlwrap">
+          <textarea class="editor" id="editorCSS" spellcheck="false" placeholder="Style 1"></textarea>
+          <pre class="hlview" id="hlCSS"></pre>
+        </div>
+        <div class="row tiny"><span class="chip">Abas: múltiplos <code class="mono">style</code> inline</span></div>
+      </div>
+    </section>
+
+    <!-- JS Pane with tabs + manage -->
+    <section class="card" id="paneJS">
+      <header>
+        <h3>JavaScript (abas)</h3>
+        <div class="toolbar">
+          <button class="btn" id="btnAddScript">+ Script</button>
+          <button class="btn" id="btnRenScript">Renomear</button>
+          <button class="btn" id="btnDupScript">Duplicar</button>
+          <button class="btn warn" id="btnDelScript">Fechar</button>
+          <button class="btn" id="btnHLjs">Highlight</button>
+        </div>
+      </header>
+      <div class="section">
+        <div class="tabbar" id="tabsJS"></div>
+        <div class="field" style="margin-bottom:8px">
+          <input id="findJS" placeholder="Buscar no JS"/>
+          <input id="replJS" placeholder="Substituir por"/>
+          <button class="btn" data-find="js" data-op="prev">◀</button>
+          <button class="btn" data-find="js" data-op="next">▶</button>
+          <button class="btn" data-find="js" data-op="replace">Subst.</button>
+          <button class="btn" data-find="js" data-op="replaceAll">Tudo</button>
+        </div>
+        <div class="hlwrap">
+          <textarea class="editor" id="editorJS" spellcheck="false" placeholder="Script 1"></textarea>
+          <pre class="hlview" id="hlJS"></pre>
+        </div>
+        <div class="row tiny"><span class="chip">Abas: múltiplos <code class="mono">script</code> inline</span></div>
+      </div>
+    </section>
+
+    <!-- Preview + Validate -->
+    <section class="card">
+      <header>
+        <h3>Pré‑visualização & Validação</h3>
+        <div class="toolbar">
+          <button class="btn" id="btnCompose">Recompor</button>
+          <button class="btn primary" id="btnPreview">Pré‑visualizar ▶</button>
+          <button class="btn" id="btnValidate">Validar</button>
+        </div>
+      </header>
+      <div class="section split">
+        <iframe class="preview" id="preview" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+        <div class="list" id="validationList"></div>
+      </div>
+      <div class="section">
+        <div class="tiny">Assets detectados (para export .zip):</div>
+        <div class="list" id="assetsList"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="stickybar">
+    <button class="btn" id="btnBeautifyAll">Auto‑indentar tudo</button>
+    <button class="btn" id="btnCopyFinal">Copiar Final</button>
+    <button class="btn ok" id="btnExport2">Exportar HTML</button>
+    <button class="btn primary" id="btnExportZip2">Exportar .zip</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const $ = (s, r=document)=>r.querySelector(s);
+  const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
+
+  // Editors state
+  const ed = {
+    html: {ta: $('#editorHTML'), undo:[], redo:[], find: $('#findHTML'), repl: $('#replHTML'), hl: $('#hlHTML')},
+    css:  {ta: $('#editorCSS'),  undo:[], redo:[], find: $('#findCSS'),  repl: $('#replCSS'),  tabs: [], active: 0, hl: $('#hlCSS')},
+    js:   {ta: $('#editorJS'),   undo:[], redo:[], find: $('#findJS'),   repl: $('#replJS'),   tabs: [], active: 0, hl: $('#hlJS')},
+  };
+
+  // Tabs helpers
+  function renderTabs(kind){
+    const bar = kind==='css' ? $('#tabsCSS') : $('#tabsJS');
+    const s = ed[kind];
+    bar.innerHTML='';
+    s.tabs.forEach((t,i)=>{
+      const b = document.createElement('button');
+      b.className = 'tab' + (s.active===i?' active':'');
+      b.textContent = t.name || (kind.toUpperCase() + ' ' + (i+1));
+      b.addEventListener('click', ()=>{ saveActive(kind); s.active=i; loadActive(kind); });
+      bar.appendChild(b);
+    });
+  }
+  function saveActive(kind){
+    const s = ed[kind];
+    if (!s.tabs.length) return;
+    s.tabs[s.active].code = s.ta.value;
+  }
+  function loadActive(kind){
+    const s = ed[kind];
+    if (!s.tabs.length){ s.ta.value=''; return; }
+    s.ta.value = s.tabs[s.active].code || '';
+    updateHL(kind);
+  }
+  function addTab(kind, name, code){
+    const s = ed[kind];
+    s.tabs.push({name: name || (kind.toUpperCase()+' '+(s.tabs.length+1)), code: code||''});
+    s.active = s.tabs.length-1;
+    renderTabs(kind); loadActive(kind);
+  }
+  function renameTab(kind){
+    const s = ed[kind]; if (!s.tabs.length) return;
+    const cur = s.tabs[s.active]; const nv = prompt('Novo nome da aba', cur.name||'');
+    if (nv){ cur.name = nv; renderTabs(kind); }
+  }
+  function dupTab(kind){
+    const s = ed[kind]; if (!s.tabs.length) return;
+    saveActive(kind);
+    const cur = s.tabs[s.active];
+    addTab(kind, (cur.name||'Aba') + ' (cópia)', cur.code||'');
+  }
+  function delTab(kind){
+    const s = ed[kind]; if (s.tabs.length<=1){ alert('Pelo menos 1 aba precisa existir.'); return; }
+    if (!confirm('Fechar aba atual?')) return;
+    s.tabs.splice(s.active,1);
+    s.active = Math.max(0, s.active-1);
+    renderTabs(kind); loadActive(kind);
+  }
+
+  // Initial tabs
+  addTab('css','Style 1','');
+  addTab('js','Script 1','');
+
+  // Manage buttons
+  $('#btnAddStyle').addEventListener('click', ()=>addTab('css', 'Style ' + (ed.css.tabs.length+1), ''));
+  $('#btnAddScript').addEventListener('click', ()=>addTab('js', 'Script ' + (ed.js.tabs.length+1), ''));
+  $('#btnRenStyle').addEventListener('click', ()=>renameTab('css'));
+  $('#btnDupStyle').addEventListener('click', ()=>dupTab('css'));
+  $('#btnDelStyle').addEventListener('click', ()=>delTab('css'));
+  $('#btnRenScript').addEventListener('click', ()=>renameTab('js'));
+  $('#btnDupScript').addEventListener('click', ()=>dupTab('js'));
+  $('#btnDelScript').addEventListener('click', ()=>delTab('js'));
+
+  // Undo/Redo
+  function pushUndo(set){
+    const val = set.ta.value;
+    if (!set.undo.length || set.undo[set.undo.length-1]!==val){
+      set.undo.push(val); if (set.undo.length>100) set.undo.shift(); set.redo.length=0;
+    }
+  }
+  function doUndo(set){ if (set.undo.length>1){ const cur=set.undo.pop(); set.redo.push(cur); set.ta.value=set.undo[set.undo.length-1]||''; updateHLof(set); }}
+  function doRedo(set){ if (set.redo.length){ const v=set.redo.pop(); set.undo.push(v); set.ta.value=v; updateHLof(set); } }
+  ['html','css','js'].forEach(k=>{
+    ed[k].ta.addEventListener('input', ()=>{ pushUndo(ed[k]); updateHL(k); });
+    pushUndo(ed[k]);
+  });
+  $$('.toolbar [data-action]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const tgt = btn.getAttribute('data-target');
+      const act = btn.getAttribute('data-action');
+      if (act==='undo') doUndo(ed[tgt]);
+      if (act==='redo') doRedo(ed[tgt]);
+      if (act==='beautify') beautify(tgt);
+    });
+  });
+
+  // Highlight toggles
+  $('#btnHLhtml').addEventListener('click', ()=>ed.html.hl.classList.toggle('on'));
+  $('#btnHLcss').addEventListener('click',  ()=>ed.css.hl.classList.toggle('on'));
+  $('#btnHLjs').addEventListener('click',   ()=>ed.js.hl.classList.toggle('on'));
+
+  // Highlight functions (leve, regex-based)
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function hlHTML(src){
+    let s = esc(src);
+    s = s.replace(/(&lt;!--[\s\S]*?--&gt;)/g, '<span class="tok-comm">$1</span>');
+    s = s.replace(/(&lt;\/?[a-zA-Z0-9\-:]+)([^&]*?)(&gt;)/g, function(_, tag, attrs, end){
+      attrs = attrs.replace(/([a-zA-Z-:]+)=(".*?"|'.*?'|[^"\s>]+)/g, function(__, a, v){
+        return '<span class="tok-attr">'+a+'</span>='+'<span class="tok-str">'+esc(v)+'</span>';
+      });
+      return '<span class="tok-tag">'+tag+'</span>'+attrs+'<span class="tok-tag">'+end+'</span>';
+    });
+    return s;
+  }
+  function hlCSS(src){
+    let s = esc(src);
+    s = s.replace(/\/\*[\s\S]*?\*\//g, '<span class="tok-comm">$&</span>');
+    s = s.replace(/(#(?:[0-9a-fA-F]{3,8}))/g, '<span class="tok-num">$1</span>');
+    s = s.replace(/([0-9]+(?:\.[0-9]+)?)(px|em|rem|%)?/g, '<span class="tok-num">$1$2</span>');
+    s = s.replace(/([a-z-]+)\s*:/g, '<span class="tok-attr">$1</span>:');
+    return s;
+  }
+  function hlJS(src){
+    let s = esc(src);
+    s = s.replace(/(\/\/.*?$)/gm, '<span class="tok-comm">$1</span>');
+    s = s.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="tok-comm">$1</span>');
+    s = s.replace(/(["'`])(?:\\.|(?!\1).)*\1/g, '<span class="tok-str">$&</span>');
+    s = s.replace(/\b(const|let|var|function|return|if|else|for|while|class|new|this|=>|try|catch|await|async|import|from|export)\b/g, '<span class="tok-key">$1</span>');
+    s = s.replace(/\b([0-9]+(?:\.[0-9]+)?)\b/g, '<span class="tok-num">$1</span>');
+    return s;
+  }
+  function updateHL(kind){
+    if (kind==='html') ed.html.hl.innerHTML = hlHTML(ed.html.ta.value);
+    if (kind==='css')  ed.css.hl.innerHTML  = hlCSS(ed.css.ta.value);
+    if (kind==='js')   ed.js.hl.innerHTML   = hlJS(ed.js.ta.value);
+  }
+  function updateHLof(set){
+    if (set===ed.html) ed.html.hl.innerHTML = hlHTML(ed.html.ta.value);
+    if (set===ed.css)  ed.css.hl.innerHTML  = hlCSS(ed.css.ta.value);
+    if (set===ed.js)   ed.js.hl.innerHTML   = hlJS(ed.js.ta.value);
+  }
+
+  // Beautify
+  function prettyHTML(html){
+    const voids = new Set(['area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr']);
+    html = html.replace(/>\\s+</g, '><').replace(/\\n+/g,'');
+    let out = '', indent=0;
+    html.split(/(<[^>]+>)/g).filter(Boolean).forEach(tok=>{
+      if (tok.startsWith('<')){
+        if (/^<\\//.test(tok)){ indent = Math.max(0, indent-1); }
+        out += '  '.repeat(indent) + tok + '\\n';
+        if (!/^<\\//.test(tok) && !/\\/\\s*>$/.test(tok)){
+          const tag = (tok.match(/^<\\s*([a-zA-Z0-9-]+)/)||[])[1];
+          if (tag && !voids.has(tag.toLowerCase()) && !tok.endsWith('/>')) indent++;
+        }
+      } else if (tok.trim()){
+        out += '  '.repeat(indent) + tok.trim() + '\\n';
+      }
+    });
+    return out.trim();
+  }
+  function prettyCSS(css){
+    css = css.replace(/\\s+/g,' ');
+    css = css.replace(/\\s*{\\s*/g,' {\\n  ').replace(/;\\s*/g,';\\n  ').replace(/\\s*}\\s*/g,'\\n}\\n');
+    css = css.replace(/\\n\\s*\\n/g,'\\n');
+    return css.trim();
+  }
+  function prettyJS(js){
+    js = js.replace(/\\r/g,'');
+    js = js.replace(/;\\s*/g,';\\n').replace(/\\{\\s*/g,'{\\n').replace(/\\}\\s*/g,'\\n}\\n');
+    let out='', indent=0;
+    js.split(/\\n/).forEach(line=>{
+      line=line.trim(); if (!line) return;
+      if (/^\\}/.test(line)) indent = Math.max(0, indent-1);
+      out += '  '.repeat(indent)+line+'\\n';
+      if (/{\\s*$/.test(line)) indent++;
+    });
+    return out.trim();
+  }
+  function beautify(kind){
+    if (kind==='html') ed.html.ta.value = prettyHTML(ed.html.ta.value);
+    if (kind==='css')  { saveActive('css'); ed.css.tabs[ed.css.active].code = prettyCSS(ed.css.tabs[ed.css.active].code); loadActive('css'); }
+    if (kind==='js')   { saveActive('js');  ed.js.tabs[ed.js.active].code   = prettyJS(ed.js.tabs[ed.js.active].code);   loadActive('js'); }
+    updateHL(kind);
+  }
+  $('#btnBeautifyAll').addEventListener('click', ()=>{ beautify('html'); ed.css.tabs.forEach((_,i)=>{ed.css.active=i; beautify('css');}); ed.css.active=0; loadActive('css'); ed.js.tabs.forEach((_,i)=>{ed.js.active=i; beautify('js');}); ed.js.active=0; loadActive('js'); });
+
+  // Search/Replace (current editor)
+  function findDo(kind, op){
+    const set = ed[kind];
+    const ta = set.ta;
+    const q = (set.find.value||''); if (!q) return;
+    if (op==='next' || op==='prev'){
+      const text = ta.value; const start = ta.selectionEnd;
+      if (op==='next'){
+        const idx = text.indexOf(q, start);
+        const pos = idx>=0 ? idx : text.indexOf(q, 0);
+        if (pos>=0){ ta.focus(); ta.selectionStart=pos; ta.selectionEnd=pos+q.length; }
+      } else {
+        const before = ta.value.substring(0, ta.selectionStart);
+        const idx = before.lastIndexOf(q);
+        const alt = ta.value.lastIndexOf(q);
+        const pos = idx>=0 ? idx : alt;
+        if (pos>=0){ ta.focus(); ta.selectionStart=pos; ta.selectionEnd=pos+q.length; }
+      }
+    } else if (op==='replace'){
+      if (ta.selectionStart!==ta.selectionEnd){
+        const s = ta.selectionStart, e=ta.selectionEnd;
+        ta.setRangeText(set.repl.value||'', s, e, 'end');
+      } else {
+        findDo(kind,'next');
+      }
+    } else if (op==='replaceAll'){
+      const re = new RegExp(set.find.value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+      ta.value = ta.value.replace(re, set.repl.value||'');
+    }
+    updateHL(kind);
+  }
+  $$('[data-find]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      const kind = b.getAttribute('data-find');
+      const op = b.getAttribute('data-op');
+      findDo(kind, op);
+    });
+  });
+
+  // Compose + assets detection
+  function compose(){
+    saveActive('css'); saveActive('js');
+    const headBody = ed.html.ta.value;
+    const styles = ed.css.tabs.map(t=>t.code).filter(Boolean).map(c=>`<style>\\n${c}\\n</style>`).join('\\n');
+    const scripts= ed.js.tabs.map(t=>t.code).filter(Boolean).map(c=>`<script>\\n${c}\\n</script>`).join('\\n');
+    let final = '';
+    if (/<!doctype/i.test(headBody)){
+      final = headBody;
+      if (styles) final = final.replace(/<\/head>/i, styles + '\\n</head>');
+      if (scripts){
+        if (/<\/body>/i.test(final)) final = final.replace(/<\/body>/i, scripts + '\\n</body>');
+        else final += scripts;
+      }
+    } else {
+      final = `<!DOCTYPE html>\\n<html lang="pt-br">\\n<head>\\n<meta charset="utf-8">\\n<meta name="viewport" content="width=device-width, initial-scale=1">\\n<title>Documento</title>\\n${styles}\\n</head>\\n<body>\\n${headBody}\\n${scripts}\\n</body>\\n</html>`;
+    }
+    detectAssets(final);
+    return final;
+  }
+
+  function detectAssets(html){
+    const d = new DOMParser().parseFromString(html, 'text/html');
+    const files = [];
+    d.querySelectorAll('script[src]').forEach(s=>files.push({type:'script', url:s.src}));
+    d.querySelectorAll('link[rel="stylesheet"][href]').forEach(l=>files.push({type:'style', url:l.href}));
+    d.querySelectorAll('img[src]').forEach(i=>files.push({type:'img', url:i.src}));
+    const box = $('#assetsList'); box.innerHTML='';
+    if (!files.length){ box.innerHTML = '<div class="li ghost">Nenhum asset externo detectado.</div>'; return; }
+    files.forEach(f=>{
+      const el = document.createElement('div'); el.className='li';
+      el.innerHTML = `<span class="tiny">[${f.type}] ${f.url}</span><span class="ghost tiny">zip</span>`;
+      box.appendChild(el);
+    });
+    window.__assetsDetected = files;
+  }
+
+  // Validate (simple heuristics)
+  function validate(html){
+    const issues = [];
+    try {
+      const d = new DOMParser().parseFromString(html, 'text/html');
+      const ids = {};
+      d.querySelectorAll('[id]').forEach(el=>{
+        const id = el.id;
+        ids[id] = (ids[id]||0)+1;
+      });
+      Object.keys(ids).forEach(id=>{ if (ids[id]>1) issues.push({t:'warn', msg:`id duplicado: #${id} (${ids[id]}x)`}); });
+      d.querySelectorAll('img:not([alt])').forEach(()=>issues.push({t:'warn', msg:'<img> sem alt'}));
+      if (!d.title) issues.push({t:'warn', msg:'<title> ausente'});
+      if (!d.querySelector('meta[name="viewport"]')) issues.push({t:'warn', msg:'meta viewport ausente'});
+      const htmlEl = d.querySelector('html'); if (htmlEl && !htmlEl.getAttribute('lang')) issues.push({t:'warn', msg:'atributo lang ausente em <html>'});
+      d.querySelectorAll('a[href="#"], a:not([href])').forEach(()=>issues.push({t:'warn', msg:'link sem href válido'}));
+      d.querySelectorAll('script[src^="http:"]').forEach(()=>issues.push({t:'warn', msg:'script externo via HTTP (use HTTPS)'}));
+      d.querySelectorAll('link[rel="stylesheet"][href^="http:"]').forEach(()=>issues.push({t:'warn', msg:'stylesheet externo via HTTP (use HTTPS)'}));
+      d.querySelectorAll('[onclick],[onchange],[oninput],[onload],[onsubmit]').forEach(el=>issues.push({t:'hint', msg:'handler inline encontrado (considere addEventListener)'}));
+    } catch(e){
+      issues.push({t:'err', msg:String(e)});
+    }
+    // Basic braces check in CSS/JS
+    const cssAll = ed.css.tabs.map(t=>t.code).join('\n');
+    const jsAll  = ed.js.tabs.map(t=>t.code).join('\n');
+    const cssOpen = (cssAll.match(/{/g)||[]).length, cssClose=(cssAll.match(/}/g)||[]).length;
+    if (cssOpen!==cssClose) issues.push({t:'err', msg:`CSS chaves não fechadas: {${cssOpen}}${cssClose}`});
+    const jsOpen = (jsAll.match(/{/g)||[]).length, jsClose=(jsAll.match(/}/g)||[]).length;
+    if (jsOpen!==jsClose) issues.push({t:'err', msg:`JS chaves não fechadas: {${jsOpen}}${jsClose}`});
+    return issues;
+  }
+  function showValidation(list){
+    const box = $('#validationList'); box.innerHTML='';
+    if (!list.length){ box.innerHTML = '<div class="li ok">Sem problemas encontrados.</div>'; return; }
+    list.forEach(it=>{
+      const el = document.createElement('div'); el.className='li';
+      const cls = it.t==='err'?'err':(it.t==='warn'?'warn':'hint');
+      el.innerHTML = `<span class="${cls}">• ${it.msg}</span><span class="tiny ghost">${it.t.toUpperCase()}</span>`;
+      box.appendChild(el);
+    });
+  }
+
+  // IO buttons
+  $('#btnOpen').addEventListener('click', ()=>$('#fileInput').click());
+  $('#fileInput').addEventListener('change', async (e)=>{
+    const f = e.target.files[0]; if (!f) return;
+    const txt = await f.text();
+    loadAndSplit(txt);
+  });
+  $('#btnPaste').addEventListener('click', async ()=>{
+    try{ const txt = await navigator.clipboard.readText(); if (txt) loadAndSplit(txt); }catch(e){ alert('Não consegui ler do clipboard.'); }
+  });
+  $('#btnCopyAll').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(compose()); alert('HTML copiado'); }catch(e){ alert('Falhou ao copiar'); }
+  });
+  $('#btnCopyFinal').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(compose()); alert('Final copiado'); }catch(e){ alert('Falhou ao copiar'); }
+  });
+  $('#btnExport').addEventListener('click', ()=>exportHTML());
+  $('#btnExport2').addEventListener('click', ()=>exportHTML());
+  $('#btnExportZip').addEventListener('click', ()=>exportZIP());
+  $('#btnExportZip2').addEventListener('click', ()=>exportZIP());
+
+  function exportHTML(){
+    const blob = new Blob([compose()], {type:'text/html'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'export.html'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
+  // Preview & Validate
+  $('#btnCompose').addEventListener('click', ()=>compose());
+  $('#btnPreview').addEventListener('click', ()=>{ $('#preview').srcdoc = compose(); });
+  $('#btnValidate').addEventListener('click', ()=>{ showValidation(validate(compose())); });
+
+  // Split loader
+  function loadAndSplit(raw){
+    const d = new DOMParser().parseFromString(raw, 'text/html');
+    const head = d.head ? d.head.innerHTML : '';
+    const body = d.body ? d.body.innerHTML : '';
+    ed.html.ta.value = prettyHTML('<head>\\n'+head+'\\n</head>\\n<body>\\n'+body+'\\n</body>');
+    // styles
+    ed.css.tabs = []; ed.css.active=0;
+    const styles = Array.from(d.querySelectorAll('style'));
+    if (styles.length){ styles.forEach((s,i)=>addTab('css', 'Style '+(i+1), s.textContent)); }
+    else { addTab('css','Style 1',''); }
+    // scripts
+    ed.js.tabs = []; ed.js.active=0;
+    const scripts = Array.from(d.querySelectorAll('script:not([src])'));
+    if (scripts.length){ scripts.forEach((s,i)=>addTab('js', 'Script '+(i+1), s.textContent)); }
+    else { addTab('js','Script 1',''); }
+    alert('Documento carregado.');
+    updateHL('html'); updateHL('css'); updateHL('js');
+  }
+
+  // -------- ZIP builder (no compression, store only) --------
+  function crc32(buf){
+    let table = window.__crc32table;
+    if (!table){
+      table = new Uint32Array(256);
+      for (let i=0;i<256;i++){
+        let c = i;
+        for (let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        table[i] = c >>> 0;
+      }
+      window.__crc32table = table;
+    }
+    let crc = 0 ^ (-1);
+    for (let i=0;i<buf.length;i++){
+      crc = (crc >>> 8) ^ table[(crc ^ buf[i]) & 0xFF];
+    }
+    return (crc ^ (-1)) >>> 0;
+  }
+  function strToU8(str){ return new TextEncoder().encode(str); }
+  function dateToDOS(d=new Date()){
+    const dosTime = ((d.getHours()   & 0x1F) << 11) | ((d.getMinutes() & 0x3F) << 5) | ((Math.floor(d.getSeconds()/2)) & 0x1F);
+    const dosDate = (((d.getFullYear()-1980) & 0x7F) << 9) | (((d.getMonth()+1) & 0x0F) << 5) | ((d.getDate()) & 0x1F);
+    return {time: dosTime, date: dosDate};
+  }
+  function encodeUTF8Filename(name){
+    return strToU8(name);
+  }
+  function addFile(records, path, dataU8){
+    const sigLFH = 0x04034b50;
+    const sigCDR = 0x02014b50;
+    const sigEOD = 0x06054b50;
+    const {time, date} = dateToDOS(new Date());
+    const crc = crc32(dataU8);
+    const compSize = dataU8.length;
+    const uncompSize = dataU8.length;
+    const nameU8 = encodeUTF8Filename(path);
+    const localHeader = new Uint8Array(30 + nameU8.length);
+    const view = new DataView(localHeader.buffer);
+    let off = 0;
+    view.setUint32(off, sigLFH, true); off+=4;
+    view.setUint16(off, 20, true); off+=2; // version
+    view.setUint16(off, 0, true);  off+=2; // flags
+    view.setUint16(off, 0, true);  off+=2; // method 0 store
+    view.setUint16(off, time, true); off+=2;
+    view.setUint16(off, date, true); off+=2;
+    view.setUint32(off, crc, true); off+=4;
+    view.setUint32(off, compSize, true); off+=4;
+    view.setUint32(off, uncompSize, true); off+=4;
+    view.setUint16(off, nameU8.length, true); off+=2;
+    view.setUint16(off, 0, true); off+=2; // extra length
+    localHeader.set(nameU8, 30);
+
+    const localOffset = records.size;
+    records.parts.push(localHeader, dataU8);
+    records.size += localHeader.length + dataU8.length;
+
+    // Central directory entry
+    const cdr = new Uint8Array(46 + nameU8.length);
+    const v = new DataView(cdr.buffer); off = 0;
+    v.setUint32(off, sigCDR, true); off+=4;
+    v.setUint16(off, 20, true); off+=2; // version made
+    v.setUint16(off, 20, true); off+=2; // version needed
+    v.setUint16(off, 0, true);  off+=2; // flags
+    v.setUint16(off, 0, true);  off+=2; // method
+    v.setUint16(off, time, true); off+=2;
+    v.setUint16(off, date, true); off+=2;
+    v.setUint32(off, crc, true); off+=4;
+    v.setUint32(off, compSize, true); off+=4;
+    v.setUint32(off, uncompSize, true); off+=4;
+    v.setUint16(off, nameU8.length, true); off+=2;
+    v.setUint16(off, 0, true); off+=2; // extra
+    v.setUint16(off, 0, true); off+=2; // comment
+    v.setUint16(off, 0, true); off+=2; // disk start
+    v.setUint16(off, 0, true); off+=2; // int attrs
+    v.setUint32(off, 0, true); off+=4; // ext attrs
+    v.setUint32(off, localOffset, true); off+=4;
+    cdr.set(nameU8, 46);
+
+    records.cdr.push(cdr);
+    records.count += 1;
+  }
+  async function exportZIP(){
+    const html = compose();
+    const rec = {parts:[], cdr:[], size:0, count:0};
+    addFile(rec, 'export.html', strToU8(html));
+
+    // fetch assets
+    const assets = window.__assetsDetected || [];
+    for (const a of assets){
+      try{
+        const res = await fetch(a.url, {mode:'cors'});
+        if (!res.ok) throw new Error('HTTP '+res.status);
+        const buf = new Uint8Array(await res.arrayBuffer());
+        let path = a.url.split('/').pop().split('?')[0] || (a.type+'.txt');
+        const dir = a.type==='img' ? 'assets/img/' : (a.type==='style' ? 'assets/css/' : 'assets/js/');
+        addFile(rec, dir + path, buf);
+      }catch(e){
+        const msg = `Falha ao baixar ${a.url}\nMotivo: ${e.message}\nObservação: pode ser bloqueio de CORS.\n`;
+        addFile(rec, 'assets/_falhas.txt', strToU8(msg));
+      }
+    }
+
+    // finalize central directory
+    const sigEOD = 0x06054b50;
+    let cdrSize = 0, cdrOffset = rec.size;
+    rec.cdr.forEach(b=>cdrSize += b.length);
+    const outParts = [...rec.parts, ...rec.cdr];
+    const eod = new Uint8Array(22);
+    const dv = new DataView(eod.buffer);
+    let off = 0;
+    dv.setUint32(off, sigEOD, true); off+=4;
+    dv.setUint16(off, 0, true); off+=2; // disk#
+    dv.setUint16(off, 0, true); off+=2; // disk start
+    dv.setUint16(off, rec.count, true); off+=2;
+    dv.setUint16(off, rec.count, true); off+=2;
+    dv.setUint32(off, cdrSize, true); off+=4;
+    dv.setUint32(off, cdrOffset, true); off+=4;
+    dv.setUint16(off, 0, true); off+=2; // comment
+    outParts.push(eod);
+
+    // blob
+    const blob = new Blob(outParts, {type:'application/zip'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'export_with_assets.zip'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+
+  // Preview & Validation handlers wired earlier...
+
+})();</script>
+</body>
+</html>
