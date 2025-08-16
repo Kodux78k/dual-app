@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Loader PULSO — Isolado</title>
+<style>
+  :root{
+    --g1:#F0F; --g2:#0FF;
+    --bg:#000; --fg:#EEEFF7;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Montserrat,sans-serif}
+  .stage{min-height:100%;display:grid;place-items:center}
+  /* ===== Loader PULSO (ondas concêntricas) isolado ===== */
+  .dual-pulse{position:relative;width:48px;height:48px;display:grid;place-items:center}
+  .dual-pulse .dot{width:10px;height:10px;border-radius:50%;
+    background:linear-gradient(90deg,var(--g1),var(--g2))}
+  .dual-pulse .wave{position:absolute;inset:0;border-radius:50%;border:1px solid transparent;
+    animation:dual-wave 2.4s ease-out infinite;opacity:.6}
+  .dual-pulse .wave::before{content:"";position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(var(--g1),var(--g2));
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+            mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);}
+  .dual-pulse .wave:nth-child(1){animation-delay:0s}
+  .dual-pulse .wave:nth-child(2){animation-delay:.7s}
+  .dual-pulse .wave:nth-child(3){animation-delay:1.4s}
+  @keyframes dual-wave{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.35);opacity:0}}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="dual-pulse" aria-label="Loader Pulso">
+      <span class="wave"></span>
+      <span class="wave"></span>
+      <span class="wave"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+</body>
+</html>

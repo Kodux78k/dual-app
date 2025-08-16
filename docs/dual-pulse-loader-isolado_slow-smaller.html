@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Loader PULSO — Slow & Menor</title>
+<style>
+  :root{ --g1:#F0F; --g2:#0FF; --bg:#000; --fg:#EEEFF7; }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);display:grid;place-items:center}
+  .dual-pulse{position:relative;width:28px;height:28px;display:grid;place-items:center}
+  .dual-pulse .stroke{
+    position:absolute;inset:0;border-radius:50%;opacity:.22;
+    background:conic-gradient(from 90deg,var(--g1),var(--g2));
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+            mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+    animation:dual-rot 20s linear infinite, dual-veil 8.4s ease-in-out infinite;
+  }
+  .dual-pulse .wave{
+    position:absolute;inset:3px;border-radius:50%;border:1px solid transparent;
+    animation:dual-wave 8.4s ease-in-out infinite, dual-veil 8.4s ease-in-out infinite;
+    opacity:.34;
+  }
+  .dual-pulse .wave::before{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(var(--g1),var(--g2));
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+            mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+  }
+  .dual-pulse .wave:nth-child(2){animation-delay:2.8s}
+  .dual-pulse .wave:nth-child(3){animation-delay:5.6s}
+  .dual-pulse .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:linear-gradient(90deg,var(--g1),var(--g2));
+    filter: drop-shadow(0 0 2px rgba(255,255,255,.08));
+    animation:dual-beat 4.2s ease-in-out infinite, dual-glow 8.4s ease-in-out infinite;
+  }
+  @keyframes dual-wave{0%{transform:scale(.58);opacity:.28}50%{opacity:.5}100%{transform:scale(1.38);opacity:0}}
+  @keyframes dual-beat{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.06);filter:brightness(1.1)}}
+  @keyframes dual-rot{to{transform:rotate(360deg)}}
+  @keyframes dual-veil{0%,100%{opacity:.24}50%{opacity:.52}}
+  @keyframes dual-glow{0%,100%{filter:drop-shadow(0 0 2px rgba(255,255,255,.08))}50%{filter:drop-shadow(0 0 5px rgba(255,255,255,.16))}}
+</style>
+</head>
+<body>
+  <div class="dual-pulse" aria-label="Loader Pulso Slow & Menor">
+    <span class="stroke"></span>
+    <span class="wave"></span>
+    <span class="wave"></span>
+    <span class="wave"></span>
+    <span class="dot"></span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Loader PULSO — Isolado (etéreo + fluxo ótico)</title>
+<style>
+  :root{
+    --g1:#F0F; --g2:#0FF;
+    --bg:#000; --fg:#EEEFF7;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Montserrat,sans-serif}
+  .stage{min-height:100%;display:grid;place-items:center}
+  /* ===== Loader PULSO (etéreo) ===== */
+  .dual-pulse{position:relative;width:60px;height:60px;display:grid;place-items:center}
+  /* Aro/Stroke girando com opacidade respirando */
+  .dual-pulse .stroke{
+    position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 90deg,var(--g1),var(--g2));
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+            mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+    opacity:.24;
+    animation:
+      dual-rot 16s linear infinite,
+      dual-veil 6.2s cubic-bezier(.42,0,.26,1) infinite;
+  }
+  /* Ondas — respiração lenta + véu suave */
+  .dual-pulse .wave{
+    position:absolute;inset:7px;border-radius:50%;border:1px solid transparent;
+    animation:
+      dual-wave 6.2s cubic-bezier(.42,0,.26,1) infinite,
+      dual-veil 6.2s cubic-bezier(.42,0,.26,1) infinite;
+    opacity:.38;
+    will-change: transform, opacity;
+  }
+  .dual-pulse .wave::before{
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(var(--g1),var(--g2));
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+            mask:radial-gradient(farthest-side,transparent calc(50% - 1px),#000 calc(50% - 1px),#000 100%);
+  }
+  .dual-pulse .wave:nth-child(2){animation-delay:2.07s}
+  .dual-pulse .wave:nth-child(3){animation-delay:4.14s}
+  /* Núcleo com batida inocente/exploradora (mais leve) */
+  .dual-pulse .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:linear-gradient(90deg,var(--g1),var(--g2));
+    filter: drop-shadow(0 0 4px rgba(255,255,255,.12));
+    animation:
+      dual-beat 3.2s cubic-bezier(.42,0,.26,1) infinite,
+      dual-glow 6.2s cubic-bezier(.42,0,.26,1) infinite;
+  }
+  /* Keyframes (fluxo ótico) */
+  @keyframes dual-wave{
+    0%{transform:scale(.58);opacity:.36}
+    50%{opacity:.58}
+    100%{transform:scale(1.46);opacity:0}
+  }
+  @keyframes dual-beat{
+    0%,100%{transform:scale(1);filter:brightness(1)}
+    50%{transform:scale(1.08);filter:brightness(1.14)}
+  }
+  @keyframes dual-rot{to{transform:rotate(360deg)}}
+  @keyframes dual-veil{
+    0%,100%{opacity:.32}
+    50%{opacity:.62}
+  }
+  @keyframes dual-glow{
+    0%,100%{filter:drop-shadow(0 0 4px rgba(255,255,255,.12))}
+    50%{filter:drop-shadow(0 0 8px rgba(255,255,255,.22))}
+  }
+
+  /* Acessibilidade */
+  @media (prefers-reduced-motion:reduce){
+    .dual-pulse .wave,.dual-pulse .dot,.dual-pulse .stroke{animation:none !important;opacity:.4}
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="dual-pulse" aria-label="Loader Pulso (etéreo)">
+      <span class="stroke" aria-hidden="true"></span>
+      <span class="wave" aria-hidden="true"></span>
+      <span class="wave" aria-hidden="true"></span>
+      <span class="wave" aria-hidden="true"></span>
+      <span class="dot"   aria-hidden="true"></span>
+    </div>
+  </div>
+</body>
+</html>
