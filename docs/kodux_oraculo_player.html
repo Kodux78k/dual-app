@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Cérebro-Oráculo — Player • KODUX</title>
+  <meta name="color-scheme" content="dark light">
+  <style>
+:root{
+  --kodux-pulse-speed: 2.6s;
+  --kodux-glow: #8a5cff;
+  --kodux-glow-2: #ff2cc3;
+  --kodux-bg: radial-gradient(120% 120% at 50% 0%, #0b0b12 0%, #0a0a0f 45%, #06060a 100%);
+  --kodux-glass: rgba(255,255,255,.06);
+  --kodux-blur: 10px;
+  --kodux-br: 16px;
+  --kodux-bezier: cubic-bezier(.175,.885,.32,1.275); /* “springy” macio */
+}
+
+/* acessível: respeita quem prefere menos animação */
+@media (prefers-reduced-motion: reduce){
+  .kodux-anim, .kobllux-pulse, .kodux-hue, .kodux-gradient { animation: none !important; transition: none !important; }
+}
+
+/* camada 1 — respiração biótica (loop contínuo sem “piscar”) */
+.kobllux-pulse{ animation: kodux-breath var(--kodux-pulse-speed) ease-in-out infinite; }
+@keyframes kodux-breath{
+  0%   { opacity:.62; transform: scale(.985); }
+  50%  { opacity:.86; transform: scale(1.012); }
+  100% { opacity:.62; transform: scale(.985); } /* 0% == 100% => ciclo contínuo */
+}
+
+/* camada 2 — aura neon (texto e ícones) */
+.kodux-aura{
+  text-shadow:
+    0 0 .6em var(--kodux-glow),
+    0 0 1.2em var(--kodux-glow-2),
+    0 0 2.2em color-mix(in oklab, var(--kodux-glow) 60%, var(--kodux-glow-2));
+  filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--kodux-glow) 40%, transparent));
+}
+
+/* camada 3 — gradiente animado + hue-rotate suave */
+.kodux-gradient{
+  background: conic-gradient(from 180deg,
+    color-mix(in oklab, var(--kodux-glow) 70%, #000) 0%,
+    color-mix(in oklab, var(--kodux-glow-2) 70%, #000) 50%,
+    #0d0d16 100%);
+  background-size: 200% 200%;
+  animation: kodux-gradient 12s linear infinite;
+}
+@keyframes kodux-gradient{
+  0% { background-position: 0% 50%; }
+  100%{ background-position: 100% 50%; }
+}
+.kodux-hue{ animation: kodux-hue 14s linear infinite both; }
+@keyframes kodux-hue{
+  0%   { filter: hue-rotate(0deg) saturate(1); }
+  50%  { filter: hue-rotate(180deg) saturate(1.12); }
+  100% { filter: hue-rotate(360deg) saturate(1); }
+}
+
+/* vidro / glassmorphism premium */
+.kodux-glass{
+  background: var(--kodux-glass);
+  backdrop-filter: blur(var(--kodux-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--kodux-blur)) saturate(120%);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: var(--kodux-br);
+  box-shadow: 0 10px 40px rgba(0,0,0,.35);
+}
+
+/* utilitários */
+.kodux-btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+  padding:.75rem 1rem; border:0; border-radius:999px; cursor:pointer; font:600 14px/1.1 system-ui, sans-serif;
+  background: linear-gradient(90deg, var(--kodux-glow), var(--kodux-glow-2));
+  color:#fff; transition: transform .25s var(--kodux-bezier), box-shadow .25s;
+  box-shadow: 0 6px 24px rgba(138,92,255,.35);
+}
+.kodux-btn:active{ transform: translateY(1px) scale(.98); }
+
+/* container base (pode aplicar no body ou numa seção) */
+.kodux-stage{
+  min-height: 100dvh; padding: 16px; display:grid; place-items:center; gap:24px;
+  background: var(--kodux-bg);
+  color:#e9e9ff;
+}
+
+/* “presets” — slow & menor (aplique em qualquer bloco) */
+.kodux-slow{ --kodux-pulse-speed: 4.2s; }
+.kodux-micro{ transform: scale(.86); transform-origin:center; }
+
+/* seleção bonita */
+::selection{ background: color-mix(in oklab, var(--kodux-glow) 70%, #fff); color:#0a0a0f; }
+
+/* desligar tudo rapidamente (ex.: <main data-kodux="off">…) */
+[data-kodux="off"] *{ animation: none !important; filter:none !important; text-shadow:none !important; }
+
+/* A11y: foco visível */
+:focus-visible{ outline: 2px dashed color-mix(in oklab, var(--kodux-glow) 75%, #fff); outline-offset: 3px; border-radius: 12px; }
+  </style>
+</head>
+<body class="kodux-stage kodux-gradient kodux-hue">
+  <script>
+  (()=> {
+    const $ = (q,root=document)=>root.querySelector(q);
+    const $$ = (q,root=document)=>[...root.querySelectorAll(q)];
+
+    /* transições suaves em toda a página (sem quebrar performance) */
+    const enableGlobalTransitions = () => {
+      $$("*").forEach(el=>{
+        el.style.transition ||= "all .30s cubic-bezier(.175,.885,.32,1.275)";
+      });
+    };
+
+    /* mutação randômica segura: cria @keyframes e um tema HSL vivo */
+    function mutateOnce(){
+      const hue = Math.floor(Math.random()*360);
+      const key = `kodux_wild_${Date.now().toString(36)}`;
+      const style = document.createElement("style");
+      style.innerHTML = \`
+        :root{
+          --kodux-glow: hsl(\${hue} 100% 70%);
+          --kodux-glow-2: hsl(\${(hue+300)%360} 100% 67%);
+          --kodux-pulse-speed: \${ (2 + Math.random()*2).toFixed(2) }s;
+        }
+        @keyframes \${key}{
+          0%{ transform: rotate(0deg) scale(1); }
+          50%{ transform: rotate(3deg)  scale(1.015); filter: hue-rotate(\${hue}deg); }
+          100%{transform: rotate(0deg) scale(1); }
+        }
+        .kodux-mutate{ animation: \${key} 3.2s var(--kodux-bezier) infinite; }
+        *::selection{ background: hsl(\${(hue+180)%360} 100% 50%); color:#0b0b12; }
+      \`;
+      document.head.appendChild(style);
+      document.documentElement.classList.add("kodux-anim");
+    }
+
+    /* API global pra usar no console ou no seu código */
+    window.KODUXCSS = {
+      on(){
+        document.documentElement.classList.add("kodux-anim");
+        enableGlobalTransitions();
+      },
+      off(){
+        document.documentElement.setAttribute("data-kodux","off");
+        setTimeout(()=>document.documentElement.removeAttribute("data-kodux"),0); // toggle rápido
+      },
+      slow(){ document.documentElement.classList.add("kodux-slow"); },
+      fast(){ document.documentElement.classList.remove("kodux-slow"); },
+      mutate: mutateOnce,
+      setSpeed(s){ document.documentElement.style.setProperty("--kodux-pulse-speed", s); },
+      setGlow(a="#8a5cff", b="#ff2cc3"){
+        document.documentElement.style.setProperty("--kodux-glow", a);
+        document.documentElement.style.setProperty("--kodux-glow-2", b);
+      }
+    };
+
+    /* hotkey: Shift+K liga/desliga animações rapidamente */
+    addEventListener("keydown", (e)=>{
+      if(e.shiftKey && (e.key.toLowerCase()==="k")){
+        const off = document.documentElement.getAttribute("data-kodux")==="off";
+        if(off){ document.documentElement.removeAttribute("data-kodux"); KODUXCSS.on(); }
+        else   { KODUXCSS.off(); }
+      }
+    });
+
+    /* inicialização */
+    KODUXCSS.on();           // ativa ao carregar
+    // KODUXCSS.slow();      // (opcional) inicie no preset slow
+    // setInterval(KODUXCSS.mutate, 5000); // (opcional) mutação automática a cada 5s
+  })();
+  </script>
+
+  <main role="main" aria-label="Cérebro-Oráculo — Player" style="width:100%; display:grid; place-items:center;">
+    <section class="kodux-glass" style="padding:20px; max-width:560px; width:clamp(280px,92vw,560px);">
+      <h1 class="kobllux-pulse kodux-aura" style="margin:0 0 8px">CÉREBRO-ORÁCULO — PLAYER</h1>
+      <p style="opacity:.85;margin:0 0 14px">[BASE] Inicia em 96c + ASCII · Libera ∞ só com gatilho/ativação</p>
+
+      <div class="kodux-glass" style="padding:14px; margin:10px 0;">
+        <strong class="kodux-aura">ATIVAÇÃO: TRINITY</strong>
+        <div>Nova + Genus + Aion · Revelações em camadas</div>
+      </div>
+
+      <div class="kodux-glass" style="padding:14px; margin:10px 0;">
+        <strong class="kodux-aura">ATIVAÇÃO: ESPAÇO DA MENTE</strong>
+        <div>“Sala mental” · ASCII fractal + metáforas</div>
+      </div>
+
+      <div class="kodux-glass" style="padding:14px; margin:10px 0;">
+        <strong class="kodux-aura">ATIVAÇÃO: UX30</strong>
+        <div>Coaching simbólico · Ciclo ∞ aplicado a metas</div>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
+        <button class="kodux-btn" onclick="KODUXCSS.mutate()" aria-label="Mutar tema e animação">⚡ Mutar</button>
+        <button class="kodux-btn" onclick="KODUXCSS.slow()" aria-label="Ativar modo lento">🫧 Slow</button>
+        <button class="kodux-btn" onclick="KODUXCSS.fast()" aria-label="Voltar ao normal">🚀 Normal</button>
+        <button class="kodux-btn" onclick="KODUXCSS.setGlow('#3cf','#8af')" aria-label="Tons azuis">💎 Azul</button>
+        <button class="kodux-btn kodux-micro kodux-mutate" aria-label="Estado Vivo">🌀 Vivo</button>
+      </div>
+
+      <p style="margin-top:16px; opacity:.7; font-size:.9rem">
+        Dica: pressione <kbd>Shift</kbd> + <kbd>K</kbd> para ligar/desligar animações rapidamente.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

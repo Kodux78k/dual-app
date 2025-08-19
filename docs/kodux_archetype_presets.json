@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Inocente",
+    "glow1": "#AEE6FF",
+    "glow2": "#C7F36A",
+    "speed": 3.8
+  },
+  {
+    "name": "Explorador",
+    "glow1": "#00E5FF",
+    "glow2": "#00FFA3",
+    "speed": 3.6
+  },
+  {
+    "name": "Sábio",
+    "glow1": "#C2B5FF",
+    "glow2": "#66E0FF",
+    "speed": 2.9
+  },
+  {
+    "name": "Herói",
+    "glow1": "#FF3B6B",
+    "glow2": "#FFA726",
+    "speed": 2.6
+  },
+  {
+    "name": "Rebelde",
+    "glow1": "#FF006E",
+    "glow2": "#7C00FF",
+    "speed": 2.4
+  },
+  {
+    "name": "Mago",
+    "glow1": "#8A5CFF",
+    "glow2": "#FF2CC3",
+    "speed": 3.1
+  },
+  {
+    "name": "Criador",
+    "glow1": "#00F0FF",
+    "glow2": "#FFEA00",
+    "speed": 3.0
+  },
+  {
+    "name": "Cuidador",
+    "glow1": "#5CF2C0",
+    "glow2": "#A6FFEA",
+    "speed": 3.9
+  },
+  {
+    "name": "Governante",
+    "glow1": "#8ED1FF",
+    "glow2": "#FFD54F",
+    "speed": 2.8
+  },
+  {
+    "name": "Bobo",
+    "glow1": "#FFEA00",
+    "glow2": "#40C4FF",
+    "speed": 2.7
+  },
+  {
+    "name": "Amante",
+    "glow1": "#FF5D9E",
+    "glow2": "#FFB3C7",
+    "speed": 3.2
+  },
+  {
+    "name": "Orfão",
+    "glow1": "#9E9E9E",
+    "glow2": "#B39DDB",
+    "speed": 3.5
+  }
+]
