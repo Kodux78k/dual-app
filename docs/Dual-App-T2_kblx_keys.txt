@@ -1,0 +1,51 @@
+--- Dual-App-T2-0-FINAL-2-1+KBLX.html
++++ Dual-App-T2-0-FINAL-2-1+KBLX.Keys.html
+@@ -3655,5 +3655,48 @@
+ })();
+ </script>
+ <!-- KOBLLUX-INTEGRATION end -->
++
++<script id="kblx-keys">
++(function(){
++  const MENU_ID = "kblx-menu";
++  function getKeys(){ try { return JSON.parse(localStorage.getItem("kblx.keys")||"{}"); } catch(e){ return {}; } }
++  function setKey(name, value){ const k = getKeys(); k[name]=value; localStorage.setItem("kblx.keys", JSON.stringify(k)); }
++  function last4(s){ return s ? s.slice(-4) : "----"; }
++  function renderLog(){
++    const box = document.getElementById("kblx-train-log"); if(!box) return;
++    let arr=[]; try{ arr = JSON.parse(localStorage.getItem("kblx.open.log")||"[]"); }catch(e){}
++    box.innerHTML = arr.slice(-100).reverse().map(e => `<div>• [${e.t}] ${e.title||""} <code>${e.path||""}</code></div>`).join("");
++  }
++  function installUI(){
++    const menu = document.getElementById(MENU_ID);
++    if(!menu || document.getElementById("kblx-keys-panel")) return;
++    const wrap = document.createElement("div");
++    wrap.id = "kblx-keys-panel";
++    wrap.innerHTML = `<details style="margin-top:8px">
++      <summary>🔑 Chaves &amp; Treino</summary>
++      <div style="margin-top:8px">
++        <label style="display:block;margin-bottom:6px">OpenAI SK: <input id="kblx-sk" placeholder="sk-..." style="width:100%"></label>
++        <div style="display:flex;gap:8px;margin-bottom:6px">
++          <button id="kblx-save">Salvar</button>
++          <button id="kblx-test">Testar</button>
++          <button id="kblx-clear-log">Limpar Log</button>
++        </div>
++        <div id="kblx-keys-status" class="kblx-muted"></div>
++        <div id="kblx-train-log" style="margin-top:8px;max-height:160px;overflow:auto;border:1px solid rgba(255,255,255,.1);padding:6px;border-radius:8px"></div>
++      </div>
++    </details>`;
++    const list = document.getElementById("kblx-list") || menu;
++    list.parentNode.insertBefore(wrap, list.nextSibling);
++    const k = getKeys(); const inp = document.getElementById("kblx-sk");
++    const status = document.getElementById("kblx-keys-status");
++    inp.value = k["openai"]||"";
++    document.getElementById("kblx-save").onclick = ()=>{ setKey("openai", inp.value.trim()); status.textContent = "Salvo. ****"+last4(inp.value.trim()); };
++    document.getElementById("kblx-test").onclick = ()=>{ const kk=getKeys(); status.textContent = kk.openai?("OK: ****"+last4(kk.openai)):"Nenhuma chave salva."; };
++    document.getElementById("kblx-clear-log").onclick = ()=>{ localStorage.removeItem("kblx.open.log"); renderLog(); };
++    renderLog();
++  }
++  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", installUI); else installUI();
++})();
++</script>
+ </body>
+ </html>
