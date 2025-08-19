@@ -1,0 +1,185 @@
+--- Dual-App-T2-0-FINAL-2-5.html
++++ Dual-App-T2-0-FINAL-2-5+KBLX.Lib.html
+@@ -3680,5 +3680,182 @@
+     })();
+   </script>
+ 
++
++<style id="kblx-css">
++/* KOBLLUX Integrator — estilos mínimos */
++#kblx-chip{
++  position: fixed; top: 12px; right: 14px; z-index: 91000;
++  border: 1px solid rgba(0,255,255,.35);
++  background: rgba(0,0,0,.45); color: inherit;
++  border-radius: 999px; padding: 6px 12px; font-size: .9em;
++  backdrop-filter: blur(8px); cursor: pointer;
++}
++#kblx-menu{
++  position: fixed; top: 56px; right: 12px; z-index: 91001; display: none;
++  width: min(360px, 88vw); max-height: 66vh; overflow: auto;
++  background: rgba(0,0,0,.6); color: inherit;
++  border: 1px solid rgba(255,255,255,.16); border-radius: 16px; padding: 12px;
++  backdrop-filter: blur(10px) saturate(120%);
++}
++.kblx-item{
++  padding: 10px; border-radius: 10px;
++  border: 1px solid rgba(255,255,255,.08);
++  background: rgba(255,255,255,.03);
++  margin: 8px 0; cursor: pointer;
++}
++.kblx-item:hover{ background: rgba(255,255,255,.07); }
++.kblx-muted{opacity:.7; font-size:.9em}
++#kblx-feed{ margin: 10px 0; }
++</style>
++
++
++<!-- KOBLLUX-INTEGRATION start -->
++<script id="kblx-integrator">
++(function(){
++  if (window.__KBLX_T2__) return; window.__KBLX_T2__ = true;
++  let LIB_PATH = (localStorage.getItem("kblx.lib") || "kobllux_library.extended.json");
++  const DEFAULT_DOC = "verbo_agua_documento.json";
++
++  function q(sel){ return document.querySelector(sel); }
++  function mk(tag, cls, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!=null) e.innerHTML=html; return e; }
++
++  function findPageWrapper(){
++    return q("#response .pages-wrapper") || q(".pages-wrapper") || q(".response-container") || q("#response") || document.body;
++  }
++  function ensureKblxPage(){
++    const wrap = findPageWrapper();
++    let page = q("#kblx-page");
++    if (!page){
++      page = mk("div","page active","");
++      page.id = "kblx-page";
++      wrap.appendChild(page);
++    }
++    return page;
++  }
++  function ensureFeed(){
++    const page = ensureKblxPage();
++    let feed = q("#kblx-feed");
++    if (!feed){
++      feed = mk("div","sumbus-section pop-in","");
++      feed.id = "kblx-feed";
++      page.appendChild(feed);
++    }
++    return feed;
++  }
++  function cycleClass(i){ return ["intro","middle","ending"][i%3]; }
++
++  function renderDoc(doc){
++    const feed = ensureFeed();
++    feed.innerHTML = "";
++    const head = mk("div","", `<strong>${doc.titulo||"Documento"}</strong> <span id="kblx-close" style="margin-left:8px;cursor:pointer;opacity:.8">✕</span><div class="kblx-muted">${doc.subtitulo||""}</div>`);
++    feed.appendChild(head);
++    head.querySelector("#kblx-close").onclick = ()=> feed.innerHTML = "";
++
++    (doc.capitulos||[]).forEach((c,i)=>{
++      const block = mk("div", "response-block "+cycleClass(i), `<h3>${c.titulo||("Capítulo "+(i+1))}</h3><p>${(c.conteudo||"").replace(/
++/g,"<br>")}</p>`);
++      feed.appendChild(block);
++    });
++
++    // log místico se existir
++    if (typeof window.logMistico === "function"){
++      try{ window.logMistico("KBLX • abriu: " + (doc.titulo||"Documento")); }catch(e){}
++    }
++    try{ feed.scrollIntoView({behavior:"smooth", block:"start"}); }catch(e){}
++  }
++
++  async function openDocByPath(path){
++    try{
++      const res = await fetch(path);
++      const doc = await res.json();
++      renderDoc(doc);
++      // telemetria leve
++      try{
++        const logKey = "kblx.open.log";
++        const arr = JSON.parse(localStorage.getItem(logKey)||"[]");
++        arr.push({t:new Date().toISOString(), path:path, title:doc.titulo||""});
++        localStorage.setItem(logKey, JSON.stringify(arr.slice(-200)));
++      }catch(e){}
++    }catch(e){
++      const feed = ensureFeed();
++      feed.innerHTML = `<div class="response-block ending"><strong>Falha</strong><p>Não consegui abrir <code>${path}</code>.</p></div>`;
++    }
++  }
++  window.openDocByPath = openDocByPath;
++
++  function ensureChip(){
++    if (q("#kblx-chip")) return;
++    const chip = mk("button","", "KBLX • Biblioteca");
++    chip.id = "kblx-chip";
++    chip.onclick = () => {
++      const m = q("#kblx-menu");
++      m.style.display = (m.style.display==="block" ? "none" : "block");
++    };
++    document.body.appendChild(chip);
++  }
++
++  function ensureMenu(){
++    if (q("#kblx-menu")) return;
++    const m = mk("div","",`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
++      <strong>Biblioteca KOBLLUX</strong>
++      <div style="display:flex;gap:6px;align-items:center">
++        <label class="kblx-muted" style="display:flex;align-items:center;gap:4px">
++          Lib:
++          <select id="kblx-lib">
++            <option value="kobllux_library.extended.json">Estendida</option>
++            <option value="kobllux_library.json">Original</option>
++          </select>
++        </label>
++        <button id="kblx-open-default">Abrir • O VERBO E A ÁGUA</button>
++        <button id="kblx-hide">Fechar</button>
++      </div>
++    </div>
++    <div id="kblx-list" class="kblx-muted">Carregando…</div>`);
++    m.id = "kblx-menu";
++    document.body.appendChild(m);
++    m.querySelector("#kblx-open-default").onclick = () => openDocByPath(DEFAULT_DOC);
++    m.querySelector("#kblx-hide").onclick = () => m.style.display = "none";
++    // wire selector
++    (function(){
++      var sel = document.getElementById("kblx-lib");
++      if (sel){
++        try{ sel.value = LIB_PATH; }catch(e){}
++        sel.onchange = function(){
++          LIB_PATH = sel.value;
++          try{ localStorage.setItem("kblx.lib", LIB_PATH); }catch(e){}
++          populateMenu();
++        };
++      }
++    })();
++  }
++
++  async function populateMenu(){
++    try{
++      const res = await fetch(LIB_PATH);
++      const lib = await res.json();
++      const list = q("#kblx-list");
++      list.innerHTML = "";
++      const entries = Array.isArray(lib) ? lib : (lib.entries || lib.itens || lib.docs || []);
++      (entries||[]).forEach((it,i)=>{
++        const title = it.titulo || it.title || it.nome || ("Item "+(i+1));
++        const path = it.path_destino || it.path || it.arquivo || it.url || "";
++        const resumo = it.resumo || it.descricao || it.description || "";
++        const el = mk("div","kblx-item", `<div><strong>${title}</strong></div><div class="kblx-muted">${resumo||""}</div><div class="kblx-muted"><code>${path||""}</code></div>`);
++        el.onclick = () => path && openDocByPath(path);
++        list.appendChild(el);
++      });
++      if (!list.children.length){ list.innerHTML = `<div class="kblx-muted">Nenhum item em <code>${LIB_PATH}</code>.</div>`; }
++    }catch(e){
++      const list = q("#kblx-list"); if(list) list.innerHTML = `<div class="kblx-muted">Não consegui ler <code>${LIB_PATH}</code>.</div>`;
++    }
++  }
++
++  function boot(){
++    ensureChip(); ensureMenu(); populateMenu();
++  }
++  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
++})();
++</script>
++<!-- KOBLLUX-INTEGRATION end -->
+ </body>
+ </html>
