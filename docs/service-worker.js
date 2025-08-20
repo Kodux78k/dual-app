@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dualchat-v10-final';
+const CACHE_NAME = 'dualchat-v11-final';
 const FILES_TO_CACHE = [
   './',
   './index.html',
