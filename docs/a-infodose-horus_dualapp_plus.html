@@ -1,0 +1,754 @@
+<!-- A.Infodose • export -->\n<html lang="pt-BR" style="--body-alpha: 0.3;"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>A.Infodose — HORUS Dual • Mobile Landing</title>
+<meta name="theme-color" content="#0b0f14">
+<meta name="description" content="A.Infodose • Fluxo de Doses mobile • HORUS Dual (Visão + Execução) • GPT-UPA">
+<style>
+/* ===== Design Tokens ===== */
+:root{
+  --bg:#0b0f14; --body-alpha:.30;
+  --card:#0f141b; --txt:#e8eef7; --muted:#9bb0c9;
+  --ac:#6cf0c2; --pill:#8be28f; --warn:#ffd27d; --err:#ff8e8e; --ok:#9be39a;
+  --radius:16px; --shadow:0 8px 28px rgba(0,0,0,.45);
+  --focus:#6cf0c2; --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --header-h:56px; --bottomnav-h:64px;
+}
+
+/* ===== Reset & Base ===== */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;color:var(--txt);
+  background:
+    radial-gradient(1200px 800px at 10% -10%, rgba(108,240,194,.18), transparent 60%),
+    radial-gradient(1000px 700px at 100% 0%, rgba(139,226,143,.12), transparent 60%),
+    linear-gradient(180deg,#0a0d11,#0b1016 40%,#0d1219);
+}
+body::before{content:"";position:fixed;inset:0;background:rgba(11,15,20,var(--body-alpha));z-index:-1}
+
+/* ===== App Layout ===== */
+.app{min-height:100%;display:flex;flex-direction:column}
+.header{position:sticky;top:0;z-index:30;height:var(--header-h);display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:rgba(16,22,29,.86);backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,255,255,.06)}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(145deg, rgba(108,240,194,.25), rgba(139,226,143,.18));display:grid;place-items:center;box-shadow:var(--shadow)}
+.brand h1{margin:0;font-size:15px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;color:var(--muted);font-size:11px}
+.iconbtn{appearance:none;border:0;background:#131a22;color:#dfe9f5;border:1px solid rgba(255,255,255,.08);width:36px;height:36px;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+.iconbtn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.main{padding:12px;display:flex;flex-direction:column;gap:14px;padding-bottom:calc(var(--bottomnav-h) + 12px + var(--safe-bottom))}
+.section{border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,#0c1218,#0b1016);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+.grid{display:grid;gap:10px}
+.grid.cols-2{grid-template-columns:1fr 1fr}
+@media(min-width:960px){.main{max-width:920px;margin:0 auto}.grid.cols-2{grid-template-columns:1fr 1fr}}
+
+h2{margin:6px 0 6px;font-size:18px}
+p{margin:8px 0;color:#c9d6e2}
+.mini{font-size:12px;color:var(--muted)}
+.doseTag{display:inline-block;background:rgba(108,240,194,.12);color:var(--ac);border:1px solid rgba(108,240,194,.35);padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px}
+.progress{width:100%;height:8px;background:#0a0f14;border-radius:999px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.progress>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ac),#8be28f);transition:width .3s ease}
+
+.row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Inputs & Buttons */
+input[type=text],textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#0c1218;color:var(--txt);outline:none;transition:border .2s}
+input[type=text]:focus,textarea:focus{border-color:rgba(108,240,194,.35);box-shadow:0 0 0 3px rgba(108,240,194,.15)}
+.btn{appearance:none;border:none;border-radius:12px;padding:12px 14px;font-weight:700;color:#0a0d11;background:linear-gradient(180deg,#aaf4da,#6cf0c2);cursor:pointer;box-shadow:var(--shadow);transition:transform .05s,filter .2s}
+.btn:active{transform:translateY(1px)}
+.btn.alt{background:#111a24;border:1px solid rgba(255,255,255,.08);color:#dfe9f5;box-shadow:none}
+.btn.ghost{background:transparent;border:1px dashed rgba(255,255,255,.12);color:#cdd9e6}
+.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0e1319;border:1px solid rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;font-size:12px;color:#dfe9f5}
+
+/* Chips & Palette */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid rgba(255,255,255,.12);padding:8px 10px;border-radius:999px;cursor:pointer;font-weight:600;font-size:13px;background:#0c1218;color:#dfe9f5}
+.chip[aria-checked="true"]{border-color:rgba(108,240,194,.6);box-shadow:0 0 0 3px rgba(108,240,194,.15)}
+.palette{display:grid;grid-template-columns:repeat(9,28px);gap:8px}
+.swatch{width:28px;height:28px;border-radius:8px;border:2px solid transparent;cursor:pointer}
+.swatch[aria-checked="true"]{border-color:#fff;box-shadow:0 0 0 3px rgba(108,240,194,.35)}
+.swatch:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.segmented{display:inline-grid;grid-auto-flow:column;border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;background:#0c1218}
+.segmented button{background:transparent;border:0;color:#dfe9f5;padding:10px 14px;cursor:pointer;font-weight:700}
+.segmented button[aria-pressed="true"]{background:#131b24;color:#aaf4da}
+
+/* Bottom Nav + FAB + Sheet */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:40;height:var(--bottomnav-h);padding-bottom:var(--safe-bottom);background:rgba(16,22,29,.9);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(4,1fr);gap:6px;align-items:center;padding-left:8px;padding-right:8px}
+.navbtn{appearance:none;border:0;background:transparent;color:#dfe9f5;height:44px;border-radius:10px;display:grid;place-items:center;gap:2px}
+.navbtn span{font-size:11px;color:var(--muted)}
+.navbtn[aria-current="page"]{background:rgba(108,240,194,.12);border:1px solid rgba(108,240,194,.35);color:#aaf4da}
+.fab{position:fixed;right:14px;bottom:calc(var(--bottomnav-h) + 14px + var(--safe-bottom));z-index:42;width:56px;height:56px;border-radius:16px;background:linear-gradient(180deg,#aaf4da,#6cf0c2);color:#0b0f14;border:0;box-shadow:0 14px 34px rgba(0,0,0,.5);display:grid;place-items:center;cursor:pointer}
+
+/* Bottom Sheet */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;transform:translateY(110%);background:#0c1218;border-radius:16px 16px 0 0;border:1px solid rgba(255,255,255,.08);box-shadow:0 -20px 40px rgba(0,0,0,.5);transition:transform .28s ease}
+.sheet.open{transform:translateY(0%)} .sheet .handle{width:48px;height:5px;background:#26313f;border-radius:999px;margin:10px auto}
+.sheet .content{padding:10px 12px 12px}
+.menuitem{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:#0e151c;margin-bottom:8px;cursor:pointer}
+
+/* Toast */
+.toast{position:fixed;left:12px;right:12px;bottom:calc(var(--bottomnav-h) + var(--safe-bottom) + 12px);padding:12px 14px;border-radius:12px;background:rgba(255,210,125,.12);border:1px solid rgba(255,210,125,.4);color:#ffeac2;backdrop-filter:blur(8px);box-shadow:var(--shadow);z-index:45;display:none}
+.toast.show{display:block}
+
+/* Accessibility */
+button:focus-visible,.menuitem:focus-visible,.chip:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+</style>
+
+<script id="dualapp-plus-shim">
+/* DualApp+ v2.1 — unificação total do LocalStorage para páginas Infodose/Dual
+   Canon: localStorage["dualapp.settings"]
+   Espelho compat: infodoseEnabled ('1'|'0'), infodoseTheme, userName, assistantBase
+   Inputs auto-bind (se existirem): 
+     #archetype, #assistant, #theme, #style, #density, #accent,
+     #userName, #assistantInput, #skInput, #roleSystemInput, #modelSelector, #bgUrl
+   Flags: <body data-company> (ativação)
+   Preferências: ui.theme, ui.bgImage (cover/center/fixed), tipografia/estilo/densidade
+   Segurança: injeta Authorization em chamadas OpenRouter se security.token presente
+   API: window.DualStore.get(), set(partial), onChange(fn), save()
+*/
+(function(){
+  const KEY="dualapp.settings";
+  const LEGACY = { enable:"infodoseEnabled", theme:"infodoseTheme", user:"userName", asst:"assistantBase" };
+  const LS = window.localStorage;
+
+  function jget(k){ try{ const v=LS.getItem(k); return v?JSON.parse(v):null; }catch(_){ return null; } }
+  function jset(k,v){ try{ LS.setItem(k, JSON.stringify(v)); }catch(_){ } }
+  function deep(a,b){
+    const o={...(a||{})};
+    for(const k in (b||{})){
+      const v=b[k];
+      o[k] = (v && typeof v==="object" && !Array.isArray(v)) ? deep(o[k]||{}, v) : v;
+    }
+    return o;
+  }
+
+  // base
+  let base = jget(KEY) || {};
+  base.ui = base.ui || {};
+  base.arch = base.arch || {};
+  base.security = base.security || {};
+  base.training = base.training || {};
+  base.activation = base.activation || {};
+  jset(KEY, base);
+
+  // migrate legacy → canon
+  (function migrate(){
+    const patch = {};
+    const en = LS.getItem(LEGACY.enable);
+    if(en!=null) patch.activation = { enabled: en==="1" };
+    const th = LS.getItem(LEGACY.theme);
+    if(th) patch.ui = deep(patch.ui,{ theme: th });
+    const un = LS.getItem(LEGACY.user);
+    if(un) patch.user = { name: un };
+    const ab = LS.getItem(LEGACY.asst);
+    if(ab) patch.arch = deep(patch.arch, { assistant: ab });
+    if(Object.keys(patch).length) jset(KEY, deep(jget(KEY)||{}, patch));
+  })();
+
+  const listeners = new Set();
+  function emit(v){ listeners.forEach(fn=>{ try{ fn(v); }catch(_){ } }); }
+
+  const DualStore = {
+    get(){ return jget(KEY) || {}; },
+    set(partial){
+      const merged = deep(jget(KEY)||{}, partial||{});
+      jset(KEY, merged);
+      // mirror to legacy
+      try{
+        if(merged.activation?.enabled != null){
+          LS.setItem(LEGACY.enable, merged.activation.enabled ? "1" : "0");
+        }
+        if(merged.ui?.theme){ LS.setItem(LEGACY.theme, merged.ui.theme); }
+        if(merged.user?.name){ LS.setItem(LEGACY.user, merged.user.name); }
+        if(merged.arch?.assistant){ LS.setItem(LEGACY.asst, merged.arch.assistant); }
+      }catch(_){}
+      emit(merged);
+    },
+    save(){ emit(jget(KEY)||{}); },
+    onChange(fn){ listeners.add(fn); return ()=>listeners.delete(fn); }
+  };
+  window.DualStore = DualStore;
+
+  // helpers
+  function bindValue(id, path){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const getPath = (obj, p)=> p.split('.').reduce((a,k)=> (a && a[k]!=null)?a[k]:null, obj);
+    const setPath = (p, v)=> p.split('.').reverse().reduce((acc,k,i,arr)=> i?{[arr[arr.length-1-i]]:acc}:{[k]:v}, {});
+    const store = DualStore.get();
+    const val = getPath(store, path);
+    if(val!=null){
+      el.value = val;
+      el.dispatchEvent(new Event('change', {bubbles:true}));
+    } else {
+      // seed store with initial UI value
+      DualStore.set(setPath(path, el.value));
+    }
+    const h = ()=> DualStore.set(setPath(path, el.value));
+    el.addEventListener("change", h);
+    if(el.tagName==="INPUT") el.addEventListener("input", h);
+  }
+
+  function applyUI(s){
+    const theme = s?.ui?.theme || LS.getItem(LEGACY.theme) || "dark";
+    try{
+      // remove known theme markers (light/medium/vibe/classic)
+      document.body.classList.remove("light","medium","vibe","dark");
+      // some UIs usam body.className 'theme-xxx'; se existir, mantenha.
+      if(!/theme-/.test(document.body.className)){
+        document.body.classList.add(theme);
+      }
+      LS.setItem(LEGACY.theme, theme);
+    }catch(_){}
+    if(s?.ui?.bgImage){
+      document.body.style.backgroundImage = `url('${s.ui.bgImage}')`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+      document.body.style.backgroundAttachment = "fixed";
+    }
+    // refletir ativação
+    try{
+      if(s?.activation?.enabled!=null){
+        document.body.dataset.company = s.activation.enabled ? "on":"off";
+      }
+    }catch(_){}
+  }
+
+  function watchBodyCompany(){
+    try{
+      const obs = new MutationObserver((muts)=>{
+        muts.forEach(m=>{
+          if(m.type==="attributes" && m.attributeName==="data-company"){
+            DualStore.set({ activation:{ enabled: document.body.dataset.company==="on" } });
+          }
+        });
+      });
+      obs.observe(document.body, { attributes:true });
+    }catch(_){}
+  }
+
+  function wire(){
+    // common binds
+    bindValue("archetype", "arch.type");
+    bindValue("assistant", "arch.assistant");
+    bindValue("theme", "ui.theme");
+    bindValue("style", "ui.style");
+    bindValue("density", "ui.density");
+    bindValue("accent", "ui.accent");
+    // extended binds
+    bindValue("userName", "user.name");
+    bindValue("assistantInput", "arch.assistant");
+    bindValue("skInput", "security.token");
+    bindValue("roleSystemInput", "training.roleSystem");
+    bindValue("modelSelector", "training.model");
+    bindValue("bgUrl", "ui.bgImage");
+    // activation flag
+    if(document.body?.dataset?.company){
+      DualStore.set({ activation:{ enabled: document.body.dataset.company==="on" } });
+    }
+    applyUI(DualStore.get());
+    watchBodyCompany();
+  }
+
+  // fetch wrapper p/ OpenRouter
+  (function patchFetch(){
+    const _fetch = window.fetch;
+    window.fetch = function(input, init){
+      try{
+        const s = DualStore.get();
+        const token = s?.security?.token;
+        const url = (typeof input==="string") ? input : (input?.url||"");
+        const isOR = /openrouter\.ai\/api\/v1\/chat\/completions/.test(url);
+        if(token && isOR){
+          init = init || {};
+          const h = new Headers(init.headers || {});
+          if(!h.has("Authorization")) h.set("Authorization", `Bearer ${token}`);
+          init.headers = h;
+        }
+      }catch(_){}
+      return _fetch(input, init);
+    };
+  })();
+
+  DualStore.onChange(applyUI);
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded", wire);
+  }else{
+    wire();
+  }
+})();
+</script>
+
+</head>
+<body>
+<div class="app" id="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">💊</div>
+      <div>
+        <h1>A.Infodose</h1>
+        <small>HORUS Dual • v3.1</small>
+      </div>
+    </div>
+    <button class="iconbtn" id="openSheet" aria-label="Abrir menu">☰</button>
+  </header>
+
+  <!-- Main -->
+  <main class="main" id="main">
+    <!-- HERO -->
+    <section class="section hero" id="sec-home" tabindex="-1" aria-labelledby="h-hero">
+      <div>
+        <div class="row" style="align-items:center;justify-content:space-between">
+          <span class="doseTag" id="doseTag">Dose 8</span>
+          <span class="mini" id="status">👤 KODUX • 🤖 KOBLLUX A.Infodose</span>
+        </div>
+        <div class="progress" aria-hidden="true"><i id="bar" style="width: 100%;"></i></div>
+        <h2 id="h-hero">Ative sua A.Infodose</h2>
+        <p class="mini">Fluxo rápido, 100% tocável.</p>
+        <div class="row">
+          <input id="cmd" type="text" placeholder="Diga: &quot;ativar A.infodose&quot;" aria-label="Comando de ativação">
+          <button class="btn" id="goActivate">Ativar</button>
+          <button class="btn alt" id="fillCmd">Preencher</button>
+        </div>
+        <p class="mini">Atalho: <span class="kbd">1+NOME</span></p>
+      </div>
+
+      <div class="grid">
+        <div class="section">
+          <h3 style="margin:4px 0 6px;font-size:15px">Transparência do fundo</h3>
+          <div class="row" style="align-items:center">
+            <button class="btn alt" id="alphaToggle">🫥 Alternar (0.30 ↔ 1.00)</button>
+            <div class="segmented" role="group" aria-label="Opacidade do body">
+              <button class="alphaOpt" data-a="0.10" aria-pressed="false">0.10</button>
+              <button class="alphaOpt" data-a="0.30" aria-pressed="true">0.30</button>
+              <button class="alphaOpt" data-a="0.45" aria-pressed="false">0.45</button>
+              <button class="alphaOpt" data-a="0.60" aria-pressed="false">0.60</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3 style="margin:4px 0 6px;font-size:15px">HORUS Dual</h3>
+          <div class="segmented" id="segHorus" role="group" aria-label="Horus"><div class="segmented"><button data-v="Visão" aria-pressed="true">Visão</button><button data-v="Execução" aria-pressed="false">Execução</button></div></div>
+          <p class="mini">Ajusta heurística e recomendações de UPA.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- IDENTIDADE -->
+    <section class="section" id="sec-identidade" tabindex="-1" aria-labelledby="h-ident">
+      <h2 id="h-ident">1) Identidade</h2>
+      <p class="mini">Clique, não digite (se quiser) ✔️</p>
+      <div class="grid">
+        <div>
+          <label class="mini" for="nome">Seu nome</label>
+          <input id="nome" type="text" placeholder="Seu nome">
+          <div class="chips" id="nomeSug"><button class="chip" aria-checked="false" data-v="Aurora">Aurora</button><button class="chip" aria-checked="false" data-v="Vertex">Vertex</button><button class="chip" aria-checked="false" data-v="Prisma">Prisma</button><button class="chip" aria-checked="false" data-v="Orbe">Orbe</button><button class="chip" aria-checked="false" data-v="Quasar">Quasar</button><button class="chip" aria-checked="false" data-v="Atlas">Atlas</button><button class="chip" aria-checked="false" data-v="Nova">Nova</button><button class="chip" aria-checked="false" data-v="Vector">Vector</button><button class="chip" aria-checked="false" data-v="Nébula">Nébula</button><button class="chip" aria-checked="false" data-v="Pulse">Pulse</button></div>
+        </div>
+        <div>
+          <h3 style="margin:8px 0 6px;font-size:15px">Cor que te representa</h3>
+          <div class="palette" id="pal"><button class="swatch" aria-checked="false" style="background:#ff0000" data-color="#ff0000" title="#ff0000"></button><button class="swatch" aria-checked="false" style="background:#ff7a00" data-color="#ff7a00" title="#ff7a00"></button><button class="swatch" aria-checked="true" style="background:#ffd400" data-color="#ffd400" title="#ffd400"></button><button class="swatch" aria-checked="false" style="background:#00c853" data-color="#00c853" title="#00c853"></button><button class="swatch" aria-checked="false" style="background:#00bcd4" data-color="#00bcd4" title="#00bcd4"></button><button class="swatch" aria-checked="false" style="background:#2979ff" data-color="#2979ff" title="#2979ff"></button><button class="swatch" aria-checked="false" style="background:#7e57c2" data-color="#7e57c2" title="#7e57c2"></button><button class="swatch" aria-checked="false" style="background:#ffffff" data-color="#ffffff" title="#ffffff"></button><button class="swatch" aria-checked="false" style="background:#000000" data-color="#000000" title="#000000"></button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENERGIA & ELEMENTO -->
+    <section class="section" id="sec-energia" tabindex="-1" aria-labelledby="h-ene">
+      <h2 id="h-ene">2) Energia &amp; Elemento</h2>
+      <div class="grid">
+        <div>
+          <p class="mini">Como está sua energia?</p>
+          <div class="chips" id="chipsEnergy"><button class="chip" aria-checked="true" data-v="Alto">Alto</button><button class="chip" aria-checked="false" data-v="Baixo">Baixo</button></div>
+        </div>
+        <div>
+          <p class="mini">Mais ou menos movimento?</p>
+          <div class="row">
+            <button class="btn" data-mov="Mais movimento">Mais</button>
+            <button class="btn alt" data-mov="Menos movimento">Menos</button>
+          </div>
+        </div>
+        <div>
+          <p class="mini">Elemento</p>
+          <div class="grid cols-2" id="els"><button class="btn alt" data-el="Fogo">Fogo</button><button class="btn alt" data-el="Água">Água</button><button class="btn alt" data-el="Terra">Terra</button><button class="btn alt" data-el="Madeira">Madeira</button><button class="btn alt" data-el="Metal">Metal</button><button class="btn alt" data-el="Ar">Ar</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- UPA / ARQUÉTIPOS -->
+    <section class="section" id="sec-upa" tabindex="-1" aria-labelledby="h-upa">
+      <h2 id="h-upa">3) Escolha seu UPA</h2>
+      <div class="grid" id="upaGrid">
+      <div class="section" tabindex="0" role="button" data-k="Atlas">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Atlas A.Infodose</b><div class="mini">Planejamento e direção.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Nova">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Nova A.Infodose</b><div class="mini">Criação e inovação.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Vitalis">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Vitalis A.Infodose</b><div class="mini">Energia e saúde.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Pulse">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Pulse A.Infodose</b><div class="mini">Emoção e impacto.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Aion">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Aion A.Infodose</b><div class="mini">Ambiente e transformação.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Orion">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Orion A.Infodose</b><div class="mini">Visão de longo prazo.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Prisma">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Prisma A.Infodose</b><div class="mini">Síntese e priorização.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Echo">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Echo A.Infodose</b><div class="mini">Comunicação persuasiva.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Lyra">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Lyra A.Infodose</b><div class="mini">Estética e UX.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Forge">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Forge A.Infodose</b><div class="mini">Execução e shipping.</div></div>
+          <div>💊</div>
+        </div>
+      </div>
+      <div class="section" tabindex="0" role="button" data-k="Horus">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>Horus A.Infodose</b><div class="mini">DUAL • Visão 👁️ / Execução ⚒️</div></div>
+          <div>💊</div>
+        </div>
+      </div></div>
+    </section>
+
+    <!-- ASSISTENTE & COMANDO -->
+    <section class="section" id="sec-assistente" tabindex="-1" aria-labelledby="h-ass">
+      <h2 id="h-ass">4) Assistente &amp; Comando</h2>
+      <div class="grid">
+        <div>
+          <label class="mini" for="anome">Nome do seu assistente</label>
+          <input id="anome" type="text" placeholder="Ex.: Aurora, Vertex, Prisma...">
+          <div class="chips" id="assistSug"><button class="chip" aria-checked="false" data-v="Aurora">Aurora</button><button class="chip" aria-checked="false" data-v="Vertex">Vertex</button><button class="chip" aria-checked="false" data-v="Prisma">Prisma</button><button class="chip" aria-checked="false" data-v="Lyra">Lyra</button><button class="chip" aria-checked="false" data-v="Echo">Echo</button><button class="chip" aria-checked="false" data-v="Forge">Forge</button><button class="chip" aria-checked="false" data-v="Orion">Orion</button><button class="chip" aria-checked="false" data-v="Pulse">Pulse</button><button class="chip" aria-checked="false" data-v="Horus">Horus</button></div>
+        </div>
+        <div>
+          <p>Comandos:</p>
+          <p class="mini">Longo: <span class="kbd" id="cmdLong">KODUX, ativar KOBLLUX A.Infodose.</span></p>
+          <p class="mini">Curto: <span class="kbd" id="cmdShort">1+KOBLLUX</span></p>
+          <div class="row">
+            <button class="btn alt" id="copyLong">Copiar longo</button>
+            <button class="btn alt" id="copyShort">Copiar curto</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PREFERÊNCIAS -->
+    <section class="section" id="sec-preferencias" tabindex="-1" aria-labelledby="h-pref">
+      <h2 id="h-pref">5) Preferências</h2>
+      <div class="grid">
+        <div>
+          <p class="mini">Estilo de resposta</p>
+          <div class="segmented" id="segLearn"><div class="segmented"><button data-v="Respostas rápidas" aria-pressed="true">Respostas rápidas</button><button data-v="Explicações detalhadas" aria-pressed="false">Explicações detalhadas</button></div></div>
+        </div>
+        <div>
+          <p class="mini">Objetivo</p>
+          <div class="chips" id="chipsGoal"><button class="chip" aria-checked="true" data-v="Produtividade">Produtividade</button><button class="chip" aria-checked="false" data-v="Planejamento">Planejamento</button><button class="chip" aria-checked="false" data-v="Exploração de ideias">Exploração de ideias</button><button class="chip" aria-checked="false" data-v="Aprendizado">Aprendizado</button><button class="chip" aria-checked="false" data-v="Outro">Outro</button></div>
+        </div>
+        <div>
+          <p class="mini">Modo</p>
+          <div class="segmented" id="segMode"><div class="segmented"><button data-v="Modo Foco Total" aria-pressed="true">Modo Foco Total</button><button data-v="Modo Explorador" aria-pressed="false">Modo Explorador</button><button data-v="Modo Equilibrado" aria-pressed="false">Modo Equilibrado</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESUMO -->
+    <section class="section" id="sec-resumo" tabindex="-1" aria-labelledby="h-res">
+      <h2 id="h-res">Resumo</h2>
+      <div class="grid cols-2" id="summary">
+      <div class="section"><b>Identidade</b><div class="mini">👤 KODUX • 🎨 #ffd400</div></div>
+      <div class="section"><b>Energia &amp; Elemento</b><div class="mini">⚡ Alto • 🌀 — • 🌿 Fogo</div></div>
+      <div class="section"><b>UPA</b><div class="mini">🧭 Horus • HORUS: Visão</div></div>
+      <div class="section"><b>Assistente</b><div class="mini">🤖 KOBLLUX • 🔑 1+KOBLLUX</div></div>
+      <div class="section"><b>Preferências</b><div class="mini">📚 Respostas rápidas • 🎯 Produtividade • ⚙️ Modo Foco Total</div></div>
+    </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn" id="exportJson">Exportar JSON</button>
+        <button class="btn alt" id="downloadHtml">Baixar .html</button>
+        <button class="btn ghost" id="resetApp">Reiniciar</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom Nav -->
+  <nav class="bottomnav" aria-label="Navegação principal">
+    <button class="navbtn" data-target="sec-home">🏠<span>Início</span></button>
+    <button class="navbtn" data-target="sec-identidade">🧑<span>Identidade</span></button>
+    <button class="navbtn" data-target="sec-upa">🧭<span>UPA</span></button>
+    <button class="navbtn" data-target="sec-resumo">📄<span>Resumo</span></button>
+  </nav>
+
+  <!-- FAB -->
+  <button class="fab" id="fab" aria-label="Ações rápidas">☰</button>
+
+  <!-- Bottom Sheet -->
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Menu rápido">
+    <div class="handle" aria-hidden="true"></div>
+    <div class="content">
+      <div class="menuitem" id="mi-download">
+        <div>⬇️</div><div><div><b>Baixar .html</b></div><div class="mini">Gera o arquivo desta página</div></div>
+      </div>
+      <div class="menuitem" id="mi-alpha">
+        <div>🫥</div><div><div><b>Transparência do body</b></div><div class="mini">Alternar 0.30 ↔ 1.00 e escolher 0.10/0.30/0.45/0.60</div></div>
+      </div>
+      <div class="menuitem" id="mi-goals">
+        <div>🎯</div><div><div><b>Definir objetivo</b></div><div class="mini">Produtividade, Planejamento, Ideias…</div></div>
+      </div>
+      <div class="menuitem" id="mi-reset">
+        <div>♻️</div><div><div><b>Reiniciar</b></div><div class="mini">Limpa e volta ao início</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status">✅ Horus selecionado.</div>
+</div>
+
+<script>
+(()=> {
+  const $ = (s, el=document) => el.querySelector(s);
+  const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+  const on = (el, ev, fn) => el && el.addEventListener(ev, fn);
+
+  /* ===== Estado & Persistência ===== */
+  const KEY = "infodose_mobile_horus_v31";
+  const state = {
+    dose: 0, userName: "", color: "", energy: "", movement: "", element: "",
+    upa: "", assistantName: "", cmdLong: "", cmdShort: "",
+    learn: "", goal: "", mode: "", bodyAlpha: 0.30, horus:"Visão"
+  };
+  const save = () => localStorage.setItem(KEY, JSON.stringify(state));
+  const load = () => { try{ Object.assign(state, JSON.parse(localStorage.getItem(KEY)||"{}")); }catch(e){} };
+  const reset = () => { localStorage.removeItem(KEY); window.location.reload(); };
+
+  /* ===== UI helpers ===== */
+  const toast = (msg, ms=3400) => { const t=$("#toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), ms); };
+  const setAlpha = (a) => { state.bodyAlpha = +a; document.documentElement.style.setProperty('--body-alpha', state.bodyAlpha); save(); };
+  const setDose = (n) => { state.dose=n; save(); $("#doseTag").textContent = "Dose " + state.dose; $("#bar").style.width = Math.min(100, Math.round((n/8)*100)) + "%"; };
+  const status = () => { const bits=[]; if(state.userName) bits.push("👤 "+state.userName); if(state.assistantName) bits.push("🤖 "+state.assistantName+" A.Infodose"); if(state.mode) bits.push("⚙️ "+state.mode); $("#status").textContent = bits.join(" • ") || "Pronto"; };
+
+  /* ===== Dados ===== */
+  const ARCHETYPES = [
+    {k:"Atlas", d:"Planejamento e direção."},
+    {k:"Nova", d:"Criação e inovação."},
+    {k:"Vitalis", d:"Energia e saúde."},
+    {k:"Pulse", d:"Emoção e impacto."},
+    {k:"Aion", d:"Ambiente e transformação."},
+    {k:"Orion", d:"Visão de longo prazo."},
+    {k:"Prisma", d:"Síntese e priorização."},
+    {k:"Echo", d:"Comunicação persuasiva."},
+    {k:"Lyra", d:"Estética e UX."},
+    {k:"Forge", d:"Execução e shipping."},
+    {k:"Horus", d:"DUAL • Visão 👁️ / Execução ⚒️"}
+  ];
+  const NAME_SUG = ["Aurora","Vertex","Prisma","Orbe","Quasar","Atlas","Nova","Vector","Nébula","Pulse"];
+  const ASSIST_SUG = ["Aurora","Vertex","Prisma","Lyra","Echo","Forge","Orion","Pulse","Horus"];
+  const COLORS = ["#ff0000","#ff7a00","#ffd400","#00c853","#00bcd4","#2979ff","#7e57c2","#ffffff","#000000"];
+  const ELEMENTS = ["Fogo","Água","Terra","Madeira","Metal","Ar"];
+  const LEARN = ["Respostas rápidas","Explicações detalhadas"];
+  const GOALS = ["Produtividade","Planejamento","Exploração de ideias","Aprendizado","Outro"];
+  const MODES = ["Modo Foco Total","Modo Explorador","Modo Equilibrado"];
+
+  /* ===== Heurística (ajustada + HORUS Dual) ===== */
+  function suggestUPA(){
+    const votes = {};
+    const add = k => votes[k]=(votes[k]||0)+1;
+
+    const byColor = {
+      vermelho:"Pulse", laranja:"Aion", amarelo:"Atlas", verde:"Vitalis",
+      azul:"Atlas", roxo:"Nova", preto:"Aion", branco:"Prisma",
+      "#ff0000":"Pulse","#ff7a00":"Aion","#ffd400":"Atlas","#00c853":"Vitalis","#00bcd4":"Prisma","#2979ff":"Atlas","#7e57c2":"Nova","#ffffff":"Prisma","#000000":"Aion"
+    };
+    const byElement = { fogo:"Pulse", água:"Vitalis", agua:"Vitalis", terra:"Atlas", madeira:"Forge", metal:"Nova", ar:"Prisma" };
+    const byEnergy = { alto:"Forge", baixo:"Prisma" };
+    const byMove = { "mais":"Forge", "menos":"Prisma" };
+
+    const c = (state.color||"").toLowerCase(); if(byColor[c]) add(byColor[c]);
+    const e = (state.element||"").toLowerCase(); if(byElement[e]) add(byElement[e]);
+    const en = (state.energy||"").toLowerCase(); if(byEnergy[en]) add(byEnergy[en]);
+    const mv = (state.movement||"").toLowerCase(); if(mv.includes("mais")) add(byMove["mais"]); if(mv.includes("menos")) add(byMove["menos"]);
+
+    // HORUS bias:
+    if(state.horus==="Visão"){ add("Orion"); add("Prisma"); }
+    if(state.horus==="Execução"){ add("Forge"); add("Atlas"); }
+
+    // desempate amigável
+    if(!Object.keys(votes).length) add("Atlas");
+    return Object.entries(votes).sort((a,b)=>b[1]-a[1])[0][0];
+  }
+
+  /* ===== Builders ===== */
+  const chips = (arr, holder, selected, onChoose) => {
+    holder.innerHTML = arr.map(v => `<button class="chip" aria-checked="${selected===v}" data-v="${v}">${v}</button>`).join("");
+    $$("[data-v]", holder).forEach(b => on(b, "click", () => { $$("[data-v]", holder).forEach(x=>x.setAttribute("aria-checked","false")); b.setAttribute("aria-checked","true"); onChoose?.(b.dataset.v); }));
+  };
+  const palette = (arr, holder, selected, onChoose) => {
+    holder.innerHTML = arr.map(c => `<button class="swatch" aria-checked="${selected===c}" style="background:${c}" data-color="${c}" title="${c}"></button>`).join("");
+    $$("[data-color]", holder).forEach(s => on(s,"click", () => { $$("[data-color]", holder).forEach(x=>x.setAttribute("aria-checked","false")); s.setAttribute("aria-checked","true"); onChoose?.(s.dataset.color); }));
+  };
+  const segmented = (arr, holder, selected, onChoose) => {
+    holder.innerHTML = `<div class="segmented">${arr.map(v=>`<button data-v="${v}" aria-pressed="${selected===v}">${v}</button>`).join("")}</div>`;
+    $$("button[data-v]", holder).forEach(b => on(b, "click", () => { $$("button[data-v]", holder).forEach(x=>x.setAttribute("aria-pressed","false")); b.setAttribute("aria-pressed","true"); onChoose?.(b.dataset.v); }));
+  };
+
+  /* ===== Navegação ===== */
+  const navTo = id => {
+    document.querySelectorAll(".navbtn").forEach(n=>n.removeAttribute("aria-current"));
+    document.querySelector(`.navbtn[data-target="${id}"]`)?.setAttribute("aria-current","page");
+    document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"});
+  };
+
+  /* ===== Montagem ===== */
+  function mountUPA(grid){
+    grid.innerHTML = ARCHETYPES.map(t => `
+      <div class="section" tabindex="0" role="button" data-k="${t.k}">
+        <div class="row" style="justify-content:space-between;align-items:center">
+          <div><b>${t.k} A.Infodose</b><div class="mini">${t.d}</div></div>
+          <div>💊</div>
+        </div>
+      </div>`).join("");
+    $$('[data-k]', grid).forEach(el=>{
+      on(el,"click", ()=>{ state.upa = el.dataset.k; save(); toast(`✅ ${state.upa} selecionado.`); navTo("sec-assistente"); });
+      on(el,"keypress", e=>{ if(e.key==="Enter") el.click(); });
+    });
+  }
+
+  function refreshSummary(){
+    const S = $("#summary");
+    S.innerHTML = `
+      <div class="section"><b>Identidade</b><div class="mini">👤 ${state.userName||"—"} • 🎨 ${state.color||"—"}</div></div>
+      <div class="section"><b>Energia & Elemento</b><div class="mini">⚡ ${state.energy||"—"} • 🌀 ${state.movement||"—"} • 🌿 ${state.element||"—"}</div></div>
+      <div class="section"><b>UPA</b><div class="mini">🧭 ${state.upa||"—"} • HORUS: ${state.horus}</div></div>
+      <div class="section"><b>Assistente</b><div class="mini">🤖 ${state.assistantName||"—"} • 🔑 ${state.cmdShort||"—"}</div></div>
+      <div class="section"><b>Preferências</b><div class="mini">📚 ${state.learn||"—"} • 🎯 ${state.goal||"—"} • ⚙️ ${state.mode||"—"}</div></div>
+    `;
+  }
+
+  function buildCmds(){
+    state.cmdLong = `${state.userName||"Você"}, ativar ${state.assistantName||"Seu"} A.Infodose.`;
+    state.cmdShort = `1+${state.assistantName||"Seu"}`;
+    $("#cmdLong").textContent = state.cmdLong;
+    $("#cmdShort").textContent = state.cmdShort;
+    save();
+  }
+
+  /* ===== Download Helpers ===== */
+  function download(filename, content, type="text/html"){
+    const blob = new Blob([content], {type});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+  }
+
+  /* ===== Listeners ===== */
+  // FAB & Sheet
+  on($("#fab"),"click", ()=> $("#sheet").classList.add("open"));
+  on($("#openSheet"),"click", ()=> $("#sheet").classList.add("open"));
+  on($("#sheet"),"click", e=> { if(e.target.id==="sheet") e.currentTarget.classList.remove("open"); });
+  on($("#mi-download"),"click", ()=>{
+    $("#sheet").classList.remove("open");
+    const html = "<!-- A.Infodose • export -->\\n"+document.documentElement.outerHTML;
+    download("a-infodose-horus.html", html);
+  });
+  on($("#mi-alpha"),"click", ()=>{ $("#sheet").classList.remove("open"); setAlpha(state.bodyAlpha===1?0.30:1); });
+  on($("#mi-goals"),"click", ()=>{ $("#sheet").classList.remove("open"); navTo("sec-preferencias"); });
+  on($("#mi-reset"),"click", ()=>{ $("#sheet").classList.remove("open"); reset(); });
+
+  // Hero
+  on($("#fillCmd"),"click", ()=> $("#cmd").value = "ativar A.infodose");
+  on($("#goActivate"),"click", ()=>{
+    const v = ($("#cmd").value||"").trim().toLowerCase();
+    if(v==="kodux"){ toast("👑 KODUX reconhecido: modo criador ON."); }
+    if(v.startsWith("ativar a.infodose")){ setDose(1); navTo("sec-identidade"); }
+    else toast("❌ Use: ativar A.infodose");
+  });
+  on($("#alphaToggle"),"click", ()=> setAlpha(state.bodyAlpha===1?0.30:1));
+
+  // HORUS segmented
+  segmented(["Visão","Execução"], $("#segHorus"), state.horus, v=>{ state.horus=v; save(); if(!state.upa){ state.upa=suggestUPA(); toast("🧭 Sugerido: "+state.upa); } refreshSummary(); });
+
+  // Identidade
+  chips(NAME_SUG, $("#nomeSug"), state.userName, v=>{ $("#nome").value=v; });
+  on($("#nome"),"change", e=>{ state.userName = (e.target.value||"").trim(); save(); status(); buildCmds(); });
+  palette(COLORS, $("#pal"), state.color, v=>{ state.color=v; save(); if(!state.upa){ state.upa=suggestUPA(); } refreshSummary(); });
+
+  // Energia & Elemento
+  chips(["Alto","Baixo"], $("#chipsEnergy"), state.energy, v=>{ state.energy=v; setDose(Math.max(2,state.dose)); save(); refreshSummary(); });
+  $$("button[data-mov]").forEach(b=> on(b,"click", ()=>{ state.movement=b.dataset.mov; setDose(Math.max(3,state.dose)); save(); refreshSummary(); }));
+  $("#els").innerHTML = ELEMENTS.map(e=>`<button class="btn alt" data-el="${e}">${e}</button>`).join("");
+  $$("button[data-el]").forEach(b=> on(b,"click", ()=>{ state.element=b.dataset.el; setDose(Math.max(4,state.dose)); if(!state.upa){ state.upa=suggestUPA(); toast("🔎 Mapeado → "+state.upa+" A.Infodose"); } save(); refreshSummary(); navTo("sec-upa"); }));
+
+  // UPA
+  mountUPA($("#upaGrid"));
+
+  // Assistente & Comando
+  chips(ASSIST_SUG, $("#assistSug"), state.assistantName, v=>{ $("#anome").value=v; });
+  on($("#anome"),"change", e=>{ state.assistantName=(e.target.value||"").trim(); setDose(Math.max(5,state.dose)); save(); buildCmds(); status(); });
+  on($("#copyLong"),"click", ()=>navigator.clipboard.writeText(state.cmdLong||"").then(()=>toast("📋 Copiado!")));
+  on($("#copyShort"),"click", ()=>navigator.clipboard.writeText(state.cmdShort||"").then(()=>toast("📋 Copiado!")));
+
+  // Preferências
+  segmented(LEARN, $("#segLearn"), state.learn, v=>{ state.learn=v; setDose(Math.max(6,state.dose)); save(); refreshSummary(); });
+  chips(GOALS, $("#chipsGoal"), state.goal, v=>{ state.goal=v; setDose(Math.max(7,state.dose)); save(); refreshSummary(); });
+  segmented(MODES, $("#segMode"), state.mode, v=>{ state.mode=v; setDose(Math.max(8,state.dose)); save(); refreshSummary(); });
+
+  // Resumo & Export
+  on($("#exportJson"),"click", ()=> download("a-infodose-perfil.json", JSON.stringify(state,null,2), "application/json"));
+  on($("#downloadHtml"),"click", ()=>{
+    const html = "<!-- A.Infodose • export -->\\n"+document.documentElement.outerHTML;
+    download("a-infodose-horus.html", html);
+  });
+  on($("#resetApp"),"click", reset);
+
+  // Bottom nav
+  $$(".navbtn").forEach(n=> on(n,"click", ()=> navTo(n.dataset.target)));
+
+  // Load & init
+  load();
+  // hydrate UI
+  setAlpha(state.bodyAlpha||0.30);
+  setDose(state.dose||0);
+  status(); buildCmds(); refreshSummary();
+})();
+</script>
+
+</body></html>
