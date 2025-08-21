@@ -1608,7 +1608,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/codex/mtlx-oo-2.txt',
+            TRAINING_FILE:'data/codex/mtlx-oo-w2.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
@@ -3762,7 +3762,7 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     const saved = localStorage.getItem("dual_footer_hide_response");
     if (saved === "1") {
-      responseContainer.style.display = "none";
+      responseContainer.style.display = "block";
       footer.classList.add("active");
     }
   } catch(_) {}
@@ -3827,10 +3827,10 @@ body.dual-compact .pagination{ display:none !important; }
 <style>
 /* v6.2.4 — Footer só oculta páginas renderizadas (nunca o #response) */
 #response{ display:block !important; }
-#response .footer-text{ display:block !important; visibility:visible !important; opacity:1 !important; }
+#response .footer-text{ display:block !important; visibility:visible !important; opacity:0.8 !important; }
 #response[data-pages-hidden="1"] .pages-wrapper,
 #response[data-pages-hidden="1"] #pagesWrapper,
-#response[data-pages-hidden="1"] .response-block{ display:none !important; }
+#response[data-pages-hidden="1"] .response-block{ display:block !important; }
 </style>
 
 <script>
