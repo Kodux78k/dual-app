@@ -1698,7 +1698,7 @@ binauralAudio.volume = binauralVolume.value;
           KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
           KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
           CONFIG = {
-            TRAINING_FILE:'data/Super_Treinamento_Universal_Dual_Infodose_v1-29.txt',
+            TRAINING_FILE:'data/Superk_Treinamento_Universal_Dual_Infodose_v1-29.txt',
             API_URL      :'https://openrouter.ai/api/v1/chat/completions',
             MODEL        :'deepseek/deepseek-chat-v3-0324:free',
             TEMP         : 0.2,
@@ -4059,38 +4059,7 @@ body.dual-compact .pagination{ display:none !important; }
 })();
 </script>
 
-<script>
-// Footer/pages visibility toggle with persistence (dual_pages_hidden)
-(function(){
-  function $(sel, root=document){ return root.querySelector(sel); }
-  document.addEventListener('DOMContentLoaded', function(){
-    const resp = $('#response');
-    const footer = resp ? resp.querySelector('.footer-text') : null;
-    if(!resp || !footer) return;
 
-    // Migrate & clear legacy keys that may conflict
-    try{
-      ['pagesCollapsed','pages_hidden','response_hidden'].forEach(k=>localStorage.removeItem(k));
-    }catch(_){}
-
-    // Restore saved state
-    try{
-      const saved = localStorage.getItem('dual_pages_hidden');
-      resp.setAttribute('data-pages-hidden', saved === '1' ? '1' : '0');
-    }catch(_){
-      resp.setAttribute('data-pages-hidden', '0');
-    }
-
-    // Toggle on footer click
-    footer.addEventListener('click', function(){
-      const hidden = resp.getAttribute('data-pages-hidden') === '1';
-      const next = hidden ? '0' : '1';
-      resp.setAttribute('data-pages-hidden', next);
-      try{ localStorage.setItem('dual_pages_hidden', next); }catch(_){}
-    });
-  });
-})();
-</script>
 
 <div id="keyManagerModal" class="modal hidden" role="dialog" aria-modal="true">
   <div class="modal-card">
