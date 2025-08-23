@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EDILSON • DUAL • INFODOSE — IGNYRA</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#FF3C3C">
+<style>
+  :root{
+    --bg: radial-gradient(circle at 50% 30%, #1a0a0a 0%, #0a0303 70%, #000 100%);
+    --txt: #FFEFEF;
+    --fire1: #FF3C3C;
+    --fire2: #FF8800;
+    --fire3: #FFD700;
+    --stroke: rgba(255,255,255,.12);
+    --glass: rgba(255,255,255,.05);
+    --br: 16px;
+    --blur: 12px;
+  }
+  body{margin:0;font-family:Inter,system-ui; color:var(--txt); background:var(--bg);}
+  header,footer{padding:14px 18px;background:linear-gradient(90deg, var(--fire1), var(--fire2));}
+  h1{margin:0;font-size:22px;font-weight:900;text-shadow:0 0 12px var(--fire2);}
+  footer{font-size:.9rem;display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;color:#fff;text-shadow:0 0 6px var(--fire1);}
+  .grid{display:grid;grid-template-columns:280px 1fr 260px;gap:14px;padding:14px;}
+  .card{background:linear-gradient(180deg, rgba(255,60,60,.08), rgba(255,136,0,.05));border:1px solid var(--stroke);border-radius:var(--br);padding:14px;box-shadow:0 0 25px rgba(255,60,60,.35),0 0 40px rgba(255,136,0,.25);backdrop-filter:blur(var(--blur));}
+  .title{color:var(--fire2);margin:0 0 8px;font-weight:800;text-shadow:0 0 6px var(--fire3);}
+  .btn{display:inline-block;padding:8px 10px;border-radius:12px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt);font-weight:700;margin:2px 0;text-decoration:none;cursor:pointer;transition:.25s;}
+  .btn:hover{background:var(--fire1);color:#fff;box-shadow:0 0 15px var(--fire1),0 0 25px var(--fire2);}
+  pre{white-space:pre-wrap;font-family:monospace;font-size:.9rem;text-shadow:0 0 8px rgba(255,136,0,.7);}
+  .dot{width:10px;height:10px;border-radius:50%;background:#555;display:inline-block;margin-left:6px;box-shadow:0 0 6px #000;}
+  .dot.on{background:var(--fire2);box-shadow:0 0 12px var(--fire2),0 0 20px var(--fire3);}
+  .circ{width:160px;height:160px;margin:10px auto;border-radius:50%;border:3px solid var(--fire1);display:grid;place-items:center;color:var(--fire2);font-weight:900;text-shadow:0 0 12px var(--fire3);animation:burn 6s linear infinite;}
+  @keyframes burn{0%{box-shadow:0 0 10px var(--fire1),0 0 20px var(--fire2);}50%{box-shadow:0 0 25px var(--fire2),0 0 45px var(--fire3);}100%{box-shadow:0 0 10px var(--fire1),0 0 20px var(--fire2);}}
+</style>
+</head>
+<body>
+<header><h1>🔥 IGNYRA — EDILSON • DUAL • INFODOSE 🔥</h1></header>
+<main class="grid">
+  <aside class="card">
+    <h2 class="title">Ativações Avançadas</h2>
+    <a href="#" class="btn" data-ritual="resp">Respiração 3-6-9<span class="dot" id="dot-resp"></span></a><br>
+    <a href="#" class="btn" data-ritual="diario">Diário Estoico<span class="dot" id="dot-diario"></span></a><br>
+    <a href="#" class="btn" data-ritual="medit">Meditação<span class="dot" id="dot-medit"></span></a><br>
+    <a href="#" class="btn" data-ritual="caibalion">Princípios Caibalion<span class="dot" id="dot-caibalion"></span></a><br>
+    <a href="#" class="btn" data-ritual="dirac">Insight Quântico Dirac<span class="dot" id="dot-dirac"></span></a>
+  </aside>
+  <section class="card">
+    <div class="circ">IGNYRA</div>
+    <pre id="asciiOut"></pre>
+    <div><button class="btn" id="btnCopy">Copiar</button>
+    <button class="btn" id="btnDownload">Baixar</button></div>
+  </section>
+  <aside class="card">
+    <h2 class="title">Frases Estoicas</h2>
+    <ul id="stoicList" style="padding-left:20px;font-size:.9rem"></ul>
+    <button class="btn" id="btnInject">Injetar</button>
+  </aside>
+</main>
+<footer><span>“O poder da mente é a chama que guia o movimento.”</span><span>IGNYRA🔥</span></footer>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./service-worker.js');}
+const state={ritual:{resp:false,diario:false,medit:false,caibalion:false,dirac:false},stoicExtra:[]};
+const out=document.getElementById('asciiOut');
+function render(){
+  const rits=Object.entries(state.ritual).filter(([k,v])=>v).map(([k])=>"✦ "+k).join("\n")||"(nenhum)";
+  const stoics=state.stoicExtra.map(s=>"› "+s).join("\n");
+  out.textContent=`🔥 IGNYRA MODE 🔥
+Rituais:\n${rits}
+Doses Extra:\n${stoics}
+Mantra: O poder da mente é a chama que guia o movimento.`;
+}
+document.querySelectorAll('[data-ritual]').forEach(btn=>{btn.addEventListener('click',e=>{e.preventDefault();const k=btn.dataset.ritual;state.ritual[k]=!state.ritual[k];document.getElementById('dot-'+k).classList.toggle('on',state.ritual[k]);render();});});
+const phrases=["Não espere por uma vida perfeita, use o fogo das dificuldades. — Sêneca","O destino guia quem o aceita, arrasta quem resiste. — Cleanthes","A chama interior é a única que não se apaga. — Epicteto"];
+const list=document.getElementById('stoicList');phrases.forEach(p=>{const li=document.createElement('li');li.textContent=p;list.appendChild(li);});
+document.getElementById('btnInject').onclick=()=>{state.stoicExtra=phrases;render();};
+document.getElementById('btnCopy').onclick=async()=>{await navigator.clipboard.writeText(out.textContent);alert('Copiado!')};
+document.getElementById('btnDownload').onclick=()=>{const blob=new Blob([out.textContent],{type:'text/plain'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='EDILSON_IGNYRA.txt';a.click();};
+render();
+</script>
+</body>
+</html>

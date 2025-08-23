@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EDILSON DUAL.INFODOSE — Final (Luxara + Ignyra)</title>
+<link rel="manifest" href="./manifest_final.json">
+<meta name="theme-color" content="#F4D26B">
+<style>
+  /* ====== LUXARA + IGNYRA — Tema, acessibilidade e polimento ====== */
+  :root{
+    --bg: radial-gradient(120% 120% at 50% 0%, #09090c 0%, #08080b 45%, #06060a 100%);
+    --glass: rgba(255,255,255,.06);
+    --stroke: rgba(255,255,255,.12);
+    --txt: #EEE6D5;
+    --gold: #F4D26B;
+    --accent1: #F4D26B;
+    --accent2: #caa242;
+    --danger: #ff477e;
+    --ok: #53d86a;
+    --br: 16px; --blur: 12px; --shadow: 0 12px 40px rgba(0,0,0,.45);
+    --bez: cubic-bezier(.2,.8,.2,1);
+  }
+  /* Paletas alternativas (Neon e Zen) */
+  .theme-neon :root, .theme-neon {
+    --bg: radial-gradient(120% 120% at 50% 0%, #0b0b12 0%, #0a0a0f 45%, #06060a 100%);
+    --txt:#EDEFF7; --accent1:#0FF; --accent2:#F0F; --gold:#9DF3FF;
+  }
+  .theme-zen :root, .theme-zen {
+    --bg: #0a0a0a; --txt:#EDEDE7; --accent1:#BDBDBD; --accent2:#848484; --gold:#E0E0D0;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    color:var(--txt); background:var(--bg); overflow-x:hidden;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+
+  .wrap{min-height:100dvh; display:grid; grid-template-rows:auto 1fr auto;}
+  header, footer{
+    position:relative; z-index:2; padding:14px 18px;
+    background: linear-gradient( to right, color-mix(in oklab, var(--accent1) 15%, transparent), color-mix(in oklab, var(--accent2) 15%, transparent) );
+    border-bottom:1px solid var(--stroke);
+    -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  }
+  footer{ border-top:1px solid var(--stroke); border-bottom:none; }
+  h1{ margin:0; font-weight:800; letter-spacing:.3px; font-size: clamp(18px, 2.6vw, 28px); display:flex; align-items:center; gap:10px; }
+  h1 .badge{ display:inline-flex; gap:8px; align-items:center; padding:6px 10px; border-radius:999px;
+    background:linear-gradient(45deg, var(--accent1), var(--accent2));
+    color:#0b0b12; font-weight:800; box-shadow: var(--shadow);
+  }
+  .grid{ position:relative; z-index:1; display:grid; gap:16px; padding:18px; max-width:1200px; margin:0 auto; width:100%;
+    grid-template-columns: 320px 1fr 360px; }
+  @media(max-width:1180px){ .grid{ grid-template-columns: 300px 1fr; } .rightcol{ display:none } }
+  @media(max-width:860px){ .grid{ grid-template-columns: 1fr; } .sidebar{ order:-1 } }
+
+  .card{ background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); border:1px solid var(--stroke); border-radius: var(--br); padding:16px; box-shadow: var(--shadow); backdrop-filter: blur(var(--blur)); }
+  .title{color:var(--gold); margin:0 0 8px 0; font-weight:800; letter-spacing:.3px}
+  .sub{opacity:.85; margin:4px 0 14px 0}
+  .btn{ border:1px solid var(--stroke); background:var(--glass); padding:10px 12px; border-radius:12px; cursor:pointer; transition: all .18s var(--bez); font-weight:700; display:inline-flex; align-items:center; gap:8px; color:var(--txt); text-decoration:none }
+  .btn:hover{ transform: translateY(-1px); box-shadow:0 8px 24px rgba(0,0,0,.35) }
+  .btn:active{ transform: translateY(0) scale(.98) }
+  .btn.grad{ color:#0b0b12; border-color:transparent; background: linear-gradient(45deg, var(--accent1), var(--accent2)); }
+  .btn.warn{ border-color: color-mix(in oklab, var(--danger) 60%, white 0%); }
+  .dot{ width:10px; height:10px; border-radius:50%; background:#5a5a5a; box-shadow: inset 0 0 0 2px rgba(0,0,0,.45) }
+  .dot.on{ background:var(--gold) }
+
+  .circ{ width:168px; height:168px; border-radius:50%; margin: 8px auto 14px auto; position:relative; border: 2px dashed rgba(255,255,255,.22); display:grid; place-items:center;
+    filter: drop-shadow(0 0 20px color-mix(in oklab, var(--accent1) 45%, black));
+    animation: spin 8s linear infinite; background: conic-gradient(from 0deg, color-mix(in oklab, var(--accent1) 22%, transparent), color-mix(in oklab, var(--accent2) 22%, transparent)), radial-gradient(closest-side, rgba(255,255,255,.08), transparent 70%); }
+  .circ:after{ content:"EDILSON • DUAL • INFODOSE"; font-size:.72rem; opacity:.82; letter-spacing:.18em; }
+  @keyframes spin{ to{ transform: rotate(360deg) } }
+  /* IGNYRA aura */
+  .aura{ position:relative }
+  .aura:before{ content:""; position:absolute; inset:-2px; border-radius: calc(var(--br) + 6px);
+    background: conic-gradient(from 0deg, color-mix(in oklab, var(--accent1) 40%, transparent), color-mix(in oklab, var(--accent2) 40%, transparent));
+    filter: blur(10px); opacity:.25; z-index:0; pointer-events:none; }
+  .aura > *{ position:relative; z-index:1 }
+
+  textarea, pre{ width:100%; min-height:160px; border-radius:12px; padding:12px 14px; border:1px solid var(--stroke); background:rgba(0,0,0,.28); color:var(--txt); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; }
+  pre{ margin:0; overflow:auto; white-space:pre-wrap; word-wrap:break-word }
+
+  .footerline{ display:flex; justify-content:space-between; gap:12px; align-items:center; flex-wrap:wrap; }
+  .muted{ opacity:.78 }
+
+  /* Biblioteca */
+  .liblist{ display:grid; gap:10px; }
+  .libitem{ padding:10px; border:1px solid var(--stroke); border-radius:12px; background:rgba(0,0,0,.24); display:grid; gap:6px }
+  .libitem h4{ margin:0; color:var(--gold) }
+  .libitem small{ opacity:.7 }
+  .libitem pre{ min-height:auto; max-height:200px }
+
+  /* QA overlay */
+  #qa{ position:fixed; right:10px; bottom:10px; z-index:9999; display:none }
+  #qa.on{ display:block }
+  #qa .box{ background:rgba(0,0,0,.7); color:#fff; padding:10px 12px; border-radius:10px; border:1px dashed rgba(255,255,255,.25); max-width:340px }
+</style>
+</head>
+<body class="theme-luxara">
+<div class="wrap">
+  <header>
+    <h1><span class="badge">⚡👁️🧠</span> EDILSON DUAL.INFODOSE — Final</h1>
+  </header>
+
+  <main class="grid">
+    <!-- Sidebar: Ativações Base -->
+    <aside class="card sidebar aura">
+      <h2 class="title">Ativações Base</h2>
+      <p class="sub">Luxara + Ignyra: liga/desliga estados e eles entram no ASCII.</p>
+      <div style="display:grid; gap:10px">
+        <a href="#" class="btn" data-act="empresa"><span>Ativar Empresa Infodose</span><span class="dot" id="dot-empresa"></span></a>
+        <a href="#" class="btn" data-act="estado78k"><span>Ativar Estado 78K</span><span class="dot" id="dot-estado78k"></span></a>
+        <a href="#" class="btn" data-act="edilsonAsc"><span>Ativar Frequência EDILSON Ascendente</span><span class="dot" id="dot-edilsonAsc"></span></a>
+      </div>
+      <div class="muted" style="margin-top:12px">Dica: toque novamente para alternar.</div>
+
+      <div style="margin-top:14px; display:grid; gap:8px">
+        <button class="btn grad" id="btnCopy">Copiar ASCII</button>
+        <button class="btn" id="btnDownload">Baixar .txt</button>
+        <button class="btn" id="btnPrint">Imprimir</button>
+        <button class="btn" id="btnTheme">Tema: Luxara/Neon/Zen</button>
+        <button class="btn warn" id="btnQA">QA Mode</button>
+      </div>
+    </aside>
+
+    <!-- Main Panel -->
+    <section class="card aura">
+      <h2 class="title">Perfil EDILSON — <span class="muted">Luxara + Ignyra</span></h2>
+      <p class="sub">Polimento de CSS, acessibilidade e responsividade. Print limpo, iOS zoom-fix, auras energéticas e animações respeitando <i>prefers-reduced-motion</i>.</p>
+
+      <div class="circ" aria-hidden="true"></div>
+      <pre id="asciiOut"></pre>
+    </section>
+
+    <!-- Right column: Biblioteca ID (correlação com o ZIP) -->
+    <aside class="card rightcol aura">
+      <h2 class="title">Biblioteca ID — EDILSON</h2>
+      <p class="sub">Itens extraídos do ZIP do Edilson. Toque para injetar como “Ativação Extra” no ASCII.</p>
+      <div class="liblist" id="lib"></div>
+    </aside>
+  </main>
+
+  <footer>
+    <div class="footerline">
+      <div><b>EDILSON DUAL.INFODOSE</b> • Final (Luxara + Ignyra + Artemis/Atlas)</div>
+      <div class="muted">Sempre único, sempre seu.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- QA Overlay -->
+<div id="qa"><div class="box">
+  <b>QA rápido</b>
+  <ul style="margin:6px 0 0 16px; padding:0">
+    <li>Viewport: <span id="qa-vp"></span></li>
+    <li>Theme: <span id="qa-theme">luxara</span></li>
+    <li>Motion: <span id="qa-motion"></span></li>
+    <li>Long lines: <span id="qa-lines"></span></li>
+  </ul>
+</div></div>
+
+<script>
+// ====== PWA register
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker-final.js').catch(console.error);
+  });
+}
+
+(() => {  // ====== App state
+  const lib = [{"title": "Como_Surgiram_as_Religioes", "filename": "Como_Surgiram_as_Religioes.pdf", "type": "pdf", "snippet": "(conteúdo em .PDF no pack)"}, {"title": "Poder da mente", "filename": "Poder da mente.txt", "type": "txt", "snippet": "Usar o “poder da mente” é algo que pode significar diferentes coisas, dependendo do que você está buscando: foco, intuição, autoconfiança, manifestação, autocontrole, ou até desenvolvimento espiritual. Abaixo explico como fazer isso de forma prática, dividida em áreas:\n\n---\n\n🔹 1. Foco e Concentração\n\nTreinar a mente para focar é o primeiro passo para ter mais controle sobre ela.\n\nComo fazer:\n\nMeditação diária (5 a 10 minutos já ajuda)\n\nTécnicas de respiração consciente (inspira 4s – segura 4s – expira 4s)\n\nEliminar distrações (ambiente limpo, celular no silencioso)\n\nTécnica Pomodoro (25 minutos focado + 5 de pausa)\n\n---\n\n🔹 2. Reprogramação Mental (Mudar pensamentos)\n\nSua mente é moldada pelos seus pensamentos repetitivos.\n\nComo fazer:\n\nAfirmar frases positivas todos os dias:\nEx: “Eu sou ca"}, {"title": "A origem da humanidade", "filename": "A origem da humanidade.txt", "type": "txt", "snippet": "A origem da humanidade pode ser explicada sob diferentes perspectivas: científica, filosófica, religiosa e mitológica. Aqui estão as principais visões:\n\n---\n\n🔬 1. Origem Científica (Evolução Humana)\n\nA explicação mais aceita pela ciência é baseada na teoria da evolução:\n\nEspécie: Homo sapiens (humano moderno)\n\nOrigem: África, há cerca de 300 mil anos\n\nProcesso: Evoluímos a partir de hominídeos ancestrais, como o Homo habilis, Homo erectus e Australopithecus.\n\nBase científica: Genética, fósseis, arqueologia e antropologia comprovam esse processo evolutivo gradual.\n\n---\n\n📜 2. Visão Filosófica\n\nFilósofos questionam não apenas de onde viemos, mas também por quê viemos:\n\nAristóteles: Via o ser humano como um \"animal racional\", com finalidade (teleologia).\n\nJean-Jacques Rousseau: Defendia que o "}, {"title": "Judai╠üsmo", "filename": "Judai╠üsmo.txt", "type": "txt", "snippet": "https://chatgpt.com/s/t_68a1f748eddc8191820f4587897fa22e"}, {"title": "Frases_Estoicas_Semana", "filename": "Frases_Estoicas_Semana.pdf", "type": "pdf", "snippet": "(conteúdo em .PDF no pack)"}, {"title": "Guia_Estoico", "filename": "Guia_Estoico.pdf", "type": "pdf", "snippet": "(conteúdo em .PDF no pack)"}, {"title": "Paul Dirac", "filename": "Paul Dirac.txt", "type": "txt", "snippet": "https://chatgpt.com/backend-api/estuary/content?id=file-EtnPVKbgo9dySuaS1VsiaG&ts=487673&p=fs&cid=1&sig=1349ff9f73742175bd27fee5cc2cff752de83b698e823ec73dc9f774a40813f7"}, {"title": "Caibalion_Setes_Principios_Hermeticos_co╠üpia", "filename": "Caibalion_Setes_Principios_Hermeticos_co╠üpia.pdf", "type": "pdf", "snippet": "(conteúdo em .PDF no pack)"}];
+
+  const state = {
+    user: "EDILSON",
+    color: "Dourado Luxara",
+    movement: "Mais movimento",
+    energy: "Alta",
+    goal: "Conectar pessoas com propósito e pulsar energia criativa",
+    interests: ["Tecnologia viva","Arquétipos","Música pulsante","Conexões simbólicas"],
+    searches: ["Infodose","dopamina","arquétipos","espiritualidade aplicada"],
+    archetypes: ["Atlas","Vitalis","Nova","Pulse","Kaos"],
+    ativ: { empresa:false, estado78k:false, edilsonAsc:false },
+    extra: [] // ativações extras injetadas da biblioteca
+  };
+
+  const out = document.getElementById('asciiOut');
+  function render(){
+    const ativLines = [
+      state.ativ.empresa ? "✶ Ativar Empresa Infodose (ON)" : "✶ Ativar Empresa Infodose (off)",
+      state.ativ.estado78k ? "✶ Ativar Estado 78K (ON)" : "✶ Ativar Estado 78K (off)",
+      state.ativ.edilsonAsc ? "✶ Ativar Frequência EDILSON DUAL Ascendente (ON)" : "✶ Ativar Frequência EDILSON DUAL Ascendente (off)"
+    ].join("\n");
+
+    const extraLines = state.extra.length ? (
+      "\nAtivações Extras (ZIP):\n" + state.extra.map((e,i)=>`• ${e}`).join("\n")
+    ) : "";
+
+    const block = `
+███████╗██████╗ ██╗██╗     ██████╗ ███████╗ ██████╗ ███╗   ██╗
+██╔════╝██╔══██╗██║██║     ██╔══██╗██╔════╝██╔═══██╗████╗  ██║
+█████╗  ██████╔╝██║██║     ██║  ██║█████╗  ██║   ██║██╔██╗ ██║
+██╔══╝  ██╔═══╝ ██║██║     ██║  ██║██╔══╝  ██║   ██║██║╚██╗██║
+███████╗██║     ██║███████╗██████╔╝███████╗╚██████╔╝██║ ╚████║
+╚══════╝╚═╝     ╚═╝╚══════╝╚═════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝
+       ⚡️ EDILSON DUAL.INFODOSE — FINAL (LUXARA + IGNYRA) ⚡️
+
+🧠 Perfil do Usuário:
+- Interesses: ${state.interests.join(", ")}
+- Pesquisas frequentes: ${state.searches.join(", ")}
+- Objetivo de vida: ${state.goal}
+- Energia atual: ${state.energy}
+- Preferência de movimento: ${state.movement}
+- Cor imediata: ${state.color}
+
+🌌 Arquétipos Ativos:
+- ${state.archetypes.join(" + ")}
+
+⚙️ Ativações:
+${ativLines}${extraLines}
+
+📊 Quadro ASCII de Perfil:
++----------------------+----------------------------+
+|        Campo         |           Valor            |
++----------------------+----------------------------+
+| Nome do Usuário      | ${state.user}              |
+| Cor do Momento       | ${state.color}             |
+| Movimento            | ${state.movement}          |
+| Foco vs Energia      | Energia em alta vibração   |
+| Arquétipos Ativos    | ${state.archetypes.join(", ")}  |
+| Objetivo Central     | ${state.goal}              |
++----------------------+----------------------------+
+
+🔑 Status Final: **Perfil Final Ativo**
+💊 Doses: Estruturadas, pulsantes e prontas.
+👤 Coordenação por: **KODUX + HORUS**.
+Sempre único, sempre seu. ⚡️`.trim();
+
+    out.textContent = block;
+    // Update QA
+    document.getElementById('qa-lines').textContent = String(block.split('\n').filter(x => x.length > 84).length);
+  }
+
+  function bindAct(id, key){
+    const el = document.querySelector('[data-act="'+key+'"]');
+    const dot = document.getElementById(id);
+    el.addEventListener('click', (e)=>{
+      e.preventDefault();
+      state.ativ[key] = !state.ativ[key];
+      dot.classList.toggle('on', state.ativ[key]);
+      render();
+    });
+  }
+  bindAct('dot-empresa','empresa');
+  bindAct('dot-estado78k','estado78k');
+  bindAct('dot-edilsonAsc','edilsonAsc');
+
+  // Biblioteca — correlação ZIP
+  const libWrap = document.getElementById('lib');
+  lib.forEach(item => {
+    const b = document.createElement('div');
+    b.className = 'libitem';
+    const head = document.createElement('h4'); head.textContent = item.title + (item.type ? ' ['+item.type+']' : '');
+    const sm = document.createElement('small'); sm.textContent = item.filename;
+    const pre = document.createElement('pre'); pre.textContent = (item.snippet || '').slice(0,800);
+    const add = document.createElement('button'); add.className = 'btn grad'; add.textContent = 'Injetar como Ativação Extra';
+    add.onclick = () => { state.extra.push(item.title); render(); };
+    b.append(head, sm, pre, add);
+    libWrap.appendChild(b);
+  });
+
+  // Actions
+  document.getElementById('btnCopy').addEventListener('click', async ()=>{ await navigator.clipboard.writeText(out.textContent); alert('ASCII copiado!'); });
+  document.getElementById('btnDownload').addEventListener('click', ()=>{ const blob = new Blob([out.textContent], {type:'text/plain'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='EDILSON_DUAL_Final.txt'; document.body.appendChild(a); a.click(); a.remove(); });
+  document.getElementById('btnPrint').addEventListener('click', ()=> window.print());
+
+  // Theme switch
+  const body = document.body;
+  const themes = ['theme-luxara','theme-neon','theme-zen'];
+  let tidx = 0;
+  document.getElementById('btnTheme').addEventListener('click', ()=>{ body.classList.remove(...themes); tidx = (tidx+1)%themes.length; body.classList.add(themes[tidx]); document.getElementById('qa-theme').textContent = themes[tidx].replace('theme-',''); });
+
+  // QA mode
+  const qa = document.getElementById('qa');
+  document.getElementById('btnQA').addEventListener('click', ()=> qa.classList.toggle('on') );
+  window.addEventListener('resize', ()=> document.getElementById('qa-vp').textContent = window.innerWidth+'×'+window.innerHeight );
+  document.getElementById('qa-vp').textContent = window.innerWidth+'×'+window.innerHeight;
+  document.getElementById('qa-motion').textContent = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'normal';
+
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Central - Dual Infodose</title>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#000000" name="theme-color"/>
+<link href="assets/icons/icon-192.png" rel="icon" type="image/png"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body {
+      overscroll-behavior: none;
+    }
+    body {
+      font-family:'Montserrat',sans-serif;
+      background: linear-gradient(to bottom, #000, #1a1a1a);
+      color:#f0f;
+      height:100vh; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      padding-top:0px; position:relative;
+      opacity:0; animation:fadeInBody 1.8s ease forwards;
+    }
+    @keyframes fadeInBody { to { opacity:1 } }
+    /* ——— SEU CSS INTEGRAL (ajustes) ——— */
+    :root {
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
+      --text: #444;
+      --fast: .4s; --med: .8s; --slow: 1.8s;
+    }
+    body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+    body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+    body.vibe  { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden}
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      padding:0px;background:var(--bg);color:var(--text);
+      font-family:'Montserrat',sans-serif;
+      transition:background var(--slow),color var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.7}}
+
+  /*  #particles-js {
+     position:absolute; inset:0; z-index:0;
+    } */
+
+    .center-group {
+      z-index:99;
+      display:flex; flex-direction:column; align-items:center;
+      gap:1rem; padding:20px; 
+    }
+    .logo-container {
+      width:249px; 
+      animation:glow 3s ease-in-out infinite alternate;
+      cursor: pointer;
+      position:relative;
+    }
+    .logo-container object { width:100%; display:block }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #f0f) }
+      to   { filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 35px #f0f) }
+    }
+    .infodose {
+      font-size:1.4em; font-weight:300;
+      animation:fadeIn 1.5s forwards 1s; opacity:0;
+    }
+    .infodose strong { font-weight:600 }
+    @keyframes fadeIn { to { opacity:0.8 } }
+
+    .login-container {
+      width:248px; padding:0.8rem;
+      background:rgba(0,0,0,0.6);
+      border:2px solid transparent;
+      border-radius:24px; backdrop-filter:blur(8px);
+      display:flex; flex-direction:column; gap:1rem;
+      opacity:0; transition:opacity .3s;
+      pointer-events:none;
+    }
+    .login-container.active {
+      opacity:0.8; pointer-events:auto;
+    }
+    .login-container input {
+      width:100%; background:rgba(255,255,255,0.05);
+      border:none; border-bottom:1px solid rgba(255,255,255,0.3);
+      padding:0.6rem; font-size:1em; font-weight:300;
+      color:#fff; outline:none; text-align:center;
+      transition: background .3s;
+      border-radius:10px;
+    }
+    .login-container input:focus {
+      background:rgba(255,255,255,0.1);
+    }
+
+    .btn-container {
+  display: flex;
+  gap: 10px; /* espaço entre botões */
+  flex-wrap: wrap; /* quebra linha se não couber */
+}
+
+.btn-full {
+  position: relative;
+  z-index: 3;
+  overflow: hidden;
+  padding: 0.8rem 1.5rem; /* aumentei o padding horizontal pra ficar bonito */
+  background: rgba(255,255,255,0.05);
+  border: none;
+  border-radius: 20px;
+  font-size: 1em;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s, background 0.3s;
+  /* width removido para não forçar 100% */
+  flex: 1 1 auto; /* deixa os botões flexíveis no container */
+  min-width: 100px; /* largura mínima para não ficar muito pequeno */
+}
+
+.btn-full::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5));
+  border-radius: 20px;
+  z-index: -1;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.btn-full:hover {
+  transform: scale(1.05);
+  background: rgba(255,255,255,0.15);
+}
+
+    .logout-area {
+      display: none;
+      margin-top: 0.3rem;
+      outline: none;
+      text-align: center;
+      
+    }
+    .logout-area .username {
+      /* font-weight: 300;*/
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 1rem;
+      font-size: 1.1em; opacity:0.8;
+    }
+    .logout-area .btn-full {
+      background: rgba(255,50,50,0.1);
+      color: #f55;
+    }
+    .logout-area .btn-full::before {
+      background: linear-gradient(45deg, rgba(255,100,100,0.5), rgba(200,0,0,0.5));
+    }
+.upload-btn {
+      
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      z-index: 10;
+    }
+    #uploadHTMLBtn{
+Position: fixed;
+      padding: 6px 9px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #222;
+      color: #fff;
+      cursor: pointer;
+      right:19px;
+      z-index: 10;
+      }
+    #messageBox { display:none; background: rgba(0,0,0,0.5); border-radius:16px; padding:0.8rem; text-align:center; color:#fff; font-size:0.86em; opacity:0.9; }
+    #buyTokens { display:none; }
+    #buyTokens button {
+      width:100%; padding:0.8rem 0;
+      background:rgba(255,255,255,0.05);
+      border:2px solid transparent;
+      border-image: linear-gradient(45deg, rgba(0,255,255,0.5), rgba(255,0,255,0.5)) 1;
+      border-radius:20px;
+      font-size:1em; font-weight:600; color:#fff;
+      cursor:pointer;
+      transition: transform .3s, background .3s;
+    }
+    #buyTokens button:hover {
+      transform:scale(1.05);
+      background:rgba(255,255,255,0.15);
+    }
+
+    #decoderBox {
+      display:none;
+      position:fixed;
+      top:42px;
+      left:50%;
+      transform:translateX(-50%);
+      background:rgba(0,0,0,0.6);
+      padding:1rem;
+      border-radius:20px;
+      backdrop-filter:blur(8px);
+      z-index:20000;
+      text-align:center;
+    }
+    #decoderBox input {
+      padding:0.6rem;
+      width:200px;
+      text-align:center;
+      border-radius:10px;
+      border:none;
+      font-size:1em;
+    }
+
+    #toggleDecoderBtn
+     {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 19;
+      padding: 0.3rem 0.7rem;
+      border: none;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.15);
+      color: #444;
+      font-weight: bold;
+      font-size: 0.95em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+      box-shadow: 0 0 10px rgba(0,255,255,0.2), 0 0 20px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+    #toggleDecoderBtn:hover,
+    #uploadHTMLBtn:hover {
+      transform: translateX(-50%) scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+    /* #toggleDecoderBtn { top: 138px; } */
+   /* #uploadHTMLBtn  { top: 93px; } */
+
+#userBgOptions {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  border-radius: 16px;
+  margin-top: 12px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeIn var(--fast) ease;
+}
+
+#userBgOptions button {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background 0.3s, transform 0.3s;
+}
+
+#userBgOptions button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.03);
+}
+
+#userBgOptions .thumbnails img {
+  width: 64px;
+  height: 40px;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+#userBgOptions .thumbnails img:hover {
+  border-color: #fff;
+  opacity: 1;
+}
+ body {background: 
+  linear-gradient(to top, rgba(68, 68, 68, 0.4),rgba(255, 255, 255, 0.6));} 
+
+/* Animação de pulsar body {
+  background: 
+    linear-gradient(to top, rgba(68, 68, 68, 0.7), rgba(255, 255, 255, 0.7));
+  background-blend-mode: lighten;
+}cósmico */
+
+<style>
+  }
+  #miniPlayerContainer {
+    position: fixed;
+    top: 89px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 80vw;
+    max-width: 400px;
+    font-size: 0.9rem;
+  }
+  #toggleMiniPlayer {
+    background: linear-gradient(90deg, #8882f8, #c277f2);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 0 12px rgba(140, 102, 255, 0.8);
+    cursor: pointer;
+    font-weight: 700;
+    user-select: none;
+    transition: transform 0.2s ease;
+    width: 48px;
+    height: 48px;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #toggleMiniPlayer:hover {
+    transform: scale(1.1);
+  }
+  #panel {
+    margin-top: 12px;
+    background: rgba(25, 25, 35, 0.9);
+    border-radius: 18px;
+    box-shadow: 0 0 15px #7f52ff88;
+    padding: 16px;
+    max-height: 360px;
+    overflow-y: auto;
+    display: none;
+    backdrop-filter: blur(6px);
+  }
+  h2 {
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #d8b9ff;
+    border-bottom: 1px solid #6e4de7;
+    padding-bottom: 4px;
+  }
+  pre {
+    background: #222;
+    border-radius: 12px;
+    padding: 12px;
+    margin: 8px 0 16px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.85rem;
+    max-height: 100px;
+    overflow-y: auto;
+  }
+  button.actionBtn {
+    background: linear-gradient(45deg, #d97aff, #60e3ff);
+    border: none;
+    border-radius: 12px;
+    padding: 6px 14px;
+    color: #121212;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 6px;
+    user-select: none;
+    transition: background-color 0.25s ease;
+  }
+  button.actionBtn:hover {
+    background: linear-gradient(45deg, #e0b8ff, #94f0ff);
+  }
+  .section {
+    margin-bottom: 18px;
+  }
+  .small-info {
+    color: #bbb;
+    font-size: 0.8rem;
+    margin-top: -12px;
+    margin-bottom: 8px;
+  }
+  /* Scrollbar dark style */
+  #panel::-webkit-scrollbar {
+    width: 8px;
+  }
+  #panel::-webkit-scrollbar-thumb {
+    background: #7f52ffcc;
+    border-radius: 6px;
+  }
+  #panel::-webkit-scrollbar-track {
+    background: transparent;
+  }
+</style>
+
+<!-- body {background: transparent !important; !-->
+<style>
+/* === Dual Infodose Loader (mínimo) === */
+.di-loader{ --di-size:42px; --di-gold:#F2C75C; --di-stroke:2px;
+  position:relative; width:var(--di-size); height:var(--di-size); display:inline-block;}
+.di-ring{ position:absolute; inset:0; border:var(--di-stroke) solid var(--di-gold);
+  border-radius:50%; will-change:transform; animation:di-spin 6s linear infinite;}
+.di-stroke{ position:absolute; left:50%; top:50%; width:62%; height:var(--di-stroke);
+  background:var(--di-gold); transform:translate(-50%,-50%); border-radius:999px;
+  animation:di-breathe 2.4s ease-in-out infinite;}
+.di-dots{ position:absolute; inset:0; transform:rotate(-90deg); animation:di-orbit 4.2s linear infinite;}
+.di-dots i{ --i:0; position:absolute; left:50%; top:50%; width:4px; height:4px; border-radius:50%;
+  background:var(--di-gold); opacity:.55;
+  transform: rotate(calc(var(--i)*51deg)) translate(calc(7px + var(--i)*2.2px)) rotate(calc(var(--i)*-51deg));
+  animation:di-pulse 4.2s linear infinite; animation-delay:calc(var(--i) * .6s);}
+@keyframes di-orbit{ to{ transform:rotate(270deg);} }
+@keyframes di-spin{ to{ transform:rotate(360deg);} }
+@keyframes di-breathe{ 0%,100%{ opacity:.9 } 50%{ opacity:1 } }
+@keyframes di-pulse{ 0%,70%{ opacity:.45; transform:scale(.92) } 76%,84%{ opacity:1; transform:scale(1.18) } 100%{ opacity:.6; transform:scale(.96) } }
+@media (prefers-reduced-motion:reduce){ .di-ring,.di-stroke,.di-dots,.di-dots i{ animation:none; } }
+</style>
+<style>
+/* === Dual Infodose Loader — minimal + gradient palette === */
+:root{
+  --di-g1:#F0F; /* magenta */
+  --di-g2:#0FF; /* cyan */
+}
+/* Reduce size */
+.di-loader{ --di-size:36px; --di-stroke:2px; position:relative; width:var(--di-size); height:var(--di-size); display:inline-block; }
+
+/* Ring with gradient stroke using mask */
+.di-ring{
+  position:absolute; inset:0;
+  background: conic-gradient(from 90deg, var(--di-g1), var(--di-g2));
+  border-radius:50%;
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px), #000 100%);
+          mask: radial-gradient(farthest-side, transparent calc(50% - 1px), #000 calc(50% - 1px), #000 100%);
+  will-change:transform;
+  animation:di-spin 6s linear infinite;
+}
+
+/* Central stroke (—) with soft breathe */
+.di-stroke{
+  position:absolute; left:50%; top:50%;
+  width:64%; height:var(--di-stroke);
+  background: linear-gradient(90deg, var(--di-g1), var(--di-g2));
+  transform:translate(-50%,-50%); border-radius:999px;
+  animation:di-breathe 2.4s ease-in-out infinite;
+}
+
+/* Spiral dots — each with a step across the gradient */
+.di-dots{ position:absolute; inset:0; transform:rotate(-90deg); animation:di-orbit 4.2s linear infinite; }
+.di-dots i{
+  --i:0; position:absolute; left:50%; top:50%;
+  width:4px; height:4px; border-radius:50%;
+  /* interpolate by using a conic gradient + mask for crisp circle */
+  background: conic-gradient(var(--di-g1), var(--di-g2));
+  -webkit-mask: radial-gradient(circle, #000 62%, transparent 63%);
+          mask: radial-gradient(circle, #000 62%, transparent 63%);
+  opacity:.75;
+  transform: rotate(calc(var(--i)*51deg)) translate(calc(7px + var(--i)*2.2px)) rotate(calc(var(--i)*-51deg));
+  animation:di-pulse 4.2s linear infinite; animation-delay:calc(var(--i) * .6s);
+}
+/* Slight hue shift per dot using filter as a cheap trick for variance */
+.di-dots i:nth-child(1){ filter:hue-rotate(0deg) }
+.di-dots i:nth-child(2){ filter:hue-rotate(20deg) }
+.di-dots i:nth-child(3){ filter:hue-rotate(40deg) }
+.di-dots i:nth-child(4){ filter:hue-rotate(60deg) }
+.di-dots i:nth-child(5){ filter:hue-rotate(80deg) }
+.di-dots i:nth-child(6){ filter:hue-rotate(100deg) }
+.di-dots i:nth-child(7){ filter:hue-rotate(120deg) }
+
+@keyframes di-orbit{ to{ transform:rotate(270deg);} }
+@keyframes di-spin{ to{ transform:rotate(360deg);} }
+@keyframes di-breathe{ 0%,100%{ opacity:.9 } 50%{ opacity:1 } }
+@keyframes di-pulse{ 0%,70%{ opacity:.55; transform:scale(.92) } 76%,84%{ opacity:1; transform:scale(1.15) } 100%{ opacity:.7; transform:scale(.96) } }
+@media (prefers-reduced-motion:reduce){
+  .di-ring,.di-stroke,.di-dots,.di-dots i{ animation:none; }
+}
+
+/* === Button enhancements (gradient border + blur background) === */
+#kblxPeopleBtn{
+  position:fixed; /* preserva o posicionamento existente */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.20) !important;
+  border: none;
+  border-radius: 50%;
+  isolation:isolate;
+  overflow: visible;
+}
+#kblxPeopleBtn::before{
+  content:"";
+  position:absolute; inset:-2px;
+  border-radius:inherit;
+  background: linear-gradient(45deg, var(--di-g1), var(--di-g2));
+  z-index:-1;
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  padding:2px; /* espessura da borda gradiente */
+}
+</style>
+<style>
+
+/* ⭮ Inline Upload (☍) next to central icon */
+.upload-inline-btn{
+  position:fixed; z-index:9999;
+  width:36px; height:36px; line-height:36px; text-align:center;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.08);
+  background:#fff;
+  color:#444; font-size:18px; font-weight:600;
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+  transition:transform .12s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
+  opacity:.96;
+}
+.upload-inline-btn:hover{ transform:translateY(-1px); background:#f7f7f7; border-color:rgba(0,0,0,.12) }
+.upload-inline-btn:active{ transform:translateY(0) scale(.98) }
+/* prefers reduced motion */
+@media (prefers-reduced-motion:reduce){
+  .upload-inline-btn{ transition:none }
+}
+
+</style>
+<style>
+/* KDX Log Editor (scoped, non-invasive) */
+.kdx-logs{margin:16px auto;max-width:960px;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:12px;background:rgba(255,255,255,.05);backdrop-filter:blur(6px)}
+.kdx-logs h2{margin:0 0 8px 0;font:700 14px/1.2 ui-sans-serif,system-ui}
+.kdx-logs pre{white-space:pre-wrap;word-wrap:break-word;background:rgba(0,0,0,.25);padding:10px;border-radius:8px;max-height:240px;overflow:auto}
+.kdx-logs textarea{width:100%;min-height:120px;border:1px solid rgba(255,255,255,.18);border-radius:10px;background:rgba(0,0,0,.25);color:inherit;padding:8px;display:none}
+.kdx-logs .row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.kdx-logs .btn{display:inline-flex;align-items:center;justify-content:center;height:34px;padding:6px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);font:600 12px/1 ui-sans-serif,system-ui}
+.kdx-logs .btn:hover{background:rgba(255,255,255,.12)}
+</style></head>
+<body>
+<div aria-label="Painel de Ativações" id="miniPlayerContainer" role="region">
+<!-- O botão de pílula foi ocultado em favor do visor integrado -->
+<button aria-controls="panel" aria-expanded="false" id="toggleMiniPlayer" style="display:none;" title="Abrir painel de ativações">💊</button>
+<div id="panel" tabindex="0">
+<div class="section" id="localStorageSection">
+<h2>🗄️ LocalStorage</h2>
+<pre id="localStorageContent">Carregando...</pre>
+<button class="actionBtn" id="clearLocalStorageBtn" title="Limpar LocalStorage">Limpar LocalStorage</button>
+</div>
+<div class="section" id="logsSection">
+<h2>📜 Logs Recentes</h2>
+<pre id="logsContent">Nenhum log registrado.</pre>
+<button class="actionBtn" id="clearLogsBtn" title="Limpar logs">Limpar Logs</button>
+</div>
+<div class="section" id="fetchSection">
+<h2>🌐 Fetch &amp; IA Acionada</h2>
+<pre id="fetchContent">Nenhum fetch recente.</pre>
+<div class="small-info" id="iaUsedInfo">IA atual: Nenhuma</div>
+<button class="actionBtn" id="clearFetchBtn" title="Limpar dados fetch">Limpar Dados Fetch</button>
+</div>
+</div>
+</div>
+<script>
+  // Toggle painel
+  const toggleBtn = document.getElementById('toggleMiniPlayer');
+  const panel = document.getElementById('panel');
+  toggleBtn.addEventListener('click', () => {
+    const isVisible = panel.style.display === 'block';
+    if (isVisible) {
+      panel.style.display = 'none';
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    } else {
+      panel.style.display = 'block';
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      loadLocalStorage();
+      loadLogs();
+      loadFetch();
+    }
+  });
+
+  // === LocalStorage ===
+  const localStorageContent = document.getElementById('localStorageContent');
+  const clearLocalStorageBtn = document.getElementById('clearLocalStorageBtn');
+
+  function loadLocalStorage() {
+    if (localStorage.length === 0) {
+      localStorageContent.textContent = 'LocalStorage vazio.';
+      return;
+    }
+    let content = '';
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      let value = localStorage.getItem(key);
+      try {
+        // tenta formatar JSON para melhor visualização
+        value = JSON.stringify(JSON.parse(value), null, 2);
+      } catch {
+        // valor normal
+      }
+      content += `${key}: ${value}\n\n`;
+    }
+    localStorageContent.textContent = content.trim();
+  }
+  clearLocalStorageBtn.addEventListener('click', () => {
+    if (confirm('Confirma limpar todo o LocalStorage?')) {
+      localStorage.clear();
+      loadLocalStorage();
+      addLog('LocalStorage limpo pelo usuário.');
+    }
+  });
+
+  // === Logs simples (exemplo) ===
+  // Simulando um log armazenado na memória local do script
+  let logs = [];
+
+  function addLog(text) {
+    const now = new Date().toLocaleTimeString();
+    logs.push(`[${now}] ${text}`);
+    if (logs.length > 30) logs.shift(); // mantém só os últimos 30 logs
+    if (panel.style.display === 'block') loadLogs();
+  }
+
+  const logsContent = document.getElementById('logsContent');
+  const clearLogsBtn = document.getElementById('clearLogsBtn');
+
+  function loadLogs() {
+    if (logs.length === 0) {
+      logsContent.textContent = 'Nenhum log registrado.';
+      return;
+    }
+    logsContent.textContent = logs.join('\n');
+  }
+  clearLogsBtn.addEventListener('click', () => {
+    if (confirm('Limpar todos os logs?')) {
+      logs = [];
+      loadLogs();
+    }
+  });
+
+  // === Fetch & IA usada (exemplo) ===
+  // Simulação de dados fetch e IA para demo
+  let fetchData = [];
+  let iaAtual = 'Nenhuma';
+
+  function addFetchData(url, iaName, responseSample) {
+    iaAtual = iaName;
+    const now = new Date().toLocaleTimeString();
+    fetchData.push(`[${now}] URL: ${url}\nIA: ${iaName}\nResposta: ${responseSample}`);
+    if (fetchData.length > 10) fetchData.shift();
+    if (panel.style.display === 'block') loadFetch();
+  }
+
+  const fetchContent = document.getElementById('fetchContent');
+  const iaUsedInfo = document.getElementById('iaUsedInfo');
+  const clearFetchBtn = document.getElementById('clearFetchBtn');
+
+  function loadFetch() {
+    if (fetchData.length === 0) {
+      fetchContent.textContent = 'Nenhum fetch recente.';
+      iaUsedInfo.textContent = 'IA atual: Nenhuma';
+      return;
+    }
+    fetchContent.textContent = fetchData.join('\n\n');
+    iaUsedInfo.textContent = 'IA atual: ' + iaAtual;
+  }
+  clearFetchBtn.addEventListener('click', () => {
+    if (confirm('Limpar dados de fetch?')) {
+      fetchData = [];
+      iaAtual = 'Nenhuma';
+      loadFetch();
+    }
+  });
+
+  // Exemplo de uso para testar (pode remover/editar)
+  addLog('Painel carregado.');
+  addFetchData('https://api.exemplo.com/gpt4', 'GPT-4', '{"result":"ok"}');
+
+  // Você pode criar funções para capturar seus fetch reais e IA em uso, e adicionar aqui
+  // Por exemplo, sobrescrever fetch para logar automaticamente, se quiser
+</script>
+<div class="center-group">
+<div class="logo-container" id="logoDual">
+<div style="position:absolute; inset:0; z-index:20; cursor:pointer;"></div>
+<object data="assets/icons/Dual-Orb-e2.png" type="image/png"></object>
+</div>
+<div class="infodose">dual.<strong>Infodose</strong></div>
+<div class="login-container" id="loginBox">
+<input id="user" placeholder="Usuário" required="" type="text"/>
+<input id="pass" placeholder="Senha" required="" type="password"/>
+<button class="btn-full" id="submitBtn">Entrar</button>
+<div> <!-- Botão de upload -->
+<button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
+<input accept="image/*" id="imgUpload" onchange="trocarImagem(event)" type="file"/>
+<input accept=".html" id="uploadHTML" style="display:none" type="file">
+<button id="uploadHTMLBtn">☍</button>
+</input></div>
+<div id="decoderBox">
+<input id="codeInput" placeholder="Digite o selo..." type="text"/>
+<button class="btn-full" onclick="decodeSymbolicCode()">Desbloquear</button>
+</div>
+<button id="toggleDecoderBtn">
+<img alt="SuS Logo" src="assets/icons/KBLX-pack/SuS-logo-1.PNG" style="height: 24px; vertical-align: middle;"/>
+</button>
+<div id="messageBox"></div>
+<div id="buyTokens">
+<button id="buyIFTBtn">Ativar 1.999 IFT (PIX)</button>
+</div>
+<div class="logout-area">
+<div class="username" id="loggedUsername"></div>
+<button class="btn-full" id="logoutBtn">Desconectar</button>
+</div>
+</div>
+</div>
+<script type="module">
+    const loginBox   = document.getElementById('loginBox');
+    const userInput  = document.getElementById('user');
+    const passInput  = document.getElementById('pass');
+    const submitBtn  = document.getElementById('submitBtn');
+    const messageBox = document.getElementById('messageBox');
+    const buyArea    = document.getElementById('buyTokens');
+    const buyBtn     = document.getElementById('buyIFTBtn');
+    const logoutArea = document.querySelector('.logout-area');
+    const logoutBtn  = document.getElementById('logoutBtn');
+    const loggedUser = document.getElementById('loggedUsername');
+    const logoDual   = document.getElementById('logoDual');
+    const storedKey  = 'infodose_user';
+
+    const decoderBox = document.getElementById('decoderBox');
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const uploadInput = document.getElementById('uploadHTML');
+    const uploadBtn   = document.getElementById('uploadHTMLBtn');
+
+    const USERS_JSON = 'users/usersid.json';
+    const PIX_LINK   = 'https://nubank.com.br/cobrar/55sr1/68379371-42e5-4f54-897c-805ae1be1b17';
+    
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBX": "menu-x-1.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "1991": "menu-x-1-E-19-E-9re-1.html",
+      "DBK": "dual-book-12.html",
+      "IMN": "index-manifestado.html",
+      "IMNN": "index-manifestado-tangle.html",
+      "BTS": "botao-simbolico.html",
+      "SBK": "SmbS-book-4.html",
+      "SBL": "SmbS-book-2.html",
+      "KDX": "menu-x-1-E-19-E-9_refatorado_final.html",
+      "KDI": "menu-integrado-kobllux.html",
+      "1992": "menu-x-1-E-19-E-9re-2.html",
+      "KDF": "menu-x-1-E-8.html",
+      "KDB": "menu-x-1-E-10.html",
+      "KDJ": "menu-x-1-E-19-E-9_renderresponse-final.html",
+      "HTM": "KBLX-HTML-v4.1-FULLSCREEN-SEPARADOR.html",
+      "MN6": "menu-x-1-E-6.html",
+      "MN7": "menu-x-1-E-7.html",
+      "MN8": "menu-x-1-E-8.html",
+      "MN9": "menu-x-1-E-9.html",
+      "MN10": "menu-x-1-E-10.html",
+      "MN11e": "menu-x-1-E-11e.html",
+      "MN12": "menu-x-1-E-12.html",
+      "MN13": "menu-final-com-pulso.html",
+      "MN14": "menu-pulso-final.html",
+      "MN15": "menu-x-1-E-15.html",
+      "19E9": "menu-x-1-E-19-E-9.html",
+      "19E10": "menu-x-1-E-19-E-10.html",
+      "19E11": "menu-x-1-E-19-E-11.html",
+      "MN19": "menu-x-1-E-19.html",
+      "19E8": "menu-x-1-E-19-E-8.html",
+      "19E0": "menu-x-1-E-19-E-0.html",
+      "19921": "menu-x-1-E-19-E-9re-2-1.html",
+      "19922": "menu-x-1-E-19-E-9re-2-2.html",
+      "19923": "menu-x-1-E-19-E-9re-2-3.html",
+      "19924": "menu-x-1-E-19-E-9re-2-4.html",
+      "19925": "menu-x-1-E-19-E-9re-2-5.html",
+      "19926": "menu-x-1-E-19-E-9re-2-6.html",
+      "19927": "menu-x-1-E-19-E-9re-2-7.html",
+      "19928": "menu-x-1-E-19-E-9re-2-8.html",
+      "9231": "menu-x-1-E-19-E-9-2re-3-1.html",
+      "9232": "menu-x-1-E-19-E-9-2re-3-2.html",
+      "9233": "menu-x-1-E-19-E-9-2re-3-3.html",
+      "9241": "menu-x-1-E-19-E-9-2re-4-1.html",
+      "9242": "menu-x-1-E-19-E-9-2re-4-2.html",
+      "9243": "menu-x-1-E-19-E-9-2re-4-3.html",
+      "9244": "menu-x-1-E-19-E-9-2re-4-4.html",
+
+      "920": "menu-x-1-E-19-E-9re-2-FINAL-0e-2-bgvar.html",
+      "92F0": "menu-x-1-E-19-E-9re-2-FINAL-0.html",
+      "F0E": "menu-x-1-E-19-E-9re-2-FINAL-0e.html",
+      "F01": "menu-x-1-E-19-E-9re-2-FINAL-0e-1.html",
+      "F02": "menu-x-1-E-19-E-9re-2-FINAL-0e-2.html",
+      "F03": "menu-x-1-E-19-E-9re-2-FINAL-0e-3.html",
+
+      "F30": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-0.html",
+      "F31": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-1.html",
+      "F32": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-2.html",
+      "F33": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-3.html",
+      "F34": "menu-x-1-E-19-E-9re-2-FINAL-0e-3e-4.html",
+      "F10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0.html",
+      "F11": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1.html",
+      "F12": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-2.html",
+      "F13": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-3.html",
+      "F14": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-4.html",
+      "F15": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-5.html",
+      "F16": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-6.html",
+      
+      "100": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-1-0.html",
+      "101": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ATUALIZADO.html",
+      "102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO.html",
+
+      "103": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-ANIMADO-INTEGRADO.html",
+      "104": "menu-x-KBLUX-SYM-renderResponse-GLOWED.html",
+      "105": "RENDERRESPONSE-refinado-MODIFICADO.html",
+      "106": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-RESPONSIVO-BOTOES.html",
+      "107": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-TRINITY-ARCHE.html",
+      
+      "108": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-0.html",
+      "109": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1.html",
+      "1102": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-2.html",
+      
+      "110": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0.html",
+      
+      "111": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-1.html",
+      "112": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-2.html",
+      "113": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-3.html",
+      "114": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-4.html",
+      "115": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-5.html",
+      "116": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-6.html",
+      "117": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-7.html",
+      "118": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-8.html",
+      "119": "dual-app-renderResponse-SEPARADA.html",
+      "120": "dual-app-renderResponse-UNIFICADA.html",
+      "121": "dual-app-renderResponse-UNIFICADA-COMPACTO.html",
+      "1000": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-0.html",
+    
+      "1001": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-1.html",
+      "1002": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2.html",
+      "1002A": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2a.html",
+      "1003": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-3.html",
+
+      "1008": "dualapp-renderResponse-Trinity-subblocos-integrado.html",
+      "1005": "menu-integrado-renderResponse-v1-final.html",
+      "1006": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-0.html",
+      
+      "AR1": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-1.html",
+      "AR2": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-2.html",
+      "AR3": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-3.html",
+      "AR4": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-4.html",
+      
+      "AR5": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-5.html",
+      "AR6": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6.html",
+      "AR7": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-7.html",
+      "AR8": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-8.html",
+      "AR9": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-9.html",
+      
+      "R10": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-10.html",
+      
+      "R60": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-0.html",
+      "R61": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-1.html",
+      "R62": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-2.html",
+      "R63": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3.html",
+
+      "R64": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-4.html",
+      "R65": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-5.html",
+      "R66": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-6.html",
+
+      "999": "dual-infodose-v3-toggle-advanced.html",
+      "666": "dual-infodose-v2-renderResponse-simbio-ajustado.html",
+      "333": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix.html",
+
+      "990": "dual-infodose-v3-refatorado-patch-0.html",
+      "991": "dual-infodose-v3-refatorado-patch-1.html",
+      "992": "dual-infodose-v3-refatorado-patch-2.html",
+      "E99": "dual-infodose-v3-refatorado-patch.html",
+
+      "993": "dual-infodose-v3-refatorado-patch-3.html",
+      "994": "dual-infodose-v3-refatorado-patch-4.html",
+      "995": "dual-infodose-v3-refatorado-patch-5.html",
+      "996": "dual-infodose-v3-refatorado-patch-6.html",
+      "997": "dual-infodose-v3-refatorado-patch-7.html",
+      "998y": "dual-infodose-v3-refatorado-patch-8.html",
+
+      "129": "dual-app-990e-12.html",
+      "139": "dual-app-990e-13.html",
+      "90e": "dual-app-990e.html",
+      "90": "dual-app-990.html",
+      
+      "139e": "dual-app-990e-13-E.html",
+      "149": "dual-app-990e-14.html",
+      "159": "dual-app-990e-15.html",
+      "169": "dual-app-990e-16.html",
+      "179": "dual-app-990e-17.html",
+      "189": "dual-app-990e-18.html",
+      "ADV": "ADV-gen.html",
+      
+      "R630": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-0.html",
+      "R631": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-1.html",
+      "R632": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3-voice-fix-2.html",
+      "R633": "menu-x-1-E-19-E-9re-2-FINAL-0e-1e-0-renderResponse-EDIT-1-0-2aR-6-3E-1.html",
+
+      "R16": "dual-app-990e-16-REFATORADO.html",
+      "R160": "dual-app-990e-16-RE-0.html",
+
+      "HTMN": "Editor-html-0.html",
+      "HTML": "Editor-html-1.html",
+      "HTMO": "Editor-html-2.html",
+      "pf": "pref-0.html",
+      
+      "vo": "App-da-vovo-0.html",
+      "vov": "App-da-vovo-1.html",
+      "vovo": "App-da-vovo-3.html",
+      
+      "git1": "KOBLLUX_git.html",
+      "git2": "KOBLLUX_git_2.html",
+      "full": "KOBLLUX_full.html",
+      
+      "G00": "gold-0.html",
+      "G01": "gold-1.html",
+      "G02": "gold-2.html",
+      "G03": "gold-3.html",
+      "G04": "gold-4.html",
+      "G05": "gold-5.html",
+      "G06": "gold-6.html",
+      "GD0": "game-of-life-dual-0.html",
+
+      
+      "MRR": "menu-RR.html",
+      "R90": "dual-infodose-v4-simbiose-final.html",
+
+"R169":"dual-app-990e-16_voice_only_voicebtn_fixed.html",
+    "1690":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH.html","1691":"dual-app-990e-16_injected.html","1692":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH_v2.html","1693":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH_v3.html","1694":"dual-app-990e-16_voice_only_voicebtn_fixed_SINGLEPAGE_PATCH_v4.html","1695":"dual-app-990e-16-refatorado.html","1696":"dual-app-990e-16-upload.html","1697":"dual-app-990e-16-upload-integrado.html","1698":"dual-app-990e-16_injected_with_ativacoes_synced.html",
+    "6900":"dual-app-990e-16-cleaned.html","6901":"dual-app-990e-16.min.html","6902":"dual-app-990e-16-singlefile-min-v2.html","6903":"dual-app-990e-16-singlefile-min.html","6904":"dual-app-990e-16-MASTER.html","6905":"dual-app-990e-16.SYMBOLIC-OFFLINE.html","6906":"dual-app-990e-16.MASTER+KOBLLUX.html","6907":"dual-app-990e-16.MASTER+DIAG.html","6908":"dual-app-990e-16.MASTER.html",
+    "6909":"metalux-font-only-0.html","6910":"metalux-font-only.html","6911":"metalux-font-first-BLUE.html","6912":"metalux-svg-only-BLUE.html","6913":"metalux-font-first.html","6914":"uploader.html","6915":"dual-app-990e-16.singlefile.html","6916":"dual-app-990e-16.MASTER+RUNES.html","6917":"dual-app-990e-16.cleaned.html","6918":"metalux-font-only-KOBLLUX.html",
+    "6920":"dual-app-990e-16.SuperPatch.v6.always.html","6921":"dual-app-990e-16.SuperPatch.v6.always.min.html","6922":"dual-app-990e-16.SuperPatch.v6.toggle.html","6923":"dual-app-990e-16.SuperPatch.v6.toggle.min.html",
+    "6924":"dual-app-990e-16.SuperPatch.v6.1.always.html","6925":"dual-app-990e-16.SuperPatch.v6.1.always.min.html","6926":"dual-app-990e-16.SuperPatch.v6.1.toggle.html","6927":"dual-app-990e-16.SuperPatch.v6.1.toggle.min.html",
+    "6928":"dual-app-990e-16.SuperPatch.v6.2.always.html","6929":"dual-app-990e-16.SuperPatch.v6.2.always.min.html","6930":"dual-app-990e-16.SuperPatch.v6.2.toggle.html","6931":"dual-app-990e-16.SuperPatch.v6.2.toggle.min.html",
+    "6932":"dual-app-990e-16.SuperPatch.v6.2.1.always.html","6933":"dual-app-990e-16.SuperPatch.v6.2.1.toggle.html",
+    "6934":"dual-app-990e-16.SuperPatch.v6.2.2.always.html","6935":"dual-app-990e-16.SuperPatch.v6.2.2.toggle.html",
+    "6936":"dual-app-990e-16.SuperPatch.v6.2.3.always.html","6937":"dual-app-990e-16.SuperPatch.v6.2.3.toggle.html",
+    "6938":"dual-app-990e-16.SuperPatch.v6.2.4.always.html","6939":"dual-app-990e-16.SuperPatch.v6.2.4.toggle.html",
+    "6940":"dual-app-990e-16.SuperPatch.v6.2.5.always.html","6941":"dual-app-990e-16.SuperPatch.v6.2.5.toggle.html",
+    "6942":"dual-app-990e-16.SuperPatch.v6.2.6.always.html","6943":"dual-app-990e-16.SuperPatch.v6.2.6.toggle.html",
+    "6944":"dual-app-990e-16.SuperPatch.v6.2.7.always.html","6945":"dual-app-990e-16.SuperPatch.v6.2.7.toggle.html",
+    "6946":"dual-app-990e-16.SuperPatch.v6.2.8.always.html","6947":"dual-app-990e-16.SuperPatch.v6.2.8.toggle.html",
+    "6948":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle.html","6949":"dual-app-990e-16.SuperPatch.v6.2.9.1.toggle.html","6950":"dual-app-990e-16.SuperPatch.v6.2.9.2.always.html","6951":"dual-app-990e-16.SuperPatch.v6.2.9.3.toggle.html","6952":"dual-app-990e-16.SuperPatch.v6.2.9.4.toggle.html",
+    "6953":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle-0.html","6954":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle-1.html","6955":"dual-app-990e-16.SuperPatch.v6.2.9.refine.toggle-2.html",
+    "6956":"dual-app.symbus-toggle-default-on.html","6957":"dual-app.symbus-toggle-default-on-0.html","6958":"dual-app.symbus-toggle-default-on.20250813-232847.html",
+    "Htmbl":"Template_Analyzer_Dual_0.html","htb1":"KOBLLUX-Pyodide-Foundry.html","htb2":"KOBLLUX-Pyodide-Foundry-v2.html","htb3":"KOBLLUX-Pyodide-Foundry-v3.html",
+    "Htmn":"Editor-html-0.html","Html":"Editor-html-1.html","ht":"Editor-html-2.html","pf":"pref-0.html",
+    "MRR":"menu-RR.html","R90":"dual-infodose-v4-simbiose-final.html",
+    
+    "T20": "Dual-App-T2-0.html",
+    "T21": "Dual-App-T2-0_pulso_v4_UNIFICADO_v7_keymgr.html",
+    "T22": "Dual-App-T2-0_pulso_v4_UNIFICADO_v7_keymgr_ACTIVATIONS.html",
+    "T23": "Dual-App-T2-0_pulso_UNIFICADO_v3a.html",
+    "T24": "Dual-App-T2-0_pulso_v4.html",
+    "T25": "Dual-App-T2-0_pulso_v5-etereo.html",
+    "T242": "Dual-App-T2-0_pulso_v4_UNIFICADO_v4b.html",
+    
+    "T26": "Dual-App-T2-0-R.html",
+    "T27": "Dual-App-T2-0.FINAL.html",
+    "T28": "Dual-App-T2-0.FINAL-0.html",
+    "T29": "Dual-App-T2-0.FINAL-1.html",
+    "T30": "Dual-App-T2-0-FINAL-2.html",
+    "T300": "Dual-App-T2-0-FINAL-2-0.html",
+    "T31": "Dual-App-T2-0-FINAL-2-1.html",
+    "T32": "Dual-App-T2-0-FINAL-2-2.html",
+    "T33": "Dual-App-T2-0-FINAL-2-3.html",
+    "T34": "Dual-App-T2-0-FINAL-2-4.html",
+    "T35": "Dual-App-T2-0-FINAL-2-5.html",
+    "T36": "Dual-App-T2-0-FINAL-2-6.html",
+    "T37": "Dual-App-T2-0-FINAL-2-7.html",
+    "T38": "Dual-App-T2-0-FINAL-2-8.html",
+    "T39": "Dual-App-T2-0-FINAL-2-9.html",
+    "T40": "Dual-App-T2-0-FINAL-2-1+KBLX.html",
+    "T41": "Dual-App-T2-0-FINAL-2-1+KBLX.Keys.html",
+    
+    "T42": "Dual-App-T2-0-FINAL-2-5+KBLX.Keys.Lib.html",
+    "T43": "Dual-App-T2-0-FINAL-2-5+KBLX.Lib.html",
+    "T44": "Dual-App-T2-0-FINAL-2-9+KBLX.Keys.Lib.html",
+    "T45": "Dual-App-T2-0-FINAL-2-9+KBLX.Lib.html",
+    
+    "T46": "Dual-App-T2-0-FINAL-2-9+KBLX.Lib.KODUX.Arche.v1.html",
+    "T47": "Dual-App-T2-0-FINAL-2-5+KBLX.Keys.Lib.KODUX.Arche.v1.html",
+    "T48": "Dual-App-T2-0-FINAL-2-5+KBLX.Lib.KODUX.Arche.v1.html",
+    "T49": "Dual-App-T2-0-FINAL-2-9+KBLX.Keys.Lib.KODUX.Arche.v1.html",
+    
+    "T50": "Dual-App-T2-0-FINAL-2-2_dualapp.html",
+    "T51": "Dual-App-T2-0-FINAL-2-2_dualapp_plus.html",
+    "T52": "Dual-App-T2-0-FINAL-2-2_dualapp_plus-1.html",
+    "T53": "a-infodose-horus_dualapp.html",
+    "T54": "Dual-App-T2-0-FINAL-2-2_dualapp_v22.html",
+    "T55": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_v22.html",
+    "T56": "a-infodose-horus_dualapp_plus_v22.html",
+    "T57": "Dual-App-T2-0-FINAL-2-2_dualapp_PLUS_v22_controlsbtn.html",
+    "T58": "KODUX-code-0.html",
+    "T59": "infodose_12x12_temas.html",
+    "T60": "SplashUI.html",
+    "T61": "Splash_PULSO_PERFEITO_FINAL_light.html",
+    "T62": "Dual-Infodose-Single.html",
+    
+    "menuz": "Dual-Infodose-Single-1.html",
+    "menos": "Dual-Infodose-Single.Neon.Custom.html",
+    "VR2": "Dual-Infodose-Single.Ver2.html",
+    "VRA": "Dual-Infodose-Single.MenuAlt.html",
+    "VRB": "Dual-Infodose-Single.MenuAlt.Loaders.html",
+    "VRC": "Dual-Infodose-Single.MenuAlt.Fixed+Workspace.html",
+    "VCD": "Dual-Infodose-Loaders.Futurized.html",
+    "VCE": "Dual-Infodose-Loaders.html",
+    "VCF": "Dual-Infodose-Loaders-Pill.html",
+    "VCG": "Dual-Infodose-Loaders.Futurized+Kobllux.html",
+    
+    "T2F0": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_focusbtn_v6_2_6_footersmall.html",
+    "T2F01": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_controls_hub_v6_2_6_footersmall.html",
+    "T2F02": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_compact_default_v6_2_6_footersmall.html",
+    "T2F03": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_6_footersmall.html",
+    "T2F04": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_focusbtn_personalize_gamevibe_v6_2_6_footersmall.html",
+    "T2F05": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_focusbtn_personalize_v6_2_6_footersmall.html",
+    "T2F06": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_focusbtn_personalize_gamevibe_adj_v6_2_6_footersmall.html",
+    "T2F07": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_sync_models_rr_v6_2_6_footersmall.html",
+    
+    "XO01": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_3_fixed.html",
+    "XO02": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_6_footersmall.html",
+    "XO03": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_4_pagesonly.html",
+    "XO04": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_7_clamp_iosfix.html",
+    "XO05": "Dual-App-T2-0-FINAL-2-2.SuperPatched.html",
+    "XO06": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_3_2_presets_official_hotkey_with_officials.html",
+    "XO07": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_7_clamp_iosfix.html",
+    "XO08": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_8_access.html",
+    "Xo09": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_9_diag.html",
+    "XO010": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_3_0_presets_rrv2.html",
+    
+    "K00": "Dual-App-T2-0-FINAL-2-2_dualapp_ZEN_TOTAL.html",
+    "K01": "Dual-App-T2-0-FINAL-2-2_dualapp_PATCHED.html",
+    "K02": "Dual-App-T2-0-FINAL-2-2_dualapp_PATCHED-0.html",
+    "K03": "Dual-App-T2-0-FINAL-2-2_dualapp_PATCHED_KEYPANEL.html",
+    "K04": "Dual-App-T2-0-FINAL-2-2_dualapp_ZEN_TOTAL_KEYPANEL.html",
+    "K05": "Dual-App-T2-0-FINAL-2-2_dualapp_v22_FOOTER_CLEAN_INLINE.html",
+    "K06": "Dual-App-T2-0-FINAL-2-2_dualapp_v22_FOOTER_CLEAN_EXTERNAL.html",
+    
+    "IO00": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_4_pagesonly_MEMv2_EXPAND_CSS.html",
+    "IO01": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_4_pagesonly_fixed.html",
+    "IO02": "Dual-App-T2-0-FINAL-2-2_dualapp_plus_patched_v6_2_4_pagesonly_MEMv1.html",
+    
+    "IO03": "DualApp_v6_2_5_AR.html",
+    "IO04": "DualApp_v6_2_6_AR_OPT.html",
+    "IO05": "DualApp_v6_2_8_AR_KEYS_RIGHT.html",
+    
+    "IO07": "DualApp_v6_2_14_AR_UPLOAD_CONTROLBTN_LAST.html",
+    "IO08": "DualApp_v6_2_14_AR_UPLOAD_LEFT_ORIGINAL.html",
+    "IO09": "DualApp_v6_2_14_AR_UPLOAD_CONTROLBTN_BETWEEN_PASTE_TOGGLE.html",
+    "IO10": "DualApp_v6_2_14_AR_UPLOAD_CONTROLBTN_LAST_GRADIENT.html",
+    "IO11": "DualApp_v6_2_14_AR_UPLOAD_CONTROLBTN_BETWEEN_PASTE_TOGGLE_GRADIENT.html",
+    "IO12": "DualApp_v6_2_14_AR_UPLOAD_LEFT_ORIGINAL_GRADIENT.html",
+    "IO13": "DualApp_v6_2_10_AR_SIDEBTN_HTML_REUP_FIX.html",
+    "IO14": "DualApp_v6_2_13_AR_SIDE_ALIGN_KEYS_FIRST.html",
+    "IO15": "DualApp_v6_2_9_AR_KEYS_RIGHT_CLEAN.html",
+    "IO16": "DualApp_v6_2_12_AR_SIDEBTN_HTML_SMALLER.html",
+        
+    "IO17": "Dual_APP_IO01_ON+V6btns_CENTER.html",
+    "IO18": "Dual_APP_IO01_ON+V6btns_END.html",
+    "IO010": "Dual_APP_IO01_ON.html",
+    "IOA0": "Infodose_Ativacoes_ASCII_ULTRA.html",
+    "IO19": "Dual_APP_IO01_ON+V6btns_INPUT.html",
+    "IO20": "Dual_APP_IO01_ON+V6btns_LATERAL.html",
+        
+    "IO21": "Dual_APP_IO01_ON+ScannerBtn_inside.html",
+    "IO22": "Dual_APP_IO01_ON+ScannerBtn_ultraSticky.html",
+    "IO23": "Dual_APP_IO01_ON+ScannerBtn_fixed.html",
+    "IO24": "KOBLLUX_Scanner_IO01.html",
+    "IO25": "Dual_APP_IO01_ON+ScannerLite_embedded.html",
+    "Io26": "Dual_APP_IO01_ON+ScannerBtn_fixed+CtrlIcon.html",
+    
+    "io27": "Dual_APP_v4_A11Y_PERF.html",
+    "io28": "Dual_APP_v1_BASE_TWEAK.html",
+    "io29": "Dual_APP_v2_THEME_REACTIVE.html",
+    "io30": "Dual_APP_IO01_ON_LUXARA_v1_4.html",
+    "io31": "Dual_APP_v3_ULTRA_PROCESSED.html",
+    "io32": "Dual_APP_IO01_ON_LUXARA_v1_2.html",
+    
+    "IO33": "Dual_APP_IO01_ON_LUXARA_v1_5.html",
+    "IO34": "Dual_APP_IO01_ON_LUXARA_OFFICIAL.html",
+        
+    "s00":"symbiote-editor.html",
+    "sv1":"symbiote-editor-pro.html",
+    "sv2":"symbiote-editor-pro-v2.html",
+    "sv3":"symbiote-editor-pro-v3.html",
+    "sv4":"symbiote-editor-pro-v4.html",
+    "sv5":"symbiote-editor-pro-v5.html",
+    "sv6":"symbiote-editor-pro-v6.html"
+
+
+    };
+
+    function playButtonSound() {
+      const sound = new Audio('assets/sounds/uiSamples/back-action.wav');
+      sound.volume = 0.7;
+      sound.play().catch(() => {});
+    }
+
+    toggleDecoderBtn.addEventListener('click', () => {
+  playButtonSound();
+
+  const isVisible = decoderBox.style.display === 'block';
+  decoderBox.style.display = isVisible ? 'none' : 'block';
+
+  // Animação fluida
+  gsap.fromTo(decoderBox,
+    { opacity: 0, y: -20 },
+    { opacity: isVisible ? 0 : 1, y: 0, duration: 0.4, ease: "power2.out" }
+  );
+});
+
+    uploadBtn.addEventListener('click', () => {
+      playButtonSound();
+      uploadInput.click();
+    });
+
+    uploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+
+    const blob = new Blob([content], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+
+    alert('Página carregada com sucesso! Redirecionando...');
+
+    setTimeout(() => {
+      window.location.href = blobUrl;
+    }, 1000);
+  };
+  reader.readAsText(file);
+      } else {
+        alert("Por favor, selecione um arquivo .html válido.");
+      }
+    });
+
+    window.decodeSymbolicCode = () => {
+  playButtonSound();
+
+  const code = document.getElementById('codeInput').value.trim().toUpperCase();
+  const dest = CODE_MAP[code];
+
+  if (dest) {
+  const audio = new Audio('assets/sounds/uiSounds/SmbS_KBL_vox.wav');
+  audio.volume = 0.6;
+  audio.play().catch(() => {});
+  
+  gsap.to('.logo-container', { scale: 0.8, duration: 0.9, ease: 'power3.out' });
+  gsap.to('.infodose', { scale: 0, duration: 0.9, ease: 'power3.out' });
+  gsap.to('.loginBox', { opacity: 0, y: -20, duration: 0.6 });
+  gsap.to('body', {
+    opacity: 0,
+    duration: 0.9,
+    delay: 0,
+    ease: 'power2.inOut',
+    onComplete: () => {
+      setTimeout(() => {
+        window.location.href = dest;
+      }, 9); // tempo extra para terminar áudio
+    }
+  });
+} else {
+    alert('Selo desconhecido ou não registrado.');
+  }
+};
+
+    const goToIndex = () => {
+      const audio = new Audio('assets/sounds/suave_portal.mp3');
+      audio.volume = 1;
+      audio.play().catch(() => {});
+      gsap.to('.logo-container', { scale: 0, duration: 1.4, ease: 'power3.out' });
+      gsap.to('.infodose', { opacity: 0, duration: 0.6 });
+      gsap.to('.loginBox', { opacity: 0, duration: 0.4 });
+      setTimeout(() => { window.location.href = 'index.html'; }, 1399);
+    };
+
+    const lockScroll = () => {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.documentElement.style.height = '100vh';
+      document.body.style.height = '100vh';
+      window.scrollTo(0, 0);
+    };
+
+    function showLoginUI() {
+      loginBox.classList.add('active');
+      userInput.style.display  = '';
+      passInput.style.display  = '';
+      submitBtn.style.display  = '';
+      logoutArea.style.display = 'none';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    function showLogoutUI(user) {
+      loginBox.classList.add('active');
+      userInput.style.display  = 'none';
+      passInput.style.display  = 'none';
+      submitBtn.style.display  = 'none';
+      logoutArea.style.display = 'block';
+      loggedUser.textContent   = user ? `${user}` : '';
+      buyArea.style.display    = 'none';
+      messageBox.style.display = 'none';
+    }
+
+    window.addEventListener('load', () => {
+      lockScroll();
+      const stored = localStorage.getItem(storedKey);
+      stored ? showLogoutUI(stored) : showLoginUI();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      const rawUser = userInput.value.trim();
+      const u = rawUser.toLowerCase();
+      const p = passInput.value.trim();
+      if (!u || !p) {
+        showLoginUI();
+        messageBox.textContent = 'Por favor, preencha usuário e senha.';
+        messageBox.style.display = 'block';
+        return;
+      }
+      try {
+        const res   = await fetch(USERS_JSON);
+        if (!res.ok) throw new Error('Falha ao carregar credenciais.');
+        const creds = await res.json();
+        if (creds[u] && creds[u] === p) {
+          localStorage.setItem(storedKey, rawUser);
+          goToIndex();
+        } else {
+          showLoginUI();
+          messageBox.textContent = creds[u] ? 'Senha incorreta para usuário mestre.' : 'Usuário ainda não conectado com o pulso.';
+          messageBox.style.display = 'block';
+          buyArea.style.display = 'block';
+        }
+      } catch (err) {
+        showLoginUI();
+        messageBox.textContent = err.message;
+        messageBox.style.display = 'block';
+        buyArea.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem(storedKey);
+      showLoginUI();
+    });
+
+    logoDual.addEventListener('click', () => {
+      const user = localStorage.getItem(storedKey);
+      if (user) goToIndex();
+    });
+
+    buyBtn.addEventListener('click', () => {
+      window.location.href = PIX_LINK;
+    });
+
+    
+  </script>
+<style>
+     body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      /*background: transparent;*/
+    }
+
+    .fake-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover; /* ou 'contain' se quiser ver tudo */
+      object-position: center;
+      z-index: -2;
+      opacity: 0.24; /* ajusta a transparência */
+      pointer-events: none; /* deixa os cliques passarem por ela */
+      transition: opacity 0.5s ease;
+    }
+
+    
+
+    #imgUpload {
+      display: none;
+    }
+  </style>
+<!-- IMG como plano de fundo fake 
+  particlesJS('particles-js', {
+      particles: {
+        number:{value:48,density:{enable:true,value_area:600}},
+        color:{value:['#0ff','#f0f']},
+        shape:{type:'circle'},
+        opacity:{value:0.4,random:true},
+        size:{value:3,random:true},
+        move:{enable:true,speed:1.2,random:true,out_mode:'out'}
+      },
+      retina_detect:true
+    }); 
+  -->
+<img alt="" class="fake-bg" id="bgImage" src="about:blank">
+<!-- Botão que alterna exibição de login/logout e visor; foi reposicionado 60px acima da borda -->
+<button id="openBgOptionsBtn" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); border:1px var(--bg); color:var(--text); background:rgba(0,0,0,0.3); padding:3px; border-radius:50%;" title="Ocultar/mostrar interface">👁</button>
+<!-- painel de opções -->
+<div id="userBgOptions" style="display:none; flex-direction:column; gap:8px; background:rgba(0,0,0,0.8); padding:10px; border-radius:8px; max-width:320px;">
+<!-- SEU botão (exatamente como pediu) -->
+<button class="upload-btn" onclick="document.getElementById('imgUpload').click()">⧈</button>
+<input accept="image/*" id="imgUpload" onchange="trocarImagem(event)" style="display:none;" type="file"/>
+<button id="cycleBtn">🔁 Ciclar</button>
+<button id="clearHistoryBtn" style="background:#c00; color:#fff;">🗑 Limpar histórico</button>
+<div id="bgHistory" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:6px;"></div>
+</div>
+<!-- elemento de fundo (seu bg) -->
+<script>
+/* --- Keys --- */
+const BG_KEY = "bgImageSource";
+const BG_HISTORY_KEY = "bgImageHistory";
+const FILTER_KEY = "bgImageFilter";
+
+/* --- Imagens fixas --- */
+const imagensFixas = [
+  'assets/styles/themes/bgs/duals/Pill-dual_9125.JPG',
+  'assets/styles/themes/bgs/Nebula-Galaxy.png',
+  'assets/styles/themes/bgs/Circuit-Spirit.jpg',
+  'assets/styles/themes/bgs/Temple-Net.png'
+];
+
+let indexAtual = 0;
+
+/* --- DOM --- */
+const bg = document.getElementById('bgImage');
+const cycleBtn = document.getElementById('cycleBtn');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+const bgHistoryContainer = document.getElementById('bgHistory');
+const userBgOptions = document.getElementById('userBgOptions');
+const openBgOptionsBtn = document.getElementById('openBgOptionsBtn');
+
+/* --- util --- */
+function logMistico(msg) {
+  if (window.logMistico) window.logMistico(msg);
+  else console.log("◉", msg);
+}
+
+/* --- toggle painel --- */
+function toggleUserOptions() {
+  userBgOptions.style.display = (userBgOptions.style.display === 'flex') ? 'none' : 'flex';
+}
+// O botão openBgOptionsBtn agora controla a exibição do login e do visor, além de alternar seu próprio ícone.
+let uiHidden = false;
+openBgOptionsBtn.addEventListener('click', () => {
+  uiHidden = !uiHidden;
+  const loginBoxEl = document.getElementById('loginBox');
+  const logoutAreaEl = document.querySelector('.logout-area');
+  if (loginBoxEl) {
+    loginBoxEl.style.display = uiHidden ? 'none' : '';
+  }
+  if (logoutAreaEl) {
+    logoutAreaEl.style.display = uiHidden ? 'none' : '';
+  }
+  // Esconde/mostra o botão do visor, se existir
+  const visorBtn = document.getElementById('kblxPeopleBtn');
+  if (visorBtn) {
+    visorBtn.style.display = uiHidden ? 'none' : '';
+  }
+  // Atualiza o texto do ícone do botão (olho aberto ou macaco escondendo os olhos)
+  openBgOptionsBtn.textContent = uiHidden ? '🙈' : '👁';
+  // Se a interface for ocultada, feche o painel de BG se estiver aberto
+  if (uiHidden) {
+    if (userBgOptions) {
+      userBgOptions.style.display = 'none';
+    }
+  }
+});
+
+/* -------------------------
+   Função de upload (vinda sua)
+   ------------------------- */
+function trocarImagem(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataURL = e.target.result;
+
+    // usa setBG para salvar e adicionar ao histórico
+    setBG(dataURL, true);
+
+    logMistico("Imagem BG atualizada 🖼️ (via trocarImagem)");
+    // limpa input para permitir re-upload do mesmo arquivo depois
+    event.target.value = "";
+  };
+  reader.readAsDataURL(file);
+}
+
+/* --- Carregar usuário / histórico --- */
+function loadUserBG() {
+  const savedSrc = localStorage.getItem(BG_KEY) || imagensFixas[0];
+  const savedFilter = localStorage.getItem(FILTER_KEY) || 'none';
+  bg.src = savedSrc;
+  bg.style.filter = savedFilter;
+  renderHistory();
+}
+
+/* --- Ciclar fixas --- */
+cycleBtn.addEventListener('click', () => {
+  indexAtual = (indexAtual + 1) % imagensFixas.length;
+  setBG(imagensFixas[indexAtual], true); // também salva no histórico
+  logMistico("🔁 BG ciclado");
+});
+
+/* --- Limpar histórico --- */
+clearHistoryBtn.addEventListener('click', () => {
+  if (!confirm("Tem certeza que deseja apagar todo o histórico de imagens?")) return;
+  localStorage.removeItem(BG_HISTORY_KEY);
+  // resetar para a primeira fixa (opcional)
+  localStorage.setItem(BG_KEY, imagensFixas[0]);
+  bg.src = imagensFixas[0];
+  renderHistory();
+  logMistico("🗑 Histórico de BG apagado");
+});
+
+/* --- Definir BG e salvar no histórico --- */
+function setBG(src, salvarHistorico = false) {
+  bg.src = src;
+  localStorage.setItem(BG_KEY, src);
+
+  if (salvarHistorico) {
+    let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+    // evita duplicatas
+    if (!history.includes(src)) {
+      history.push(src);
+      localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history));
+    }
+    renderHistory();
+  }
+}
+
+/* --- Renderizar miniaturas do histórico --- */
+function renderHistory() {
+  bgHistoryContainer.innerHTML = "";
+  const history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+
+  history.forEach(src => {
+    const thumb = document.createElement("img");
+    thumb.src = src;
+    thumb.style.width = "58px";
+    thumb.style.height = "38px";
+    thumb.style.objectFit = "cover";
+    thumb.style.cursor = "pointer";
+    thumb.style.border = "2px solid transparent";
+    thumb.style.borderRadius = "4px";
+
+    thumb.addEventListener("click", () => {
+      setBG(src, false); // não duplica no histórico ao escolher
+      logMistico("📷 BG trocado via histórico");
+    });
+
+    // botão de remover miniatura individual (opcional)
+    const wrap = document.createElement("div");
+    wrap.style.position = "relative";
+    wrap.style.display = "inline-block";
+    wrap.appendChild(thumb);
+
+    const rm = document.createElement("button");
+    rm.textContent = "✕";
+    rm.title = "Remover";
+    rm.style.position = "absolute";
+    rm.style.top = "-6px";
+    rm.style.right = "-6px";
+    rm.style.width = "18px";
+    rm.style.height = "18px";
+    rm.style.border = "none";
+    rm.style.borderRadius = "50%";
+    rm.style.fontSize = "11px";
+    rm.style.cursor = "pointer";
+    rm.style.background = "rgba(0,0,0,0.6)";
+    rm.style.color = "#fff";
+    rm.addEventListener("click", (ev) => {
+      ev.stopPropagation();
+      removeFromHistory(src);
+    });
+
+    wrap.appendChild(rm);
+    bgHistoryContainer.appendChild(wrap);
+  });
+}
+
+/* --- Remover item do histórico --- */
+function removeFromHistory(src) {
+  let history = JSON.parse(localStorage.getItem(BG_HISTORY_KEY)) || [];
+  history = history.filter(s => s !== src);
+  localStorage.setItem(BG_HISTORY_KEY, JSON.stringify(history));
+  renderHistory();
+  logMistico("🗑 Miniatura removida do histórico");
+}
+
+/* --- init --- */
+window.addEventListener('load', loadUserBG);
+</script>
+<script>
+  const toggleMiniPlayer = document.getElementById("toggleMiniPlayer");
+  const iframeWrapper = document.getElementById("iframeWrapper");
+
+  let showing = false;
+  toggleMiniPlayer.addEventListener("click", () => {
+    showing = !showing;
+    iframeWrapper.style.display = showing ? "block" : "none";
+    toggleMiniPlayer.innerText = showing ? "💊" : "💊";
+  });
+</script>
+<!-- Botão que abre o visor integrado (KBLX People) -->
+<button id="kblxPeopleBtn" style="position:fixed; top:166px; left:50%; transform:translateX(-50%); z-index:10001; padding:10px; border-radius:50%; border:none; cursor:pointer; background:linear-gradient(135deg, rgba(0,216,216,0.85), rgba(216,0,216,0.85)); box-shadow:0 10px 30px rgba(0,0,0,.45); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);" title="Abrir Visor Integrado">
+<span aria-hidden="true" class="di-loader">
+<span class="di-ring"></span>
+<span class="di-stroke"></span>
+<span class="di-dots">
+<i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i>
+<i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i>
+</span>
+</span>
+</button>
+<!-- Overlay e iFrame do visor integrado -->
+<div id="kblxIframeOverlay" style="position:fixed; inset:0; display:none; z-index:2000; background:rgba(0,0,0,0.55);">
+<div id="kblxIframeBox" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:88vw; max-width:400px; height:72vh; background:rgba(0,0,0,0.35); border-radius:16px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.45); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.08);">
+<header id="kblxDragBar" style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 12px; color:#fff; background:linear-gradient(90deg, rgba(0,255,255,.22), rgba(255,0,255,.16)); cursor:move;">
+<span class="title">Visor Integrado</span>
+<span style="flex:1;"></span>
+<button id="kblxIframeReload" style="background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;" title="Recarregar">↻</button>
+<button id="kblxIframePop" style="background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;" title="Abrir em nova guia">⤴︎</button>
+<button aria-label="Fechar" id="kblxIframeClose" style="background:transparent; color:#fff; border:none; font-size:18px; cursor:pointer; padding:4px 8px;">×</button>
+</header>
+<iframe id="kblxIframe" loading="lazy" referrerpolicy="no-referrer" src="about:blank" style="width:100%; height:calc(72vh - 46px); border:0; display:block; background:#000;"></iframe>
+<div id="kblxResize" style="position:absolute; right:0; bottom:0; width:20px; height:20px; cursor:nwse-resize; background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,.35) 51%); opacity:.65;" title="Redimensionar"></div>
+</div>
+</div>
+<script>
+  (function() {
+    const PREFERRED = 'Ativar_Dual_Gen_MASTER_headerContrast_unicodeCards_signatures_refined_hover_unjection.html';
+    const btn = document.getElementById('kblxPeopleBtn');
+    const overlay = document.getElementById('kblxIframeOverlay');
+    const iframe = document.getElementById('kblxIframe');
+    const reloadBtn = document.getElementById('kblxIframeReload');
+    const popBtn = document.getElementById('kblxIframePop');
+    const closeBtn = document.getElementById('kblxIframeClose');
+    function show() {
+      if (overlay) overlay.style.display = 'block';
+    }
+    function hide() {
+      if (overlay) overlay.style.display = 'none';
+    }
+    window.kblxOpenVisor = function(url) {
+      if (url) {
+        iframe.src = url;
+      }
+      show();
+    };
+    if (btn) {
+      btn.addEventListener('click', () => {
+        if (!iframe.src || iframe.src === 'about:blank') {
+          window.kblxOpenVisor(PREFERRED);
+        } else {
+          if (overlay.style.display === 'block') {
+            hide();
+          } else {
+            show();
+          }
+        }
+      });
+    }
+    if (closeBtn) {
+      closeBtn.addEventListener('click', hide);
+    }
+    if (reloadBtn) {
+      reloadBtn.addEventListener('click', () => {
+        try {
+          iframe.contentWindow.location.reload();
+        } catch (e) {
+          iframe.src = iframe.src;
+        }
+      });
+    }
+    if (popBtn) {
+      popBtn.addEventListener('click', () => {
+        window.open(iframe.src || PREFERRED, '_blank');
+      });
+    }
+  })();
+  </script>
+<style>
+/* Skins pro di-loader (visor) — mais lentas */
+.di-loader.skin-a .di-ring {
+  animation-duration: 12s; /* antes 6s */
+  filter: drop-shadow(0 0 8px rgba(0,255,255,.35)) drop-shadow(0 0 12px rgba(255,0,255,.25));
+}
+.di-loader.skin-a .di-stroke { opacity:.9 }
+
+.di-loader.skin-b .di-ring {
+  animation-duration: 6.4s; /* antes 3.2s */
+  filter: saturate(140%) blur(.2px);
+}
+.di-loader.skin-b .di-dots i {
+  transform: rotate(calc(var(--i)*51deg)) translate(calc(9px + var(--i)*2.6px)) rotate(calc(var(--i)*-51deg));
+}
+
+.di-loader.skin-c .di-ring { animation-duration: 17s; /* antes 8.5s */ }
+.di-loader.skin-c .di-stroke { animation-duration: 3.2s; /* antes 1.6s */ }
+.di-loader.skin-c .di-dots { animation: di-orbit 11.2s linear infinite; /* antes 5.6s */ }
+
+.di-loader.skin-d .di-ring { animation-duration: 4.4s; /* antes 2.2s */ }
+.di-loader.skin-d .di-stroke { opacity:.6 }
+
+@media (prefers-reduced-motion:reduce){
+  .di-loader.skin-a .di-ring,
+  .di-loader.skin-b .di-ring,
+  .di-loader.skin-c .di-ring,
+  .di-loader.skin-d .di-ring { animation: none !important; }
+}
+</style>
+<script>
+/* Visor: clique alterna skins do di-loader, sem afetar o open/close */
+(function(){
+  const btn = document.getElementById('kblxPeopleBtn');
+  if (!btn) return;
+
+  const skins = ['skin-a','skin-b','skin-c','skin-d'];
+
+  function getLoader(){
+    return btn.querySelector('.di-loader');
+  }
+  function currentSkinIndex(loader){
+    const cls = loader.className;
+    for (let i=0;i<skins.length;i++){
+      if (cls.includes(skins[i])) return i;
+    }
+    return -1;
+  }
+  function applySkin(loader, idx){
+    skins.forEach(s => loader.classList.remove(s));
+    loader.classList.add(skins[idx]);
+    // micro tap feedback
+    btn.animate(
+      [{ transform:'translateX(-50%) scale(1)' }, { transform:'translateX(-50%) scale(1.06)' }, { transform:'translateX(-50%) scale(1)' }],
+      { duration:180, easing:'ease-out' }
+    );
+  }
+
+  // inicializa com skin-a se nenhuma
+  const init = () => {
+    const loader = getLoader();
+    if (!loader) return;
+    if (currentSkinIndex(loader) === -1) loader.classList.add('skin-a');
+
+    // clique/touch alterna
+    const advance = (e) => {
+      // se o clique veio do overlay open/close, não impedir; só troca skin também
+      const l = getLoader();
+      if (!l) return;
+      const i = currentSkinIndex(l);
+      const next = (i + 1) % skins.length;
+      applySkin(l, next);
+    };
+
+    btn.addEventListener('click', advance);       // além de abrir/fechar o visor, já troca skin
+    btn.addEventListener('touchend', advance, { passive:true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+<script>
+/* Visor: clique alterna skins do di-loader, sem afetar o open/close */
+(function(){
+  const btn = document.getElementById('kblxPeopleBtn');
+  if (!btn) return;
+
+  const skins = ['skin-a','skin-b','skin-c','skin-d'];
+
+  function getLoader(){
+    return btn.querySelector('.di-loader');
+  }
+  function currentSkinIndex(loader){
+    const cls = loader.className;
+    for (let i=0;i<skins.length;i++){
+      if (cls.includes(skins[i])) return i;
+    }
+    return -1;
+  }
+  function applySkin(loader, idx){
+    skins.forEach(s => loader.classList.remove(s));
+    loader.classList.add(skins[idx]);
+    // micro tap feedback
+    btn.animate(
+      [{ transform:'translateX(-50%) scale(1)' }, { transform:'translateX(-50%) scale(1.06)' }, { transform:'translateX(-50%) scale(1)' }],
+      { duration:180, easing:'ease-out' }
+    );
+  }
+
+  // inicializa com skin-a se nenhuma
+  const init = () => {
+    const loader = getLoader();
+    if (!loader) return;
+    if (currentSkinIndex(loader) === -1) loader.classList.add('skin-a');
+
+    // clique/touch alterna
+    const advance = (e) => {
+      // se o clique veio do overlay open/close, não impedir; só troca skin também
+      const l = getLoader();
+      if (!l) return;
+      const i = currentSkinIndex(l);
+      const next = (i + 1) % skins.length;
+      applySkin(l, next);
+    };
+
+    btn.addEventListener('click', advance);       // além de abrir/fechar o visor, já troca skin
+    btn.addEventListener('touchend', advance, { passive:true });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</img>
+<section class="kdx-logs" id="kdxLogsPanel">
+<h2>📜 Logs do App</h2>
+<pre id="kdxLogsContent">Nenhum log.</pre>
+<textarea id="kdxLogsEditor" placeholder="Edite os logs aqui, uma entrada por linha"></textarea>
+<div class="row">
+<button class="btn" id="kdxEditLogsBtn">Editar</button>
+<button class="btn" id="kdxSaveLogsBtn" style="display:none">Salvar</button>
+<button class="btn" id="kdxClearLogsBtn">Limpar</button>
+<button class="btn" id="kdxExportLogsBtn">Exportar .txt</button>
+<button class="btn" id="kdxImportLogsBtn">Importar .txt</button>
+</div>
+</section>
+<script>
+(function(){
+  const storeKey = "app.logs";
+  const pre = document.getElementById("kdxLogsContent");
+  const ta  = document.getElementById("kdxLogsEditor");
+  const btnEdit  = document.getElementById("kdxEditLogsBtn");
+  const btnSave  = document.getElementById("kdxSaveLogsBtn");
+  const btnClear = document.getElementById("kdxClearLogsBtn");
+  const btnExport= document.getElementById("kdxExportLogsBtn");
+  const btnImport= document.getElementById("kdxImportLogsBtn");
+
+  // Read logs source: prefer window.logs (array), fallback to LS string[]
+  function readLogs(){
+    try{
+      if (Array.isArray(window.logs)) return [...window.logs];
+    }catch(_){}
+    try{
+      const raw = localStorage.getItem(storeKey);
+      if(!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr : [];
+    }catch(_){ return []; }
+  }
+  function writeLogs(arr){
+    // try update window.logs
+    try{ if(Array.isArray(window.logs)){ window.logs.length = 0; arr.forEach(x=>window.logs.push(x)); } }catch(_){}
+    // always persist LS
+    try{ localStorage.setItem(storeKey, JSON.stringify(arr)); }catch(_){}
+  }
+
+  function render(){
+    const L = readLogs();
+    pre.textContent = L.length ? L.join("\n") : "Nenhum log.";
+  }
+
+  // Edit
+  btnEdit && btnEdit.addEventListener("click", ()=>{
+    ta.style.display = "block";
+    ta.value = readLogs().join("\n");
+    btnSave.style.display = "inline-flex";
+    btnEdit.style.display = "none";
+  });
+
+  // Save
+  btnSave && btnSave.addEventListener("click", ()=>{
+    const arr = ta.value.split("\n").map(s=>s.trim()).filter(Boolean);
+    writeLogs(arr);
+    ta.style.display = "none";
+    btnSave.style.display = "none";
+    btnEdit.style.display = "inline-flex";
+    render();
+    // optional: dispatch event so app can react
+    document.dispatchEvent(new CustomEvent("kdx:logs:edited", {detail:{count:arr.length}}));
+  });
+
+  // Clear
+  btnClear && btnClear.addEventListener("click", ()=>{
+    writeLogs([]);
+    render();
+  });
+
+  // Export
+  btnExport && btnExport.addEventListener("click", ()=>{
+    const blob = new Blob([ (readLogs().join("\n") || "") ], {type:"text/plain"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "logs.txt";
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
+  });
+
+  // Import
+  btnImport && btnImport.addEventListener("click", async ()=>{
+    try{
+      const inp = document.createElement("input");
+      inp.type = "file"; inp.accept = ".txt,text/plain";
+      inp.onchange = async ()=>{
+        const file = inp.files && inp.files[0];
+        if(!file) return;
+        const txt = await file.text();
+        const arr = txt.split("\n").map(s=>s.trim()).filter(Boolean);
+        writeLogs(arr);
+        render();
+      };
+      inp.click();
+    }catch(_){}
+  });
+
+  // Initial
+  document.addEventListener("DOMContentLoaded", render);
+  render();
+})();
+</script></body>
+</html>

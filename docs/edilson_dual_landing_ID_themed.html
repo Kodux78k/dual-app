@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="luxara">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nutrilis × Infodose — EDILSON DUAL</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#F4D26B">
+<style>
+  :root{ --radius: 16px; --txt: #EEE6D5; --muted: rgba(255,255,255,.85); --stroke: rgba(255,255,255,.14); }
+  html[data-theme="luxara"] { --bg-a:#0b0b12; --bg-b:#08080d; --accent1:#F4D26B; --accent2:#8C6A21; --card-a:rgba(255,255,255,.06); --card-b:rgba(255,255,255,.03); --shadow:0 16px 44px rgba(0,0,0,.55) }
+  html[data-theme="ignyra"] { --bg-a:#140505; --bg-b:#090202; --accent1:#FF3C3C; --accent2:#FF8800; --card-a:rgba(255,60,60,.10); --card-b:rgba(255,136,0,.06); --shadow:0 18px 55px rgba(255,60,60,.22), 0 14px 40px rgba(255,136,0,.18) }
+  html[data-theme="neon"] { --bg-a:#0a0a10; --bg-b:#05050a; --accent1:#00FFFF; --accent2:#FF00FF; --card-a:rgba(0,255,255,.10); --card-b:rgba(255,0,255,.06); --shadow:0 16px 44px rgba(0,0,0,.55) }
+
+  *{box-sizing:border-box} html,body{height:100%}
+  body{ margin:0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color:var(--txt);
+        background: radial-gradient(120% 120% at 50% 0%, var(--bg-a) 0%, var(--bg-b) 60%, #000 100%); }
+  a{ color:var(--accent1); text-decoration:none }
+  header{ position:sticky; top:0; z-index:10; padding:12px 16px; border-bottom:1px solid var(--stroke);
+          background: linear-gradient(90deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); backdrop-filter: blur(10px) }
+  .wrap{ min-height:100dvh; display:grid; grid-template-rows: auto 1fr auto }
+  .container{ width:min(100%, 1020px); margin:0 auto; padding:16px }
+  .brand{ display:flex; align-items:center; gap:12px }
+  .badge{ width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
+          background: linear-gradient(45deg, var(--accent1), var(--accent2)); color:#0b0b12; font-weight:900 }
+  .seg{ padding:8px 12px; border-radius:999px; border:1px solid var(--stroke); background:rgba(0,0,0,.35);
+        color:var(--txt); font-weight:800; cursor:pointer; margin-left:6px }
+  .seg.active{ background: linear-gradient(45deg, var(--accent1), var(--accent2)); color:#0b0b12 }
+  h1{ margin:0; color:var(--accent1); font-size: clamp(22px, 5.5vw, 36px) }
+  h2{ margin:0 0 8px 0; color:var(--accent1); font-size: clamp(18px, 4.6vw, 24px) }
+  p{ margin:6px 0; color:var(--muted) }
+
+  .card{ background: linear-gradient(180deg, var(--card-a), var(--card-b)); border:1px solid var(--stroke);
+         border-radius: var(--radius); padding:14px; box-shadow: var(--shadow); backdrop-filter: blur(12px) }
+  .grid{ display:grid; gap:12px }
+  .hero{ text-align:center; padding:24px 0 }
+  .halo{ width:164px; height:164px; margin:10px auto; border-radius:50%; border:2px dashed rgba(255,255,255,.2);
+         display:grid; place-items:center; font-weight:900; letter-spacing:.18em; color:var(--accent1);
+         background: conic-gradient(from 0deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+         box-shadow: 0 0 24px rgba(0,0,0,.35), 0 0 28px rgba(255,255,255,.06); animation: spin 10s linear infinite }
+  @keyframes spin{ to{ transform: rotate(360deg) } }
+
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
+        padding:12px; border-radius:12px; border:1px solid var(--stroke); background:rgba(0,0,0,.35);
+        color:var(--txt); font-weight:800; cursor:pointer; text-decoration:none; transition:.18s }
+  .btn.grad{ color:#0b0b12; border-color:transparent; background: linear-gradient(45deg, var(--accent1), var(--accent2)) }
+  .btn:hover{ transform: translateY(-1px) }
+
+  .filecard{ display:flex; align-items:center; gap:12px; padding:10px; border:1px dashed var(--stroke); border-radius:12px }
+  .fileicon{ width:38px; height:38px; border-radius:10px; display:grid; place-items:center; color:#0b0b12; font-weight:900;
+             background: linear-gradient(45deg, var(--accent1), var(--accent2)) }
+  .meta small{ opacity:.8 }
+
+  .bubbles{ display:grid; gap:10px }
+  .bubble{ position:relative; padding:12px; border-radius:16px; background:rgba(0,0,0,.35); border:1px solid var(--stroke) }
+  .bubble:after{ content:''; position:absolute; left:18px; bottom:-10px; border:10px solid transparent; border-top-color: var(--stroke) }
+  .bubble h3{ margin:0 0 6px 0; color:var(--accent1); font-size:1rem }
+  .bubble .dose{ display:inline-block; margin-top:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--stroke) }
+
+  pre{ white-space: pre-wrap; background: rgba(0,0,0,.28); border:1px solid var(--stroke); border-radius:12px; padding:12px; min-height:160px }
+  .footline{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap }
+
+  @media (min-width: 920px) { .split{ display:grid; grid-template-columns: 1fr 1fr; gap:12px } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:12px">
+      <div class="brand">
+        <div class="badge">⚡</div>
+        <div>
+          <strong>Nutrilis × Infodose</strong><br>
+          <small>Pesquisa do EDILSON • DUAL</small>
+        </div>
+      </div>
+      <div>
+        <button class="seg active" data-theme="luxara">Luxara</button>
+        <button class="seg" data-theme="ignyra">Ignyra</button>
+        <button class="seg" data-theme="neon">Neon</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <div class="halo">DUAL</div>
+      <h1>Central de Pesquisa do Edilson</h1>
+      <p>Conecta os teus arquivos (Caibalion, Estoicos, Origem da Humanidade, Poder da Mente, Dirac) com <b>doses</b> práticas — estilo Nutrilis × Infodose.</p>
+      <div class="grid" style="margin-top:10px">
+        <a class="btn grad" id="btnInstall">Instalar como App</a>
+        <a class="btn" href="#caibalion">Abrir Balões do Caibalion 🐴</a>
+      </div>
+    </section>
+
+    <section class="container split">
+      <div class="card">
+        <h2>Arquivos do Edilson (PACK)</h2>
+        <div id="fileList" class="grid"></div>
+      </div>
+      <div class="card">
+        <h2>Pôster ASCII</h2>
+        <pre id="asciiOut">Selecione materiais, injete doses e gere seu pôster aqui.</pre>
+        <div class="grid" style="margin-top:8px">
+          <a class="btn" id="btnCopy">Copiar</a>
+          <a class="btn" id="btnDownload">Baixar .txt</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="caibalion" class="container card" style="margin-top:12px">
+      <h2>Balões do Caibalion — 7 Princípios</h2>
+      <p>Para cada princípio, um micro‑ritual Nutrilis × Infodose. Clique para <b>injetar no ASCII</b>.</p>
+      <div class="bubbles" id="bubbles"></div>
+    </section>
+
+    <section class="container card" style="margin-top:12px">
+      <h2>Frases Estoicas da Semana</h2>
+      <p>Extraídas do teu pack (Guia/Frases Estoicas). Injetar como <b>Doses Extra</b>.</p>
+      <div class="grid">
+        <button class="btn" id="btnInjectEstoicos">Injetar 3 frases no ASCII</button>
+        <a class="btn" id="btnOpenGuia" target="_blank">Abrir Guia Estoico (PDF)</a>
+        <a class="btn" id="btnOpenFrases" target="_blank">Abrir Frases Estoicas (PDF)</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footline">
+      <div><b>EDILSON • DUAL • INFODOSE</b> — Nutrilis × Infodose</div>
+      <div>“O poder da mente é a chama que guia o movimento.”</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+// Theme switcher
+const themeButtons = document.querySelectorAll('[data-theme]');
+function setTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  themeButtons.forEach(b => b.classList.toggle('active', b.dataset.theme===t));
+}
+themeButtons.forEach(b => b.addEventListener('click', ()=>setTheme(b.dataset.theme)));
+setTheme('luxara');
+
+// PWA register
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js'));
+}
+
+// Inventory from ZIP
+const INVENTORY = [{"name": "A origem da humanidade.txt", "path": "/mnt/data/edilson_pack/A origem da humanidade.txt", "ext": ".txt", "size": 2095}, {"name": "Caibalion_Setes_Principios_Hermeticos_co╠üpia.pdf", "path": "/mnt/data/edilson_pack/Caibalion_Setes_Principios_Hermeticos_co╠üpia.pdf", "ext": ".pdf", "size": 2879}, {"name": "Como_Surgiram_as_Religioes.pdf", "path": "/mnt/data/edilson_pack/Como_Surgiram_as_Religioes.pdf", "ext": ".pdf", "size": 2526}, {"name": "Frases_Estoicas_Semana.pdf", "path": "/mnt/data/edilson_pack/Frases_Estoicas_Semana.pdf", "ext": ".pdf", "size": 2170}, {"name": "Guia_Estoico.pdf", "path": "/mnt/data/edilson_pack/Guia_Estoico.pdf", "ext": ".pdf", "size": 3700}, {"name": "Judai╠üsmo.txt", "path": "/mnt/data/edilson_pack/Judai╠üsmo.txt", "ext": ".txt", "size": 56}, {"name": "Paul Dirac.txt", "path": "/mnt/data/edilson_pack/Paul Dirac.txt", "ext": ".txt", "size": 168}, {"name": "Poder da mente.txt", "path": "/mnt/data/edilson_pack/Poder da mente.txt", "ext": ".txt", "size": 2424}];
+const fileList = document.getElementById('fileList');
+const stoicPDF = INVENTORY.find(f=>/Guia_Estoico\.pdf$/i.test(f.name));
+const frasesPDF = INVENTORY.find(f=>/Frases_Estoicas_Semana\.pdf$/i.test(f.name));
+INVENTORY.forEach(f=>{
+  const card = document.createElement('div');
+  card.className='filecard';
+  const icon = document.createElement('div');
+  icon.className='fileicon';
+  icon.textContent = f.ext.replace('.','').toUpperCase();
+  const meta = document.createElement('div');
+  meta.className='meta';
+  meta.innerHTML = `<b>${f.name}</b><br><small>${(f.size/1024).toFixed(1)} KB</small>`;
+  const actions = document.createElement('div');
+  actions.style.marginLeft='auto';
+  const a = document.createElement('a');
+  a.href = f.path; a.textContent = 'Abrir'; a.className='btn'; a.style.width='auto';
+  actions.appendChild(a);
+  card.appendChild(icon); card.appendChild(meta); card.appendChild(actions);
+  card.addEventListener('click', (e)=>{ if(e.target.tagName!=='A') addDose('Fonte: '+f.name); });
+  fileList.appendChild(card);
+});
+if(stoicPDF) document.getElementById('btnOpenGuia').href = stoicPDF.path; else document.getElementById('btnOpenGuia').style.display='none';
+if(frasesPDF) document.getElementById('btnOpenFrases').href = frasesPDF.path; else document.getElementById('btnOpenFrases').style.display='none';
+
+// Caibalion balloons
+const PRINCIPLES = [{"title": "Mentalismo", "desc": "Tudo é Mente. Direcione o foco para criar realidade.", "dose": "Respiração 3‑6‑9 + intenção clara por 60s."}, {"title": "Correspondência", "desc": "Como em cima, é embaixo. Espelhe o micro no macro.", "dose": "Um hábito pequeno que reflita seu objetivo."}, {"title": "Vibração", "desc": "Nada está parado. Tudo vibra.", "dose": "Playlist pulsante 3 min + visualização."}, {"title": "Polaridade", "desc": "Opostos são extremos da mesma coisa.", "dose": "Reenquadre 1 desafio como oportunidade."}, {"title": "Ritmo", "desc": "Fluxos e refluxos. Cicle com o tempo.", "dose": "Pomodoro 25/5 com foco Infodose."}, {"title": "Causa e Efeito", "desc": "Nada acontece por acaso.", "dose": "Defina 1 gatilho → 1 ação concreta agora."}, {"title": "Gênero", "desc": "Princípios ativo e receptivo.", "dose": "Combine ação (fazer) + receptividade (observar)."}];
+const bubbles = document.getElementById('bubbles');
+PRINCIPLES.forEach(p=>{
+  const b = document.createElement('div');
+  b.className='bubble';
+  b.innerHTML = `<h3>🔮 ${p.title}</h3><div>${p.desc}</div><span class="dose">Dose: ${p.dose}</span>`;
+  b.addEventListener('click', ()=> addDose('Caibalion · '+p.title+' → Dose aplicada'));
+  bubbles.appendChild(b);
+});
+
+// ASCII actions
+const out = document.getElementById('asciiOut');
+function addDose(text){ out.textContent += "\n› " + text; }
+document.getElementById('btnInjectEstoicos').onclick = ()=>{
+  const phrases = [
+    "O homem é perturbado não pelas coisas, mas pela visão que tem delas. — Epicteto",
+    "A verdadeira riqueza é a de caráter. — Sêneca",
+    "A felicidade depende de nós mesmos. — Aristóteles"
+  ];
+  addDose("📜 Doses Estoicas:");
+  phrases.forEach(s => addDose(s));
+};
+
+// Copy/Download
+document.getElementById('btnCopy').onclick = async ()=>{ await navigator.clipboard.writeText(out.textContent); alert('ASCII copiado!') };
+document.getElementById('btnDownload').onclick = ()=>{
+  const blob = new Blob([out.textContent], {type:'text/plain'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='EDILSON_DUAL_ASCII.txt'; a.click();
+};
+
+// Install prompt
+let deferred; window.addEventListener('beforeinstallprompt', e=>{ e.preventDefault(); deferred=e; });
+document.getElementById('btnInstall').onclick = ()=> deferred ? (deferred.prompt(), deferred=null) : alert('Use “Adicionar à Tela Inicial” no menu do navegador.');
+</script>
+</body>
+</html>
