@@ -1,0 +1,5160 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dual.Infodose</title>
+<link href="manifest.json" rel="manifest"/>
+<meta content="#000000" name="theme-color"/>
+<link href="assets/icons/icon-192.png" rel="icon" type="image/png"/>
+<style>
+    /* ——— SEU CSS INTEGRAL (ajustes) ——— */
+    :root {
+      --bg: linear-gradient(to bottom, #000, #1a1a1a);
+      --text: #d7d7d7;
+      --fast: .4s; --med: .8s; --slow: 1.8s;
+      --safe-b: max(12px, env(safe-area-inset-bottom));
+    }
+    body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+    body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+    body.vibe  { --bg: linear-gradient(135deg,#00d8d8,#d800d8); --text:#fff; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{width:100%;height:100%;overflow:hidden}
+    body{
+      display:flex;flex-direction:column;align-items:center;
+      padding:0px;background:var(--bg);color:var(--text);
+      font-family:'Montserrat',sans-serif;
+      transition:background var(--slow),color var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes clickPulse{0%,100%{opacity:1}50%{opacity:0.9}}
+    @keyframes expandFooter{0%,100%{transform:scale(1)}50%{transform:scale(0.96)}}
+    @keyframes moveGradient{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+    #themeToggle{
+      position:absolute;top:40px;left:50%;transform:translateX(-50%);
+      width:30px;height:30px;border:1px solid var(--text);
+      border-radius:50%;background:transparent;opacity:.3;
+      cursor:pointer;transition:opacity var(--med),border-color var(--med);
+      z-index:10;
+    }
+    #themeToggle:hover{opacity:.8}
+    #particles-js{position:absolute;inset:0;z-index:3;pointer-events:auto}
+    .svg-container{
+      position:absolute;top:220px;left:50%;width:180px;height:180px;
+      transform:translateX(-50%);z-index:1;
+      filter:drop-shadow(0 0 10px rgba(0,255,255,0.15));
+      transition:opacity var(--slow);
+    }
+    .svg-container.fading{opacity:0}
+    .svg-container object{width:100%;height:100%;object-fit:contain;
+      animation:pulse 6s infinite ease-in-out;
+    }
+    #assistantName{top:199px;font-size:1.1em;font-weight:600;opacity:.8;
+      transition:opacity var(--slow);
+    }
+    .response-container{
+      position:fixed;left:20px;right:20px;bottom:156px;padding:12px;
+      background:rgba(0,0,0,0.3);backdrop-filter:blur(8px);
+      border-radius:20px;max-height:calc(100vh - 200px);
+      overflow-y:auto;z-index:999;transition:background var(--slow);
+      animation:fadeIn var(--slow) ease forwards;
+    }
+    body.light  .response-container{background:rgba(255,255,255,0.3)}
+    body.medium .response-container{background:rgba(0,0,0,0.2)}
+    body.vibe   .response-container{background:rgba(255,255,255,0.2)}
+    .pages-wrapper{transition:opacity var(--slow),height var(--slow);}
+    .pages-wrapper.collapsed{display:none}
+    .page{display:none;opacity:0;transition:opacity var(--slow)}
+    .page.active{display:block;opacity:1}
+    .page.initial{display:flex;align-items:center;justify-content:center;
+      height:100%;text-align:center;
+    }
+    .footer-text{
+      display:block;margin:12px auto;padding:6px 12px;
+      background:var(--bg);opacity:.5;color:var(--text);
+      font-size:0.8em;text-align:center;font-style:italic;
+      border-radius:12px;cursor:pointer;
+      transition:opacity var(--slow),transform var(--slow);
+      animation:moveGradient 8s linear infinite;
+    }
+    .footer-text.loading{background:transparent!important;backdrop-filter:none!important}
+    .footer-text.loading span{background:none!important}
+    .footer-text:hover{opacity:.6}
+    .footer-text.active{opacity:.8;animation:expandFooter var(--med) ease-out}
+    .response-controls{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-top:15px;padding-top:10px;
+      border-top:1px solid rgba(255,255,255,0.2);
+    }
+    body.light  .response-controls{border-top-color:rgba(0,0,0,0.2)}
+    body.medium .response-controls{border-top-color:rgba(255,255,255,0.2)}
+    body.vibe   .response-controls{border-top-color:rgba(0,0,0,0.4)}
+    .control-buttons,.pagination{display:flex;align-items:center;gap:10px}
+    .copy-button,.paste-button,.toggle-button,.kitty-button{
+      width:36px;height:36px;border:none;border-radius:12px;
+      background:rgba(255,255,255,0.06);display:flex;
+      align-items:center;justify-content:center;cursor:pointer;
+      transition:background var(--fast),opacity var(--slow);opacity:.7;
+    }
+    .toggle-button,.kitty-button{border-radius:50%}
+    .copy-button:hover,.paste-button:hover,
+    .toggle-button:hover,.kitty-button:hover{background:rgba(255,255,255,0.15)}
+    .toggle-button.active,.kitty-button.active{opacity:1}
+    .pagination button {
+      border: none;
+      background: linear-gradient(45deg, #0ff, #f0f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 1.2em;
+      cursor: pointer;
+      transition: transform var(--fast);
+    }
+    .pagination button:hover{transform:scale(1.2)}
+    .response-block{
+      margin:1rem 0;padding:1.8rem;border-radius:12px;
+      line-height:1.8;position:relative;overflow:hidden;
+      animation:fadeIn var(--slow) ease forwards,pulse 12s infinite ease-in-out;
+      transition:box-shadow var(--fast),transform var(--fast);
+    }
+    .response-block:hover{box-shadow:0 0 15px rgba(0,255,255,.4)}
+    .response-block.clicked{animation:clickPulse var(--med) ease-out}
+    .response-block.expanded{
+      transform:scale(1.03);background:rgba(0,0,0,.6);z-index:2;
+    }
+    .intro{background:linear-gradient(135deg,rgba(0,255,255,.2),rgba(0,100,100,.1));border-left:4px solid #0ff}
+    .middle{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(50,50,50,.1));border-left:4px solid rgba(255,255,255,.4)}
+    .ending{background:linear-gradient(135deg,rgba(255,0,255,.2),rgba(100,0,100,.1));border-left:4px solid #f0f}
+    .input-container{
+      position:fixed;left:20px;right:20px;bottom:90px;
+      display:flex;gap:6px;z-index:2;
+    }
+    .input-container input{
+      flex:1;padding:10px;border:none;border-radius:20px;
+      background:rgba(255,255,255,.1);color:inherit;font-size:16px;
+      transition:background var(--fast);opacity:0.7;
+    }
+    .input-container input:focus{background:rgba(255,255,255,.2)}
+    .input-container button{
+      width:60px;height:60px;border:none;
+      background:linear-gradient(42deg,#0ff,#f0f);
+      background-clip:text;-webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      font-size:48px;cursor:pointer;animation:pulse 2s infinite ease-in-out;
+      display:flex;align-items:center;justify-content:center;
+      transition:transform var(--med);opacity:.7;
+    }
+    .input-container button:hover{transform:scale(1.1)}
+    .login-container{
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:300px;padding:1.5rem 1rem;background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.15);border-radius:10px;
+      backdrop-filter:blur(8px);z-index:10;display:none;
+    }
+    .login-container.active{display:block}
+    .login-container input{
+      width:100%;background:transparent;border:none;
+      border-bottom:1px solid rgba(255,255,255,.3);
+      margin:.8rem 0;padding:.4rem 0;font-size:.95em;color:#fff;
+    }
+    .login-container input::placeholder{color:rgba(255,255,255,.5)}
+    .login-container button{
+      width:100%;margin-top:1rem;padding:.5rem 0;
+      border:1px solid #0ff;border-radius:8px;
+      background:transparent;font-size:.95em;color:#0ff;cursor:pointer;
+      transition:background .25s,color .25s;
+    }
+    .login-container button:hover{background:#0ff;color:#000}
+    
+    .response-block {
+  margin: 2rem 0;
+  padding: 1.3rem;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn 1s ease forwards, pulse 12s infinite ease-in-out;
+  transition: all 0.3s ease-in-out;
+}
+
+.response-block.intro {
+  background: linear-gradient(135deg, rgba(0,255,255,.2), rgba(0,100,100,.1));
+  border-left: 4px solid #0ff;
+}
+.response-block.middle {
+  background: linear-gradient(135deg, rgba(255,255,255,.05), rgba(50,50,50,.1));
+  border-left: 4px solid rgba(255,255,255,.4);
+}
+.response-block.ending {
+  background: linear-gradient(135deg, rgba(255,0,255,.2), rgba(100,0,100,.1));
+  border-left: 4px solid #f0f;
+}
+.response-block.expanded {
+  transform: scale(1.03);
+  background: rgba(0, 0, 0, .6);
+  z-index: 2;
+}
+.symbol-btn {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  color: #0ff;
+  border-radius: 8px;
+  padding: 2px 6px;
+  margin: 2px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background 0.3s ease;
+}
+.symbol-btn:hover {
+  background: rgba(0, 255, 255, 0.3);
+}
+    /* ————— FIM DO CSS ————— */
+  
+
+/* Aumenta o espaço inferior do container de respostas para não sobrepor o input e considerar a safe-area */
+.response-container {
+  /* Move the response container up by about 18px to avoid overlapping the input */
+  bottom: 98px !important;
+}
+
+.input-container.hidden,
+.control-buttons.hidden,
+.pagination.hidden {
+  display: none !important;
+}
+
+.footer-text.move-to-bottom {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 12px;
+  margin: 0 auto;
+  z-index: 99999;
+  animation: moveFooterDown var(--fast) ease-out forwards;
+}
+
+@keyframes moveFooterDown {
+  from { bottom: 69px; opacity: 0.5; }
+  to { bottom: 12px; opacity: 1; }
+}
+
+
+.input-container {
+  bottom: 30px !important;
+}
+
+#btn-expandir-ritual {
+  bottom: 210px !important;
+}
+
+/* === CLICK FIX & PATCH MANAGER DESIGN (IO29_14/15) === */
+.input-container{
+  z-index: 200010 !important;
+  pointer-events: auto !important;
+}
+.response-container{ z-index: 200000 !important; }
+
+/* Visual layers shouldn't block input */
+#particles-js, .svg-container, #pulsos-container, .symbol-bar {
+  pointer-events: none !important;
+}
+.symbol-bar .symbol-button { pointer-events: auto !important; }
+
+/* Player: container doesn't catch, children do */
+#koblluxPlayer { pointer-events: none !important; }
+#koblluxPlayer * { pointer-events: auto !important; }
+
+/* Central lock above visuals but below input */
+.lock-button{ z-index: 200005 !important; }
+
+/* Patch Manager panel: avoid colliding with input and be readable */
+#patchMgrPanel{
+  bottom: calc(110px + var(--safe-b)) !important;
+  z-index: 200050 !important;
+  width: min(560px, 92vw);
+  max-height: calc(70vh - 120px) !important;
+  overflow: auto;
+  border-radius: 14px;
+  background: rgba(10,12,16,.84);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+#patchMgrPanel header{
+  position: sticky; top: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+  margin: -12px -12px 8px; padding: 10px 12px;
+  border-radius: 14px 14px 0 0;
+  cursor: move;
+}
+#patchList .pm-item{
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+}
+#patchMgrBtn{
+  min-width: 34px; min-height: 34px;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 18px;
+}
+
+</style>
+<style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .content {
+      width: 100%;
+      /* Reserve safe-area space at the bottom so the iframe doesn’t get cropped */
+      height: calc(100% - var(--safe-b));
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      position: absolute;
+      z-index: 1;
+    }
+
+    iframe.active {
+      opacity: 1;
+    }
+
+    .symbol-bar {
+      position: fixed;
+      top: 39%;
+      right: 15px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 40;
+    }
+
+    .symbol-button {
+      width: 26px;
+      height: 26px;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      opacity: 0.7;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    .symbol-button:hover {
+      background: rgba(255,255,255,0.2);
+      transform: scale(1.1);
+    }
+
+    .lock-button {
+      position: fixed;
+      bottom: 43px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      z-index: 183000;
+    }
+
+    /* Botões de ação */
+    #uploadComponentBtn,
+    #remoteComponentBtn,
+    #toggleDecoderBtn {
+      position: fixed;
+      left: 12px;
+      z-index: 90000;
+      padding: 4px;
+      border: none;
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-weight: bold;
+      font-size: 0.9em;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+      border: 2px solid transparent;
+
+      box-shadow: 0 0 4px rgba(0,255,255,0.2), 0 0 8px rgba(255,0,255,0.2);
+      transition: all 0.3s ease;
+    }
+
+   
+    #uploadComponentBtn { top: 330px; }
+    #remoteComponentBtn { top: 370px; }
+    #toggleDecoderBtn { top: 410px; }
+
+    #uploadComponentBtn:hover,
+    #remoteComponentBtn:hover,
+    #toggleDecoderBtn:hover {
+      transform: scale(1.05);
+      background: rgba(0, 255, 255, 0.2);
+    }
+
+    #decoderBox {
+      display: none;
+      position: fixed;
+      top: 140px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      padding: 1rem;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      z-index: 70;
+    }
+
+    #decoderBox input {
+      padding: 0.6rem;
+      width: 200px;
+      text-align: center;
+      border-radius: 10px;
+      border: none;
+      font-size: 1em;
+    }
+
+    #decoderBox button {
+      margin-top: 10px;
+      padding: 0.5rem 1rem;
+      background: rgba(0,255,255,0.2);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      cursor: pointer;
+    }
+
+    my-frame-loader::part(container) {
+      width: 90%;
+      height: 85%;
+      z-index: 8;
+    }
+  
+
+#btn-expandir-ritual {
+  position: fixed;
+  bottom: 33px;
+  
+  z-index: 99999;
+border-radius:50%;
+
+  font-size: 18px;
+background:linear-gradient(42deg,#0ff,#f0f);
+      background-clip:text;-webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+
+
+  border:none
+
+  cursor: pointer;
+    opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+#btn-expandir-ritual:hover,
+ {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+#btn-expandir-ritual { right: 35px; }
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.021); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.4; }
+}
+
+</style>
+<style>
+.upload-symbolic-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid rgba(0,255,255,0.2);
+  box-shadow: 0 0 8px rgba(0,255,255,0.2), 0 0 12px rgba(255,0,255,0.2);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.upload-symbolic-button:hover {
+  background: rgba(0,255,255,0.2);
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(0,255,255,0.4);
+}
+</style>
+<style>
+#advancedToggleOptions input,
+#advancedToggleOptions select {
+  font-family: monospace;
+  font-size: 0.9em;
+  backdrop-filter: blur(4px);
+}
+#advancedToggleOptions button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px rgba(0,255,255,0.4);
+}
+</style>
+<link href="dual-ui-kit.css" rel="stylesheet"/>
+<script id="dualapp-plus-shim">
+/* DualApp+ v2.1 — unificação total do LocalStorage para páginas Infodose/Dual
+   Canon: localStorage["dualapp.settings"]
+   Espelho compat: infodoseEnabled ('1'|'0'), infodoseTheme, userName, assistantBase
+   Inputs auto-bind (se existirem): 
+     #archetype, #assistant, #theme, #style, #density, #accent,
+     #userName, #assistantInput, #skInput, #roleSystemInput, #modelSelector, #bgUrl
+   Flags: <body data-company> (ativação)
+   Preferências: ui.theme, ui.bgImage (cover/center/fixed), tipografia/estilo/densidade
+   Segurança: injeta Authorization em chamadas OpenRouter se security.token presente
+   API: window.DualStore.get(), set(partial), onChange(fn), save()
+*/
+(function(){
+  const KEY="dualapp.settings";
+  const LEGACY = { enable:"infodoseEnabled", theme:"infodoseTheme", user:"userName", asst:"assistantBase" };
+  const LS = window.localStorage;
+
+  function jget(k){ try{ const v=LS.getItem(k); return v?JSON.parse(v):null; }catch(_){ return null; } }
+  function jset(k,v){ try{ LS.setItem(k, JSON.stringify(v)); }catch(_){ } }
+  function deep(a,b){
+    const o={...(a||{})};
+    for(const k in (b||{})){
+      const v=b[k];
+      o[k] = (v && typeof v==="object" && !Array.isArray(v)) ? deep(o[k]||{}, v) : v;
+    }
+    return o;
+  }
+
+  // base
+  let base = jget(KEY) || {};
+  base.ui = base.ui || {};
+  base.arch = base.arch || {};
+  base.security = base.security || {};
+  base.training = base.training || {};
+  base.activation = base.activation || {};
+  jset(KEY, base);
+
+  // migrate legacy → canon
+  (function migrate(){
+    const patch = {};
+    const en = LS.getItem(LEGACY.enable);
+    if(en!=null) patch.activation = { enabled: en==="1" };
+    const th = LS.getItem(LEGACY.theme);
+    if(th) patch.ui = deep(patch.ui,{ theme: th });
+    const un = LS.getItem(LEGACY.user);
+    if(un) patch.user = { name: un };
+    const ab = LS.getItem(LEGACY.asst);
+    if(ab) patch.arch = deep(patch.arch, { assistant: ab });
+    if(Object.keys(patch).length) jset(KEY, deep(jget(KEY)||{}, patch));
+  })();
+
+  const listeners = new Set();
+  function emit(v){ listeners.forEach(fn=>{ try{ fn(v); }catch(_){ } }); }
+
+  const DualStore = {
+    get(){ return jget(KEY) || {}; },
+    set(partial){
+      const merged = deep(jget(KEY)||{}, partial||{});
+      jset(KEY, merged);
+      // mirror to legacy
+      try{
+        if(merged.activation?.enabled != null){
+          LS.setItem(LEGACY.enable, merged.activation.enabled ? "1" : "0");
+        }
+        if(merged.ui?.theme){ LS.setItem(LEGACY.theme, merged.ui.theme); }
+        if(merged.user?.name){ LS.setItem(LEGACY.user, merged.user.name); }
+        if(merged.arch?.assistant){ LS.setItem(LEGACY.asst, merged.arch.assistant); }
+      }catch(_){}
+      emit(merged);
+    },
+    save(){ emit(jget(KEY)||{}); },
+    onChange(fn){ listeners.add(fn); return ()=>listeners.delete(fn); }
+  };
+  window.DualStore = DualStore;
+
+  // helpers
+  function bindValue(id, path){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const getPath = (obj, p)=> p.split('.').reduce((a,k)=> (a && a[k]!=null)?a[k]:null, obj);
+    const setPath = (p, v)=> p.split('.').reverse().reduce((acc,k,i,arr)=> i?{[arr[arr.length-1-i]]:acc}:{[k]:v}, {});
+    const store = DualStore.get();
+    const val = getPath(store, path);
+    if(val!=null){
+      el.value = val;
+      el.dispatchEvent(new Event('change', {bubbles:true}));
+    } else {
+      // seed store with initial UI value
+      DualStore.set(setPath(path, el.value));
+    }
+    const h = ()=> DualStore.set(setPath(path, el.value));
+    el.addEventListener("change", h);
+    if(el.tagName==="INPUT") el.addEventListener("input", h);
+  }
+
+  function applyUI(s){
+    const theme = s?.ui?.theme || LS.getItem(LEGACY.theme) || "dark";
+    try{
+      // remove known theme markers (light/medium/vibe/classic)
+      document.body.classList.remove("light","medium","vibe","dark");
+      // some UIs usam body.className 'theme-xxx'; se existir, mantenha.
+      if(!/theme-/.test(document.body.className)){
+        document.body.classList.add(theme);
+      }
+      LS.setItem(LEGACY.theme, theme);
+    }catch(_){}
+    if(s?.ui?.bgImage){
+      document.body.style.backgroundImage = `url('${s.ui.bgImage}')`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center center";
+      document.body.style.backgroundAttachment = "fixed";
+    }
+    // refletir ativação
+    try{
+      if(s?.activation?.enabled!=null){
+        document.body.dataset.company = s.activation.enabled ? "on":"off";
+      }
+    }catch(_){}
+  }
+
+  function watchBodyCompany(){
+    try{
+      const obs = new MutationObserver((muts)=>{
+        muts.forEach(m=>{
+          if(m.type==="attributes" && m.attributeName==="data-company"){
+            DualStore.set({ activation:{ enabled: document.body.dataset.company==="on" } });
+          }
+        });
+      });
+      obs.observe(document.body, { attributes:true });
+    }catch(_){}
+  }
+
+  function wire(){
+    // common binds
+    bindValue("archetype", "arch.type");
+    bindValue("assistant", "arch.assistant");
+    bindValue("theme", "ui.theme");
+    bindValue("style", "ui.style");
+    bindValue("density", "ui.density");
+    bindValue("accent", "ui.accent");
+    // extended binds
+    bindValue("userName", "user.name");
+    bindValue("assistantInput", "arch.assistant");
+    bindValue("skInput", "security.token");
+    bindValue("roleSystemInput", "training.roleSystem");
+    bindValue("modelSelector", "training.model");
+    bindValue("bgUrl", "ui.bgImage");
+    // activation flag
+    if(document.body?.dataset?.company){
+      DualStore.set({ activation:{ enabled: document.body.dataset.company==="on" } });
+    }
+    applyUI(DualStore.get());
+    watchBodyCompany();
+  }
+
+  // fetch wrapper p/ OpenRouter
+  (function patchFetch(){
+    const _fetch = window.fetch;
+    window.fetch = function(input, init){
+      try{
+        const s = DualStore.get();
+        const token = s?.security?.token;
+        const url = (typeof input==="string") ? input : (input?.url||"");
+        const isOR = /openrouter\.ai\/api\/v1\/chat\/completions/.test(url);
+        if(token && isOR){
+          init = init || {};
+          const h = new Headers(init.headers || {});
+          if(!h.has("Authorization")) h.set("Authorization", `Bearer ${token}`);
+          init.headers = h;
+        }
+      }catch(_){}
+      return _fetch(input, init);
+    };
+  })();
+
+  DualStore.onChange(applyUI);
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded", wire);
+  }else{
+    wire();
+  }
+})();
+</script>
+<style>
+/* v2 — theme reactive */
+:root{ --bg: transparent; --bg-alpha: .5; }
+html[data-theme="neon"] body{ background: color-mix(in srgb, var(--bg, transparent) calc(100% * var(--bg-alpha)), transparent); }
+html[data-theme="glass"] body{ background: rgba(20,22,28, calc(var(--bg-alpha) * .6)); }
+html[data-theme="dark"] body{ background: rgba(6,7,10, calc(var(--bg-alpha) * .8)); }
+#layoutToggle,[data-ui="layout-toggle"]{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
+.kdx-round{width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);backdrop-filter:blur(4px);aspect-ratio:1/1}
+.kdx-round svg{width:20px;height:20px;display:block;fill:none;stroke:currentColor;stroke-width:2}
+#kdx-reload{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:9999}
+
+/* Ensure the main content iframe sits above the particle background.
+ * Without a z-index, the particles layer (z-index:3) can intercept
+ * pointer events, preventing interaction with the iframe. Setting
+ * pointer-events:auto ensures clicks pass through to the iframe content.
+ */
+#frame{
+  position: relative;
+  z-index: 4;
+  pointer-events: auto;
+}
+</style><style>
+/* === PatchMgr: visibility + transition (safe append) === */
+#patchMgrPanel{display:none;opacity:0;transition:opacity .3s ease, transform .3s ease;}
+#patchMgrPanel.active{display:block;opacity:1;}
+</style><style id="kdx-response-bridge">
+  /* KDX Response Bridge — permite controlar o response via CSS Injection (Patch Manager) */
+  :root{
+    --resp-left: 20px;
+    --resp-right: 20px;
+    --resp-max: 40vh;
+    --resp-extra-gap: 47px; /* ajuste livre via Patch Manager */
+    --resp-bottom: calc(72px + var(--resp-extra-gap, 0px));            /* distância do input */
+    --resp-padding: 12px;
+    --resp-bg: rgba(0,0,0,0.3);
+    --resp-blur: 8px;
+    --resp-radius: 20px;
+    --resp-max: calc(100vh - 200px); /* altura máxima padrão */
+  }
+  .response-container, #responseContainer{
+    left: var(--resp-left) !important;
+    right: var(--resp-right) !important;
+    bottom: var(--resp-bottom) !important;
+    padding: var(--resp-padding) !important;
+    background: var(--resp-bg) !important;
+    backdrop-filter: blur(var(--resp-blur)) !important;
+    border-radius: var(--resp-radius) !important;
+    max-height: var(--resp-max) !important;
+    overscroll-behavior: contain;
+  }
+</style>
+
+<!-- Preset Fonts (optional Google Fonts) -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@400;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+
+<style id="kdx-presets-and-styles">
+/* === KDX Presets: gap + styles + fonts === */
+
+/* Gap presets (editable via Patch Manager buttons) */
+:root{
+  /* already present: --resp-extra-gap ; keep it. add suggested presets: */
+  --resp-gap-low: 12px;   /* mínimo além dos 72px base */
+  --resp-gap-med: 47px;   /* recomendado */
+  --resp-gap-high: 96px;  /* maior afastamento */
+}
+
+/* Response render styles */
+body[data-resp-style="glass"] .response-container{
+  background: rgba(12,16,22,0.35) !important;
+  backdrop-filter: blur(10px) saturate(140%) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35) !important;
+}
+body[data-resp-style="paper"] .response-container{
+  background: rgba(255,255,255,0.92) !important;
+  color: #0b0e13 !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.08) !important;
+}
+body[data-resp-style="paper"] .response-block{
+  background: #fff !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+}
+body[data-resp-style="neon"] .response-container{
+  background: linear-gradient(135deg, rgba(0,255,255,0.08), rgba(255,0,255,0.08)) !important;
+  border: 1px solid rgba(0,255,255,0.22) !important;
+  box-shadow: 0 0 20px rgba(0,255,255,0.15), 0 0 26px rgba(255,0,255,0.12) !important;
+}
+
+/* Font presets */
+body[data-resp-font="sans"] .response-container{ font-family: "Inter", "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }
+body[data-resp-font="grotesk"] .response-container{ font-family: "Space Grotesk", "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }
+body[data-resp-font="mono"] .response-container{ font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace !important; }
+body[data-resp-font="serif"] .response-container{ font-family: "DM Serif Display", Georgia, "Times New Roman", serif !important; }
+
+/* Subtle inner tweaks per style */
+body[data-resp-style="glass"] .response-block{
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02)) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+body[data-resp-style="neon"] .response-block{
+  background: linear-gradient(135deg, rgba(0,255,255,0.10), rgba(255,0,255,0.06)) !important;
+  border: 1px solid rgba(0,255,255,0.25) !important;
+  text-shadow: 0 0 6px rgba(0,255,255,0.12);
+}
+/* Pager & buttons accents in neon mode */
+body[data-resp-style="neon"] .pagination button{
+  filter: drop-shadow(0 0 6px rgba(0,255,255,0.45));
+}
+</style>
+
+</head>
+<!-- Estilos do gerenciador de chaves e treinamentos -->
+<style>
+    .keymgr-btn{
+      width:36px;height:36px;border:none;border-radius:12px;
+      background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;
+      cursor:pointer;transition:.2s;opacity:.85;
+    }
+    .keymgr-btn:hover{background:rgba(255,255,255,0.16);}
+    .keymgr-btn svg{width:18px;height:18px;}
+    .keymgr-panel{
+      position:fixed;right:18px;bottom:160px;z-index:1000;
+      width:min(520px, calc(100vw - 36px)); max-height:60vh; overflow:auto;
+      border-radius:16px; padding:14px 14px 10px;
+      background:rgba(10,12,16,.78); backdrop-filter: blur(10px) saturate(160%);
+      border:1px solid rgba(255,255,255,.12); box-shadow:0 14px 36px rgba(0,0,0,.4);
+      display:none;
+    }
+    .keymgr-panel.open{display:block;}
+    .keymgr-hd{display:flex;align-items:center;justify-content:space-between; gap:8px; margin-bottom:10px;}
+    .keymgr-hd h3{margin:0;font-size:14px;letter-spacing:.06em;opacity:.9;}
+    .keymgr-close{appearance:none;border:1px solid rgba(255,255,255,.14);background:transparent;color:inherit;
+      padding:4px 8px;border-radius:10px;cursor:pointer;font-size:12px;}
+    .keymgr-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+    .cardx{border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px;background:rgba(255,255,255,.04);}
+    .cardx h4{margin:0 0 8px 0;font-size:13px;letter-spacing:.04em;opacity:.8;}
+    .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+    .row input[type="text"], .row input[type="password"], .row textarea{
+      flex:1; min-width:180px; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06); color:inherit; font-size:12px; outline:none;
+    }
+    .row textarea{min-height:110px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;}
+    .btnx{appearance:none;border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.06);
+      padding:6px 10px;border-radius:8px;font-size:12px;cursor:pointer;color:inherit;transition:.2s;}
+    .btnx:hover{background:rgba(255,255,255,.12);}
+    .list{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+    .item{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.08);padding:6px;border-radius:8px;}
+    .badge{background:rgba(0,255,255,.3);padding:2px 6px;border-radius:6px;font-size:10px;margin-right:4px;}
+    .badges{display:flex;gap:4px;}
+    .switch{display:flex;align-items:center;gap:4px;}
+    .switch input{margin-right:4px;}
+    /* Informações de usuário/assistente no painel de chaves */
+    .user-info{
+      font-size: 12px;
+      margin-bottom: 8px;
+      opacity: 0.7;
+    }
+  </style>
+<style>
+/* v6.2.9-refine — UI refinements */
+.response-controls{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:14px !important;
+}
+.response-controls .control-buttons{ gap:10px !important; }
+.response-controls .pagination{ display:none !important; }
+.response-container{
+  border: none !important;
+  border-image: none !important;
+  box-shadow: none !important;
+}
+/* block visual rhythm */
+.response-block{
+  margin: 18px 0 !important;
+  padding: 16px 18px !important;
+  border-radius: 14px !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(0,0,0,0.18)) !important;
+  border: 1px solid rgba(255,255,255,0.12) !important;
+}
+.response-block + .response-block{
+  position: relative;
+}
+.response-block + .response-block::before{
+  content:"";
+  position:absolute; left:10%; right:10%; top:-10px; height:1px;
+  background: linear-gradient(90deg, rgba(0,255,255,0), rgba(0,255,255,0.35), rgba(255,0,255,0));
+  opacity:.6;
+}
+.response-block.intro{ border-left:4px solid #0ff !important; }
+.response-block.middle{ border-left:4px solid rgba(255,255,255,0.35) !important; }
+.response-block.ending{ border-left:4px solid #f0f !important; }
+
+/* nicer code and list styling inside response */
+.response-block pre, .response-block code{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px; padding: 2px 6px;
+}
+.response-block pre{ padding:10px 12px; overflow:auto; }
+.response-block ul, .response-block ol{ padding-left: 1.3em; }
+.response-block li{ margin: 4px 0; }
+</style>
+<body class="perf-medium">
+<div id="assistantName"></div>
+<div class="content">
+<iframe class="active" id="frame" src="index.html"></iframe>
+</div>
+<div class="symbol-bar">
+<button class="symbol-button" onclick="loadPage('about:blank')">Φ</button>
+<button class="symbol-button" onclick="loadPage('dual-decoder-13.html')">꩜</button>
+<button class="symbol-button" onclick="loadPage('Splash_FINAL_TEMA_PULSO.html')">◌</button>
+<button class="symbol-button" onclick="loadPage('Raros.html')">☼</button>
+<button class="symbol-button" onclick="loadPage('Solashss.html')">◑</button>
+<button class="symbol-button" onclick="loadPage('dual-tube-25-0.html')">◘</button>
+</div>
+<button class="lock-button" onclick="loadPage('index.html')"></button>
+<!-- Botões -->
+<input accept=".html" id="uploadHTML" style="display:none" type="file"/>
+<button id="uploadComponentBtn">⧉</button>
+<button id="remoteComponentBtn">☍</button>
+<button id="toggleDecoderBtn">✦</button>
+<button id="btn-expandir-ritual">◉</button>
+<!-- Caixa do decodificador -->
+<div id="decoderBox">
+<input id="codeInput" placeholder="Digite o selo..." type="text"/>
+<button onclick="decodeSymbolicCode()">✦ Desbloquear</button>
+</div>
+<!-- COMPONENTE WEB -->
+<script type="module">
+    class MyFrameLoader extends HTMLElement {
+      constructor() {
+        super();
+        const shadow = this.attachShadow({ mode: 'open' });
+        shadow.innerHTML = `
+          <style>
+            .overlay {
+              position: fixed;
+              inset: 0;
+              background: rgba(0,0,0,0.6);
+              backdrop-filter: blur(8px);
+              z-index: 999;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .container {
+              width: 92%;
+              height: 86%;
+              background: #111;
+              border-radius: 20px;
+              box-shadow: 0 0 20px #0ff;
+              overflow: hidden;
+              position: relative;
+            }
+            iframe {
+              width: 100%;
+              height: 100%;
+              border: none;
+            }
+            .close-btn {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background: #f0f;
+              border: none;
+              color: #000;
+              font-weight: bold;
+              border-radius: 12px;
+              padding: 4px 10px;
+              cursor: pointer;
+              z-index: 10;
+            }
+          </style>
+          <div class="overlay">
+            <div class="container">
+              <button class="close-btn">✖</button>
+              <iframe></iframe>
+            </div>
+          </div>
+        `;
+        this.iframe = shadow.querySelector('iframe');
+        shadow.querySelector('.close-btn').onclick = () => this.remove();
+      }
+      set src(val) {
+        this.iframe.src = val;
+      }
+    }
+    customElements.define('my-frame-loader', MyFrameLoader);
+  </script>
+<!-- Funções JS -->
+<script>
+    const frame = document.getElementById('frame');
+    const activationSound = new Audio('assets/sounds/acts/wounds/codigo-MT-OLX-0.wav');
+
+    function playSound() {
+      activationSound.volume = 1;
+      activationSound.play().catch(()=>{});
+    }
+
+    function loadPage(url) {
+      frame.classList.remove('active');
+      setTimeout(() => {
+        frame.src = url;
+        frame.onload = () => frame.classList.add('active');
+      }, 300);
+    }
+
+    const uploadInput = document.getElementById('uploadHTML');
+    document.getElementById('uploadComponentBtn').onclick = () => {
+      playSound();
+      uploadInput.click();
+    };
+
+    uploadInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.endsWith('.html')) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const blob = new Blob([ev.target.result], { type: 'text/html' });
+          const blobUrl = URL.createObjectURL(blob);
+          const frame = document.createElement('my-frame-loader');
+          frame.src = blobUrl;
+          document.body.appendChild(frame);
+        };
+        reader.readAsText(file);
+      } else {
+        alert('Selecione um arquivo .html válido.');
+      }
+    };
+
+    document.getElementById('remoteComponentBtn').onclick = () => {
+      playSound();
+      const url = prompt("URL do componente remoto:");
+      if (url) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = url;
+        document.body.appendChild(frame);
+      }
+    };
+
+    const toggleDecoderBtn = document.getElementById('toggleDecoderBtn');
+    const decoderBox = document.getElementById('decoderBox');
+    toggleDecoderBtn.onclick = () => {
+      playSound();
+      decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+    };
+
+    const CODE_MAP = {
+      "DUAL": "menu.html",
+      "KBX": "menu-x-1.html",
+      "ATVR": "render-response.html",
+      "ATVD": "decodificador.html",
+      "337": "KOBLLUX_MetaLux_CLEANED.html",
+      "DBK": "dual-book-12.html",
+      "IMN": "index-manifestado.html",
+      "IMNN": "index-manifestado-tangle.html",
+      "BTS": "botao-simbolico.html",
+      "SBK": "SmbS-book-4.html",
+      "SBL": "SmbS-book-2.html",
+      "KDX": "menu-kobllux-v2-completo.html",
+      "KDI": "menu-integrado-kobllux.html",
+      "KDP": "menu-x-1-E-4.html",
+      "KDF": "menu-x-1-E-8.html",
+      "KDB": "menu-x-1-E-10.html",
+      "KDJ": "menu-x-1-E-4-com-botoes-injetados.html",
+      "HTM": "KBLX-HTML-v4.1-FULLSCREEN-SEPARADOR.html",
+      "MN6": "menu-x-1-E-6.html",
+      "MN7": "menu-x-1-E-7.html",
+      "MN8": "menu-x-1-E-8.html",
+      "MN9": "menu-x-1-E-9.html",
+      "MN10": "menu-x-1-E-10.html",
+      "MN11e": "menu-x-1-E-11e.html",
+      "MN12": "menu-x-1-E-12.html",
+      "MN13": "menu-final-com-pulso.html",
+      "MN14": "menu-pulso-final.html",
+      "MN15": "menu-x-1-E-15.html",
+      "MN16": "menu-x-1-E-16.html",
+    };
+
+    function decodeSymbolicCode() {
+      playSound();
+      const code = document.getElementById('codeInput').value.trim().toUpperCase();
+      const dest = CODE_MAP[code];
+      if (dest) {
+        const frame = document.createElement('my-frame-loader');
+        frame.src = dest;
+        document.body.appendChild(frame);
+        decoderBox.style.display = 'none';
+      } else {
+        alert('Selo desconhecido ou não registrado.');
+      }
+    }
+  </script>
+<script>
+document.getElementById("btn-expandir-ritual").onclick = () => {
+  const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
+  if (alvo) {
+    alvo.style.display = alvo.style.display === "none" ? "block" : "none";
+    logMistico("⧉ Expandiu o plano ritual oculto.");
+  }
+};
+</script>
+<!-- 🌌 Botões simbióticos -->
+<style>
+#btn-expandir-ritual {
+  position: fixed;
+  bottom: 33px;
+  
+  z-index: 99999;
+border-radius:50%;
+
+  font-size: 21px;
+background:linear-gradient(42deg,#0ff,#f0f);
+      background-clip:text;-webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+
+
+  border:none;
+
+  cursor: pointer;
+    opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+#btn-expandir-ritual:hover,
+ {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+#btn-expandir-ritual { right: 40px; }
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.021); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+</style>
+<script>
+document.getElementById("btn-expandir-ritual").onclick = () => {
+  const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
+  if (alvo) {
+    alvo.style.display = alvo.style.display === "none" ? "block" : "none";
+    logMistico("⧉ Expandiu o plano ritual oculto.");
+  }
+};
+</script>
+<style>
+#pulsos-container {
+  position: fixed;
+  top: 198px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  opacity: var(--slow);
+  border: 1px solid transparent;
+  border-image: linear-gradient(45deg, #F0F, #0FF);
+  border-image-slice: 1;
+
+  -webkit-mask-image: radial-gradient(white, black); /* força máscara arredondada no Safari */
+  mask-image: radial-gradient(white, black);
+
+  overflow: hidden;
+  z-index:99992;
+  cursor: pointer;
+  font-family: monospace;
+  text-align: center;
+}
+
+  #pulsos {
+    max-height: calc(2.5 * 1.2em);
+    overflow-y: auto;
+    padding: 0.4em;
+    font-size: 0.93em;
+    color: #0ff;
+    position: relative;
+  }
+
+  #pulsos.expanded {
+    max-height: calc(12 * 1.2em);
+    overflow-y: auto;
+  }
+
+  .debug-mistico {
+    line-height: 1.2em;
+    margin-bottom: 0em; 
+    word-break: break-word;
+  }
+
+  /* FADE VISUAL no final */
+  #pulsos:not(.expanded)::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: 1.2em;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    pointer-events: none;
+  }
+.pulso-item {
+  margin-bottom: 12px;
+}
+.pulso-item button.replay-btn {
+  background: transparent;
+  border: 1px solid #0ff;
+  color: #0ff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+.pulso-item button:hover {
+  background: #0ff;
+  color: #000;
+}
+    #koblluxPlayer {
+position: fixed;
+top: 30px;
+left: 20px;
+z-index: 9999;
+background: rgba(0, 10, 20, 0.8);
+backdrop-filter: blur(12px) saturate(180%);
+padding: 18px;
+border-radius: 16px;
+border: 1px solid rgba(0, 255, 255, 0.15);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+0 0 0 1px rgba(0, 255, 255, 0.1),
+0 0 30px rgba(0, 255, 255, 0.05);
+color: #e0f7ff;
+display: flex;
+flex-direction: column;
+gap: 14px;
+max-width: 260px;
+transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#koblluxPlayer button, 
+#koblluxPlayer select, 
+#koblluxPlayer input[type="range"] {
+background: rgba(0, 255, 255, 0.05);
+border: 1px solid rgba(0, 255, 255, 0.1);
+border-radius: 8px;
+color: inherit;
+padding: 8px 12px;
+font-size: 13px;
+transition: all 0.3s ease;
+width: 100%;
+cursor: pointer;
+}
+#koblluxPlayer button {
+background: linear-gradient(135deg, rgba(0, 150, 255, 0.15), rgba(0, 80, 200, 0.2));
+backdrop-filter: blur(4px);
+}
+#koblluxPlayer button:hover {
+background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 100, 220, 0.3));
+border-color: rgba(0, 255, 255, 0.3);
+box-shadow: 0 0 15px rgba(0, 200, 255, 0.1);
+transform: translateY(-1px);
+}
+#togglePlayer {
+width: 60px;
+height: 60px;
+border-radius: 50% !important;
+border: none !important;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3) !important;
+background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 120, 255, 0.35)) !important;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+#togglePlayer:hover {
+transform: rotate(90deg);
+background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 100, 220, 0.3)) !important;
+box-shadow: 0 0 25px rgba(0, 255, 255, 0.5) !important;
+}
+#togglePlayer:hover {
+transform: rotate(90deg);
+background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 120, 255, 0.35)) !important;
+box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+#playerControls {
+display: none;
+flex-direction: column;
+gap: 12px;
+margin-top: 10px;
+animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+#koblluxPlayer input[type="range"] {
+-webkit-appearance: none;
+height: 6px;
+background: rgba(0, 255, 255, 0.1);
+border-radius: 10px;
+padding: 0;
+margin: 10px 0;
+}
+#koblluxPlayer input[type="range"]::-webkit-slider-thumb {
+-webkit-appearance: none;
+width: 16px;
+height: 16px;
+border-radius: 50%;
+background: #00ffff;
+cursor: pointer;
+box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+transition: all 0.2s ease;
+}
+#koblluxPlayer input[type="range"]::-webkit-slider-thumb:hover {
+transform: scale(1.2);
+box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+}
+#koblluxPlayer label {
+font-size: 11px;
+opacity: 0.7;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+color: rgba(0, 255, 255, 0.7);
+}
+#themeSelector {
+background: rgba(0, 255, 255, 0.05);
+border: 1px solid rgba(0, 255, 255, 0.15);
+border-radius: 8px;
+color: #0ff;
+padding: 4px 8px;
+font-size: 13px;
+backdrop-filter: blur(4px);
+transition: all 0.3s ease;
+}
+#themeSelector:hover {
+background: rgba(0, 255, 255, 0.1);
+border-color: rgba(0, 255, 255, 0.3);
+}
+/* Ultra Foda KOBLLUX Player Styles */
+#koblluxPlayer {
+position: fixed;
+top: 20px;
+left: 20px;
+z-index: 99999;
+background: rgba(0, 10, 20, 0.8);
+backdrop-filter: blur(12px) saturate(180%);
+padding: 18px;
+border-radius: 16px;
+border: 1px solid rgba(0, 255, 255, 0.15);
+box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+0 0 0 1px rgba(0, 255, 255, 0.1),
+0 0 30px rgba(0, 255, 255, 0.05);
+color: #e0f7ff;
+display: flex;
+flex-direction: column;
+gap: 14px;
+max-width: 260px;
+transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Additional overrides... */
+/* Remove parent border/shadow influence on toggle */
+#koblluxPlayer #togglePlayer {
+border: none !important;
+box-shadow: none !important;
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Ensure perfect circle */
+#togglePlayer {
+width: 60px !important;
+height: 60px !important;
+aspect-ratio: 1 / 1 !important;
+border-radius: 50% !important;
+box-sizing: border-box !important;
+}
+/* Remove inherited borders/shadows and set gradient background */
+#koblluxPlayer #togglePlayer {
+border: none !important;
+box-shadow: none !important;
+outline: none !important;
+background: var(--bg) !important;
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Ensure perfect circle of 33px */
+#togglePlayer {
+width: 33px !important;
+height: 33px !important;
+aspect-ratio: 1 / 1 !important;
+border-radius: 50% !important;
+overflow: visible !important;
+}
+/* Scale inner icon */
+#togglePlayer svg,
+#togglePlayer .waves-icon {
+width: 20px !important;
+height: 20px !important;
+}
+/* Clear extra padding/margin */
+#togglePlayer > * {
+padding: 0 !important;
+margin: 0 !important;
+}
+/* Remove any border/box-shadow on container that affect children */
+#koblluxPlayer {
+border: none !important;
+box-shadow: none !important;
+outline: none !important;
+}
+</style>
+<!-- 🌌 Camada Simbiótica Oculta -->
+<div id="pulsos-container">
+<div id="pulsos" style="display:none"></div>
+</div>
+<script>
+  const pulsos = document.getElementById("pulsos");
+
+  function logMistico(msg) {
+    const el = document.createElement("div");
+    el.className = "debug-mistico";
+    el.innerText = "◉ " + msg;
+    pulsos.appendChild(el);
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  }
+
+  pulsos.addEventListener("click", () => {
+    pulsos.classList.toggle("expanded");
+    if (!pulsos.classList.contains("expanded")) {
+      pulsos.scrollTop = pulsos.scrollHeight;
+    }
+  });
+
+  function spawnCosmicExplosion(x, y) {
+    const boom = document.createElement("div");
+    boom.style.position = "absolute";
+    boom.style.left = x + "px";
+    boom.style.top = y + "px";
+    boom.style.width = boom.style.height = "12px";
+    boom.style.borderRadius = "50%";
+    boom.style.background = "radial-gradient(circle, #0ff, #f0f0ff, transparent)";
+    boom.style.pointerEvents = "none";
+    boom.style.animation = "pulse 0.4s ease-out";
+    document.body.appendChild(boom);
+    setTimeout(() => boom.remove(), 1000);
+  }
+
+  // Pulso na página principal
+  document.addEventListener("click", e => {
+    spawnCosmicExplosion(e.clientX, e.clientY);
+    navigator.vibrate?.([5, 15, 5]);
+    logMistico("Pulso simbiótico em " + e.clientX + ", " + e.clientY);
+  });
+
+  // Recebe cliques do iframe
+  window.addEventListener("message", function(event) {
+    if (event.data?.type === "iframeClick") {
+      const iframe = document.getElementById("seuIframeID"); // Troque para o ID real do seu iframe
+      if (!iframe) return;
+
+      const rect = iframe.getBoundingClientRect();
+      const xGlobal = rect.left + event.data.x;
+      const yGlobal = rect.top + event.data.y;
+
+      spawnCosmicExplosion(xGlobal, yGlobal);
+      navigator.vibrate?.([5, 15, 5]);
+      logMistico("⚡ Pulso no iFrame em " + event.data.x + ", " + event.data.y);
+    }
+  });
+</script>
+<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.8);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
+<button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
+    ≈
+   </button>
+<div class="hidden" id="playerWrapper">
+</div>
+<div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
+<button id="playPause" style="font-size:22px;background:none;">
+     ►
+    </button>
+<select id="trackSelect">
+<option value="">
+      🎵 Escolha uma trilha
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      ◉ Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<select id="binauralSelect">
+<option value="">
+      🎶 Binaural Desativado
+     </option>
+<option value="Sono_Profundo">
+      🌙 Sono Profundo
+     </option>
+<option value="Manifestação">
+      ✨ Manifestação
+     </option>
+<option value="Ativação_Pineal">
+      🧠 Ativação Pineal
+     </option>
+<option value="Alívio_da_Ansiedade">
+      🌿 Alívio da Ansiedade
+     </option>
+<option value="Meditação_Theta">
+      ◉ Meditação Theta
+     </option>
+<option value="Viagem_Astral">
+      🌌 Viagem Astral
+     </option>
+<option value="Foco_Profundo">
+      🎯 Foco Profundo
+     </option>
+<option value="Flow_State">
+      🌊 Flow State
+     </option>
+<option value="Relaxamento_Rápido">
+      💤 Relaxamento Rápido
+     </option>
+<option value="Concentração_Sustentada">
+      📚 Concentração Sustentada
+     </option>
+<option value="Cura_Emocional">
+      💖 Cura Emocional
+     </option>
+<option value="Recuperação_Física">
+      🏋️ Recuperação Física
+     </option>
+<option value="matrix">
+      🧪 Matrix
+     </option>
+<option value="tesseract">
+      🧿 Tesseract
+     </option>
+</select>
+<label>
+     🎵 Volume Trilha
+     <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+</label>
+<label>
+     🧘 Volume Binaural
+     <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/>
+</label>
+</div>
+</div>
+<button id="themeToggle" title="Alternar tema"></button>
+<div id="particles-js"></div>
+<div class="svg-container" id="logoContainer">
+<object data="assets/icons/3D_logo_Dual_Infodose_10.png" id="logoObj" type="image/png"></object>
+</div>
+<div class="response-container" id="response">
+<div class="pages-wrapper">
+<div class="page initial active">
+<strong>Clique no ◉ e diga “Oi, Dual”.</strong>
+</div>
+</div>
+<p class="footer-text">
+<em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em>
+</p>
+<div class="response-controls">
+<div class="control-buttons">
+<button class="copy-button" title="Copiar">
+<object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object>
+</button>
+
+<button class="paste-button" title="Colar">
+<object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object>
+</button>
+<button class="toggle-button" id="toggleBtn" title="Login Infodose">
+<object data="assets/icons/KBLX-pack/SuS-logo-1.PNG" height="33" type="image/png" width="33"></object>
+</button>
+<button class="kitty-button" id="kittyBtn" title="Estudos">
+<object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object>
+</button>
+<button class="upload-symbolic-button" id="uploadFileBtn" title="Enviar Arquivo">
+  ⧉
+</button>
+<input accept=".txt,.html,.json,.pdf,.png,.jpg,.jpeg" id="symbolicFileInput" style="display: none;" type="file"/>
+<!-- Botão para abrir o gerenciador de chaves e treinamentos -->
+<button class="keymgr-btn" id="keymgrOpen" title="Chaves &amp; Treinamentos">
+<!-- Ícone representando chaves -->
+<svg fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 12a6 6 0 1 1 11.31 3H22v3h-3v3h-3v-3h-3.69A6 6 0 0 1 3 12Z"></path>
+<circle cx="9" cy="12" r="2"></circle>
+</svg>
+</button>
+<!-- Botão para abrir o gerenciador de patches -->
+<!-- Botão do gerenciador de patches usa o símbolo ”⃝ (aspa curva com círculo) -->
+<!-- Updated patch manager button symbol to U+20CB (Combining Diacritical Marks overlay). Using HTML entity &#x20CB; to ensure proper rendering. Note: this symbol is a combining mark and may require a preceding space or dot for visibility. -->
+<button id="patchMgrBtn" class="upload-symbolic-button" title="Patches">&#x20CB;</button>
+</div>
+<div class="pagination">
+<button data-action="prev">⟵</button>
+<span id="pageIndicator">1 / 1</span>
+<button data-action="next">⟶</button>
+</div>
+</div>
+</div>
+<!-- ========= Patch Manager Injection Begin ========= -->
+<!-- Style definitions specific to the Patch Manager -->
+<style id="patchMgrStyles">
+  #patchMgrBtn{
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid rgba(0,255,255,0.2);
+    box-shadow: 0 0 6px rgba(0,255,255,0.2), 0 0 10px rgba(255,0,255,0.2);
+    font-size: 20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition: all .3s ease;
+  }
+  #patchMgrBtn:hover{
+    background: rgba(0,255,255,0.2);
+    transform: scale(1.1);
+    box-shadow: 0 0 12px rgba(0,255,255,0.4);
+  }
+  #patchMgrPanel{
+    position: fixed;
+    right: 14px;
+    /* Ajusta a posição do painel de patches para considerar a área segura */
+    bottom: calc(60px + var(--safe-b));
+    z-index: 100002;
+    width: min(560px, 92vw);
+    max-height: min(70vh, 560px);
+    overflow: auto;
+    padding: 12px;
+    border-radius: 14px;
+    background: rgba(10,12,16,.78);
+    color: #EDEFF7;
+    border: 1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(10px);
+    display: none;
+  }
+
+  /*
+   * Arrange the patch manager header in a column layout so the title and action buttons
+   * wrap nicely. Without this, a long row of buttons can overflow on smaller screens.
+   */
+  #patchMgrPanel header{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  /* Wrap the action buttons and allow them to span the full width of the panel */
+  #patchMgrPanel header .pm-actions{
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: .5rem;
+    justify-content: flex-start;
+  }
+
+  #patchMgrPanel header{
+    display:flex;
+    gap:.6rem;
+    align-items:center;
+    justify-content: space-between;
+    margin-bottom:.6rem;
+  }
+  #patchMgrPanel pre{
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background: rgba(255,255,255,.06);
+    padding:.6rem;
+    border-radius:8px;
+  }
+  #patchList{
+    display:flex;
+    flex-direction: column;
+    gap:.5rem;
+    margin-top:.5rem;
+  }
+  .pm-item{
+    display:flex;
+    gap:.5rem;
+    align-items:center;
+    justify-content: space-between;
+    background: rgba(255,255,255,.06);
+    padding:.5rem .6rem;
+    border-radius: 10px;
+  }
+  .pm-actions{ display:flex; gap:.4rem; }
+  .pm-actions button{
+    padding:.35rem .6rem;
+    border-radius:8px;
+    border:0;
+    cursor:pointer;
+  }
+  .pm-on{ background: rgba(0,255,200,.16); }
+  .pm-off{ background: rgba(255,80,120,.16); }
+  #storageManager{ display:none; margin-top:1rem; }
+  #storageManager textarea{
+    width:100%;
+    height:60px;
+    margin-top:10px;
+    border-radius:8px;
+    padding:8px;
+    font-family:monospace;
+  }
+  #terminalManager{ display:none; margin-top:1rem; }
+  #terminalManager iframe{
+    width:100%;
+    height:420px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(10,12,16,.78);
+  }
+  #kdx-footer-spacer{
+    /* Espaço reservado no final da página apenas para a área segura (não cria folga extra) */
+    height: var(--safe-b);
+  }
+
+  /* Perfil do usuário e avatar */
+  .pm-profile{
+    display:flex;
+    align-items:center;
+    gap:0.8rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.05));
+    border-radius:16px;
+    padding:0.8rem;
+    margin-bottom:0.8rem;
+  }
+  .pm-profile svg{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.1);
+    padding:4px;
+    flex-shrink:0;
+  }
+  .pm-profile-info strong{
+    font-size:1.4rem;
+    color: var(--accent-1);
+  }
+  .pm-profile-info small{
+    font-size:0.8rem;
+    color: rgba(255,255,255,0.7);
+  }
+
+  /* Social login buttons */
+  .pm-socials{
+    display:flex;
+    flex-wrap: wrap;
+    gap:0.4rem;
+    margin-top:0.5rem;
+  }
+  .pm-socials .social-btn{
+    padding:0.3rem 0.6rem;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.3);
+    font-size:0.8rem;
+    cursor:pointer;
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+    transition: opacity 0.2s ease;
+  }
+  .pm-socials .social-btn:hover{
+    opacity:0.8;
+  }
+  .pm-socials .git{
+    background:#171515;
+    color:#fff;
+  }
+  .pm-socials .apple{
+    background:#f5f5f5;
+    color:#000;
+  }
+  .pm-socials .fb{
+    background:#1877F2;
+    color:#fff;
+  }
+  .pm-socials .google{
+    background:#EA4335;
+    color:#fff;
+  }
+
+  /* Quick injection panel styling */
+  #quickManager{
+    display:none;
+    margin-top:1rem;
+  }
+  #quickManager label{
+    font-size:0.85rem;
+    color: rgba(255,255,255,0.8);
+  }
+  #quickManager textarea{
+    width:100%;
+    height:80px;
+    margin-top:6px;
+    border-radius:10px;
+    padding:8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text);
+    font-family: monospace;
+  }
+  #quickManager .pm-actions{
+    margin-top:0.5rem;
+  }
+
+  /* Background manager styles */
+  #bgManager {
+    display: none;
+    margin-top: 1rem;
+  }
+  .bg-list {
+    display:flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .bg-item {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 6px rgba(0,0,0,0.5);
+  }
+  .bg-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bg-item .bg-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(0,0,0,0.5);
+    padding: 2px;
+  }
+  .bg-item .bg-actions button {
+    padding: 2px 4px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .bg-item .bg-actions button:hover {
+    background: rgba(255,255,255,0.3);
+  }
+</style>
+<!-- Botão de patches será adicionado na barra de controles -->
+<!-- Painel do gerenciador de patches (inicialmente oculto) -->
+<div id="patchMgrPanel" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <!-- Perfil do usuário / card humanizado -->
+  <div class="pm-profile">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 20a8 8 0 0 1 16 0z"></path></svg>
+    <div class="pm-profile-info">
+      <strong id="pmUserName">Seu Perfil</strong>
+      <small>Gerencie seus patches e preferências</small>
+      <div class="pm-socials">
+        <button class="social-btn git" title="Conectar com GitHub" onclick="window.open('https://github.com/login','_blank')">GitHub</button>
+        <button class="social-btn apple" title="Conectar com Apple" onclick="window.open('https://appleid.apple.com/auth/authorize','_blank')">Apple</button>
+        <button class="social-btn fb" title="Conectar com Facebook" onclick="window.open('https://www.facebook.com/login','_blank')">Facebook</button>
+        <button class="social-btn google" title="Conectar com Google" onclick="window.open('https://accounts.google.com/signin','_blank')">Google</button>
+      </div>
+    </div>
+    <!-- Hidden file input for uploading avatar -->
+    <input id="avatarUpload" type="file" accept="image/*" style="display:none;" />
+  </div>
+  <header>
+    <strong id="pmTitle">Gerenciador de Patches</strong>
+    <div class="pm-actions">
+      <button id="pmImport">Importar .json</button>
+      <button id="pmPaste">Colar JSON</button>
+      <button id="pmExport">Exportar</button>
+      <button id="pmStorage">Storage</button>
+      <button id="pmQuick">Rápido</button>
+      <button id="pmTerminal">Terminal</button>
+      <button id="pmBackgrounds">Fundos</button>
+      <button id="pmClose">Fechar</button>
+    </div>
+  </header>
+  <small>Os patches são salvos localmente e aplicados em ordem de prioridade.</small>
+  <div id="patchList"></div>
+  <div id="storageManager">
+    <div class="pm-actions">
+      <button id="storageRefresh">Atualizar</button>
+      <button id="storageClear">Limpar tudo</button>
+      <button id="storageExport">Exportar</button>
+      <button id="storageAdd">Adicionar</button>
+    </div>
+    <div id="storageList"></div>
+    <textarea id="cssInput" placeholder="Cole seu CSS aqui"></textarea>
+    <div class="pm-actions">
+      <button id="applyCSS">Aplicar CSS</button>
+    </div>
+  </div>
+  <div id="terminalManager">
+    <iframe id="pmTerminalFrame" src="Dual-terminal-0.html"></iframe>
+  </div>
+  <!-- Área de injeção rápida de CSS/JS -->
+  <div id="quickManager">
+    <label for="quickInput">Injeção rápida:</label>
+    <textarea id="quickInput" placeholder="Cole CSS ou JS aqui..."></textarea>
+    <div class="pm-actions">
+      <button id="applyQuick">Injetar</button>
+    </div>
+  </div>
+
+  <!-- Gerenciador de fundos de tela -->
+  <div id="bgManager">
+    <div class="pm-actions">
+      <button id="bgUploadBtn">Upload BG</button>
+      <input id="bgUploadInput" type="file" accept="image/*" multiple style="display:none" />
+    </div>
+    <div id="bgList" class="bg-list"></div>
+  </div>
+</div>
+<div id="kdx-footer-spacer"></div>
+<!-- ========= Patch Manager Injection End ========= -->
+<div class="input-container">
+<input id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
+<button id="sendBtn" title="Enviar">➤</button>
+<button id="voiceBtn" title="Falar">
+<object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36"></object>
+</button>
+</div>
+<div class="login-container" id="loginBox">
+<div id="advancedToggleOptions" style="display:none;margin-top:12px;flex-direction:column;gap:10px;">
+<input id="skInput" placeholder="🔑 Nova chave SK..." style="padding:8px;border-radius:8px;border:1px solid #0ff;background:rgba(0,0,0,0.2);color:#0ff;" type="text"/>
+<input id="roleSystemInput" placeholder="📜 Role System..." style="padding:8px;border-radius:8px;border:1px solid #0ff;background:rgba(0,0,0,0.2);color:#0ff;" type="text"/>
+<select id="modelSelector" style="padding:8px;border-radius:8px;background:rgba(0,0,0,0.2);color:#0ff;border:1px solid #0ff;">
+<option value="">🤖 Selecione modelo</option>
+<option value="deepseek/deepseek-chat-v3-0324:free">Deepseek v3</option>
+<option value="openchat/openchat-3.5-1210:free">OpenChat 3.5</option>
+<option value="mistralai/mixtral-8x7b:free">Mixtral</option>
+<option value="meta-llama/llama-3-70b-instruct:free">LLaMA 3 70B</option>
+</select>
+<button onclick="salvarConfiguracoesAvancadas()" style="padding:8px;border-radius:8px;border:1px solid #0ff;background:#0ff;color:#000;font-weight:bold;">💾 Ativar Configurações</button>
+</div>
+<form id="loginForm">
+<input id="userName" placeholder="Nome do usuário" required="" type="text"/>
+<input id="assistantInput" placeholder="Nome dual.infodose" required="" type="text"/>
+<button type="submit">Ativar</button>
+</form>
+</div>
+<script>
+   document.addEventListener("DOMContentLoaded", () => {
+const toggleBtn = document.getElementById("togglePlayer");
+const controls = document.getElementById("playerControls");
+const playPauseBtn = document.getElementById("playPause");
+const trackSelect = document.getElementById("trackSelect");
+const binauralSelect = document.getElementById("binauralSelect");
+const trackVolume = document.getElementById("trackVolume");
+const binauralVolume = document.getElementById("binauralVolume");
+const trackAudio = new Audio();
+const binauralAudio = new Audio();
+toggleBtn.addEventListener("click", () => {
+controls.style.display = controls.style.display === "flex" ? "none" : "flex";
+});
+playPauseBtn.addEventListener("click", () => {
+if (trackAudio.src) trackAudio.paused ? trackAudio.play() : trackAudio.pause();
+if (binauralAudio.src) binauralAudio.paused ? binauralAudio.play() : binauralAudio.pause();
+playPauseBtn.textContent = (trackAudio.paused && binauralAudio.paused) ? "►" : "⏸";
+});
+trackSelect.addEventListener("change", () => {
+if (trackSelect.value) {
+trackAudio.src = `assets/sounds/trilhas/${trackSelect.value}.mp3`;
+trackAudio.loop = true;
+trackAudio.volume = trackVolume.value;
+trackAudio.play();
+playPauseBtn.textContent = "⏸";
+} else {
+trackAudio.pause();
+trackAudio.src = "";
+}
+});
+binauralSelect.addEventListener("change", () => {
+if (binauralSelect.value) {
+binauralAudio.src = `assets/sounds/binaural/${binauralSelect.value}.wav`;
+binauralAudio.loop = true;
+binauralAudio.volume = binauralVolume.value;
+binauralAudio.play();
+} else {
+binauralAudio.pause();
+binauralAudio.src = "";
+}
+});
+trackVolume.addEventListener("input", () => {
+trackAudio.volume = trackVolume.value;
+});
+binauralVolume.addEventListener("input", () => {
+binauralAudio.volume = binauralVolume.value;
+});
+});
+  </script>
+<script>
+  document.addEventListener("click", function(e) {
+    window.parent.postMessage({
+      type: "iframeClick",
+      x: e.clientX,
+      y: e.clientY
+    }, "*");
+  });
+  document.addEventListener("touchstart", function(e) {
+    const t = e.touches[0];
+    if (t) {
+      window.parent.postMessage({
+        type: "iframeClick",
+        x: t.clientX,
+        y: t.clientY
+      }, "*");
+    }
+  });
+</script>
+<script>
+  document.getElementById("btn-expandir-ritual")?.addEventListener("click", () => {
+    const pulsos = document.getElementById("pulsos");
+    if (pulsos) {
+      pulsos.classList.toggle("expanded");
+      if (!pulsos.classList.contains("expanded")) {
+        pulsos.scrollTop = pulsos.scrollHeight;
+      }
+    }
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+<script>
+   (function(){
+    const STORAGE_KEY  = 'infodoseEnabled',
+          THEME_KEY    = 'infodoseTheme',
+          KIT_PRIMARY  = 'assets/icons/DualKittyKard-icon-3.png',
+          KIT_FALLBACK = 'assets/icons/dual_Dual_Infodose.svg',
+          CONFIG = {
+            TRAINING_FILE:'data/Oidual.txt',
+            API_URL      :'https://openrouter.ai/api/v1/chat/completions',
+            MODEL        :'deepseek/deepseek-chat-v3-0324:free',
+            TEMP         : 0.2,
+            CHUNK_SIZE   :12000,
+            AUTH_TOKEN   :''
+          };
+
+    let training = '', chunks = [], chunkIndex = 0;
+    let isEnabled = false, isStudying = false;
+    let userName = '', assistantBase = '';
+    let conversation = [];
+    let pages = [], currentPage = 0, autoAdvance = true;
+    let originalLogo = '';
+
+    const $ = s => document.querySelector(s);
+    const create = (t,c,h) => {
+      const e = document.createElement(t);
+      if(c) e.className = c;
+      if(h) e.innerHTML = h;
+      return e;
+    };
+    particlesJS('particles-js',{
+      particles:{ number:{value:40}, color:{value:['#0ff','#f0f']},
+        shape:{type:'circle'}, opacity:{value:0.4}, size:{value:2.4},
+        move:{enable:true,speed:1.5}
+      }, retina_detect:true
+    });
+
+    function applyTheme(theme){
+      document.body.classList.remove('light','medium','vibe');
+      if(theme!=='dark') document.body.classList.add(theme);
+    }
+    function toggleTheme(){
+      const order=['dark','light','medium','vibe'];
+      const cur=localStorage.getItem(THEME_KEY)||'dark';
+      const next=order[(order.indexOf(cur)+1)%order.length];
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY,next);
+    }
+    function changeLogo(srcs){
+      const cont=$('#logoContainer'), obj=$('#logoObj');
+      cont.classList.add('fading');
+      cont.addEventListener('transitionend',function once(){
+        cont.removeEventListener('transitionend',once);
+        if(Array.isArray(srcs)){
+          obj.data=srcs[0];
+          obj.onerror=()=>obj.data=srcs[1];
+        } else obj.data=srcs;
+        cont.classList.remove('fading');
+      });
+    }
+
+    async function init(){
+      applyTheme(localStorage.getItem(THEME_KEY)||'dark');
+      $('#themeToggle').addEventListener('click',toggleTheme);
+      originalLogo = $('#logoObj').data;
+
+      try {
+        training = await fetch(CONFIG.TRAINING_FILE).then(r=>r.text());
+        for(let i=0;i<training.length;i+=CONFIG.CHUNK_SIZE){
+          chunks.push(training.slice(i,i+CONFIG.CHUNK_SIZE));
+        }
+      } catch(e){ console.error('Falha no treino:',e); }
+
+      loadConfig();
+      if(!conversation.length){
+        conversation.push({
+          role:'system',
+          content:(chunks[0]||training)+'\n\nVocê é o assistente Dual.infodose.'
+        });
+        chunkIndex=1;
+      }
+      bindUI();
+    }
+
+    function loadConfig(){
+      if(localStorage.getItem(STORAGE_KEY)==='1'){
+        isEnabled=true;
+        userName=localStorage.getItem('userName')||'';
+        assistantBase=localStorage.getItem('assistantBase')||'';
+        conversation=[{
+          role:'system',
+          content:(chunks[0]||training)
+            +`\n\nUsuário: ${userName}.\nAssistente: ${assistantBase} dual.infodose.`
+        }];
+        chunkIndex=1;
+        updateUI();
+      }
+    }
+
+    function updateUI(){
+      $('#toggleBtn').classList.toggle('active',isEnabled);
+      $('#kittyBtn').classList.toggle('active',isStudying);
+      $('#assistantName').textContent = isStudying
+        ? 'Estudos dual.infodose'
+        : (isEnabled ? `${assistantBase} dual.infodose` : '');
+    }
+
+    function showLoading(msg){
+      const wrap=$('.pages-wrapper');
+      wrap.innerHTML='';
+      const p=create('div','page active'), foot=create('p','footer-text loading','');
+      msg.split('').forEach((ch,i)=>{
+        const sp=create('span'); sp.textContent=ch;
+        sp.style.animationDelay=(i*0.02)+'s'; sp.classList.add('loading');
+        foot.appendChild(sp);
+      });
+      p.appendChild(foot); wrap.appendChild(p);
+      $('#pageIndicator').textContent = '1 / 1';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(new SpeechSynthesisUtterance(msg));
+    }
+
+    function splitText(t){
+      let ps = t.split(/\n\s*\n/).filter(p=>p.trim());
+      if(ps.length % 3 !== 0){
+        ps = (t.match(/[^\.!\?]+[\.!\?]+/g)||[]).map(s=>s.trim());
+      }
+      const out=[];
+      for(let i=0;i<ps.length;i+=3){
+        out.push(ps.slice(i,i+3));
+      }
+      return out;
+    }
+
+    function renderResponse(txt){
+      const wrap=$('.pages-wrapper');
+      wrap.innerHTML=''; pages=[]; currentPage=0; autoAdvance=true;
+      txt = txt 
+        .replace(/`([^`]+)`/g,'<code>$1</code>') 
+        .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>') 
+        .replace(/\*(.+?)\*/g,'<em>$1</em>');
+      // AJUSTE 2: Substituir emojis por símbolos Unicode de forma consistente.
+      // Este mapeamento converte os emojis temáticos em símbolos Unicode mais "limpos".
+      const emojiMap = { '🎁':'◇', '👁️':'◆', '⚡️':'✦', '⚡':'✦' };
+      txt = txt.replace(/([\u1F300-\u1F9FF\u2600-\u26FF\u2700-\u27BF])/g, m => emojiMap[m] || m);
+      const groups = splitText(txt), 
+            titles = ['🎁 Recompensa Inicial','👁️ Exploração','⚡️ Antecipação'];
+
+      // AJUSTE 1: Combinar blocos consecutivos se a soma do conteúdo for muito curta.
+      function mergeShortParagraphs(paragraphs, threshold = 30) {
+        const merged = [];
+        let buffer = '';
+        paragraphs.forEach(p => {
+          // remove tags para calcular comprimento real
+          const plain = p.replace(/<[^>]+>/g,'').trim();
+          if(plain.length < threshold) {
+            buffer += (buffer ? ' ' : '') + p;
+          } else {
+            if(buffer) { merged.push(buffer.trim()); buffer=''; }
+            merged.push(p);
+          }
+        });
+        if(buffer) merged.push(buffer.trim());
+        return merged;
+      }
+      groups.forEach((grp, gi)=>{ 
+        // unir pequenos parágrafos antes de renderizar
+        const mergedGrp = mergeShortParagraphs(grp); 
+        const pg = create('div','page'+(gi===0?' active':''),''); 
+        mergedGrp.forEach((para,j)=>{ 
+          const cls = j===0?'intro':j===1?'middle':'ending'; 
+          // AJUSTE 3: detectar tokens de cor (#RGB ou #RRGGBB) dentro do parágrafo e aplicá-los no estilo
+          let colorMatch = para.match(/#([0-9a-fA-F]{3,6})/);
+          let colorToken = null;
+          if(colorMatch){
+            colorToken = colorMatch[0];
+            para = para.replace(colorToken,'');
+            // normalizar tokens abreviados (#f0f -> #ff00ff)
+            if(colorToken.length === 4){
+              const r = colorToken[1], g = colorToken[2], b = colorToken[3];
+              colorToken = '#' + r + r + g + g + b + b;
+            }
+          }
+          const block = create('div',`response-block ${cls}`,`<p>${para}</p>`); 
+          if(colorToken){
+            block.style.color = colorToken;
+            block.style.borderLeftColor = colorToken;
+            block.style.transition = 'all 0.3s ease';
+          }
+          block.addEventListener('click',()=>{
+            autoAdvance=false;
+                  const cleanPara = para
+          .replace(/["“”‘’]/g, '')                        // aspas
+          .replace(/[\u1F300-\u1F6FF\u1F900-\u1F9FF\u2600-\u26FF\u2700-\u27BF]/g, ''); // emojis
+      
+        const utter = new SpeechSynthesisUtterance(cleanPara);
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utter);
+      
+        if (!block.dataset.spoken) {
+          block.dataset.spoken = '1';
+          block.classList.add('clicked');
+        } else {
+          block.classList.add('expanded');
+          if (!isEnabled) {
+            isEnabled = true;
+            localStorage.setItem(STORAGE_KEY, '1');
+            updateUI();
+              }
+              showLoading(' Pulso em Expansão...');
+              conversation.push({role:'user',content:`${titles[j]}\n\n${para}`});
+              callAI();
+            }
+          });
+          pg.appendChild(block);
+        });
+        wrap.appendChild(pg);
+        pages.push(pg);
+      });
+
+      $('#pageIndicator').textContent = `1 / ${pages.length}`;
+      autoSpeakPage(0);
+    }
+
+    function autoSpeakPage(i){
+  const txts = Array.from(pages[i].querySelectorAll('p'))
+    .map(p=>p.textContent).join(' ');
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(txts);
+  
+  utter.onend = () => {
+    if (autoAdvance && i < pages.length - 1) {
+      changePage(1);
+    } else if (i === pages.length - 1) {
+      // Aqui, só após a ÚLTIMA página:
+      speechSynthesis.speak(
+        new SpeechSynthesisUtterance('Do seu jeito. Sempre único. Sempre seu.')
+      );
+    }
+  };
+
+  speechSynthesis.speak(utter);
+}
+
+    function changePage(d){
+      const np = currentPage + d;
+      if(np<0||np>=pages.length) return;
+      pages[currentPage].classList.remove('active');
+      pages[np].classList.add('active');
+      currentPage=np;
+      $('#pageIndicator').textContent = `${np+1} / ${pages.length}`;
+      if(autoAdvance) autoSpeakPage(np)
+    }
+
+    async function callAI(){
+      try {
+        /*
+         * Para evitar requisições lentas causadas pelo envio de um histórico de
+         * conversa muito longo, cortamos a conversa antes de enviá‑la para a API.
+         * Mantemos sempre a primeira mensagem do tipo system (que contém o
+         * treinamento inicial) e apenas as últimas interações do usuário e
+         * assistente. Isso reduz o tamanho do payload e melhora o tempo de
+         * resposta sem perder o contexto imediato.
+         */
+        let messages;
+        if (conversation.length > 8) {
+          // mantém a mensagem de sistema original e as 6 últimas interações
+          messages = [conversation[0], ...conversation.slice(-6)];
+        } else {
+          messages = conversation;
+        }
+
+        const res = await fetch(CONFIG.API_URL, {
+          method: 'POST',
+          headers: {
+            // A chave de autorização será injetada dinamicamente pelo gerenciador de chaves (fetch wrapper)
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: CONFIG.MODEL,
+            messages: messages,
+            temperature: CONFIG.TEMP
+          })
+        });
+
+        const payload = await res.json();
+        if (!res.ok) throw new Error(payload.error?.message || res.statusText);
+        if (!payload.choices?.length) throw new Error('Resposta vazia da API');
+        const ans = payload.choices[0].message.content.trim();
+        conversation.push({ role: 'assistant', content: ans });
+        renderResponse(ans);
+
+      } catch (err) {
+        console.error('callAI erro:', err);
+        const fallback = 'Desculpe, não consegui obter resposta. Tente novamente.';
+        conversation.push({ role: 'assistant', content: fallback });
+        renderResponse(fallback);
+      }
+    }
+
+    function bindUI(){
+      $('#sendBtn').addEventListener('click',onSend);
+      $('#userInput').addEventListener('keypress',e=>{ if(e.key==='Enter') onSend(); });
+      $('#voiceBtn').addEventListener('click',()=>{
+        const rec = new (window.SpeechRecognition||window.webkitSpeechRecognition)();
+        rec.lang='pt-BR'; rec.start();
+        rec.onresult=evt=>{
+          $('#userInput').value=evt.results[0][0].transcript; onSend();
+        };
+      });
+
+      document.querySelector('.control-buttons').addEventListener('click',e=>{
+        if(e.target.closest('.copy-button')){
+          const txt=pages.map(p=>p.innerText.trim()).join('\n\n');
+          navigator.clipboard.writeText(txt);
+        }
+        if(e.target.closest('.paste-button')){
+          navigator.clipboard.readText().then(txt=>$('#userInput').value=txt);
+        }
+        if(e.target.closest('#toggleBtn')){
+          if(!isEnabled) $('#loginBox').classList.add('active');
+          else {
+            isEnabled=false; localStorage.removeItem(STORAGE_KEY);
+            conversation=[]; updateUI();
+          }
+        }
+        if(e.target.closest('#kittyBtn')){
+          isStudying=!isStudying;
+          if(isStudying){
+            conversation=[{
+              role:'system',
+              content:(chunks[0]||training)+'\n\nVocê é Assistente de Estudos dual.infodose.'
+            }];
+            changeLogo([KIT_PRIMARY,KIT_FALLBACK]);
+          } else {
+            changeLogo(originalLogo); loadConfig();
+          }
+          updateUI();
+        }
+      });
+
+      document.querySelector('.pagination').addEventListener('click',e=>{
+        if(e.target.dataset.action==='prev') changePage(-1);
+        if(e.target.dataset.action==='next') changePage(1);
+        autoAdvance=false;
+      });
+
+      $('#loginForm').addEventListener('submit',e=>{
+        e.preventDefault();
+        const u=$('#userName').value.trim(), a=$('#assistantInput').value.trim();
+        if(!u||!a) return alert('Preencha os dados');
+        isEnabled=true; userName=u; assistantBase=a;
+        localStorage.setItem(STORAGE_KEY,'1');
+        localStorage.setItem('userName',u);
+        localStorage.setItem('assistantBase',a);
+        loadConfig(); $('#loginBox').classList.remove('active');
+      });
+
+      // A alternância de visibilidade das páginas é gerenciada por um
+      // script dedicado no rodapé (v6.2.4). Removemos o listener
+      // anterior para evitar duplicação e conflitos de estado.
+    }
+
+    function onSend(){
+      const raw=$('#userInput').value.trim(); if(!raw) return;
+      $('#userInput').value=''; autoAdvance=false;
+      showLoading('Pulso enviado...Recebendo intenção…');
+      conversation.push({role:'user',content:raw});
+      callAI();
+    }
+
+    document.addEventListener('DOMContentLoaded',init);
+  })();
+  </script>
+<script>
+function renderResponseBlocks({ intro = "", middle = "", ending = "" }) {
+  const container = document.querySelector(".pages-wrapper");
+
+  function createBlock(content, className) {
+    const block = document.createElement("div");
+    block.className = "response-block " + className;
+
+    const parsed = content
+      .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match => {
+        return `<button class="symbol-btn" onclick="registrarPulsoEEnviar('Emoji: ${match}')">${match}</button>`;
+      })
+      .replace(/\[(.+?)\]/g, (match, p1) => {
+        return `<button class="symbol-btn" onclick="registrarPulsoEEnviar('[${p1}]')">[${p1}]</button>`;
+      });
+
+    block.innerHTML = parsed;
+
+    block.addEventListener("click", () => {
+      block.classList.toggle("expanded");
+      const pulsos = document.getElementById("pulsos");
+      if (pulsos) pulsos.classList.toggle("expanded");
+      logMistico("◉ Expandiu bloco: " + className);
+    });
+
+    return block;
+  }
+
+  if (intro)  container.appendChild(createBlock(intro, "intro"));
+  if (middle) container.appendChild(createBlock(middle, "middle"));
+  if (ending) container.appendChild(createBlock(ending, "ending"));
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const footer = document.querySelector(".footer-text");
+  const inputContainer = document.querySelector(".input-container");
+  const controls = document.querySelector(".control-buttons");
+  const pagination = document.querySelector(".pagination");
+const ritualBtn = document.getElementById("btn-expandir-ritual");
+
+  // Estado inicial: ocultar UI e botões/ícones
+  if (inputContainer) inputContainer.classList.add('hidden');
+  if (controls) controls.classList.add('hidden');
+  if (pagination) pagination.classList.add('hidden');
+  if (ritualBtn) ritualBtn.classList.add('move-to-bottom-ritual');
+  if (footer) footer.classList.add('move-to-bottom');
+  // Ocultar logo, symbol bar e botões laterais
+  document.querySelectorAll('.svg-container, .symbol-bar, #uploadComponentBtn, #remoteComponentBtn, #toggleDecoderBtn').forEach(el => {
+    if (el) el.style.display = 'none';
+  });
+
+  if (footer && inputContainer && controls && pagination) {
+    footer.addEventListener("click", () => {
+      inputContainer.classList.toggle("hidden");
+      controls.classList.toggle("hidden");
+      pagination.classList.toggle("hidden");
+    ritualBtn.classList.toggle("move-to-bottom-ritual");
+      footer.classList.toggle("move-to-bottom");
+    });
+  }
+});
+</script>
+<script>
+   // 🎧 Sons de interface - Coblux UI Samples
+const uiSounds = {
+click: new Audio('assets/sounds/uiSamples/navigation.wav'),
+hover: new Audio('assets/sounds/uiSamples/hover.wav'),
+confirm: new Audio('assets/sounds/uiSamples/confirm.wav'),
+back: new Audio('assets/sounds/uiSamples/back.wav'),
+temaUp: new Audio('assets/sounds/uiSamples/back-action.wav'),
+temaDown: new Audio('assets/sounds/uiSamples/back-action.wav'),
+};
+// Volume padrão
+for (const key in uiSounds) {
+uiSounds[key].volume = 0.4;
+}
+// ⛔ Remover microfone automático
+// window.SpeechRecognition = null;
+// window.webkitSpeechRecognition = null;
+// 🎯 Sons ao interagir
+document.addEventListener("DOMContentLoaded", () => {
+// Clique em qualquer botão
+document.querySelectorAll("button").forEach(btn => {
+btn.addEventListener("click", () => {
+uiSounds.click.currentTime = 0;
+uiSounds.click.play().catch(() => {});
+});
+btn.addEventListener("mouseover", () => {
+uiSounds.hover.currentTime = 0;
+uiSounds.hover.play().catch(() => {});
+});
+});
+// Enviar mensagem (confirmar)
+const sendBtn = document.getElementById("sendBtn");
+if (sendBtn) {
+sendBtn.addEventListener("click", () => {
+uiSounds.confirm.currentTime = 0;
+uiSounds.confirm.play().catch(() => {});
+});
+}
+// Trocar tema manualmente (temaSelector)
+const themeSelector = document.getElementById("themeSelector");
+if (themeSelector) {
+let lastIndex = themeSelector.selectedIndex;
+themeSelector.addEventListener("change", () => {
+const newIndex = themeSelector.selectedIndex;
+if (newIndex > lastIndex) {
+uiSounds.temaUp.currentTime = 0;
+uiSounds.temaUp.play().catch(() => {});
+} else if (newIndex < lastIndex) {
+uiSounds.temaDown.currentTime = 0;
+uiSounds.temaDown.play().catch(() => {});
+}
+lastIndex = newIndex;
+});
+}
+// Navegação entre páginas
+document.querySelectorAll('[data-action="prev"]').forEach(btn =>
+btn.addEventListener("click", () => {
+uiSounds.back.currentTime = 0;
+uiSounds.back.play().catch(() => {});
+})
+);
+document.querySelectorAll('[data-action="next"]').forEach(btn =>
+btn.addEventListener("click", () => {
+uiSounds.confirm.currentTime = 0;
+uiSounds.confirm.play().catch(() => {});
+})
+);
+});
+  </script>
+<script>
+   // 🎧 Novos sons com base em IDs
+const uiBL = {
+toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
+kitty: new Audio('assets/sounds/uiSamples/kittyBtn-sfx.wav'),
+ativar: new Audio('assets/sounds/uiSamples/ativar-click-toggleBtn.wav'),
+nav: new Audio('assets/sounds/uiSamples/navigation.wav'),
+cancel: new Audio('assets/sounds/uiSamples/cancel.wav')
+};
+// Volume padrão
+for (const k in uiBL) uiBL[k].volume = 0.45;
+document.addEventListener("DOMContentLoaded", () => {
+// Botão toggle (login)
+const toggle = document.getElementById("toggleBtn");
+if (toggle) toggle.addEventListener("click", () => {
+uiBL.toggle.currentTime = 0;
+uiBL.toggle.play().catch(()=>{});
+});
+// Botão kitty
+const kitty = document.getElementById("kittyBtn");
+if (kitty) kitty.addEventListener("click", () => {
+uiBL.kitty.currentTime = 0;
+uiBL.kitty.play().catch(()=>{});
+});
+// Botão ativar no login
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+loginForm.addEventListener("submit", () => {
+uiBL.ativar.currentTime = 0;
+uiBL.ativar.play().catch(()=>{});
+});
+}
+// Copiar / colar
+document.querySelectorAll('.copy-button, .paste-button').forEach(btn =>
+btn.addEventListener("click", () => {
+uiBL.cancel.currentTime = 0;
+uiBL.cancel.play().catch(()=>{});
+})
+);
+});
+  </script>
+<style>
+#btn-expandir-ritual.move-to-bottom-ritual {
+  bottom: 18px !important;
+  animation: moveRitualDown 0.4s ease forwards !important;
+}
+@keyframes moveRitualDown {
+  from { bottom: 193px; opacity: 0.4; }
+  to   { bottom: 18px; opacity: 0.6; }
+}
+</style>
+<style>
+#layoutTogglePanel {
+  position: fixed;
+  top: 50px;
+  right: 20px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Montserrat, sans-serif;
+  border: 1px solid var(--bg);
+  border-radius: 12px;
+  padding: 14px;
+  z-index: 999999;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+}
+#layoutTogglePanel label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+#layoutTogglePanel input[type="checkbox"] {
+  transform: scale(1.2);
+  accent-color: #0ff;
+}
+#userButton {
+  display: none;
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #0ff, #f0f);
+  color: #000;
+  font-weight: bold;
+  padding: 10px 14px;
+  border-radius: 10px;
+  z-index: 9999;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 0 12px #0ff;
+}
+
+/* Botão de Toggle do Painel */
+#togglePanelBtn {
+  position: fixed;
+  top: 20px;
+  right: 33px;
+  background: var(--bg);
+  color: var(--text);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  z-index: 999;
+  box-shadow: 0 0 10px var(--bg);
+}
+/* --- Customizações de desempenho e visibilidade --- */
+/* Oculta o botão SÜMBÜS por padrão */
+#sumbus-toggle {
+  display: none !important;
+}
+/* Configurações de performance: low/medium/high */
+body.perf-low #particles-js {
+  display: none !important;
+}
+body.perf-low .response-block,
+body.perf-low .svg-container object {
+  animation: none !important;
+}
+/* medium e high permitem partículas (nada a fazer) */
+</style>
+<!-- Botão de Toggle -->
+<button id="togglePanelBtn">⚙️</button>
+<!-- Painel de controle simbiótico -->
+<div id="layoutTogglePanel">
+<label><input onchange="toggleElement('#response', this)" type="checkbox"/> Mostrar IA</label>
+<label><input onchange="toggleElement('.svg-container', this)" type="checkbox"/> Mostrar Logo</label>
+<label><input onchange="toggleElement('#koblluxPlayer', this)" type="checkbox"/> Mostrar Player</label>
+<label><input onchange="toggleElement('#uploadComponentBtn,#remoteComponentBtn,#toggleDecoderBtn', this)" type="checkbox"/> Mostrar Botões Laterais</label>
+<label><input onchange="toggleElement('.symbol-bar', this)" type="checkbox"/> Mostrar SymbolBar</label>
+<hr/>
+<!-- Opções de desempenho: Low/Medium/High -->
+<fieldset id="performanceOptions" style="border:none;padding:0;">
+<legend style="font-size:0.9em;margin-bottom:4px;">Desempenho</legend>
+<label style="margin-right:6px;"><input name="performance" type="radio" value="low"/> Low</label>
+<label style="margin-right:6px;"><input checked="" name="performance" type="radio" value="medium"/> Medium</label>
+<label><input name="performance" type="radio" value="high"/> High</label>
+</fieldset>
+<hr/>
+<button onclick="mostrarTodos()">Mostrar Todos</button>
+<button onclick="ocultarTodos()">Ocultar Todos</button>
+<hr/>
+<button onclick="salvarEstadoUI()">Salvar Preferência</button>
+</div>
+<!-- Botão simbiótico do usuário -->
+<button id="userButton">☯ UserButton</button>
+<script>
+// Toggle do painel de controle
+document.getElementById('togglePanelBtn').addEventListener('click', function () {
+  const panel = document.getElementById('layoutTogglePanel');
+  panel.style.display = (panel.style.display === 'none' || getComputedStyle(panel).display === 'none') ? 'flex' : 'none';
+});
+
+// Funções básicas de mostrar/ocultar
+function toggleElement(selector, input) {
+  selector.split(',').forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => {
+      el.style.display = input.checked ? '' : 'none';
+    });
+  });
+}
+function ocultarTodos() {
+  ['#response', '.svg-container', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.symbol-bar']
+    .forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = 'none'));
+}
+function mostrarTodos() {
+  ['#response', '.svg-container', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.symbol-bar']
+    .forEach(sel => document.querySelectorAll(sel).forEach(el => el.style.display = ''));
+}
+
+// LocalStorage
+function salvarEstadoUI() {
+  const estado = {
+    response: getDisplayState('#response'),
+    svg: getDisplayState('.svg-container'),
+    player: getDisplayState('#koblluxPlayer'),
+    botoes: getDisplayState('#uploadComponentBtn,#remoteComponentBtn,#toggleDecoderBtn'),
+    bar: getDisplayState('.symbol-bar')
+  };
+  localStorage.setItem('layoutConfig', JSON.stringify(estado));
+  logMistico?.("🎛️ Preferência de layout salva.");
+}
+function getDisplayState(selector) {
+  const el = document.querySelector(selector.split(',')[0]);
+  return el?.style.display !== 'none';
+}
+function carregarEstadoUI() {
+  const saved = JSON.parse(localStorage.getItem('layoutConfig') || '{}');
+  Object.entries(saved).forEach(([key, visible]) => {
+    let sel;
+    if (key === 'response') sel = '#response';
+    if (key === 'svg') sel = '.svg-container';
+    if (key === 'player') sel = '#koblluxPlayer';
+    if (key === 'botoes') sel = '#uploadComponentBtn,#remoteComponentBtn,#toggleDecoderBtn';
+    if (key === 'bar') sel = '.symbol-bar';
+    sel && document.querySelectorAll(sel).forEach(el => el.style.display = visible ? '' : 'none');
+  });
+}
+
+// MODO SIMBIÓTICO PRESET
+function ativarModo(modo) {
+  ocultarTodos();
+  const modos = {
+    pulse: ['#koblluxPlayer'],
+    happyHour: ['#response', '.symbol-bar'],
+    ritual: ['#response', '#koblluxPlayer'],
+    exploracao: ['#response', '.symbol-bar', '#koblluxPlayer', '#uploadComponentBtn', '#remoteComponentBtn', '#toggleDecoderBtn', '.svg-container']
+  };
+  (modos[modo] || []).forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => el.style.display = '');
+  });
+  logMistico?.("⚙️ Modo ativado: " + modo);
+}
+
+// Carregar config ao iniciar
+document.addEventListener("DOMContentLoaded", () => {
+  carregarEstadoUI();
+  // Inicializar nível de desempenho e listeners de performance
+  const perfRadios = document.querySelectorAll('#performanceOptions input[name="performance"]');
+  perfRadios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      const level = radio.value;
+      document.body.classList.remove('perf-low','perf-medium','perf-high');
+      document.body.classList.add('perf-' + level);
+    });
+  });
+});
+</script>
+<script>
+// ========= Markdown simbiótico =========
+function renderMarkdown(raw) {
+  return raw
+    .replace(/(["“”'])(.+?)\1/g, '<button class="response-button">"$2"</button>')
+    .replace(/\[(.+?)\]/g, '<button class="response-button">[$1]</button>')
+    .replace(/([\u231A-\u2B55\u{1F300}-\u{1F6FF}\u{1F900}-\u{1F9FF}])/gu, '<button class="emoji-button">$1</button>')
+    .replace(/^### (.*)/gm, '<h3>$1</h3>')
+    .replace(/^## (.*)/gm, '<h2>$1</h2>')
+    .replace(/^# (.*)/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
+// ========= Separador de parágrafos robusto =========
+function splitText(t) {
+  return t
+    .split(/\n\s*\n|(?<!\d)\. |! |\? /)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .reduce((acc, cur, i) => {
+      const index = Math.floor(i / 3);
+      acc[index] = acc[index] || [];
+      acc[index].push(cur);
+      return acc;
+    }, []);
+}
+
+// ========= Função renderResponse simbiótica =========
+function renderResponse(txt) {
+  const wrap = document.querySelector(".pages-wrapper");
+  wrap.innerHTML = "";
+  let pages = [], currentPage = 0;
+  txt = renderMarkdown(txt);
+  // AJUSTE 2: Substituir emojis por símbolos Unicode para limpeza visual.
+  const emojiMap2 = { '🎁':'◇', '👁️':'◆', '⚡️':'✦', '⚡':'✦' };
+  txt = txt.replace(/([\u1F300-\u1F9FF\u2600-\u26FF\u2700-\u27BF])/g, m => emojiMap2[m] || m);
+
+  // AJUSTE 1: Combinar blocos consecutivos pequenos
+  function mergeShortParagraphs2(paragraphs, threshold = 30) {
+    const merged = [];
+    let buffer = '';
+    paragraphs.forEach(p => {
+      const plain = p.replace(/<[^>]+>/g,'').trim();
+      if(plain.length < threshold) {
+        buffer += (buffer ? ' ' : '') + p;
+      } else {
+        if(buffer) { merged.push(buffer.trim()); buffer=''; }
+        merged.push(p);
+      }
+    });
+    if(buffer) merged.push(buffer.trim());
+    return merged;
+  }
+
+  const groups = splitText(txt),
+        titles = ["🎁 Recompensa Inicial", "👁️ Exploração", "⚡️ Antecipação"];
+
+  groups.forEach((grp, gi) => {
+    const mergedGrp = mergeShortParagraphs2(grp);
+    const pg = document.createElement("div");
+    pg.className = "page" + (gi === 0 ? " active" : "");
+
+    mergedGrp.forEach((para, j) => {
+      const cls = j === 0 ? "intro" : j === 1 ? "middle" : "ending";
+      // AJUSTE 3: interpretar tokens de cor no texto e aplicar no estilo
+      let colorMatch2 = para.match(/#([0-9a-fA-F]{3,6})/);
+      let colorToken2 = null;
+      if(colorMatch2){
+        colorToken2 = colorMatch2[0];
+        para = para.replace(colorToken2,'');
+        if(colorToken2.length === 4){
+          const r=colorToken2[1], g=colorToken2[2], b=colorToken2[3];
+          colorToken2 = '#' + r + r + g + g + b + b;
+        }
+      }
+      const block = document.createElement("div");
+      block.className = "response-block " + cls;
+      block.innerHTML = "<p>" + para + "</p>";
+      if(colorToken2){
+        block.style.color = colorToken2;
+        block.style.borderLeftColor = colorToken2;
+        block.style.transition = 'all 0.3s ease';
+      }
+      block.addEventListener("click", () => {
+        // AJUSTE 4: garantir que o TTS fale o conteúdo completo após renderização
+        speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(block.textContent);
+        setTimeout(() => {
+          speechSynthesis.speak(utter);
+        }, 50);
+        block.classList.add("clicked");
+      });
+
+      pg.appendChild(block);
+    });
+
+    wrap.appendChild(pg);
+    pages.push(pg);
+  });
+
+  document.getElementById("pageIndicator").textContent = "1 / " + pages.length;
+}
+</script>
+<style>
+.symbol-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  margin: 3px 4px;
+  background: var(--bg, #000);
+  color: var(--text, #0ff);
+  border: 1px solid var(--text, #0ff);
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: bold;
+  font-size: 0.95em;
+  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: 0 0 4px var(--text, #0ff);
+  cursor: pointer;
+}
+.symbol-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #f0f, 0 0 4px #0ff;
+}
+
+.tipo-emoji {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 1.3em;
+  padding: 0;
+  background: var(--bg, #000);
+  color: var(--text, #0f0);
+  border: 1px solid var(--text, #0f0);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.tipo-colchete  { background: var(--bg); border-color: var(--text); color: var(--text); }
+.tipo-chave     { background: var(--bg); border-color: #ff0; color: #ff0; }
+.tipo-parenteses{ background: var(--bg); border-color: var(--text); color: var(--text); }
+.tipo-ascii-toggle {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px dashed var(--text);
+  font-weight: bold;
+}
+.nestedBlock {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--bg, #111);
+  border: 1px dashed var(--text, #0ff);
+  color: var(--text, #0ff);
+  font-family: 'Montserrat', sans-serif;
+  white-space: pre-wrap;
+  border-radius: 10px;
+}
+.hidden {
+  display: none;
+}
+.response-block {
+  margin: 16px auto;
+  padding: 16px;
+  border-radius: 22px;
+  background: var(--bg, rgba(255, 255, 255, 0.06));
+  color: var(--text, #0ff);
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+  max-width: 600px;
+  cursor: pointer;
+}
+.response-block.expanded {
+  transform: scale(1.03);
+  box-shadow: 0 0 10px #0ff5;
+}
+.response-block .nestedBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.symbol-header {
+  font-size: 1.4em;
+  text-align: center;
+}
+.symbol-body {
+  font-size: 1em;
+  line-height: 1.5;
+  padding: 8px;
+}
+.response-block.intro { border-left: 4px solid #0ff; }
+.response-block.middle { border-left: 4px solid #fff; }
+.response-block.ending { border-left: 4px solid #f0f; }
+
+.submenu {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 10px;
+  border-top: 1px solid #0ff5;
+}
+.submenu button {
+  background: transparent;
+  border: 1px solid var(--text, #0ff);
+  color: var(--text, #0ff);
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.8em;
+}
+.submenu button:hover {
+  background: var(--text, #0ff);
+  color: #000;
+}
+.submenu.hidden {
+  display: none;
+}
+</style>
+<script>
+function transformarSimbolosAvancado() {
+  const targetBlocks = document.querySelectorAll('.renderResponse, .response-block, .output-block, .console');
+
+  targetBlocks.forEach(block => {
+    if (!block.dataset.parsed) {
+      let html = block.innerHTML;
+
+      // Colchetes [simbolo]
+      html = html.replace(/\[(.+?)\]/g, (_, simbolo) =>
+        `<span class="symbol-button tipo-colchete" onclick="registrarPulsoEEnviar('${simbolo}')">[${simbolo}]</span>`
+      );
+
+      // Chaves {simbolo}
+      //html = html.replace(/\{(.+?)\}/g, (_, simbolo) =>
+      //  `<span class="symbol-button tipo-chave" onclick="enviarPulsoSimbolico('${simbolo}')">{${simbolo}}</span>`
+      //);
+
+      // Parênteses (simbolo)
+      //html = html.replace(/\((.+?)\)/g, (_, simbolo) =>
+      //  `<span class="symbol-button tipo-parenteses" onclick="enviarPulsoSimbolico('${simbolo}')">(${simbolo})</span>`
+      //);
+
+      // Emojis únicos (corrigido: evita quadrado duplicado)
+      html = html.replace(/([\p{Emoji}])/gu, (_, emoji) =>
+        `<span class="symbol-button tipo-emoji" onclick="registrarPulsoEEnviar('${emoji}')">${emoji}</span>`
+      );
+
+      // ASCII blocks (3+ linhas)
+      //* html = html.replace(/(?:<br\s*\/?>\s*){2,}([\s\S]+?)(?:<br\s*\/?>\s*){2,}/g, (_, ascii) => {
+        //const id = 'ascii-' + Math.random().toString(36).substr(2, 6);
+        //return `
+        //  <div class="ascii-container">
+         //   <span class="symbol-button tipo-ascii-toggle" onclick="toggleNested('${id}')">▶️ ASCII</span>
+        //    <pre id="${id}" class="nestedBlock hidden">${ascii.trim()}</pre>
+       //   </div>`;
+     // }); 
+
+      block.innerHTML = html;
+      block.dataset.parsed = "true";
+    }
+  });
+}
+
+function enviarPulsoSimbolico(simbolo, tipo = "SimboloAvancado") {
+  const role = localStorage.getItem("role") || "user";
+  const system = localStorage.getItem("system") || "";
+
+  const entradaSimbolica = {
+    role,
+    content: `[${simbolo}]`,
+    system,
+    tipo,
+  };
+
+  renderResponse(entradaSimbolica.content, tipo);
+  console.log("🔮 Pulso simbiótico:", entradaSimbolica);
+}
+
+function toggleNested(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('hidden');
+    const toggle = el.previousElementSibling;
+    toggle.innerText = el.classList.contains('hidden') ? '▶️ ASCII' : '▼ ASCII';
+  }
+}
+
+// Otimizado com MutationObserver (sem setInterval)
+const observer = new MutationObserver(transformarSimbolosAvancado);
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
+<script>
+function expandirPulso() {
+  const pulsos = document.getElementById("pulsos");
+  if (pulsos && !pulsos.classList.contains("expanded")) {
+    pulsos.classList.add("expanded");
+    pulsos.scrollTop = pulsos.scrollHeight;
+    logMistico("◉ Pulso ativado com expansão externa.");
+  }
+}
+
+function renderResponseBlocks({ intro = "", middle = "", ending = "" }) {
+  const container = document.querySelector(".pages-wrapper");
+
+  function createBlock(content, className) {
+    const block = document.createElement("div");
+    block.className = "response-block " + className;
+
+    const parsed = content
+      .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match => {
+        return `<button class="symbol-btn" onclick="expandirPulso(); logMistico('Emoji: ${match}')">${match}</button>`;
+      })
+      .replace(/\[(.+?)\]/g, (match, p1) => {
+        return `<button class="symbol-btn" onclick="expandirPulso(); logMistico('[${p1}]')">[${p1}]</button>`;
+      });
+
+    block.innerHTML = parsed;
+
+    block.addEventListener("click", () => {
+      block.classList.toggle("expanded");
+      expandirPulso();
+      logMistico("◉ Expandiu bloco: " + className);
+    });
+
+    return block;
+  }
+
+  if (intro)  container.appendChild(createBlock(intro, "intro"));
+  if (middle) container.appendChild(createBlock(middle, "middle"));
+  if (ending) container.appendChild(createBlock(ending, "ending"));
+}
+</script>
+<script>
+function renderSplitText(txt) {
+  const groups = txt.split("---").map(str => str.trim()).filter(Boolean);
+  return {
+    intro: groups[0] || "",
+    middle: groups[1] || "",
+    ending: groups[2] || ""
+  };
+}
+
+function renderResponse(input) {
+  const wrap = document.querySelector(".pages-wrapper") || document.getElementById("pagesWrapper");
+  if (!wrap) return console.warn("⚠️ .pages-wrapper não encontrado");
+
+  wrap.innerHTML = "";
+
+  // Aceita string dividida ou objeto Trinity
+  const { intro, middle, ending } = typeof input === "string" ? renderSplitText(input) : input;
+
+  const renderBlock = (text, className, icon) => {
+    const block = document.createElement("div");
+    block.className = `response-block ${className}`;
+    
+    // Submenu dinâmico
+    const submenu = document.createElement("div");
+    submenu.className = "submenu hidden";
+    submenu.innerHTML = `
+      <button onclick="logMistico('🔁 Reiniciando pulso: ${className}')">🔄 Repetir Pulso</button>
+      <button onclick="mostrarNucleoAntecipacao()">◉ Ativar Núcleo</button>
+      <button onclick="alert('💾 Exportar conteúdo em construção')">📥 Exportar</button>
+    `;
+
+    block.innerHTML = `
+      <div class="nestedBlock">
+        <div class="symbol-header">${icon}</div>
+        <div class="symbol-body">${text}</div>
+      </div>
+    `;
+
+    block.appendChild(submenu);
+
+    // Toggle de submenu
+    block.addEventListener("click", () => {
+      submenu.classList.toggle("hidden");
+      block.classList.toggle("expanded");
+      logMistico(`🧬 Pulso expandido: ${className}`);
+    pg.appendChild(block);
+        });
+        wrap.appendChild(pg);
+        pages.push(pg);
+    });
+
+    return block;
+  };
+
+  if (intro) wrap.appendChild(renderBlock(intro, "intro", "🎁"));
+  if (middle) wrap.appendChild(renderBlock(middle, "middle", "👁️"));
+  if (ending) wrap.appendChild(renderBlock(ending, "ending", "◉"));
+}
+
+</script>
+<script>
+function salvarHistorico(pulso) {
+  logResponseHistorico.push({ ...pulso, timestamp: new Date().toISOString() });
+
+  const pulsos = document.getElementById("pulsos");
+  if (pulsos) {
+    const item = document.createElement("div");
+    item.className = "pulso-item";
+    item.innerHTML = `
+      <div><strong>🕒</strong> ${new Date().toLocaleTimeString()}</div>
+      <div>🎁 ${pulso.intro?.slice(0, 30) || ''}</div>
+      <div>👁️ ${pulso.middle?.slice(0, 30) || ''}</div>
+      <div>◉ ${pulso.ending?.slice(0, 30) || ''}</div>
+      <button class="replay-btn">🔁 Repetir</button>
+      <hr/>
+    `;
+    item.querySelector("button").addEventListener("click", () => {
+      renderResponse(pulso);
+      logMistico("♻️ Pulso do histórico reativado.");
+    });
+    pulsos.prepend(item);
+  }
+}
+</script>
+<style>
+:root {
+  --bg: rgba(0, 0, 0, 0.8);
+  --text: #0ff;
+}
+.response-block {
+  margin: 16px auto;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--bg);
+  color: var(--text);
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+  max-width: 600px;
+  cursor: pointer;
+}
+.response-block.expanded {
+  transform: scale(1.03);
+  box-shadow: 0 0 10px #0ff5;
+}
+.nestedBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.symbol-header {
+  font-size: 1.4em;
+  text-align: center;
+}
+.symbol-body {
+  font-size: 1em;
+  line-height: 1.5;
+  padding: 8px;
+}
+.submenu {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding-top: 10px;
+  border-top: 1px solid #0ff5;
+}
+.submenu button {
+  background: transparent;
+  border: 1px solid var(--text);
+  color: var(--text);
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+.submenu button:hover {
+  background: var(--text);
+  color: #000;
+}
+
+.pulso-item {
+  margin-bottom: 12px;
+}
+</style>
+<div class="pages-wrapper" id="pagesWrapper"></div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const voiceBtn = document.getElementById("voiceBtn");
+  if (!voiceBtn) return;
+
+  let recognition;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!SpeechRecognition) {
+    console.warn("Reconhecimento de voz não suportado.");
+    voiceBtn.style.opacity = 0.2;
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = "pt-BR";
+  recognition.continuous = false;
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    voiceBtn.classList.add("listening");
+    logMistico("🎤 Pulso iniciado: ouvindo...");
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript.trim();
+    document.getElementById("userInput").value = transcript;
+    logMistico("🎤 Voz detectada: " + transcript);
+    document.getElementById("sendBtn").click();
+
+    
+  };
+
+  recognition.onerror = (event) => {
+    logMistico("⚠️ Erro de voz: " + event.error);
+  };
+
+  recognition.onend = () => {
+    voiceBtn.classList.remove("listening");
+    logMistico("🛑 Pulso finalizado");
+  };
+
+  voiceBtn.addEventListener("click", () => {
+    try {
+      recognition.start();
+    } catch (err) {
+      logMistico("🚫 Falha ao iniciar reconhecimento: " + err.message);
+    }
+  });
+});
+</script>
+<style>
+#voiceBtn.listening {
+  animation: pulse 1s infinite;
+  filter: drop-shadow(0 0 6px #0ff);
+}
+</style>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const uploadBtn = document.getElementById("uploadFileBtn");
+  const inputFile = document.getElementById("symbolicFileInput");
+
+  uploadBtn?.addEventListener("click", () => {
+    inputFile?.click();
+  });
+
+  inputFile?.addEventListener("change", () => {
+    const file = inputFile.files[0];
+    if (file) {
+      logMistico("📂 Arquivo enviado: " + file.name);
+      const reader = new FileReader();
+      reader.onload = () => {
+        logMistico("📖 Conteúdo: " + reader.result.slice(0, 300) + "...");
+      };
+      reader.readAsText(file);
+    }
+  });
+});
+</script>
+<script>
+function salvarConfiguracoesAvancadas() {
+  const newSK = document.getElementById("skInput")?.value.trim();
+  const roleSystem = document.getElementById("roleSystemInput")?.value.trim();
+  const newModel = document.getElementById("modelSelector")?.value;
+
+  if (newSK) {
+    localStorage.setItem("INFODOSE_SK", newSK);
+    logMistico("🔐 Nova chave SK salva.");
+  }
+
+  if (roleSystem) {
+    sessionStorage.setItem("ROLE_SYSTEM_DOC", roleSystem);
+    logMistico("📜 Role System atualizado.");
+  }
+
+  if (newModel) {
+    localStorage.setItem("INFODOSE_MODEL", newModel);
+    logMistico("🤖 Modelo alterado para: " + newModel);
+  }
+
+  alert("Configurações avançadas aplicadas.");
+}
+</script>
+<script>
+function ATIVAR_KOBLLUX_PATCH() {
+  // CSS refinado com bordas suaves
+  const style = document.createElement("style");
+  style.textContent = `
+    :root {
+    
+      --mask-REDACTED: linear-gradient(45deg, #F0F, #0FF);
+    }
+
+    button,
+    .symbol-button,
+   
+
+    
+    .response-container,
+    .login-container,
+    #decoderBox,
+    #koblluxPlayer,
+    #pulsos-container {
+
+    -webkit-mask-image: var(--mask-REDACTED);
+      mask-image: var(--mask-REDACTED);
+      border-image: var(--mask-REDACTED);
+      border-image-slice: 1;
+      border-width: 1px;
+      border-style: solid;
+      border-radius: 28px;
+    
+  transition: transform 0.2s, box-shadow 0.3s;
+
+  cursor: pointer;
+    }
+
+    .symbol-btn {
+      -webkit-mask-image: var(--mask-REDACTED);
+      mask-image: var(--mask-REDACTED);
+      border-image: var(--mask-REDACTED);
+      border-image-slice: 1;
+      background: var(--bg);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      color: #0ff;
+      border-radius: 8px;
+      padding: 2px 6px;
+      margin: 2px;
+      cursor: pointer;
+      font-size: 0.9em;
+    }
+
+    .response-block {
+      padding: 1.8rem !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // renderResponse aprimorado
+  window.renderResponse = function(text) {
+    const container = document.querySelector(".pages-wrapper");
+    if (!container) return;
+    container.innerHTML = "";
+
+    const sentences = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+    const classes = ["intro", "middle", "ending"];
+
+    sentences.forEach((para, index) => {
+      const block = document.createElement("div");
+      block.className = "response-block " + classes[index % 3];
+
+      const parsed = para
+        .replace(/(\p{Emoji_Presentation}|\p{Emoji})/gu, match =>
+          `<button class="symbol-btn" onclick="logMistico('Emoji: ${match}')">${match}</button>`
+        )
+        .replace(/\[(.+?)\]/g, (match, p1) =>
+          `<button class="symbol-btn" onclick="logMistico('[${p1}]')">[${p1}]</button>`
+        );
+
+      block.innerHTML = parsed;
+
+      block.addEventListener("click", () => {
+        block.classList.toggle("expanded");
+        const pulsos = document.getElementById("pulsos");
+        if (pulsos) pulsos.classList.toggle("expanded");
+        logMistico("◉ Expandiu bloco: " + block.className);
+      });
+
+      container.appendChild(block);
+    });
+
+    logMistico("✅ renderResponse executado com " + sentences.length + " blocos");
+  };
+
+  // VoiceBtn refinado
+  const voiceBtn = document.getElementById("voiceBtn");
+  if (voiceBtn) {
+    voiceBtn.addEventListener("click", () => {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'pt-BR';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const inputField = document.getElementById("userInput");
+        if (inputField) {
+          inputField.value = transcript;
+          document.getElementById("sendBtn")?.click();
+          logMistico("🎤 Voz capturada: " + transcript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        logMistico("❌ Erro no microfone: " + event.error);
+      };
+
+      logMistico("🎤 Microfone ativado");
+    });
+  }
+
+  // LOG MISTICO — Universal logging visual + ações opcionais
+window.logMistico = function(msg, options = {}) {
+  const el = document.createElement("div");
+  el.className = "debug-mistico";
+  el.innerText = "◉ " + msg;
+
+  const pulsos = document.getElementById("pulsos");
+  if (pulsos) {
+    pulsos.appendChild(el);
+    pulsos.scrollTop = pulsos.scrollHeight;
+  } else {
+    console.log("[KOBLLUX LOG]:", msg);
+  }
+
+  // Ações opcionais integradas ao log
+  if (options.enviarPulso && options.simbolo) {
+    registrarPulsoEEnviar(options.simbolo);
+  }
+
+  if (options.callAI) {
+    callAI();
+  }
+
+  if (options.updateUI) {
+    updateUI();
+  }
+};
+
+  // Eventos extras
+  document.getElementById("toggleBtn")?.addEventListener("click", () => logMistico("🧠 Assistente Toggled"));
+  document.getElementById("kittyBtn")?.addEventListener("click", () => logMistico("🐱 Kitty ativado"));
+  document.getElementById("sendBtn")?.addEventListener("click", () => {
+    const msg = document.getElementById("userInput")?.value;
+    logMistico("📤 Enviado: " + msg);
+  });
+
+  logMistico("✨ PATCH KOBLLUX SUPREMO ativado");
+}
+</script>
+<script>
+function registrarPulsoEEnviar(simbolo) {
+  logMistico(`🧿 Pulso simbólico ativado: ${simbolo}`);
+  
+  if (!isEnabled) {
+    isEnabled = true;
+    localStorage.setItem(STORAGE_KEY, '1');
+    updateUI();
+  }
+
+  showLoading(` Pulso simbiótico de "${simbolo}" em expansão...`);
+  conversation.push({
+    role: 'user',
+    content: `✨ Pulso simbólico: ${simbolo}`
+  });
+
+  callAI();
+}
+</script>
+<script>ATIVAR_KOBLLUX_PATCH();</script>
+<!-- KODUX_PATCH: normalize buttons + SR fallback, keep your CSS intact -->
+<script>
+(function(){
+  function wireButtons(){
+    const input = document.getElementById('userInput');
+    // SEND
+    const send = document.getElementById('sendBtn');
+    if (send && !send.dataset.koduxWired) {
+      const newSend = send.cloneNode(true);
+      send.parentNode.replaceChild(newSend, send);
+      newSend.dataset.koduxWired = "1";
+      newSend.addEventListener('click', () => {
+        const val = (input?.value || '').trim();
+        if (!val) { input?.focus(); return; }
+        if (typeof window.onSend === 'function') {
+          try { window.onSend(); return; } catch(e){}
+        }
+        // Fallback: dispatch click to any original sendBtn (if re-added later)
+        newSend.dispatchEvent(new Event('kodux-send', {bubbles:true}));
+      });
+    }
+    // VOICE
+    const voice = document.getElementById('voiceBtn');
+    if (voice && !voice.dataset.koduxWired) {
+      const newVoice = voice.cloneNode(true);
+      voice.parentNode.replaceChild(newVoice, voice);
+      newVoice.dataset.koduxWired = "1";
+      newVoice.addEventListener('click', () => {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+          try {
+            const rec = new SpeechRecognition();
+            rec.lang = 'pt-BR';
+            rec.interimResults = false;
+            rec.maxAlternatives = 1;
+            newVoice.classList.add('listening');
+            rec.onresult = (evt) => {
+              const transcript = evt.results[0][0].transcript || '';
+              if (input) input.value = transcript.trim();
+              const val = (input?.value || '').trim();
+              if (val && typeof window.onSend === 'function') {
+                try { window.onSend(); } catch(e){}
+              }
+            };
+            rec.onerror = () => { /* graceful fallback below onend */ };
+            rec.onend = () => {
+              newVoice.classList.remove('listening');
+              // Fallback: if user dictated or typed something, send it
+              const val = (input?.value || '').trim();
+              if (val && typeof window.onSend === 'function') {
+                try { window.onSend(); } catch(e){}
+              } else {
+                input?.focus();
+              }
+            };
+            rec.start();
+            return;
+          } catch(err) {
+            // continue to fallback
+          }
+        }
+        // No SR support -> treat as quick-send
+        const val = (input?.value || '').trim();
+        if (val && typeof window.onSend === 'function') {
+          try { window.onSend(); } catch(e){}
+        } else {
+          input?.focus();
+        }
+      });
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireButtons);
+  } else {
+    wireButtons();
+  }
+})();
+</script>
+<style>/* SuperPatch v6.2.2 — fixes */
+.dual-md{margin:12px 0;padding:14px;border-radius:14px;background:rgba(0,0,0,.35);
+border:1px solid rgba(0,255,255,.18);backdrop-filter:blur(6px);line-height:1.55;font-size:.98em}
+.dual-md blockquote{margin:0 0 8px 0;padding-left:10px;border-left:3px solid #0ff;opacity:.95}
+.dual-chip{display:inline-block;padding:2px 8px;margin:0 6px 0 0;border-radius:999px;
+background:rgba(0,255,255,.08);border:1px solid rgba(0,255,255,.22);font-size:.82em}
+.pages-wrapper{display:block!important;opacity:1!important;height:auto!important}
+.page{display:block!important;opacity:1!important}
+.pagination{display:none!important}
+#sumbus-toggle{position:fixed;left:50%;transform:translateX(-50%);top:112px;z-index:3;opacity:0.3;
+padding:8px 14px;border-radius:999px;border:1px solid transparent;color:#0ff;font-weight:600;
+letter-spacing:.4px;cursor:pointer;background:rgba(0,0,0,.45);
+box-shadow:0 0 18px rgba(0,255,255,.18),inset 0 0 12px rgba(0,0,0,.2);backdrop-filter:blur(6px)}
+#sumbus-toggle::before,#sumbus-toggle::after{content:"";position:absolute;inset:0;border-radius:999px;pointer-events:none}
+#sumbus-toggle::before{padding:1px;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-REDACTED:xor;mask-REDACTED:exclude;background:linear-gradient(45deg,#0FF,#FF00F)}
+#sumbus-toggle::after{border:1px solid transparent;border-image:linear-gradient(45deg,#0FF,#FF00F) 1;border-image-slice:1;
+  -webkit-mask-image:radial-gradient(white,black);mask-image:radial-gradient(white,black);opacity:.9}
+#pulsos-container{top:170px!important}
+.input-container{border:none!important;border-image:none!important;box-shadow:none!important}
+.input-container::before,.input-container::after{content:none!important}
+.symbol-bar{border:1px solid transparent;border-image:linear-gradient(45deg,#0FF,#FF00F) 1;
+  -webkit-mask-image:radial-gradient(white,black);mask-image:radial-gradient(white,black);
+  border-radius:12px;padding:8px;background:transparent;backdrop-filter:blur(6px)}
+.symbol-button{font-weight:400;border:1px solid rgba(0,255,255,.18);border-radius:10px}
+body.vibe{animation:vibePulse .6s ease-out}
+@keyframes vibePulse{0%{filter:saturate(.9)}50%{filter:saturate(1.2)}100%{filter:saturate(1)}}</style>
+<button id="sumbus-toggle" title="SÜMBÜS – formatação + injeção">SÜMBÜS: ON</button>
+<script>(function(){
+  const b=document.getElementById('sumbus-toggle'); if(!b) return;
+  const K='SUMBUS_ACTIVE'; const saved=localStorage.getItem(K);
+  if(saved==='false'){ window.__SUMBUS_ACTIVE__=false; b.textContent='SÜMBÜS: OFF'; b.style.color='#aaa'; }
+  b.addEventListener('click',(ev)=>{ ev.stopPropagation();
+    const on = !(window.__SUMBUS_ACTIVE__===true);
+    window.__SUMBUS_ACTIVE__ = on;
+    b.textContent = on? 'SÜMBÜS: ON' : 'SÜMBÜS: OFF';
+    b.style.color = on? '#0ff' : '#aaa';
+    localStorage.setItem(K,String(on));
+  });
+})();</script>
+<script>// SuperPatch v6.2.2 — no MetaLux, keep upload, single feed
+(function(){
+  if (window.__SUPERPATCH_V622__) return; window.__SUPERPATCH_V622__=true;
+  window.__SUMBUS_ACTIVE__ = (window.__SUMBUS_ACTIVE__ ?? true);
+  const INJECT_OUTBOUND = true;
+  const $=(s,r=document)=>r.querySelector(s);
+  const now=()=>{const d=new Date(),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`};
+  function dual_formatter(t){try{t=String(t??'');t=t.replace(/\.{3}/g,'…⚡');t=t.replace(/(\d+)/g,'🔢 $1');t=t.replace(/\b(\w+)\b(?=!)/g,'🌟 $1');if(/\?\s*$/.test(t))t=t.replace(/\?\s*$/,'')+'🌀';t=t.replace(/\s{2,}/g,'⸱');return t}catch(e){return String(t??'')}}
+  function detectArch(t){const A=[[/(meta)?lux/i,'🜚 MetaLux'],[/kaos|caos|chaos/i,'🌪️ Chaos'],[/lumine|luz/i,'🌟 Lumine'],[/pulse|pulso/i,'💓 Pulse'],[/atlas|mundo|terra/i,'🌍 Atlas'],[/rhea|lua/i,'🌙 Rhea'],[/rhia/i,'🧬 RHIA'],[/nova/i,'☀️ Nova'],[/sol/i,'🔥 Sol'],[/ion|íon/i,'⚛️ Ion'],[/artemis/i,'🏹 Artemis'],[/anfodote|antidoto|antídoto/i,'🧪 Anfodote']];for(const [k,l] of A) if(k.test(t))return l;return '🧬 Neutro';}
+  function vib(t){let h=0,s=String(t??'');for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;const v=((h%40)/4+6.0);return Math.min(10,Math.max(1,+(v/1.75).toFixed(1)))}
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const br=s=>esc(s).replace(/\n/g,'<br/>');
+
+  function updateHUD({regex,vib,arch}){
+    const ft=$('.footer-text'); if(!ft) return;
+    ft.setAttribute('data-hud','1');
+    const base=ft.getAttribute('data-base')||ft.textContent.trim()||'sempre único, sempre seu';
+    ft.setAttribute('data-base',base);
+    ft.innerHTML = `${esc(base)} · <span class="dual-chip">${esc(arch||'Neutro')}</span> <span class="dual-chip">Regex</span> <span class="dual-chip">Vib: ${esc(String(vib??'–'))}</span>`;
+  }
+  function logPulso(msg){
+    const p=$('#pulsos'); if(!p) return;
+    const d=document.createElement('div'); d.className='debug-mistico';
+    const ts=new Date(),pad=n=>String(n).padStart(2,'0');
+    d.textContent=`[${pad(ts.getHours())}:${pad(ts.getMinutes())}:${pad(ts.getSeconds())}] ${msg}`;
+    p.prepend(d);
+  }
+  function applyTheme(label){
+    const name=String(label||'').replace(/^[^A-Za-zÀ-ÿ]*\s*/, '').trim()||'Neutro';
+    document.body.dataset.arch=name;
+    localStorage.setItem('SUMBUS_LAST_ARCH',name);
+    document.body.classList.add('vibe'); setTimeout(()=>document.body.classList.remove('vibe'),600);
+    return name;
+  }
+  (function rsArch(){const last=localStorage.getItem('SUMBUS_LAST_ARCH'); if(last) document.body.dataset.arch=last;})();
+
+  (function rsScroll(){
+    const c=$('.response-container'); if(!c) return;
+    const K='SUMBUS_SCROLL_TOP'; const last=+localStorage.getItem(K); if(!isNaN(last)) c.scrollTop=last;
+    c.addEventListener('scroll',()=>localStorage.setItem(K,c.scrollTop),{passive:true});
+  })();
+
+  function renderDual({userQuery,resposta,regex,arch,energy}){
+    const el=document.createElement('div'); el.className='dual-md';
+    el.innerHTML = `<blockquote>🌌 ${esc(userQuery||'Dual.Infodose')}<br/><small>${now()}</small></blockquote>`+
+      `<div>${br(resposta||'')}</div>`+
+      `<div style="margin-top:10px"><span class="dual-chip">Regex: ${esc(regex||'')}</span> <span class="dual-chip">Arquétipo: ${esc(arch||'')}</span> <span class="dual-chip">Vibração: ${esc(String(energy||''))}/10</span></div>`;
+    const cont=$('.response-container')||document.body; cont.appendChild(el); cont.scrollTop=cont.scrollHeight; return el;
+  }
+
+  if (typeof window.splitText==='function' && !window.splitText.__v622){
+    const prev=window.splitText;
+    window.splitText=function(text,maxLen){ try{return [String(text??'')]}catch(e){return prev.call(this,text,maxLen)} };
+    window.splitText.__v622=true;
+  }
+
+  (function hookRender(){
+    const g=window; if(typeof g.renderResponse!=='function' || g.renderResponse.__v622) return;
+    const prev=g.renderResponse;
+    g.renderResponse=function(...a){
+      const ret=prev.apply(this,a);
+      try{
+        if(!window.__SUMBUS_ACTIVE__) return ret;
+        const txt=(a && typeof a[0]==='string')?a[0]:''; if(!txt) return ret;
+        const arch=detectArch(txt), energy=vib(txt), regex=r'\b(\w+)\b(?=!) + \?$ + \.\.\.→…⚡ + (\d+)';
+        const out=dual_formatter(txt);
+        const name=applyTheme(arch);
+        updateHUD({regex,vib:energy,arch:name}); logPulso('🔁 Voz: '+arch);
+        renderDual({userQuery: window.__KOBLLUX_LAST_QUERY__||'Dual.Infodose', resposta: out, regex, arch, energy});
+      }catch(e){}
+      return ret;
+    }; g.renderResponse.__v622=true;
+  })();
+
+  (function hookCall(){
+    const g=window; if(typeof g.callAI!=='function' || g.callAI.__v622) return;
+    const prev=g.callAI;
+    g.callAI=function(prompt,...rest){
+      const raw=(typeof prompt==='string'?prompt:String(prompt??''));
+      window.__KOBLLUX_LAST_QUERY__=raw;
+      if(window.__SUMBUS_ACTIVE__){
+        const energy=vib(raw); renderDual({userQuery:'Você',resposta:dual_formatter(raw),regex:'ida',arch:'Usuário',energy});
+      }
+      const payload=(window.__SUMBUS_ACTIVE__&&INJECT_OUTBOUND) ? dual_formatter(raw) : raw;
+      const r=prev.call(this,payload,...rest);
+      if(r && typeof r.then==='function'){ return r.then(x=>{ try{ window.renderResponse && window.renderResponse(String(x)); }catch(e){} return x; }); }
+      return r;
+    }; g.callAI.__v622=true;
+  })();
+
+  (function rememberInput(){
+    const i=$('.input-container input'), b=$('.input-container button');
+    if(!i||!b) return; const set=()=>window.__KOBLLUX_LAST_QUERY__=i.value;
+    b.addEventListener('click',set,{capture:true}); i.addEventListener('keydown',ev=>{if(ev.key==='Enter') set();});
+  })();
+
+  // Do not remove upload; no MetaLux button
+})();</script>
+<script>
+(function(){
+  if (window.__REFINE_629__) return; window.__REFINE_629__=true;
+
+  const $ = (s,r=document)=>r.querySelector(s);
+  const create = (t,c,h)=>{ const e=document.createElement(t); if(c) e.className=c; if(h!=null) e.innerHTML=h; return e; };
+  const esc = s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  function protectCode(text){
+    const stash=[];
+    let i=0;
+    const protected = text
+      // ```code``` blocks
+      .replace(/```([\s\S]*?)```/g, (_,code)=>`§§CODE${stash.push(code)-1}§§`)
+      // inline `code`
+      .replace(/`([^`]+)`/g, (_,code)=>`§§INL${stash.push(code)-1}§§`);
+    return { 
+      text: protected, 
+      restore: (t)=>t
+        .replace(/§§CODE(\d+)§§/g, (_,k)=>"<pre><code>"+esc(stash[+k])+"</code></pre>")
+        .replace(/§§INL(\d+)§§/g,  (_,k)=>"<code>"+esc(stash[+k])+"</code>")
+    };
+  }
+
+  function dualFormatter(t){
+    // safe formatting outside of code
+    const {text, restore} = protectCode(String(t||''));
+    let x = text;
+    x = x.replace(/\.{3}/g,'…⚡');
+    x = x.replace(/(?<!\w)(\d{1,3}(?:[.,]\d{3})*|\d+)(?!\w)/g,'<span class="num">🔢 $1</span>');
+    x = x.replace(/\b(\w+)\b(?=!)/g,'<span class="em">🌟 $1</span>');
+    x = x.replace(/\?\s*$/,'🌀');
+    x = x.replace(/\s{2,}/g,'⸱');
+    return restore(x);
+  }
+
+  // smarter split for single-page blocks
+  function smartSplit(text, maxChars){
+    const MAX = +localStorage.getItem('SUMBUS_MAX_CHARS') || (maxChars||1200);
+    const segments = [];
+    const {text: safe, restore} = protectCode(text);
+    // split on strong boundaries while preserving tables and code markers we've stashed
+    let parts = safe
+      .split(/\n(?=#{1,6}\s)|\n-{3,}\n|\n\*{3,}\n|\n\s*\n/g)
+      .filter(p=>p && p.trim());
+
+    // re-wrap to MAX by sentence if needed
+    const out=[];
+    for (let p of parts){
+      if (p.length<=MAX){ out.push(p); continue; }
+      const sentences = p.match(/[^\.!\?]+[\.!\?]+|\S+$/g) || [p];
+      let buf="";
+      for (const s of sentences){
+        if ((buf+s).length>MAX){
+          out.push(buf.trim()); buf=s;
+        } else {
+          buf+=s;
+        }
+      }
+      if (buf.trim()) out.push(buf.trim());
+    }
+    for (const o of out) segments.push( restore(o) );
+    return segments;
+  }
+
+  function renderResponseUnified(txt){
+    const wrap = document.querySelector('.pages-wrapper');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    const page = create('div','page active','');
+    const blocks = smartSplit(dualFormatter(txt));
+
+    blocks.forEach((chunk, idx)=>{
+      const cls = idx===0?'intro': (idx%3===1?'middle':'ending');
+      const block = create('div','response-block '+cls, '<p>'+chunk+'</p>');
+      page.appendChild(block);
+    });
+    wrap.appendChild(page);
+
+    const ind = document.querySelector('#pageIndicator');
+    if (ind) ind.textContent = '1 / 1';
+  }
+
+  // hook original renderResponse if exists
+  const g=window;
+  if (typeof g.renderResponse === 'function' && !g.renderResponse.__refine629){
+    const prev = g.renderResponse;
+    g.renderResponse = function(text){
+      try{
+        renderResponseUnified(String(text||''));
+      }catch(e){
+        console.warn('refine629 fallback', e);
+        return prev.apply(this, arguments);
+      }
+    };
+    g.renderResponse.__refine629 = true;
+  }
+
+  // also refine when calling AI result comes back as string
+  if (typeof g.callAI === 'function' && !g.callAI.__refine629){
+    const prev = g.callAI;
+    g.callAI = function(prompt, ...rest){
+      const r = prev.call(this, prompt, ...rest);
+      if (r && typeof r.then === 'function'){
+        return r.then(ans=>{
+          try{ renderResponseUnified(String(ans||'')); }catch(e){}
+          return ans;
+        });
+      }
+      return r;
+    };
+    g.callAI.__refine629 = true;
+  }
+
+  // Center controls if pagination is removed
+  (function centerControls(){
+    const rc = document.querySelector('.response-controls');
+    if (rc){
+      // ensure only control-buttons are visible inside
+      const pag = rc.querySelector('.pagination');
+      if (pag) pag.style.display='none';
+    }
+  })();
+
+})();
+</script>
+<script src="dual-ui-orchestrator.simbio-first.js"></script>
+<!-- Painel do gerenciador de chaves e treinamentos -->
+<div class="keymgr-panel" id="keymgrPanel">
+<div class="keymgr-hd">
+<h3>Chaves &amp; Treinamentos — Dual.Infodose</h3>
+<button class="keymgr-close" id="keymgrClose">Fechar</button>
+</div>
+<!-- Informações do usuário e assistente -->
+<p class="user-info">Usuário: <span id="keymgrUserName"></span> — Assistente: <span id="keymgrAssistantName"></span></p>
+<div class="keymgr-grid">
+<!-- Cartão de chaves OpenRouter -->
+<div class="cardx">
+<h4>OpenRouter — Chaves</h4>
+<div class="row">
+<input id="orKeyName" placeholder="Nome da chave (ex.: Pessoal, Work)" type="text">
+<input id="orKeyValue" placeholder="Cole sua chave sk-..." type="password">
+<button class="btnx" id="btnPasteKey">Colar</button>
+<button class="btnx" id="btnSaveKey">Salvar</button>
+</input></input></div>
+<div class="list" id="keysList"></div>
+</div>
+<!-- Cartão de treinamento base -->
+<div class="cardx">
+<h4>Treinamento Base (TXT)</h4>
+<div class="row">
+<input id="baseTrainName" placeholder="Nome (ex.: Unificado v6)" type="text">
+<button class="btnx" id="btnLoadBaseTxt">Carregar TXT</button>
+<input accept=".txt" id="baseTrainFile" style="display:none" type="file">
+<button class="btnx" id="btnApplyBaseTxt">Aplicar</button>
+<label class="switch"><input checked="" id="baseTrainEnabled" type="checkbox"> Ativo</input></label>
+</input></input></div>
+<textarea id="baseTrainText" placeholder="Conteúdo do TXT base"></textarea>
+</div>
+<!-- Cartão de extras / ativações -->
+<div class="cardx">
+<h4>Treinamentos Extras / Ativações</h4>
+<div class="row">
+<input id="extraName" placeholder="Nome do extra/ativação" type="text">
+<button class="btnx" id="btnLoadExtraTxt">Adicionar TXT</button>
+<input accept=".txt" id="extraFile" style="display:none" type="file">
+</input></input></div>
+<div class="list" id="extrasList"></div>
+</div>
+<!-- Cartão de componentes e uploads -->
+<div class="cardx">
+<h4>Componentes &amp; Uploads</h4>
+<div class="row">
+<button class="btnx" id="btnUploadHTML">Carregar HTML</button>
+<button class="btnx" id="btnUploadSymbol">Upload Arquivo</button>
+<button class="btnx" id="btnRemoteComponent">Carregar URL</button>
+<button class="btnx" id="btnToggleDecoder">Decodificador</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Script para gerenciar chaves e treinamentos -->
+<script>
+    (function(){
+      // LocalStorage keys
+      const LS_KEYS = {
+        OR_KEYS: 'OR_KEYS',           // array of {name, key}
+        OR_ACTIVE: 'OR_ACTIVE',       // name of active key
+        TRAIN_BASE: 'TRAIN_BASE_TEXT',
+        TRAIN_BASE_NAME: 'TRAIN_BASE_NAME',
+        TRAIN_BASE_ENABLED: 'TRAIN_BASE_ENABLED',
+        TRAIN_EXTRAS: 'TRAIN_EXTRAS'  // array of {name, text, enabled}
+      };
+      // Helpers
+      const qs = (s, r=document)=>r.querySelector(s);
+      const store = {
+        get(k, d){ try{ return JSON.parse(localStorage.getItem(k)) ?? d; }catch(e){ return d; } },
+        set(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
+      };
+      // UI refs
+      const openBtn  = qs('#keymgrOpen');
+      const panel    = qs('#keymgrPanel');
+      const closeBtn = qs('#keymgrClose');
+      const orKeyName  = qs('#orKeyName');
+      const orKeyValue = qs('#orKeyValue');
+      const btnPaste   = qs('#btnPasteKey');
+      const btnSaveKey = qs('#btnSaveKey');
+      const keysList   = qs('#keysList');
+      const baseName   = qs('#baseTrainName');
+      const baseText   = qs('#baseTrainText');
+      const baseFile   = qs('#baseTrainFile');
+      const btnLoadBase= qs('#btnLoadBaseTxt');
+      const btnApply   = qs('#btnApplyBaseTxt');
+      const baseEnabled= qs('#baseTrainEnabled');
+      const extraName  = qs('#extraName');
+      const extraFile  = qs('#extraFile');
+      const btnLoadExt = qs('#btnLoadExtraTxt');
+      const extrasList = qs('#extrasList');
+
+      // Novos elementos para uploads e info de usuário
+      const keymgrUserName = qs('#keymgrUserName');
+      const keymgrAssistantName = qs('#keymgrAssistantName');
+      const btnUploadHTML = qs('#btnUploadHTML');
+      const btnUploadSymbol = qs('#btnUploadSymbol');
+      const btnRemoteComponent = qs('#btnRemoteComponent');
+      const btnToggleDecoder = qs('#btnToggleDecoder');
+      const uploadHTMLInput = document.getElementById('uploadHTML');
+      const uploadSymbolInput = document.getElementById('symbolicFileInput');
+      const decoderBox = document.getElementById('decoderBox');
+
+      // open/close panel
+      openBtn && openBtn.addEventListener('click', ()=>{
+        panel.classList.add('open');
+        // Atualiza informações do usuário e assistente ao abrir
+        if (keymgrUserName) keymgrUserName.textContent = localStorage.getItem('userName') || '';
+        if (keymgrAssistantName) keymgrAssistantName.textContent = localStorage.getItem('assistantBase') || '';
+      });
+      closeBtn && closeBtn.addEventListener('click', ()=> panel.classList.remove('open'));
+
+      // clipboard support
+      btnPaste && btnPaste.addEventListener('click', async ()=>{
+        try{ orKeyValue.value = await navigator.clipboard.readText(); }catch(e){ alert('Não consegui ler o clipboard.'); }
+      });
+
+      // render keys
+      function renderKeys(){
+        const list = store.get(LS_KEYS.OR_KEYS, []);
+        const active = store.get(LS_KEYS.OR_ACTIVE, null);
+        keysList.innerHTML = '';
+        list.forEach((k, idx)=>{
+          const item = document.createElement('div'); item.className='item';
+          item.innerHTML = '<div class="badges"><span class="badge">'+(k.name||('Chave '+(idx+1)))+'</span>'+(active===k.name?'<span class="badge">ATIVA</span>':'')+'</div>';
+          const actions = document.createElement('div'); actions.className='row';
+          const btnAct = document.createElement('button'); btnAct.className='btnx'; btnAct.textContent='Ativar';
+          btnAct.addEventListener('click', ()=>{ store.set(LS_KEYS.OR_ACTIVE, k.name); renderKeys(); });
+          const btnDel = document.createElement('button'); btnDel.className='btnx'; btnDel.textContent='Excluir';
+          btnDel.addEventListener('click', ()=>{ list.splice(idx,1); store.set(LS_KEYS.OR_KEYS, list); if (active===k.name) store.set(LS_KEYS.OR_ACTIVE, null); renderKeys(); });
+          actions.append(btnAct, btnDel);
+          item.append(actions);
+          keysList.append(item);
+        });
+      }
+      // save key
+      btnSaveKey && btnSaveKey.addEventListener('click', ()=>{
+        const name = (orKeyName.value||'').trim(); const val = (orKeyValue.value||'').trim();
+        if (!val || !/^sk-/.test(val)){ return alert('Cole uma chave começando com sk-'); }
+        const list = store.get(LS_KEYS.OR_KEYS, []);
+        const i = list.findIndex(x=>x.name===name);
+        if (i>=0) list[i].key = val; else list.push({name: name||('Chave '+(list.length+1)), key: val});
+        store.set(LS_KEYS.OR_KEYS, list);
+        if (!store.get(LS_KEYS.OR_ACTIVE,null)) store.set(LS_KEYS.OR_ACTIVE, list[0].name);
+        orKeyValue.value='';
+        renderKeys();
+        alert('Chave salva.');
+      });
+      // public helper
+      window.getOpenRouterKey = function(){
+        const list = store.get(LS_KEYS.OR_KEYS, []);
+        const active = store.get(LS_KEYS.OR_ACTIVE, null);
+        const item = list.find(x=>x.name===active) || list[0];
+        return item ? item.key : null;
+      };
+      // patch fetch to inject Authorization header
+      if (!window.__openrouterPatched){
+        const origFetch = window.fetch;
+        window.fetch = async function(input, init={}){
+          try{
+            const url = (typeof input === 'string') ? input : (input && input.url) || '';
+            const key = window.getOpenRouterKey && window.getOpenRouterKey();
+            if (key){
+              init = init || {};
+              init.headers = new Headers(init.headers || {});
+              if (/openrouter|\/v1\/chat\/|\/v1\/completions/.test(url)){
+                if (!init.headers.get('Authorization')) init.headers.set('Authorization','Bearer '+key);
+              }
+            }
+          }catch(e){ console.warn('OpenRouter wrapper falhou', e); }
+          return origFetch(input, init);
+        };
+        window.__openrouterPatched = true;
+      }
+      // training base
+      function loadBaseFromLS(){
+        baseName.value = store.get(LS_KEYS.TRAIN_BASE_NAME, 'Base (inline)');
+        baseText.value = store.get(LS_KEYS.TRAIN_BASE, '') || (window.TRAININGS && window.TRAININGS.unificado) || '';
+        baseEnabled.checked = store.get(LS_KEYS.TRAIN_BASE_ENABLED, true);
+      }
+      loadBaseFromLS();
+      btnLoadBase && btnLoadBase.addEventListener('click', ()=> baseFile.click());
+      baseFile && baseFile.addEventListener('change', async (e)=>{
+        const f = e.target.files[0]; if (!f) return;
+        const txt = await f.text();
+        baseName.value = f.name.replace(/\.txt$/i,'');
+        baseText.value = txt;
+      });
+      btnApply && btnApply.addEventListener('click', ()=>{
+        store.set(LS_KEYS.TRAIN_BASE_NAME, baseName.value.trim()||'Base');
+        store.set(LS_KEYS.TRAIN_BASE, baseText.value||'');
+        store.set(LS_KEYS.TRAIN_BASE_ENABLED, baseEnabled.checked);
+        try{
+          if (baseEnabled.checked && typeof window.setTrainingText==='function'){
+            window.setTrainingText(baseText.value||'');
+            localStorage.setItem('DUAL_TRAINING_MODE','unificado');
+          }
+          alert('Treinamento base aplicado.');
+          if (window.logMistico) window.logMistico('⚙️ Base aplicada: '+(baseName.value||'Base'));
+        }catch(e){ console.warn('Falha ao aplicar base', e); }
+      });
+      baseEnabled && baseEnabled.addEventListener('change', ()=> store.set(LS_KEYS.TRAIN_BASE_ENABLED, baseEnabled.checked));
+      // extras / ativações
+      function renderExtras(){
+        const extras = store.get(LS_KEYS.TRAIN_EXTRAS, []);
+        extrasList.innerHTML='';
+        extras.forEach((ex, idx)=>{
+          const row = document.createElement('div'); row.className='item';
+          const left = document.createElement('div'); left.className='badges';
+          left.innerHTML = '<span class="badge">'+(ex.name||('Extra '+(idx+1)))+'</span>';
+          const right = document.createElement('div'); right.className='row';
+          const toggle = document.createElement('label'); toggle.className='switch';
+          const cb = document.createElement('input'); cb.type='checkbox'; cb.checked=!!ex.enabled;
+          cb.addEventListener('change', ()=>{ ex.enabled = cb.checked; extras[idx]=ex; store.set(LS_KEYS.TRAIN_EXTRAS, extras); });
+          toggle.append(cb, document.createTextNode(' Ativo'));
+          const btnView = document.createElement('button'); btnView.className='btnx'; btnView.textContent='Ver';
+          btnView.addEventListener('click', ()=>{ alert(ex.text.slice(0,1200) + (ex.text.length>1200?'...':'')); });
+          const btnDel = document.createElement('button'); btnDel.className='btnx'; btnDel.textContent='Excluir';
+          btnDel.addEventListener('click', ()=>{ extras.splice(idx,1); store.set(LS_KEYS.TRAIN_EXTRAS, extras); renderExtras(); });
+          right.append(toggle, btnView, btnDel);
+          row.append(left, right);
+          extrasList.append(row);
+        });
+      }
+      renderExtras();
+      btnLoadExt && btnLoadExt.addEventListener('click', ()=> extraFile.click());
+      extraFile && extraFile.addEventListener('change', async (e)=>{
+        const f = e.target.files[0]; if (!f) return;
+        const txt = await f.text();
+        const name = (extraName.value||f.name.replace(/\.txt$/i,'')).trim() || ('Extra '+(store.get(LS_KEYS.TRAIN_EXTRAS, []).length+1));
+        const extras = store.get(LS_KEYS.TRAIN_EXTRAS, []);
+        extras.push({name, text: txt, enabled:true});
+        store.set(LS_KEYS.TRAIN_EXTRAS, extras);
+        extraName.value='';
+        renderExtras();
+      });
+
+      // Integração de uploads e componentes no painel
+      if (btnUploadHTML && uploadHTMLInput) {
+        btnUploadHTML.addEventListener('click', () => {
+          uploadHTMLInput.click();
+        });
+      }
+      if (btnUploadSymbol && uploadSymbolInput) {
+        btnUploadSymbol.addEventListener('click', () => {
+          uploadSymbolInput.click();
+        });
+      }
+      if (btnRemoteComponent) {
+        btnRemoteComponent.addEventListener('click', () => {
+          const url = prompt("URL do componente remoto:");
+          if (url) {
+            const frame = document.createElement('my-frame-loader');
+            frame.src = url;
+            document.body.appendChild(frame);
+          }
+        });
+      }
+      if (btnToggleDecoder && decoderBox) {
+        btnToggleDecoder.addEventListener('click', () => {
+          decoderBox.style.display = decoderBox.style.display === 'none' ? 'block' : 'none';
+        });
+      }
+      // Oculta os botões laterais originais, pois agora estão acessíveis pelo painel
+      const sideBtns = document.querySelectorAll('#uploadComponentBtn, #remoteComponentBtn, #toggleDecoderBtn');
+      sideBtns.forEach(el => el.style.display = 'none');
+      // merge extras to system prompt
+      if (!window.__mergeExtrasInstalled){
+        const origBuild = window.buildSystemPrompt;
+        window.buildSystemPrompt = function(){
+          let base = '';
+          if (store.get(LS_KEYS.TRAIN_BASE_ENABLED, true)){
+            base = store.get(LS_KEYS.TRAIN_BASE, '') || (window.TRAININGS && window.TRAININGS.unificado) || '';
+          } else {
+            base = (window.TRAININGS && window.TRAININGS.unificado) || '';
+          }
+          const extras = store.get(LS_KEYS.TRAIN_EXTRAS, []).filter(x=>x.enabled).map(x=>x.text).join('\n\n');
+          return [base, extras].filter(Boolean).join('\n\n');
+        };
+        window.__mergeExtrasInstalled = true;
+      }
+      // apply base on boot
+      try{
+        if (store.get(LS_KEYS.TRAIN_BASE, '')){
+          if (typeof window.setTrainingText==='function' && store.get(LS_KEYS.TRAIN_BASE_ENABLED, true)){
+            window.setTrainingText(store.get(LS_KEYS.TRAIN_BASE, ''));
+          }
+        }
+      }catch(e){}
+      // initial render of keys
+      renderKeys();
+    })();
+  </script>
+<script>
+// v6.2.2 footer-click → oculta/exibe respostas renderizadas (.response-container)
+document.addEventListener("DOMContentLoaded", () => {
+  const footer = document.querySelector(".footer-text");
+  const responseContainer = document.getElementById("response");
+
+  if (!footer || !responseContainer) return;
+
+  // estado inicial persistente (opcional)
+  try {
+    const saved = localStorage.getItem("dual_footer_hide_response");
+    if (saved === "1") {
+      responseContainer.style.display = "none";
+      footer.classList.add("active");
+    }
+  } catch(_) {}
+
+  footer.addEventListener("click", () => {
+    const isHidden = responseContainer.style.display === "none";
+    // alterna display
+    responseContainer.style.display = isHidden ? "block" : "none";
+    footer.classList.toggle("active", !isHidden);
+
+    // persiste preferencia
+    try {
+      localStorage.setItem("dual_footer_hide_response", (!isHidden) ? "1" : "0");
+    } catch(_) {}
+  });
+});
+</script>
+<style>
+/* v6.2.3 — Footer sempre visível; compact esconde só conteúdo e UI */
+.footer-text{ display:block !important; visibility:visible !important; opacity:1 !important; }
+body.dual-compact #response-inner{ display:none !important; } /* só o conteúdo, não o footer */
+body.dual-compact .input-container,
+body.dual-compact .control-buttons,
+body.dual-compact .pagination{ display:none !important; }
+</style>
+<script>
+// v6.2.3 — Cria #response-inner e garante que o footer nunca suma
+(function(){
+  function q(sel, root=document){ return root.querySelector(sel); }
+  function wrapResponseInner(){
+    const resp = q('#response');
+    if(!resp) return;
+    // Procura footer
+    const footer = resp.querySelector('.footer-text');
+    // Já existe inner?
+    if(resp.querySelector('#response-inner')) return;
+    const inner = document.createElement('div');
+    inner.id = 'response-inner';
+    // Move tudo que NÃO é footer para dentro do inner
+    Array.from(resp.childNodes).forEach(node=>{
+      if(node.nodeType===1 && node.classList && node.classList.contains('footer-text')) return;
+      if(node === footer) return;
+      inner.appendChild(node);
+    });
+    // Insere antes do footer (se houver), senão no fim
+    if(footer) resp.insertBefore(inner, footer);
+    else resp.appendChild(inner);
+  }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    wrapResponseInner();
+    // Se algum script antigo tentar dar display:none em #response, desfazemos para não perder o footer
+    const resp = q('#response');
+    if(resp && getComputedStyle(resp).display === 'none'){
+      resp.style.display = 'block';
+    }
+  });
+})();
+</script>
+<style>
+/* v6.2.4 — Footer só oculta páginas renderizadas (nunca o #response) */
+#response{ display:block !important; }
+#response .footer-text{ display:block !important; visibility:visible !important; opacity:1 !important; }
+#response[data-pages-hidden="1"] .pages-wrapper,
+#response[data-pages-hidden="1"] #pagesWrapper,
+#response[data-pages-hidden="1"] .response-block{ display:none !important; }
+</style>
+<script>
+// v6.2.4 — Footer alterna apenas as páginas renderizadas (mantém #response visível)
+(function(){
+  function q(sel, root=document){ return root.querySelector(sel); }
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const resp = q('#response');
+    const footer = resp ? resp.querySelector('.footer-text') : null;
+    if(!resp || !footer) return;
+
+    // failsafe: se algum código antigo esconder o #response, reexibe
+    if(getComputedStyle(resp).display === 'none'){ resp.style.display = 'block'; }
+
+    // restaura estado salvo
+    try{
+      const saved = localStorage.getItem('dual_pages_hidden');
+      if(saved === '1'){ resp.setAttribute('data-pages-hidden','1'); }
+    }catch(_){}
+
+    footer.addEventListener('click', ()=>{
+      const hidden = resp.getAttribute('data-pages-hidden') === '1';
+      resp.setAttribute('data-pages-hidden', hidden ? '0' : '1');
+      try{ localStorage.setItem('dual_pages_hidden', hidden ? '0' : '1'); }catch(_){}
+    });
+  });
+})();
+</script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  const host=document.querySelector('#layoutToggle,[data-ui="layout-toggle"]');
+  function ensure(btn,svg){
+    if(!btn) return;
+    btn.classList.add('kdx-round');
+    if(!btn.querySelector('svg')) btn.innerHTML = svg;
+    if(btn.parentElement!==host && host) host.appendChild(btn);
+  }
+  ensure(document.querySelector('#lockButton,[data-role="lock"],.lock-btn,button[name="lock"],button[data-action="lock"]'), `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M8 11v-2a4 4 0 0 1 8 0v2"></path><rect x="8" y="11" width="8" height="7" rx="2" ry="2"></rect></svg>`);
+  ensure(document.querySelector('#themeToggle,[data-role="theme"],.theme-toggle,button[name="theme"],button[data-action="theme"]'), `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 0 0 20a8 8 0 0 1 0-20z"></path></svg>`);
+
+  const b=document.createElement('button'); b.id='kdx-reload'; b.type='button'; b.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v4l3 1"></path></svg>`; b.onclick=()=>location.reload(); document.body.appendChild(b);
+});
+</script>
+<!-- Patch Manager logic -->
+<script>
+(() => {
+  const LS_KEY = 'dualapp.patches';
+  const dom = {
+    btn: document.getElementById('patchMgrBtn'),
+    panel: document.getElementById('patchMgrPanel'),
+    list: document.getElementById('patchList'),
+    patchList: document.getElementById('patchList'),
+    imp: document.getElementById('pmImport'),
+    paste: document.getElementById('pmPaste'),
+    exp: document.getElementById('pmExport'),
+    close: document.getElementById('pmClose'),
+    storageBtn: document.getElementById('pmStorage'),
+    storagePanel: document.getElementById('storageManager'),
+    storageList: document.getElementById('storageList'),
+    storageRefresh: document.getElementById('storageRefresh'),
+    storageClear: document.getElementById('storageClear'),
+    storageExport: document.getElementById('storageExport'),
+    storageAdd: document.getElementById('storageAdd'),
+    cssInput: document.getElementById('cssInput'),
+    applyCSSBtn: document.getElementById('applyCSS'),
+    terminalBtn: document.getElementById('pmTerminal'),
+    terminalPanel: document.getElementById('terminalManager'),
+    terminalFrame: document.getElementById('pmTerminalFrame'),
+    // Quick injection panel elements
+    quickBtn: document.getElementById('pmQuick'),
+    quickPanel: document.getElementById('quickManager'),
+    quickInput: document.getElementById('quickInput'),
+    applyQuickBtn: document.getElementById('applyQuick'),
+    // Avatar upload and profile elements
+    avatarUpload: document.getElementById('avatarUpload'),
+    pmAvatarSvg: document.querySelector('.pm-profile svg'),
+    pmUserName: document.getElementById('pmUserName'),
+
+    // Background manager elements
+    bgBtn: document.getElementById('pmBackgrounds'),
+    bgPanel: document.getElementById('bgManager'),
+    bgUploadBtn: document.getElementById('bgUploadBtn'),
+    bgUploadInput: document.getElementById('bgUploadInput'),
+    bgList: document.getElementById('bgList'),
+  };
+  const guards = {
+    maxCss: 50000,
+    maxJs: 50000,
+    blocked: [/document\.write\s*\(/i, /new\s+Function\s*\(/i, /\beval\s*\(/i],
+  };
+  function load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch{ return []; } }
+  function save(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr||[])); }
+  function byPriority(a,b){ return (a.priority??0) - (b.priority??0); }
+  function validate(p){
+    if(!p || typeof p!=='object') throw new Error('patch inválido');
+    if(!p.id || typeof p.id!=='string') throw new Error('id obrigatório');
+    if(p.css && p.css.length>guards.maxCss) throw new Error('CSS muito grande');
+    if(p.js && p.js.length>guards.maxJs) throw new Error('JS muito grande');
+    const bad = (p.js||'');
+    guards.blocked.forEach(rx=>{ if(rx.test(bad)) throw new Error('JS bloqueado por política'); });
+    return true;
+  }
+  function removeOne(id){
+    document.querySelectorAll(`[data-patch="${id}"]`).forEach(el=>el.remove());
+  }
+  function applyOne(p){
+    removeOne(p.id);
+    if(p.css){
+      const st = document.createElement('style');
+      st.setAttribute('data-patch', p.id);
+      st.textContent = p.css;
+      document.head.appendChild(st);
+    }
+    if(p.js){
+      const sc = document.createElement('script');
+      sc.setAttribute('data-patch', p.id);
+      sc.textContent = `(function(){ try{ ${p.js}\n }catch(e){console.warn('Patch JS falhou',e)} })();`;
+      document.body.appendChild(sc);
+    }
+  }
+  function applyAll(){
+    const arr = load().filter(p=>p.enabled!==false).sort(byPriority);
+    arr.forEach(applyOne);
+  }
+  function upsert(patch){
+    validate(patch);
+    const arr = load();
+    const i = arr.findIndex(x=>x.id===patch.id);
+    if(i>=0) arr[i] = {...arr[i], ...patch};
+    else arr.push({...patch, enabled:true});
+    save(arr); render(); applyAll();
+  }
+  function toggle(id,on){
+    const arr = load();
+    const i = arr.findIndex(x=>x.id===id);
+    if(i>=0){ arr[i].enabled = on; save(arr); render(); applyAll(); }
+  }
+  function remove(id){
+    const arr = load().filter(x=>x.id!==id);
+    save(arr);
+    removeOne(id);
+    render();
+    applyAll();
+  }
+  function exportAll(){
+    const data = JSON.stringify(load(), null, 2);
+    const blob = new Blob([data], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'dualapp-patches.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function renderStorage() {
+    if (!dom.storageList) return;
+    const list = dom.storageList;
+    list.innerHTML = '';
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k !== LS_KEY) keys.push(k);
+    }
+    if (keys.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'pm-item';
+      empty.innerHTML = '<em>Sem dados</em>';
+      list.appendChild(empty);
+      return;
+    }
+    keys.sort();
+    keys.forEach(key => {
+      const val = localStorage.getItem(key) || '';
+      const displayVal = val.length > 40 ? val.slice(0, 40) + '…' : val;
+      const row = document.createElement('div');
+      row.className = 'pm-item';
+      row.innerHTML = `<div><strong>${key}</strong><small style="opacity:.7;display:block">${displayVal}</small></div><div class="pm-actions"><button data-act="edit">Editar</button><button data-act="rm">Remover</button></div>`;
+      row.querySelector('[data-act="edit"]').onclick = () => {
+        const current = localStorage.getItem(key);
+        const nv = prompt('Novo valor para ' + key, current);
+        if (nv !== null) {
+          try {
+            localStorage.setItem(key, nv);
+            renderStorage();
+          } catch (e) { alert('Erro ao gravar no localStorage: ' + e.message); }
+        }
+      };
+      row.querySelector('[data-act="rm"]').onclick = () => {
+        if (confirm('Remover ' + key + '?')) {
+          localStorage.removeItem(key);
+          renderStorage();
+        }
+      };
+      list.appendChild(row);
+    });
+  }
+  function clearStorage() {
+    if (confirm('Limpar TODOS os dados do localStorage?')) {
+      localStorage.clear();
+      renderStorage();
+    }
+  }
+  function exportStorage() {
+    const data = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      data[k] = localStorage.getItem(k);
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'dualapp-localstorage.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function addStorage() {
+    const key = prompt('Nome da chave');
+    if (!key) return;
+    const val = prompt('Valor para ' + key);
+    if (val === null) return;
+    try {
+      localStorage.setItem(key, val);
+      renderStorage();
+    } catch (e) { alert('Erro ao gravar no localStorage: ' + e.message); }
+  }
+  function applyCSS() {
+    if (!dom.cssInput) return;
+    const css = dom.cssInput.value || '';
+    let styleEl = document.getElementById('customCssPatch');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'customCssPatch';
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = css;
+    try { localStorage.setItem('dualapp_custom_css', css); } catch (_) {}
+  }
+  function loadCustomCSS() {
+    try {
+      const css = localStorage.getItem('dualapp_custom_css');
+      if (css && dom.cssInput) {
+        dom.cssInput.value = css;
+        applyCSS();
+      }
+    } catch (_) {}
+  }
+  function render(){
+    const arr = load().sort(byPriority);
+    dom.list.innerHTML = '';
+    arr.forEach(p=>{
+      const row = document.createElement('div'); row.className = 'pm-item';
+      row.innerHTML = `<div><strong>${p.id}</strong><small style="opacity:.7;display:block">prio: ${p.priority??0} · css:${p.css?'✔︎':'–'} · js:${p.js?'✔︎':'–'}</small></div><div class="pm-actions"><button class="${p.enabled!==false?'pm-on':'pm-off'}" data-act="toggle">${p.enabled!==false?'On':'Off'}</button><button data-act="edit">Editar</button><button data-act="rm">Remover</button></div>`;
+      row.querySelector('[data-act="toggle"]').onclick = () => toggle(p.id, !(p.enabled!==false));
+      row.querySelector('[data-act="rm"]').onclick = () => remove(p.id);
+      row.querySelector('[data-act="edit"]').onclick = () => {
+        const txt = prompt('Edite o JSON do patch', JSON.stringify(p, null, 2));
+        if(!txt) return;
+        try{ upsert(JSON.parse(txt)); }catch(e){ alert('JSON inválido: ' + e.message); }
+      };
+      dom.list.appendChild(row);
+    });
+  }
+  async function importFile(){
+    const input = Object.assign(document.createElement('input'), {type:'file', accept:'application/json'});
+    input.onchange = () => {
+      const f = input.files?.[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try{
+          const j = JSON.parse(r.result);
+          (Array.isArray(j) ? j : [j]).forEach(upsert);
+        }catch(e){ alert('JSON inválido: ' + e.message); }
+      };
+      r.readAsText(f);
+    };
+    input.click();
+  }
+  async function pasteJson(){
+    const txt = prompt('Cole o JSON do patch:');
+    if(!txt) return;
+    try{
+      const j = JSON.parse(txt);
+      (Array.isArray(j) ? j : [j]).forEach(upsert);
+    }catch(e){ alert('JSON inválido: ' + e.message); }
+  }
+  if(dom.btn){
+    dom.btn.onclick = () => {
+      dom.panel.style.display = (dom.panel.style.display==='block'?'none':'block');
+    };
+  }
+  if(dom.close) dom.close.onclick = () => dom.panel.style.display = 'none';
+  if(dom.imp) dom.imp.onclick = importFile;
+  if(dom.paste) dom.paste.onclick = pasteJson;
+  if(dom.exp) dom.exp.onclick = exportAll;
+  if(dom.storageBtn){
+    dom.storageBtn.onclick = () => {
+      if(!dom.storagePanel) return;
+      const visible = dom.storagePanel.style.display === 'block';
+      if(visible){
+        dom.storagePanel.style.display = 'none';
+        dom.patchList.style.display = '';
+      } else {
+        dom.storagePanel.style.display = 'block';
+        dom.patchList.style.display = 'none';
+        if(dom.terminalPanel) dom.terminalPanel.style.display = 'none';
+        renderStorage();
+        loadCustomCSS();
+      }
+    };
+  }
+  if(dom.storageRefresh) dom.storageRefresh.onclick = renderStorage;
+  if(dom.storageClear) dom.storageClear.onclick = clearStorage;
+  if(dom.storageExport) dom.storageExport.onclick = exportStorage;
+  if(dom.storageAdd) dom.storageAdd.onclick = addStorage;
+  if(dom.applyCSSBtn) dom.applyCSSBtn.onclick = applyCSS;
+  if(dom.terminalBtn){
+    dom.terminalBtn.onclick = () => {
+      if(!dom.terminalPanel) return;
+      const visible = dom.terminalPanel.style.display === 'block';
+      if(visible){
+        dom.terminalPanel.style.display = 'none';
+        dom.patchList.style.display = '';
+      } else {
+        dom.terminalPanel.style.display = 'block';
+        dom.patchList.style.display = 'none';
+        if(dom.storagePanel) dom.storagePanel.style.display = 'none';
+      }
+    };
+  }
+
+  // -----------------------
+  // Quick Manager toggle logic
+  // Show or hide the quick injection panel when clicking the Rápido button
+  if(dom.quickBtn){
+    dom.quickBtn.onclick = () => {
+      if(!dom.quickPanel) return;
+      const visible = dom.quickPanel.style.display === 'block';
+      if(visible){
+        dom.quickPanel.style.display = 'none';
+        dom.patchList.style.display = '';
+      } else {
+        dom.quickPanel.style.display = 'block';
+        dom.patchList.style.display = 'none';
+        if(dom.storagePanel) dom.storagePanel.style.display = 'none';
+        if(dom.terminalPanel) dom.terminalPanel.style.display = 'none';
+      }
+    };
+  }
+
+  // Apply quick injection of CSS or JS entered by the user
+  if(dom.applyQuickBtn){
+    dom.applyQuickBtn.onclick = () => {
+      if(!dom.quickInput) return;
+      const txt = dom.quickInput.value.trim();
+      if(!txt) return;
+      const id = 'quick-' + Date.now();
+      const patch = { id };
+      // Determine if the payload is likely JavaScript by looking for common JS keywords
+      if(/[;{}]/.test(txt) && /(function|const|let|var|=>|console|return)/.test(txt)){
+        patch.js = txt;
+      } else {
+        patch.css = txt;
+      }
+      try {
+        upsert(patch);
+        // clear the input after injection
+        dom.quickInput.value = '';
+      } catch(e){ alert('Erro ao injetar: ' + e.message); }
+    };
+  }
+
+  // Avatar upload handling: allow the user to click on the avatar to select an image
+  if(dom.pmAvatarSvg && dom.avatarUpload){
+    dom.pmAvatarSvg.style.cursor = 'pointer';
+    dom.pmAvatarSvg.addEventListener('click', () => {
+      dom.avatarUpload.click();
+    });
+    dom.avatarUpload.addEventListener('change', () => {
+      const file = dom.avatarUpload.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        try {
+          localStorage.setItem('dualapp.userAvatar', dataUrl);
+        } catch(err){}
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.width = dom.pmAvatarSvg.clientWidth || 42;
+        img.height = dom.pmAvatarSvg.clientHeight || 42;
+        img.style.borderRadius = '50%';
+        dom.pmAvatarSvg.replaceWith(img);
+        dom.pmAvatarSvg = img;
+        // Also set the avatar as background on the patch manager button
+        if(dom.btn){
+          dom.btn.style.backgroundImage = `url(${dataUrl})`;
+          dom.btn.style.backgroundSize = 'cover';
+          dom.btn.style.backgroundPosition = 'center';
+          dom.btn.style.backgroundRepeat = 'no-repeat';
+          dom.btn.textContent = '';
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Background manager: toggle panel visibility and handle uploads
+  if(dom.bgBtn){
+    dom.bgBtn.onclick = () => {
+      if(!dom.bgPanel) return;
+      const visible = dom.bgPanel.style.display === 'block';
+      if(visible){
+        dom.bgPanel.style.display = 'none';
+        dom.patchList.style.display = '';
+      } else {
+        dom.bgPanel.style.display = 'block';
+        dom.patchList.style.display = 'none';
+        if(dom.storagePanel) dom.storagePanel.style.display = 'none';
+        if(dom.terminalPanel) dom.terminalPanel.style.display = 'none';
+        if(dom.quickPanel) dom.quickPanel.style.display = 'none';
+        // ensure backgrounds list is up to date when opening
+        renderBackgrounds();
+      }
+    };
+  }
+  if(dom.bgUploadBtn){
+    dom.bgUploadBtn.onclick = () => {
+      if(dom.bgUploadInput) dom.bgUploadInput.click();
+    };
+  }
+  if(dom.bgUploadInput){
+    dom.bgUploadInput.addEventListener('change', () => {
+      if(dom.bgUploadInput.files && dom.bgUploadInput.files.length){
+        uploadBackground(dom.bgUploadInput.files);
+        dom.bgUploadInput.value = '';
+      }
+    });
+  }
+
+  // Load avatar from localStorage if present and replace the default icon
+  function loadAvatar(){
+    try{
+      const dataUrl = localStorage.getItem('dualapp.userAvatar');
+      if(dataUrl && dom.pmAvatarSvg){
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.width = dom.pmAvatarSvg.clientWidth || 42;
+        img.height = dom.pmAvatarSvg.clientHeight || 42;
+        img.style.borderRadius = '50%';
+        dom.pmAvatarSvg.replaceWith(img);
+        dom.pmAvatarSvg = img;
+        // Also set the avatar on the patch manager button at load time
+        if(dom.btn){
+          dom.btn.style.backgroundImage = `url(${dataUrl})`;
+          dom.btn.style.backgroundSize = 'cover';
+          dom.btn.style.backgroundPosition = 'center';
+          dom.btn.style.backgroundRepeat = 'no-repeat';
+          dom.btn.textContent = '';
+        }
+      }
+    }catch(e){}
+  }
+
+  // Background manager helper functions
+  function loadBackgrounds(){
+    try{
+      return JSON.parse(localStorage.getItem('dualapp.backgrounds') || '[]');
+    }catch(e){ return []; }
+  }
+  function saveBackgrounds(arr){
+    try{ localStorage.setItem('dualapp.backgrounds', JSON.stringify(arr||[])); }catch(e){}
+  }
+  function renderBackgrounds(){
+    if(!dom.bgList) return;
+    const arr = loadBackgrounds();
+    dom.bgList.innerHTML = '';
+    if(arr.length === 0){
+      const p = document.createElement('p');
+      p.textContent = 'Nenhum fundo salvo.';
+      p.style.opacity = '0.7';
+      dom.bgList.appendChild(p);
+      return;
+    }
+    arr.forEach(bg => {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'bg-item';
+      wrapper.dataset.id = bg.id;
+      const img = document.createElement('img');
+      img.src = bg.data;
+      wrapper.appendChild(img);
+      const actions = document.createElement('div');
+      actions.className = 'bg-actions';
+      const activateBtn = document.createElement('button');
+      activateBtn.textContent = 'Usar';
+      activateBtn.onclick = () => useBackground(bg.id);
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'Remover';
+      removeBtn.onclick = () => deleteBackground(bg.id);
+      actions.appendChild(activateBtn);
+      actions.appendChild(removeBtn);
+      wrapper.appendChild(actions);
+      dom.bgList.appendChild(wrapper);
+    });
+  }
+  function useBackground(id){
+    const arr = loadBackgrounds();
+    const found = arr.find(b => b.id === id);
+    if(found){
+      document.body.style.backgroundImage = `url(${found.data})`;
+      try{ localStorage.setItem('dualapp.activeBackground', id); }catch(e){}
+    }
+  }
+  function deleteBackground(id){
+    let arr = loadBackgrounds();
+    arr = arr.filter(b => b.id !== id);
+    saveBackgrounds(arr);
+    if(localStorage.getItem('dualapp.activeBackground') === id){
+      localStorage.removeItem('dualapp.activeBackground');
+      document.body.style.backgroundImage = '';
+    }
+    renderBackgrounds();
+  }
+  function uploadBackground(files){
+    let arr = loadBackgrounds();
+    const readers = [];
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      readers.push(new Promise((resolve) => {
+        reader.onload = (e) => {
+          const dataUrl = e.target.result;
+          arr.push({ id: 'bg-' + Date.now() + Math.random().toString(16).slice(2), data: dataUrl });
+          resolve();
+        };
+      }));
+      reader.readAsDataURL(file);
+    });
+    Promise.all(readers).then(() => {
+      saveBackgrounds(arr);
+      renderBackgrounds();
+    });
+  }
+  function loadActiveBackground(){
+    try{
+      const activeId = localStorage.getItem('dualapp.activeBackground');
+      if(activeId){
+        const arr = loadBackgrounds();
+        const found = arr.find(b => b.id === activeId);
+        if(found){
+          document.body.style.backgroundImage = `url(${found.data})`;
+        }
+      }
+    }catch(e){}
+  }
+  window.addEventListener('DOMContentLoaded', () => {
+    render();
+    applyAll();
+    loadCustomCSS();
+    // restore the user’s avatar if one is saved
+    loadAvatar();
+    // load backgrounds list and apply active background
+    renderBackgrounds();
+    loadActiveBackground();
+  });
+})();
+</script>
+<!-- Pulsos log hook: forward all console messages to logMistico so actions are recorded in the Pulsos pane -->
+<script>
+(function(){
+  try {
+    const pulseLogger = window.logMistico;
+    if (typeof pulseLogger === 'function') {
+      const origLog = console.log;
+      console.log = function(...args) {
+        try { pulseLogger(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); } catch (e) {}
+        return origLog.apply(console, args);
+      };
+      const origWarn = console.warn;
+      console.warn = function(...args) {
+        try { pulseLogger('⚠️ ' + args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); } catch (e) {}
+        return origWarn.apply(console, args);
+      };
+      const origError = console.error;
+      console.error = function(...args) {
+        try { pulseLogger('❌ ' + args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); } catch (e) {}
+        return origError.apply(console, args);
+      };
+    }
+  } catch (err) {
+    // swallow errors and fallback to standard console
+    console.warn && console.warn('Pulsos logger hook failed', err);
+  }
+})();
+</script>
+<script>
+/* Abrir/fechar painel */
+function togglePanel(force){
+  const p = document.getElementById('layoutTogglePanel');
+  if(!p) return;
+  if(force === true) p.style.display = 'block';
+  else if(force === false) p.style.display = 'none';
+  else p.style.display = (p.style.display === 'block' ? 'none' : 'block');
+}
+
+/* Mostrar / Ocultar principais áreas (Response, Input, Footer) */
+function mostrarTodos(){
+  ['.response-container','.input-container','.footer-text']
+    .forEach(sel => document.querySelectorAll(sel).forEach(el => el && (el.style.display = '')));
+}
+function ocultarTodos(){
+  ['.response-container','.input-container','.footer-text']
+    .forEach(sel => document.querySelectorAll(sel).forEach(el => el && (el.style.display = 'none')));
+}
+
+/* Tema base + VARs */
+function setThemeBase(val){
+  document.body.classList.remove('light','medium'); // “escuro” é default
+  if(val === 'light')  document.body.classList.add('light');
+  if(val === 'medium') document.body.classList.add('medium');
+}
+function aplicarVars(){
+  const bg   = (document.getElementById('varBg')||{}).value?.trim?.() || '';
+  const text = (document.getElementById('varText')||{}).value?.trim?.() || '';
+  if(bg)   document.documentElement.style.setProperty('--bg', bg);
+  if(text) document.documentElement.style.setProperty('--text', text);
+  // persiste preferências
+  try{
+    const cfg = JSON.parse(localStorage.getItem('layoutConfig') || '{}');
+    if(bg)   cfg.bg = bg;
+    if(text) cfg.text = text;
+    localStorage.setItem('layoutConfig', JSON.stringify(cfg));
+  }catch(e){}
+}
+
+/* Performance (animações/partículas) */
+function setPerf(level){
+  document.body.classList.remove('perf-low','perf-medium','perf-high');
+  document.body.classList.add('perf-'+level);
+}
+
+/* Bind inicial — não altera footer/input por padrão */
+document.addEventListener('DOMContentLoaded', () => {
+  // tema base
+  document.querySelectorAll('input[name="themeBase"]').forEach(r =>
+    r.addEventListener('change', e => setThemeBase(e.target.value))
+  );
+  // performance
+  document.querySelectorAll('input[name="perf"]').forEach(r =>
+    r.addEventListener('change', e => setPerf(e.target.value))
+  );
+  // restaurar vars personalizadas
+  try{
+    const saved = JSON.parse(localStorage.getItem('layoutConfig') || '{}');
+    if(saved.bg)   document.documentElement.style.setProperty('--bg', saved.bg);
+    if(saved.text) document.documentElement.style.setProperty('--text', saved.text);
+    if(saved.bg)   { const el=document.getElementById('varBg'); if(el) el.value = saved.bg; }
+    if(saved.text) { const el=document.getElementById('varText'); if(el) el.value = saved.text; }
+  }catch(e){}
+});
+</script>
+
+
+<script>
+/* === Global click guard: ignore visuals on top of input & patch panels === */
+(function(){
+  const SAFE_AREAS = ['.input-container', '#patchMgrPanel', '.keymgr-panel', '#layoutTogglePanel'];
+  function isInSafeArea(el){
+    return SAFE_AREAS.some(sel => el && (el.closest ? el.closest(sel) : null));
+  }
+  const _origAdd = document.addEventListener;
+  document.addEventListener = function(type, listener, opts){
+    if(type === 'click' && typeof listener === 'function'){
+      const wrapped = function(ev){
+        if(isInSafeArea(ev.target)) return;
+        return listener.call(this, ev);
+      };
+      return _origAdd.call(document, type, wrapped, opts);
+    }
+    return _origAdd.call(document, type, listener, opts);
+  };
+})();
+
+/* === Patch Manager UX: toggle + drag + persist === */
+(function(){
+  const panel = document.getElementById('patchMgrPanel');
+  const btn   = document.getElementById('patchMgrBtn');
+  if(!panel || !btn) return;
+
+  btn.addEventListener('click', ()=> {
+    panel.style.display = (panel.style.display === 'block' ? 'none' : 'block');
+    if(panel.style.display === 'block') panel.focus?.();
+  });
+
+  const header = panel.querySelector('header');
+  let drag = null;
+  function onDown(e){
+    drag = {
+      sx: (e.touches?e.touches[0].clientX:e.clientX),
+      sy: (e.touches?e.touches[0].clientY:e.clientY),
+      x:  panel.offsetLeft,
+      y:  panel.offsetTop
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    document.addEventListener('touchmove', onMove, {passive:false});
+    document.addEventListener('touchend', onUp);
+  }
+  function onMove(e){
+    if(!drag) return;
+    e.preventDefault?.();
+    const cx = (e.touches?e.touches[0].clientX:e.clientX);
+    const cy = (e.touches?e.touches[0].clientY:e.clientY);
+    const nx = Math.max(8, Math.min(window.innerWidth  - panel.offsetWidth  - 8, drag.x + (cx - drag.sx)));
+    const ny = Math.max(8, Math.min(window.innerHeight - panel.offsetHeight - 8, drag.y + (cy - drag.sy)));
+    panel.style.left = nx + 'px';
+    panel.style.top  = ny + 'px';
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+  }
+  function onUp(){
+    if(!drag) return;
+    localStorage.setItem('pm.pos', JSON.stringify({ left: panel.style.left, top: panel.style.top }));
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend', onUp);
+    drag = null;
+  }
+  header?.addEventListener('mousedown', onDown);
+  header?.addEventListener('touchstart', onDown, {passive:true});
+
+  // Restore position
+  try{
+    const pos = JSON.parse(localStorage.getItem('pm.pos')||'null');
+    if(pos?.left && pos?.top){
+      panel.style.left = pos.left; panel.style.top = pos.top;
+      panel.style.right = 'auto'; panel.style.bottom = 'auto';
+    }
+  }catch(e){}
+})();
+</script>
+
+
+<script>
+// === PatchMgr: toggle behavior (safe append) ===
+document.addEventListener("DOMContentLoaded", () => {
+  try{
+    const patchBtn = document.getElementById("patchMgrBtn");
+    const patchPanel = document.getElementById("patchMgrPanel");
+    if (patchBtn && patchPanel) {
+      patchBtn.addEventListener("click", () => {
+        patchPanel.classList.toggle("active");
+        // ensure compatibility with older CSS
+        if (patchPanel.classList.contains("active")) {
+          patchPanel.style.display = "block";
+          requestAnimationFrame(()=>{ patchPanel.style.opacity = "1"; });
+        } else {
+          patchPanel.style.opacity = "0";
+          setTimeout(()=>{ patchPanel.style.display = "none"; }, 250);
+        }
+      });
+    } else {
+      console.warn("[PatchMgr] Elementos não encontrados:", { btn: !!patchBtn, panel: !!patchPanel });
+    }
+  }catch(e){ console.error("[PatchMgr] erro:", e); }
+});
+</script>
+
+
+<!-- KDX — Presets UI (auto-injetado no Patch Manager) -->
+<script>
+(function(){
+  function ensureControls(){
+    const panel = document.getElementById('patchMgrPanel');
+    if(!panel || panel.querySelector('.kdx-presets-ui')) return;
+
+    const box = document.createElement('div');
+    box.className = 'kdx-presets-ui';
+    box.style.marginTop = '10px';
+    box.innerHTML = `
+      <div style="border-top:1px solid rgba(255,255,255,.12); margin:.6rem 0; opacity:.8"></div>
+      <h4 style="margin-bottom:.4rem; letter-spacing:.03em; opacity:.9;">Presets de Layout do Response</h4>
+      <div class="kdx-grid" style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;">
+        <div class="cardx">
+          <strong style="font-size:12px; opacity:.8;">Gap inferior</strong>
+          <div class="row" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btnx" data-gap="var(--resp-gap-low)">Baixo</button>
+            <button class="btnx" data-gap="var(--resp-gap-med)">Médio</button>
+            <button class="btnx" data-gap="var(--resp-gap-high)">Alto</button>
+            <input id="kdx-gap-custom" type="text" placeholder="px (ex.: 64px)" style="flex:1; min-width:120px;">
+            <button class="btnx" id="kdx-apply-gap">Aplicar</button>
+          </div>
+        </div>
+
+        <div class="cardx">
+          <strong style="font-size:12px; opacity:.8;">Estilo visual</strong>
+          <div class="row" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btnx" data-style="glass">Glass</button>
+            <button class="btnx" data-style="paper">Paper</button>
+            <button class="btnx" data-style="neon">Neon</button>
+          </div>
+        </div>
+
+        <div class="cardx">
+          <strong style="font-size:12px; opacity:.8;">Fonte</strong>
+          <div class="row" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btnx" data-font="sans">Sans</button>
+            <button class="btnx" data-font="grotesk">Grotesk</button>
+            <button class="btnx" data-font="mono">Mono</button>
+            <button class="btnx" data-font="serif">Serif</button>
+          </div>
+        </div>
+
+        <div class="cardx">
+          <strong style="font-size:12px; opacity:.8;">Reset</strong>
+          <div class="row" style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btnx" id="kdx-reset-presets">Limpar estilos</button>
+          </div>
+        </div>
+      </div>
+    `;
+    panel.appendChild(box);
+
+    // Wire buttons
+    box.querySelectorAll('[data-gap]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const val = getComputedStyle(document.documentElement).getPropertyValue(btn.getAttribute('data-gap')).trim();
+        document.documentElement.style.setProperty('--resp-extra-gap', val || '0px');
+      });
+    });
+    box.querySelector('#kdx-apply-gap').addEventListener('click', ()=>{
+      const t = box.querySelector('#kdx-gap-custom').value.trim();
+      if(t) document.documentElement.style.setProperty('--resp-extra-gap', t);
+    });
+    box.querySelectorAll('[data-style]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.body.setAttribute('data-resp-style', btn.getAttribute('data-style'));
+      });
+    });
+    box.querySelectorAll('[data-font]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.body.setAttribute('data-resp-font', btn.getAttribute('data-font'));
+      });
+    });
+    box.querySelector('#kdx-reset-presets').addEventListener('click', ()=>{
+      document.documentElement.style.removeProperty('--resp-extra-gap');
+      document.body.removeAttribute('data-resp-style');
+      document.body.removeAttribute('data-resp-font');
+    });
+  }
+
+  // Attach when DOM is ready and also when PatchMgr is opened later
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ensureControls);
+  }else{
+    ensureControls();
+  }
+  // Also observe for panel insertion if it loads after
+  const obs = new MutationObserver(()=>ensureControls());
+  obs.observe(document.documentElement, {subtree:true, childList:true});
+})();
+</script>
+
+</body>
+</html>
