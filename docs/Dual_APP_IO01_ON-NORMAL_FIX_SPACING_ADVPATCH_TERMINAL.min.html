@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-
-<html lang="pt-BR">
-<head>
-<style>
+<!DOCTYPE html><html lang="pt-BR"><head> <style>
 
 /* —— LUXARA CLEAN (Normal) ——————————————————————————— */
 :root{
@@ -43,9 +39,7 @@ body{ overflow:auto !important; }
   backdrop-filter: blur(10px);
 }
 
-</style>
-<!-- Styles for Patch Manager button and panel -->
-<style>
+</style> <style>
 #patchMgrBtn{
   /* Diminuir o botão de patches e usar símbolo em vez de letra */
   width: 32px;
@@ -120,22 +114,12 @@ body{ overflow:auto !important; }
 }
 .pm-on{ background: rgba(0,255,200,.16); }
 .pm-off{ background: rgba(255,80,120,.16); }
-</style>
-<!-- Spacer style to ensure footer doesn't overlap controls -->
-<style>
+</style> <style>
 #kdx-footer-spacer{
   /* Reserve space for the tagline/footer and safe area, but keep it compact */
   height: calc(40px + env(safe-area-inset-bottom));
 }
-</style>
-
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Dual.Infodose</title>
-<link href="manifest.json" rel="manifest"/>
-<meta content="#000000" name="theme-color"/>
-<link href="assets/icons/icon-192.png" rel="icon" type="image/png"/>
-<style>
+</style> <meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>Dual.Infodose</title><link href="manifest.json" rel="manifest"/><meta content="#000000" name="theme-color"/><link href="assets/icons/icon-192.png" rel="icon" type="image/png"/> <style>
     /* ——— SEU CSS INTEGRAL (ajustes) ——— */
     :root {
       --bg: linear-gradient(to bottom, #000, #1a1a1a);
@@ -377,8 +361,7 @@ body{ overflow:auto !important; }
 #btn-expandir-ritual {
   bottom: 210px !important;
 }
-</style>
-<style>
+</style> <style>
     body {
       margin: 0;
       height: 100vh;
@@ -565,9 +548,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
   100% { transform: scale(1); opacity: 0.4; }
 }
 
-</style>
-
-<style>
+</style> <style>
 .upload-symbolic-button {
   width: 36px;
   height: 36px;
@@ -588,10 +569,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
   transform: scale(1.1);
   box-shadow: 0 0 12px rgba(0,255,255,0.40);
 }
-</style>
-
-
-<style>
+</style> <style>
 #advancedToggleOptions input,
 #advancedToggleOptions select {
   font-family: monospace;
@@ -602,12 +580,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
   transform: scale(1.05);
   box-shadow: 0 0 12px rgba(0,255,255,0.40);
 }
-</style>
-
-
-<link rel="stylesheet" href="dual-ui-kit.css">
-
-<script id="dualapp-plus-shim">
+</style> <link rel="stylesheet" href="dual-ui-kit.css"> <script id="dualapp-plus-shim">
 /* DualApp+ v2.1 — unificação total do LocalStorage para páginas Infodose/Dual
    Canon: localStorage["dualapp.settings"]
    Espelho compat: infodoseEnabled ('1'|'0'), infodoseTheme, userName, assistantBase
@@ -791,16 +764,15 @@ background:linear-gradient(42deg,#0ff,#f0f);
     wire();
   }
 })();
-</script>
-</script>
-<!-- Patch Manager logic -->
-<script>
+</script> </script> <script>
 (() => {
   const LS_KEY = 'dualapp.patches';
   const dom = {
     btn: document.getElementById('patchMgrBtn'),
     panel: document.getElementById('patchMgrPanel'),
     list: document.getElementById('patchList'),
+    // alias: patchList references the same element for legacy code
+    patchList: document.getElementById('patchList'),
     imp: document.getElementById('pmImport'),
     paste: document.getElementById('pmPaste'),
     exp: document.getElementById('pmExport'),
@@ -815,6 +787,10 @@ background:linear-gradient(42deg,#0ff,#f0f);
     storageAdd: document.getElementById('storageAdd'),
     cssInput: document.getElementById('cssInput'),
     applyCSSBtn: document.getElementById('applyCSS'),
+    // elementos para terminal integrado
+    terminalBtn: document.getElementById('pmTerminal'),
+    terminalPanel: document.getElementById('terminalManager'),
+    terminalFrame: document.getElementById('pmTerminalFrame'),
   };
   const guards = {
     maxCss: 50000,
@@ -1030,8 +1006,18 @@ background:linear-gradient(42deg,#0ff,#f0f);
     dom.storageBtn.onclick = () => {
       if(!dom.storagePanel) return;
       const visible = dom.storagePanel.style.display === 'block';
-      dom.storagePanel.style.display = visible ? 'none' : 'block';
-      if(!visible) renderStorage();
+      if(visible){
+        // hiding storage: show patch list
+        dom.storagePanel.style.display = 'none';
+        dom.patchList.style.display = '';
+      } else {
+        // showing storage: hide patch list and terminal
+        dom.storagePanel.style.display = 'block';
+        dom.patchList.style.display = 'none';
+        if(dom.terminalPanel) dom.terminalPanel.style.display = 'none';
+        renderStorage();
+        loadCustomCSS();
+      }
     };
   }
   if(dom.storageRefresh) dom.storageRefresh.onclick = renderStorage;
@@ -1039,13 +1025,27 @@ background:linear-gradient(42deg,#0ff,#f0f);
   if(dom.storageExport) dom.storageExport.onclick = exportStorage;
   if(dom.storageAdd) dom.storageAdd.onclick = addStorage;
   if(dom.applyCSSBtn) dom.applyCSSBtn.onclick = applyCSS;
+  // Evento para botão Terminal
+  if(dom.terminalBtn){
+    dom.terminalBtn.onclick = () => {
+      if(!dom.terminalPanel) return;
+      const visible = dom.terminalPanel.style.display === 'block';
+      if(visible){
+        // hiding terminal: show patch list
+        dom.terminalPanel.style.display = 'none';
+        dom.patchList.style.display = '';
+      } else {
+        // showing terminal: hide patch list and storage
+        dom.terminalPanel.style.display = 'block';
+        dom.patchList.style.display = 'none';
+        if(dom.storagePanel) dom.storagePanel.style.display = 'none';
+        // optional: focus inside iframe or pass events
+      }
+    };
+  }
   window.addEventListener('DOMContentLoaded', () => { render(); applyAll(); loadCustomCSS(); });
 })();
-</script>
-
-</head>
-  <!-- Estilos do gerenciador de chaves e treinamentos -->
-  <style>
+</script> </head> <style>
     .keymgr-btn{
       width:36px;height:36px;border:none;border-radius:12px;
       background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;
@@ -1090,8 +1090,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
       margin-bottom: 8px;
       opacity: 0.7;
     }
-  </style>
-<style>
+  </style> <style>
 /* v6.2.9-refine — UI refinements */
 .response-controls{
   display:flex !important;
@@ -1137,38 +1136,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
 .response-block pre{ padding:10px 12px; overflow:auto; }
 .response-block ul, .response-block ol{ padding-left: 1.3em; }
 .response-block li{ margin: 4px 0; }
-</style>
-
-<body class="perf-medium">
-<div id="assistantName"></div>
-<div class="content">
-<iframe class="active" id="frame" src="index.html"></iframe>
-</div>
-<div class="symbol-bar">
-<button class="symbol-button" onclick="loadPage('about:blank')">Φ</button>
-<button class="symbol-button" onclick="loadPage('dual-decoder-13.html')">꩜</button>
-<button class="symbol-button" onclick="loadPage('Splash_FINAL_TEMA_PULSO.html')">◌</button>
-<button class="symbol-button" onclick="loadPage('Raros.html')">☼</button>
-
-
-<button class="symbol-button" onclick="loadPage('Solashss.html')">◑</button>
-<button class="symbol-button" onclick="loadPage('dual-tube-25-0.html')">◘</button>
-
-</div>
-<button class="lock-button" onclick="loadPage('index.html')"></button>
-<!-- Botões -->
-<input accept=".html" id="uploadHTML" style="display:none" type="file"/>
-<button id="uploadComponentBtn">⧉</button>
-<button id="remoteComponentBtn">☍</button>
-<button id="toggleDecoderBtn">✦</button>
-<button id="btn-expandir-ritual">◉</button>
-<!-- Caixa do decodificador -->
-<div id="decoderBox">
-<input id="codeInput" placeholder="Digite o selo..." type="text"/>
-<button onclick="decodeSymbolicCode()">✦ Desbloquear</button>
-</div>
-<!-- COMPONENTE WEB -->
-<script type="module">
+</style> <body class="perf-medium"><div id="assistantName"></div><div class="content"><iframe class="active" id="frame" src="index.html"></iframe></div><div class="symbol-bar"><button class="symbol-button" onclick="loadPage('about:blank')">Φ</button><button class="symbol-button" onclick="loadPage('dual-decoder-13.html')">꩜</button><button class="symbol-button" onclick="loadPage('Splash_FINAL_TEMA_PULSO.html')">◌</button><button class="symbol-button" onclick="loadPage('Raros.html')">☼</button><button class="symbol-button" onclick="loadPage('Solashss.html')">◑</button><button class="symbol-button" onclick="loadPage('dual-tube-25-0.html')">◘</button></div><button class="lock-button" onclick="loadPage('index.html')"></button><input accept=".html" id="uploadHTML" style="display:none" type="file"/><button id="uploadComponentBtn">⧉</button><button id="remoteComponentBtn">☍</button><button id="toggleDecoderBtn">✦</button><button id="btn-expandir-ritual">◉</button><div id="decoderBox"><input id="codeInput" placeholder="Digite o selo..." type="text"/><button onclick="decodeSymbolicCode()">✦ Desbloquear</button></div> <script type="module">
     class MyFrameLoader extends HTMLElement {
       constructor() {
         super();
@@ -1228,9 +1196,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
       }
     }
     customElements.define('my-frame-loader', MyFrameLoader);
-  </script>
-<!-- Funções JS -->
-<script>
+  </script> <script>
     const frame = document.getElementById('frame');
     const activationSound = new Audio('assets/sounds/acts/wounds/codigo-MT-OLX-0.wav');
 
@@ -1332,8 +1298,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
         alert('Selo desconhecido ou não registrado.');
       }
     }
-  </script>
-<script>
+  </script> <script>
 document.getElementById("btn-expandir-ritual").onclick = () => {
   const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
   if (alvo) {
@@ -1341,9 +1306,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
     logMistico("⧉ Expandiu o plano ritual oculto.");
   }
 };
-</script>
-<!-- 🌌 Botões simbióticos -->
-<style>
+</script> <style>
 #btn-expandir-ritual {
   position: fixed;
   bottom: 33px;
@@ -1374,8 +1337,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
   50% { transform: scale(1.021); opacity: 1; }
   100% { transform: scale(1); opacity: 0.7; }
 }
-</style>
-<script>
+</style> <script>
 document.getElementById("btn-expandir-ritual").onclick = () => {
   const alvo = document.getElementById("corpo-espelho") || document.getElementById("pulsos");
   if (alvo) {
@@ -1383,8 +1345,7 @@ document.getElementById("btn-expandir-ritual").onclick = () => {
     logMistico("⧉ Expandiu o plano ritual oculto.");
   }
 };
-</script>
-<style>
+</script> <style>
 #pulsos-container {
   position: fixed;
   top: 198px;
@@ -1645,12 +1606,7 @@ border: none !important;
 box-shadow: none !important;
 outline: none !important;
 }
-</style>
-<!-- 🌌 Camada Simbiótica Oculta -->
-<div id="pulsos-container">
-<div id="pulsos" style="display:none"></div>
-</div>
-<script>
+</style> <div id="pulsos-container"><div id="pulsos" style="display:none"></div></div> <script>
   const pulsos = document.getElementById("pulsos");
 
   function logMistico(msg) {
@@ -1706,238 +1662,7 @@ outline: none !important;
       logMistico("⚡ Pulso no iFrame em " + event.data.x + ", " + event.data.y);
     }
   });
-</script>
-<div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.80);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;">
-<button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;">
-    ≈
-   </button>
-<div class="hidden" id="playerWrapper">
-</div>
-<div id="playerControls" style="display:none;flex-direction:column;gap:8px;">
-<button id="playPause" style="font-size:22px;background:none;">
-     ►
-    </button>
-<select id="trackSelect">
-<option value="">
-      🎵 Escolha uma trilha
-     </option>
-<option value="Sono_Profundo">
-      🌙 Sono Profundo
-     </option>
-<option value="Manifestação">
-      ✨ Manifestação
-     </option>
-<option value="Ativação_Pineal">
-      🧠 Ativação Pineal
-     </option>
-<option value="Alívio_da_Ansiedade">
-      🌿 Alívio da Ansiedade
-     </option>
-<option value="Meditação_Theta">
-      ◉ Meditação Theta
-     </option>
-<option value="Viagem_Astral">
-      🌌 Viagem Astral
-     </option>
-<option value="Foco_Profundo">
-      🎯 Foco Profundo
-     </option>
-<option value="Flow_State">
-      🌊 Flow State
-     </option>
-<option value="Relaxamento_Rápido">
-      💤 Relaxamento Rápido
-     </option>
-<option value="Concentração_Sustentada">
-      📚 Concentração Sustentada
-     </option>
-<option value="Cura_Emocional">
-      💖 Cura Emocional
-     </option>
-<option value="Recuperação_Física">
-      🏋️ Recuperação Física
-     </option>
-<option value="matrix">
-      🧪 Matrix
-     </option>
-<option value="tesseract">
-      🧿 Tesseract
-     </option>
-</select>
-<select id="binauralSelect">
-<option value="">
-      🎶 Binaural Desativado
-     </option>
-<option value="Sono_Profundo">
-      🌙 Sono Profundo
-     </option>
-<option value="Manifestação">
-      ✨ Manifestação
-     </option>
-<option value="Ativação_Pineal">
-      🧠 Ativação Pineal
-     </option>
-<option value="Alívio_da_Ansiedade">
-      🌿 Alívio da Ansiedade
-     </option>
-<option value="Meditação_Theta">
-      ◉ Meditação Theta
-     </option>
-<option value="Viagem_Astral">
-      🌌 Viagem Astral
-     </option>
-<option value="Foco_Profundo">
-      🎯 Foco Profundo
-     </option>
-<option value="Flow_State">
-      🌊 Flow State
-     </option>
-<option value="Relaxamento_Rápido">
-      💤 Relaxamento Rápido
-     </option>
-<option value="Concentração_Sustentada">
-      📚 Concentração Sustentada
-     </option>
-<option value="Cura_Emocional">
-      💖 Cura Emocional
-     </option>
-<option value="Recuperação_Física">
-      🏋️ Recuperação Física
-     </option>
-<option value="matrix">
-      🧪 Matrix
-     </option>
-<option value="tesseract">
-      🧿 Tesseract
-     </option>
-</select>
-<label>
-     🎵 Volume Trilha
-     <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1"/>
-</label>
-<label>
-     🧘 Volume Binaural
-     <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/>
-</label>
-</div>
-</div>
-<button id="themeToggle" title="Alternar tema"></button>
-<div id="particles-js"></div>
-<div class="svg-container" id="logoContainer">
-<object data="assets/icons/3D_logo_Dual_Infodose_10.png" id="logoObj" type="image/png"></object>
-</div>
-<div class="response-container" id="response">
-<div class="pages-wrapper">
-<div class="page initial active">
-<strong>Clique no ◉ e diga “Oi, Dual”.</strong>
-</div>
-</div>
-<p class="footer-text">
-<em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em>
-</p>
-<div class="response-controls">
-<div class="control-buttons">
-<button class="copy-button" title="Copiar">
-<object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object>
-</button>
-<button class="paste-button" title="Colar">
-<object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object>
-</button>
-<button class="toggle-button" id="toggleBtn" title="Login Infodose">
-<object data="assets/icons/KBLX-pack/SuS-logo-1.PNG" height="33" type="image/png" width="33"></object>
-</button>
-<button class="kitty-button" id="kittyBtn" title="Estudos">
-<object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object>
-</button>
-
-<button class="upload-symbolic-button" id="uploadFileBtn" title="Enviar Arquivo">
-  ⧉
-</button>
-<input type="file" id="symbolicFileInput" style="display: none;" accept=".txt,.html,.json,.pdf,.png,.jpg,.jpeg"/>
-
-  <!-- Botão para abrir o gerenciador de chaves e treinamentos -->
-  <button class="keymgr-btn" id="keymgrOpen" title="Chaves &amp; Treinamentos">
-    <!-- Ícone representando chaves -->
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path d="M3 12a6 6 0 1 1 11.31 3H22v3h-3v3h-3v-3h-3.69A6 6 0 0 1 3 12Z"/>
-      <circle cx="9" cy="12" r="2"/>
-    </svg>
-  </button>
-
-      <!-- Botão para abrir o gerenciador de patches -->
-      <button id="patchMgrBtn" class="upload-symbolic-button" title="Patches">
-        🧩
-      </button>
-
-</div>
-<div class="pagination">
-<button data-action="prev">⟵</button>
-<span id="pageIndicator">1 / 1</span>
-<button data-action="next">⟶</button>
-</div>
-</div>
-    <!-- Painel do gerenciador de patches (inicialmente oculto) -->
-    <div id="patchMgrPanel" role="dialog" aria-modal="true" aria-labelledby="pmTitle" style="display:none;">
-      <header>
-        <strong id="pmTitle">Gerenciador de Patches</strong>
-        <div class="pm-actions">
-          <button id="pmImport">Importar .json</button>
-          <button id="pmPaste">Colar JSON</button>
-          <button id="pmExport">Exportar</button>
-          <!-- Botão para abrir a seção de armazenamento local e CSS -->
-          <button id="pmStorage">Storage</button>
-          <button id="pmClose">Fechar</button>
-        </div>
-      </header>
-      <small>Os patches são salvos localmente e aplicados em ordem de prioridade.</small>
-      <div id="patchList"></div>
-      <!-- Área do gerenciador de armazenamento local e CSS (inicialmente oculta) -->
-      <div id="storageManager" style="display:none;margin-top:1rem;">
-        <div class="pm-actions">
-          <button id="storageRefresh">Atualizar</button>
-          <button id="storageClear">Limpar tudo</button>
-          <button id="storageExport">Exportar</button>
-          <button id="storageAdd">Adicionar</button>
-        </div>
-        <div id="storageList"></div>
-        <textarea id="cssInput" placeholder="Cole seu CSS aqui" style="width:100%;height:60px;margin-top:10px;border-radius:8px;padding:8px;font-family:monospace;"></textarea>
-        <div class="pm-actions" style="margin-top:8px;">
-          <button id="applyCSS">Aplicar CSS</button>
-        </div>
-      </div>
-    </div>
-    <!-- Spacer to reserve space for the footer and ensure controls are not covered -->
-    <div id="kdx-footer-spacer"></div>
-</div>
-<div class="input-container">
-<input id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
-<button id="sendBtn" title="Enviar">➤</button>
-<button id="voiceBtn" title="Falar">
-<object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36"></object>
-</button>
-</div>
-<div class="login-container" id="loginBox">
-
-<div id="advancedToggleOptions" style="display:none;margin-top:12px;flex-direction:column;gap:10px;">
-  <input id="skInput" type="text" placeholder="🔑 Nova chave SK..." style="padding:8px;border-radius:8px;border:1px solid #0ff;background:rgba(0,0,0,0.20);color:#0ff;"/>
-  <input id="roleSystemInput" type="text" placeholder="📜 Role System..." style="padding:8px;border-radius:8px;border:1px solid #0ff;background:rgba(0,0,0,0.20);color:#0ff;"/>
-  <select id="modelSelector" style="padding:8px;border-radius:8px;background:rgba(0,0,0,0.20);color:#0ff;border:1px solid #0ff;">
-    <option value="">🤖 Selecione modelo</option>
-    <option value="deepseek/deepseek-chat-v3-0324:free">Deepseek v3</option>
-    <option value="openchat/openchat-3.5-1210:free">OpenChat 3.5</option>
-    <option value="mistralai/mixtral-8x7b:free">Mixtral</option>
-    <option value="meta-llama/llama-3-70b-instruct:free">LLaMA 3 70B</option>
-  </select>
-  <button onclick="salvarConfiguracoesAvancadas()" style="padding:8px;border-radius:8px;border:1px solid #0ff;background:#0ff;color:#000;font-weight:bold;">💾 Ativar Configurações</button>
-</div>
-
-<form id="loginForm">
-<input id="userName" placeholder="Nome do usuário" required="" type="text"/>
-<input id="assistantInput" placeholder="Nome dual.infodose" required="" type="text"/>
-<button type="submit">Ativar</button>
-</form>
-</div>
-<script>
+</script> <div id="koblluxPlayer" style="position:fixed;top:42px;left:20px;z-index:7;background:rgba(0,0,0,0.80);backdrop-filter:blur(9px);padding:5px;border-radius:10px;display:flex;flex-direction:column;gap:6px;transition:all 0.6s ease;max-width:199px;color:var(--text);font-family:monospace;"><button id="togglePlayer" style="font-size:20px;background:none;border:none;color:inherit;cursor:pointer;"> ≈ </button><div class="hidden" id="playerWrapper"></div><div id="playerControls" style="display:none;flex-direction:column;gap:8px;"><button id="playPause" style="font-size:22px;background:none;"> ► </button><select id="trackSelect"><option value=""> 🎵 Escolha uma trilha </option><option value="Sono_Profundo"> 🌙 Sono Profundo </option><option value="Manifestação"> ✨ Manifestação </option><option value="Ativação_Pineal"> 🧠 Ativação Pineal </option><option value="Alívio_da_Ansiedade"> 🌿 Alívio da Ansiedade </option><option value="Meditação_Theta"> ◉ Meditação Theta </option><option value="Viagem_Astral"> 🌌 Viagem Astral </option><option value="Foco_Profundo"> 🎯 Foco Profundo </option><option value="Flow_State"> 🌊 Flow State </option><option value="Relaxamento_Rápido"> 💤 Relaxamento Rápido </option><option value="Concentração_Sustentada"> 📚 Concentração Sustentada </option><option value="Cura_Emocional"> 💖 Cura Emocional </option><option value="Recuperação_Física"> 🏋️ Recuperação Física </option><option value="matrix"> 🧪 Matrix </option><option value="tesseract"> 🧿 Tesseract </option></select><select id="binauralSelect"><option value=""> 🎶 Binaural Desativado </option><option value="Sono_Profundo"> 🌙 Sono Profundo </option><option value="Manifestação"> ✨ Manifestação </option><option value="Ativação_Pineal"> 🧠 Ativação Pineal </option><option value="Alívio_da_Ansiedade"> 🌿 Alívio da Ansiedade </option><option value="Meditação_Theta"> ◉ Meditação Theta </option><option value="Viagem_Astral"> 🌌 Viagem Astral </option><option value="Foco_Profundo"> 🎯 Foco Profundo </option><option value="Flow_State"> 🌊 Flow State </option><option value="Relaxamento_Rápido"> 💤 Relaxamento Rápido </option><option value="Concentração_Sustentada"> 📚 Concentração Sustentada </option><option value="Cura_Emocional"> 💖 Cura Emocional </option><option value="Recuperação_Física"> 🏋️ Recuperação Física </option><option value="matrix"> 🧪 Matrix </option><option value="tesseract"> 🧿 Tesseract </option></select><label> 🎵 Volume Trilha <input id="trackVolume" max="1" min="0" step="0.01" type="range" value="1"/></label><label> 🧘 Volume Binaural <input id="binauralVolume" max="1" min="0" step="0.01" type="range" value="1"/></label></div></div><button id="themeToggle" title="Alternar tema"></button><div id="particles-js"></div><div class="svg-container" id="logoContainer"><object data="assets/icons/3D_logo_Dual_Infodose_10.png" id="logoObj" type="image/png"></object></div><div class="response-container" id="response"><div class="pages-wrapper"><div class="page initial active"><strong>Clique no ◉ e diga “Oi, Dual”.</strong></div></div><p class="footer-text"><em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em></p><div class="response-controls"><div class="control-buttons"><button class="copy-button" title="Copiar"><object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object></button><button class="paste-button" title="Colar"><object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object></button><button class="toggle-button" id="toggleBtn" title="Login Infodose"><object data="assets/icons/KBLX-pack/SuS-logo-1.PNG" height="33" type="image/png" width="33"></object></button><button class="kitty-button" id="kittyBtn" title="Estudos"><object data="assets/icons/DualKittyKard-icon-3.png" height="33" type="image/png" width="33"></object></button><button class="upload-symbolic-button" id="uploadFileBtn" title="Enviar Arquivo"> ⧉ </button><input type="file" id="symbolicFileInput" style="display: none;" accept=".txt,.html,.json,.pdf,.png,.jpg,.jpeg"/><button class="keymgr-btn" id="keymgrOpen" title="Chaves &amp; Treinamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a6 6 0 1 1 11.31 3H22v3h-3v3h-3v-3h-3.69A6 6 0 0 1 3 12Z"/><circle cx="9" cy="12" r="2"/></svg></button><button id="patchMgrBtn" class="upload-symbolic-button" title="Patches"> 🧩 </button></div><div class="pagination"><button data-action="prev">⟵</button><span id="pageIndicator">1 / 1</span><button data-action="next">⟶</button></div></div><div id="patchMgrPanel" role="dialog" aria-modal="true" aria-labelledby="pmTitle" style="display:none;"><header><strong id="pmTitle">Gerenciador de Patches</strong><div class="pm-actions"><button id="pmImport">Importar .json</button><button id="pmPaste">Colar JSON</button><button id="pmExport">Exportar</button><button id="pmStorage">Storage</button><button id="pmTerminal">Terminal</button><button id="pmClose">Fechar</button></div></header><small>Os patches são salvos localmente e aplicados em ordem de prioridade.</small><div id="patchList"></div><div id="storageManager" style="display:none;margin-top:1rem;"><div class="pm-actions"><button id="storageRefresh">Atualizar</button><button id="storageClear">Limpar tudo</button><button id="storageExport">Exportar</button><button id="storageAdd">Adicionar</button></div><div id="storageList"></div><textarea id="cssInput" placeholder="Cole seu CSS aqui" style="width:100%;height:60px;margin-top:10px;border-radius:8px;padding:8px;font-family:monospace;"></textarea><div class="pm-actions" style="margin-top:8px;"><button id="applyCSS">Aplicar CSS</button></div></div><div id="terminalManager" style="display:none;margin-top:1rem;"><iframe id="pmTerminalFrame" src="Dual-terminal-0.html" style="width:100%;height:420px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(10,12,16,.78);"></iframe></div></div><div id="kdx-footer-spacer"></div></div><div class="input-container"><input id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/><button id="sendBtn" title="Enviar">➤</button><button id="voiceBtn" title="Falar"><object data="assets/icons/Reset_buttom_Dual-Infodose.svg" height="36" type="image/svg+xml" width="36"></object></button></div><div class="login-container" id="loginBox"><div id="advancedToggleOptions" style="display:none;margin-top:12px;flex-direction:column;gap:10px;"><input id="skInput" type="text" placeholder="🔑 Nova chave SK..." style="padding:8px;border-radius:8px;border:1px solid #0ff;background:rgba(0,0,0,0.20);color:#0ff;"/><input id="roleSystemInput" type="text" placeholder="📜 Role System..." style="padding:8px;border-radius:8px;border:1px solid #0ff;background:rgba(0,0,0,0.20);color:#0ff;"/><select id="modelSelector" style="padding:8px;border-radius:8px;background:rgba(0,0,0,0.20);color:#0ff;border:1px solid #0ff;"><option value="">🤖 Selecione modelo</option><option value="deepseek/deepseek-chat-v3-0324:free">Deepseek v3</option><option value="openchat/openchat-3.5-1210:free">OpenChat 3.5</option><option value="mistralai/mixtral-8x7b:free">Mixtral</option><option value="meta-llama/llama-3-70b-instruct:free">LLaMA 3 70B</option></select><button onclick="salvarConfiguracoesAvancadas()" style="padding:8px;border-radius:8px;border:1px solid #0ff;background:#0ff;color:#000;font-weight:bold;">💾 Ativar Configurações</button></div><form id="loginForm"><input id="userName" placeholder="Nome do usuário" required="" type="text"/><input id="assistantInput" placeholder="Nome dual.infodose" required="" type="text"/><button type="submit">Ativar</button></form></div> <script>
    document.addEventListener("DOMContentLoaded", () => {
 const toggleBtn = document.getElementById("togglePlayer");
 const controls = document.getElementById("playerControls");
@@ -1986,8 +1711,7 @@ binauralVolume.addEventListener("input", () => {
 binauralAudio.volume = binauralVolume.value;
 });
 });
-  </script>
-<script>
+  </script> <script>
   document.addEventListener("click", function(e) {
     window.parent.postMessage({
       type: "iframeClick",
@@ -2005,8 +1729,7 @@ binauralAudio.volume = binauralVolume.value;
       }, "*");
     }
   });
-</script>
-<script>
+</script> <script>
   document.getElementById("btn-expandir-ritual")?.addEventListener("click", () => {
     const pulsos = document.getElementById("pulsos");
     if (pulsos) {
@@ -2016,9 +1739,7 @@ binauralAudio.volume = binauralVolume.value;
       }
     }
   });
-</script>
-<script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-<script>
+</script> <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script> <script>
    (function(){
     const STORAGE_KEY  = 'infodoseEnabled',
           THEME_KEY    = 'infodoseTheme',
@@ -2390,8 +2111,7 @@ binauralAudio.volume = binauralVolume.value;
 
     document.addEventListener('DOMContentLoaded',init);
   })();
-  </script>
-<script>
+  </script> <script>
 function renderResponseBlocks({ intro = "", middle = "", ending = "" }) {
   const container = document.querySelector(".pages-wrapper");
 
@@ -2423,8 +2143,7 @@ function renderResponseBlocks({ intro = "", middle = "", ending = "" }) {
   if (middle) container.appendChild(createBlock(middle, "middle"));
   if (ending) container.appendChild(createBlock(ending, "ending"));
 }
-</script>
-<script>
+</script> <script>
 document.addEventListener("DOMContentLoaded", () => {
   const footer = document.querySelector(".footer-text");
   const inputContainer = document.querySelector(".input-container");
@@ -2453,8 +2172,7 @@ const ritualBtn = document.getElementById("btn-expandir-ritual");
     });
   }
 });
-</script>
-<script>
+</script> <script>
    // 🎧 Sons de interface - Coblux UI Samples
 const uiSounds = {
 click: new Audio('assets/sounds/uiSamples/navigation.wav'),
@@ -2522,8 +2240,7 @@ uiSounds.confirm.play().catch(() => {});
 })
 );
 });
-  </script>
-<script>
+  </script> <script>
    // 🎧 Novos sons com base em IDs
 const uiBL = {
 toggle: new Audio('assets/sounds/uiSamples/toggleBtn-sfx.wav'),
@@ -2563,8 +2280,7 @@ uiBL.cancel.play().catch(()=>{});
 })
 );
 });
-  </script>
-<style>
+  </script> <style>
 #btn-expandir-ritual.move-to-bottom-ritual {
   bottom: 18px !important;
   animation: moveRitualDown 0.4s ease forwards !important;
@@ -2573,8 +2289,7 @@ uiBL.cancel.play().catch(()=>{});
   from { bottom: 193px; opacity: 0.4; }
   to   { bottom: 18px; opacity: 0.6; }
 }
-</style>
-<style>
+</style> <style>
 #layoutTogglePanel {
   position: fixed;
   top: 50px;
@@ -2646,37 +2361,7 @@ body.perf-low .svg-container object {
   animation: none !important;
 }
 /* medium e high permitem partículas (nada a fazer) */
-</style>
-
-<!-- Botão de Toggle -->
-<button id="togglePanelBtn">⚙️</button>
-
-<!-- Painel de controle simbiótico -->
-<div id="layoutTogglePanel">
-  <label><input type="checkbox" onchange="toggleElement('#response', this)"> Mostrar IA</label>
-  <label><input type="checkbox" onchange="toggleElement('.svg-container', this)"> Mostrar Logo</label>
-  <label><input type="checkbox" onchange="toggleElement('#koblluxPlayer', this)"> Mostrar Player</label>
-  <label><input type="checkbox" onchange="toggleElement('#uploadComponentBtn,#remoteComponentBtn,#toggleDecoderBtn', this)"> Mostrar Botões Laterais</label>
-  <label><input type="checkbox" onchange="toggleElement('.symbol-bar', this)"> Mostrar SymbolBar</label>
-  <hr/>
-    <!-- Opções de desempenho: Low/Medium/High -->
-    <fieldset id="performanceOptions" style="border:none;padding:0;">
-      <legend style="font-size:0.9em;margin-bottom:4px;">Desempenho</legend>
-      <label style="margin-right:6px;"><input type="radio" name="performance" value="low"> Low</label>
-      <label style="margin-right:6px;"><input type="radio" name="performance" value="medium" checked> Medium</label>
-      <label><input type="radio" name="performance" value="high"> High</label>
-    </fieldset>
-    <hr/>
-  <button onclick="mostrarTodos()">Mostrar Todos</button>
-  <button onclick="ocultarTodos()">Ocultar Todos</button>
-  <hr/>
-  <button onclick="salvarEstadoUI()">Salvar Preferência</button>
-</div>
-
-<!-- Botão simbiótico do usuário -->
-<button id="userButton">☯ UserButton</button>
-
-<script>
+</style> <button id="togglePanelBtn">⚙️</button><div id="layoutTogglePanel"><label><input type="checkbox" onchange="toggleElement('#response', this)"> Mostrar IA</label><label><input type="checkbox" onchange="toggleElement('.svg-container', this)"> Mostrar Logo</label><label><input type="checkbox" onchange="toggleElement('#koblluxPlayer', this)"> Mostrar Player</label><label><input type="checkbox" onchange="toggleElement('#uploadComponentBtn,#remoteComponentBtn,#toggleDecoderBtn', this)"> Mostrar Botões Laterais</label><label><input type="checkbox" onchange="toggleElement('.symbol-bar', this)"> Mostrar SymbolBar</label><hr/><fieldset id="performanceOptions" style="border:none;padding:0;"><legend style="font-size:0.9em;margin-bottom:4px;">Desempenho</legend><label style="margin-right:6px;"><input type="radio" name="performance" value="low"> Low</label><label style="margin-right:6px;"><input type="radio" name="performance" value="medium" checked> Medium</label><label><input type="radio" name="performance" value="high"> High</label></fieldset><hr/><button onclick="mostrarTodos()">Mostrar Todos</button><button onclick="ocultarTodos()">Ocultar Todos</button><hr/><button onclick="salvarEstadoUI()">Salvar Preferência</button></div><button id="userButton">☯ UserButton</button> <script>
 // Toggle do painel de controle
 document.getElementById('togglePanelBtn').addEventListener('click', function () {
   const panel = document.getElementById('layoutTogglePanel');
@@ -2757,8 +2442,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-</script>
-<script>
+</script> <script>
 // ========= Markdown simbiótico =========
 function renderMarkdown(raw) {
   return raw
@@ -2863,8 +2547,7 @@ function renderResponse(txt) {
 
   document.getElementById("pageIndicator").textContent = "1 / " + pages.length;
 }
-</script>
-<style>
+</script> <style>
 .symbol-button {
   display: inline-flex;
   align-items: center;
@@ -2980,9 +2663,7 @@ function renderResponse(txt) {
 .submenu.hidden {
   display: none;
 }
-</style>
-
-<script>
+</style> <script>
 function transformarSimbolosAvancado() {
   const targetBlocks = document.querySelectorAll('.renderResponse, .response-block, .output-block, .console');
 
@@ -3053,9 +2734,7 @@ function toggleNested(id) {
 // Otimizado com MutationObserver (sem setInterval)
 const observer = new MutationObserver(transformarSimbolosAvancado);
 observer.observe(document.body, { childList: true, subtree: true });
-</script>
-
-<script>
+</script> <script>
 function expandirPulso() {
   const pulsos = document.getElementById("pulsos");
   if (pulsos && !pulsos.classList.contains("expanded")) {
@@ -3095,8 +2774,7 @@ function renderResponseBlocks({ intro = "", middle = "", ending = "" }) {
   if (middle) container.appendChild(createBlock(middle, "middle"));
   if (ending) container.appendChild(createBlock(ending, "ending"));
 }
-</script>
-<script>
+</script> <script>
 function renderSplitText(txt) {
   const groups = txt.split("---").map(str => str.trim()).filter(Boolean);
   return {
@@ -3156,8 +2834,7 @@ function renderResponse(input) {
   if (ending) wrap.appendChild(renderBlock(ending, "ending", "◉"));
 }
 
-</script>
-<script>
+</script> <script>
 function salvarHistorico(pulso) {
   logResponseHistorico.push({ ...pulso, timestamp: new Date().toISOString() });
 
@@ -3180,8 +2857,7 @@ function salvarHistorico(pulso) {
     pulsos.prepend(item);
   }
 }
-</script>
-<style>
+</script> <style>
 :root {
   --bg: rgba(0,0,0,0.80);
   --text: #0ff;
@@ -3241,13 +2917,7 @@ function salvarHistorico(pulso) {
 .pulso-item {
   margin-bottom: 12px;
 }
-</style>
-
-<div class="pages-wrapper" id="pagesWrapper"></div>
-
-
-
-<script>
+</style> <div class="pages-wrapper" id="pagesWrapper"></div> <script>
 document.addEventListener("DOMContentLoaded", () => {
   const voiceBtn = document.getElementById("voiceBtn");
   if (!voiceBtn) return;
@@ -3297,17 +2967,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-</script>
-
-<style>
+</script> <style>
 #voiceBtn.listening {
   animation: pulse 1s infinite;
   filter: drop-shadow(0 0 6px #0ff);
 }
-</style>
-
-
-<script>
+</style> <script>
 document.addEventListener("DOMContentLoaded", () => {
   const uploadBtn = document.getElementById("uploadFileBtn");
   const inputFile = document.getElementById("symbolicFileInput");
@@ -3328,10 +2993,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-</script>
-
-
-<script>
+</script> <script>
 function salvarConfiguracoesAvancadas() {
   const newSK = document.getElementById("skInput")?.value.trim();
   const roleSystem = document.getElementById("roleSystemInput")?.value.trim();
@@ -3354,8 +3016,7 @@ function salvarConfiguracoesAvancadas() {
 
   alert("Configurações avançadas aplicadas.");
 }
-</script>
-<script>
+</script> <script>
 function ATIVAR_KOBLLUX_PATCH() {
   // CSS refinado com bordas suaves
   const style = document.createElement("style");
@@ -3512,8 +3173,7 @@ window.logMistico = function(msg, options = {}) {
 
   logMistico("✨ PATCH KOBLLUX SUPREMO ativado");
 }
-</script>
-<script>
+</script> <script>
 function registrarPulsoEEnviar(simbolo) {
   logMistico(`🧿 Pulso simbólico ativado: ${simbolo}`);
   
@@ -3531,11 +3191,7 @@ function registrarPulsoEEnviar(simbolo) {
 
   callAI();
 }
-</script>
-<script>ATIVAR_KOBLLUX_PATCH();</script>
-
-<!-- KODUX_PATCH: normalize buttons + SR fallback, keep your CSS intact -->
-<script>
+</script> <script>ATIVAR_KOBLLUX_PATCH();</script> <script>
 (function(){
   function wireButtons(){
     const input = document.getElementById('userInput');
@@ -3611,10 +3267,7 @@ function registrarPulsoEEnviar(simbolo) {
     wireButtons();
   }
 })();
-</script>
-
-
-<style>/* SuperPatch v6.2.2 — fixes */
+</script> <style>/* SuperPatch v6.2.2 — fixes */
 .dual-md{margin:12px 0;padding:14px;border-radius:14px;background:rgba(0,0,0,0.35);
 border:1px solid rgba(0,255,255,0.18);backdrop-filter:blur(6px);line-height:1.55;font-size:.98em}
 .dual-md blockquote{margin:0 0 8px 0;padding-left:10px;border-left:3px solid #0ff;opacity:.95}
@@ -3640,9 +3293,7 @@ box-shadow:0 0 18px rgba(0,255,255,0.18),inset 0 0 12px rgba(0,0,0,0.20);backdro
   border-radius:12px;padding:8px;background:transparent;backdrop-filter:blur(6px)}
 .symbol-button{font-weight:400;border:1px solid rgba(0,255,255,0.18);border-radius:10px}
 body.vibe{animation:vibePulse .6s ease-out}
-@keyframes vibePulse{0%{filter:saturate(.9)}50%{filter:saturate(1.2)}100%{filter:saturate(1)}}</style>
-<button id="sumbus-toggle" title="SÜMBÜS – formatação + injeção">SÜMBÜS: ON</button>
-<script>(function(){
+@keyframes vibePulse{0%{filter:saturate(.9)}50%{filter:saturate(1.2)}100%{filter:saturate(1)}}</style> <button id="sumbus-toggle" title="SÜMBÜS – formatação + injeção">SÜMBÜS: ON</button> <script>(function(){
   const b=document.getElementById('sumbus-toggle'); if(!b) return;
   const K='SUMBUS_ACTIVE'; const saved=localStorage.getItem(K);
   if(saved==='false'){ window.__SUMBUS_ACTIVE__=false; b.textContent='SÜMBÜS: OFF'; b.style.color='#aaa'; }
@@ -3653,8 +3304,7 @@ body.vibe{animation:vibePulse .6s ease-out}
     b.style.color = on? '#0ff' : '#aaa';
     localStorage.setItem(K,String(on));
   });
-})();</script>
-<script>// SuperPatch v6.2.2 — no MetaLux, keep upload, single feed
+})();</script> <script>// SuperPatch v6.2.2 — no MetaLux, keep upload, single feed
 (function(){
   if (window.__SUPERPATCH_V622__) return; window.__SUPERPATCH_V622__=true;
   window.__SUMBUS_ACTIVE__ = (window.__SUMBUS_ACTIVE__ ?? true);
@@ -3751,9 +3401,7 @@ body.vibe{animation:vibePulse .6s ease-out}
   })();
 
   // Do not remove upload; no MetaLux button
-})();</script>
-
-<script>
+})();</script> <script>
 (function(){
   if (window.__REFINE_629__) return; window.__REFINE_629__=true;
 
@@ -3878,68 +3526,7 @@ body.vibe{animation:vibePulse .6s ease-out}
   })();
 
 })();
-</script>
-
-
-<script src="dual-ui-orchestrator.simbio-first.js"></script>
-  <!-- Painel do gerenciador de chaves e treinamentos -->
-  <div class="keymgr-panel" id="keymgrPanel">
-    <div class="keymgr-hd">
-      <h3>Chaves &amp; Treinamentos — Dual.Infodose</h3>
-      <button class="keymgr-close" id="keymgrClose">Fechar</button>
-    </div>
-    <!-- Informações do usuário e assistente -->
-    <p class="user-info">Usuário: <span id="keymgrUserName"></span> — Assistente: <span id="keymgrAssistantName"></span></p>
-    <div class="keymgr-grid">
-      <!-- Cartão de chaves OpenRouter -->
-      <div class="cardx">
-        <h4>OpenRouter — Chaves</h4>
-        <div class="row">
-          <input id="orKeyName" type="text" placeholder="Nome da chave (ex.: Pessoal, Work)"/>
-          <input id="orKeyValue" type="password" placeholder="Cole sua chave sk-..." />
-          <button class="btnx" id="btnPasteKey">Colar</button>
-          <button class="btnx" id="btnSaveKey">Salvar</button>
-        </div>
-        <div class="list" id="keysList"></div>
-      </div>
-      <!-- Cartão de treinamento base -->
-      <div class="cardx">
-        <h4>Treinamento Base (TXT)</h4>
-        <div class="row">
-          <input id="baseTrainName" type="text" placeholder="Nome (ex.: Unificado v6)"/>
-          <button class="btnx" id="btnLoadBaseTxt">Carregar TXT</button>
-          <input id="baseTrainFile" type="file" accept=".txt" style="display:none"/>
-          <button class="btnx" id="btnApplyBaseTxt">Aplicar</button>
-          <label class="switch"><input id="baseTrainEnabled" type="checkbox" checked/> Ativo</label>
-        </div>
-        <textarea id="baseTrainText" placeholder="Conteúdo do TXT base"></textarea>
-      </div>
-      <!-- Cartão de extras / ativações -->
-      <div class="cardx">
-        <h4>Treinamentos Extras / Ativações</h4>
-        <div class="row">
-          <input id="extraName" type="text" placeholder="Nome do extra/ativação"/>
-          <button class="btnx" id="btnLoadExtraTxt">Adicionar TXT</button>
-          <input id="extraFile" type="file" accept=".txt" style="display:none"/>
-        </div>
-        <div class="list" id="extrasList"></div>
-      </div>
-
-      <!-- Cartão de componentes e uploads -->
-      <div class="cardx">
-        <h4>Componentes &amp; Uploads</h4>
-        <div class="row">
-          <button class="btnx" id="btnUploadHTML">Carregar HTML</button>
-          <button class="btnx" id="btnUploadSymbol">Upload Arquivo</button>
-          <button class="btnx" id="btnRemoteComponent">Carregar URL</button>
-          <button class="btnx" id="btnToggleDecoder">Decodificador</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Script para gerenciar chaves e treinamentos -->
-  <script>
+</script> <script src="dual-ui-orchestrator.simbio-first.js"></script> <div class="keymgr-panel" id="keymgrPanel"><div class="keymgr-hd"><h3>Chaves &amp; Treinamentos — Dual.Infodose</h3><button class="keymgr-close" id="keymgrClose">Fechar</button></div><p class="user-info">Usuário: <span id="keymgrUserName"></span> — Assistente: <span id="keymgrAssistantName"></span></p><div class="keymgr-grid"><div class="cardx"><h4>OpenRouter — Chaves</h4><div class="row"><input id="orKeyName" type="text" placeholder="Nome da chave (ex.: Pessoal, Work)"/><input id="orKeyValue" type="password" placeholder="Cole sua chave sk-..." /><button class="btnx" id="btnPasteKey">Colar</button><button class="btnx" id="btnSaveKey">Salvar</button></div><div class="list" id="keysList"></div></div><div class="cardx"><h4>Treinamento Base (TXT)</h4><div class="row"><input id="baseTrainName" type="text" placeholder="Nome (ex.: Unificado v6)"/><button class="btnx" id="btnLoadBaseTxt">Carregar TXT</button><input id="baseTrainFile" type="file" accept=".txt" style="display:none"/><button class="btnx" id="btnApplyBaseTxt">Aplicar</button><label class="switch"><input id="baseTrainEnabled" type="checkbox" checked/> Ativo</label></div><textarea id="baseTrainText" placeholder="Conteúdo do TXT base"></textarea></div><div class="cardx"><h4>Treinamentos Extras / Ativações</h4><div class="row"><input id="extraName" type="text" placeholder="Nome do extra/ativação"/><button class="btnx" id="btnLoadExtraTxt">Adicionar TXT</button><input id="extraFile" type="file" accept=".txt" style="display:none"/></div><div class="list" id="extrasList"></div></div><div class="cardx"><h4>Componentes &amp; Uploads</h4><div class="row"><button class="btnx" id="btnUploadHTML">Carregar HTML</button><button class="btnx" id="btnUploadSymbol">Upload Arquivo</button><button class="btnx" id="btnRemoteComponent">Carregar URL</button><button class="btnx" id="btnToggleDecoder">Decodificador</button></div></div></div></div> <script>
     (function(){
       // LocalStorage keys
       const LS_KEYS = {
@@ -4176,10 +3763,7 @@ body.vibe{animation:vibePulse .6s ease-out}
       // initial render of keys
       renderKeys();
     })();
-  </script>
-
-
-<script>
+  </script> <script>
 // v6.2.2 footer-click → oculta/exibe respostas renderizadas (.response-container)
 document.addEventListener("DOMContentLoaded", () => {
   const footer = document.querySelector(".footer-text");
@@ -4208,18 +3792,14 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch(_) {}
   });
 });
-</script>
-
-<style>
+</script> <style>
 /* v6.2.3 — Footer sempre visível; compact esconde só conteúdo e UI */
 .footer-text{ display:block !important; visibility:visible !important; opacity:1 !important; }
 body.dual-compact #response-inner{ display:none !important; } /* só o conteúdo, não o footer */
 body.dual-compact .input-container,
 body.dual-compact .control-buttons,
 body.dual-compact .pagination{ display:none !important; }
-</style>
-
-<script>
+</style> <script>
 // v6.2.3 — Cria #response-inner e garante que o footer nunca suma
 (function(){
   function q(sel, root=document){ return root.querySelector(sel); }
@@ -4251,18 +3831,14 @@ body.dual-compact .pagination{ display:none !important; }
     }
   });
 })();
-</script>
-
-<style>
+</script> <style>
 /* v6.2.4 — Footer só oculta páginas renderizadas (nunca o #response) */
 #response{ display:block !important; }
 #response .footer-text{ display:block !important; visibility:visible !important; opacity:1 !important; }
 #response[data-pages-hidden="1"] .pages-wrapper,
 #response[data-pages-hidden="1"] #pagesWrapper,
 #response[data-pages-hidden="1"] .response-block{ display:none !important; }
-</style>
-
-<script>
+</style> <script>
 // v6.2.4 — Footer alterna apenas as páginas renderizadas (mantém #response visível)
 (function(){
   function q(sel, root=document){ return root.querySelector(sel); }
@@ -4287,6 +3863,4 @@ body.dual-compact .pagination{ display:none !important; }
     });
   });
 })();
-</script>
-</body>
-</html>
+</script> </body></html> 

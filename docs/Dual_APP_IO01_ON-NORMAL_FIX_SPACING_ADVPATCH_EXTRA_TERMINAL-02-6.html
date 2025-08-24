@@ -25,7 +25,6 @@ body{ overflow:auto !important; }
 }
 .footer-text{
   position: fixed; left: var(--pad-x); right: var(--pad-x);
-  /* Desce o footer (tagline) 6px para aproximá-lo da borda inferior */
   bottom: calc(var(--safe-b) - 6px);
   animation: none !important;
 }
@@ -81,6 +80,52 @@ body{ overflow:auto !important; }
   color: #EDEFF7;
   border: 1px solid rgba(255,255,255,.12);
   backdrop-filter: blur(10px);
+}
+
+/* Style for the Storage Manager button (separate icon) */
+#storageMgrBtn{
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid rgba(0,255,255,0.2);
+  box-shadow: 0 0 6px rgba(0,255,255,0.2), 0 0 10px rgba(255,0,255,0.2);
+  font-size: 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition: all .3s ease;
+}
+#storageMgrBtn:hover{
+  background: rgba(0,255,255,0.2);
+  transform: scale(1.1);
+  box-shadow: 0 0 12px rgba(0,255,255,0.4);
+}
+/* Style for the storage manager panel */
+#storageMgrPanel{
+  position: absolute;
+  right: 14px;
+  bottom: calc(60px + env(safe-area-inset-bottom));
+  z-index: 100002;
+  width: min(560px, 92vw);
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(10,12,16,.78);
+  color: #EDEFF7;
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px);
+  display: none;
+}
+#storageMgrPanel header{
+  display:flex;
+  gap:.6rem;
+  align-items:center;
+  justify-content: space-between;
+  margin-bottom:.6rem;
 }
 #patchMgrPanel header{
   display:flex;
@@ -805,9 +850,9 @@ background:linear-gradient(42deg,#0ff,#f0f);
     paste: document.getElementById('pmPaste'),
     exp: document.getElementById('pmExport'),
     close: document.getElementById('pmClose'),
-    // elementos adicionais para gerenciar armazenamento local e CSS
-    storageBtn: document.getElementById('pmStorage'),
-    storagePanel: document.getElementById('storageManager'),
+    // elementos adicionais para o painel de armazenamento local e CSS
+    storageBtn: document.getElementById('storageMgrBtn'),
+    storagePanel: document.getElementById('storageMgrPanel'),
     storageList: document.getElementById('storageList'),
     storageRefresh: document.getElementById('storageRefresh'),
     storageClear: document.getElementById('storageClear'),
@@ -815,6 +860,12 @@ background:linear-gradient(42deg,#0ff,#f0f);
     storageAdd: document.getElementById('storageAdd'),
     cssInput: document.getElementById('cssInput'),
     applyCSSBtn: document.getElementById('applyCSS'),
+    smClose: document.getElementById('smClose'),
+    // elementos para terminal extra
+    terminalOpenBtn: document.getElementById('terminalOpenBtn'),
+    terminalPanel: document.getElementById('terminalPanel'),
+    terminalFrame: document.getElementById('terminalFrame'),
+    tmClose: document.getElementById('tmClose'),
   };
   const guards = {
     maxCss: 50000,
@@ -884,7 +935,8 @@ background:linear-gradient(42deg,#0ff,#f0f);
     a.click();
     URL.revokeObjectURL(a.href);
   }
-  // ============ Local Storage Manager ============
+
+  // ===== Gerenciador de Armazenamento Local e CSS =====
   function renderStorage() {
     if (!dom.storageList) return;
     const list = dom.storageList;
@@ -1025,7 +1077,7 @@ background:linear-gradient(42deg,#0ff,#f0f);
   if(dom.imp) dom.imp.onclick = importFile;
   if(dom.paste) dom.paste.onclick = pasteJson;
   if(dom.exp) dom.exp.onclick = exportAll;
-  // Eventos para o gerenciador de armazenamento local e CSS
+  // Eventos para o painel de armazenamento e CSS
   if(dom.storageBtn){
     dom.storageBtn.onclick = () => {
       if(!dom.storagePanel) return;
@@ -1034,11 +1086,32 @@ background:linear-gradient(42deg,#0ff,#f0f);
       if(!visible) renderStorage();
     };
   }
+  if(dom.smClose) dom.smClose.onclick = () => {
+    if(dom.storagePanel) dom.storagePanel.style.display = 'none';
+  };
   if(dom.storageRefresh) dom.storageRefresh.onclick = renderStorage;
   if(dom.storageClear) dom.storageClear.onclick = clearStorage;
   if(dom.storageExport) dom.storageExport.onclick = exportStorage;
   if(dom.storageAdd) dom.storageAdd.onclick = addStorage;
   if(dom.applyCSSBtn) dom.applyCSSBtn.onclick = applyCSS;
+  // Eventos para Terminal extra
+  if(dom.terminalOpenBtn){
+    dom.terminalOpenBtn.onclick = () => {
+      if(!dom.terminalPanel) return;
+      const visible = dom.terminalPanel.style.display === 'block';
+      if(visible){
+        dom.terminalPanel.style.display = 'none';
+      } else {
+        dom.terminalPanel.style.display = 'block';
+        // ocultar painéis de patches e storage para evitar sobreposição
+        if(dom.panel) dom.panel.style.display = 'none';
+        if(dom.storagePanel) dom.storagePanel.style.display = 'none';
+      }
+    };
+  }
+  if(dom.tmClose){
+    dom.tmClose.onclick = () => { if(dom.terminalPanel) dom.terminalPanel.style.display = 'none'; };
+  }
   window.addEventListener('DOMContentLoaded', () => { render(); applyAll(); loadCustomCSS(); });
 })();
 </script>
@@ -1868,6 +1941,14 @@ outline: none !important;
       <button id="patchMgrBtn" class="upload-symbolic-button" title="Patches">
         🧩
       </button>
+      <!-- Botão para abrir o gerenciador de armazenamento e CSS -->
+      <button id="storageMgrBtn" class="upload-symbolic-button" title="Storage/CSS">
+        ⚙️
+      </button>
+      <!-- Botão para abrir o terminal -->
+      <button id="terminalOpenBtn" class="upload-symbolic-button" title="Terminal">
+        🖥️
+      </button>
 
 </div>
 <div class="pagination">
@@ -1884,27 +1965,40 @@ outline: none !important;
           <button id="pmImport">Importar .json</button>
           <button id="pmPaste">Colar JSON</button>
           <button id="pmExport">Exportar</button>
-          <!-- Botão para abrir a seção de armazenamento local e CSS -->
-          <button id="pmStorage">Storage</button>
           <button id="pmClose">Fechar</button>
         </div>
       </header>
       <small>Os patches são salvos localmente e aplicados em ordem de prioridade.</small>
       <div id="patchList"></div>
-      <!-- Área do gerenciador de armazenamento local e CSS (inicialmente oculta) -->
-      <div id="storageManager" style="display:none;margin-top:1rem;">
+    </div>
+
+    <!-- Painel do gerenciador de armazenamento e CSS (inicialmente oculto) -->
+    <div id="storageMgrPanel" role="dialog" aria-modal="true" aria-labelledby="smTitle" style="display:none;">
+      <header>
+        <strong id="smTitle">Storage &amp; CSS</strong>
         <div class="pm-actions">
           <button id="storageRefresh">Atualizar</button>
           <button id="storageClear">Limpar tudo</button>
           <button id="storageExport">Exportar</button>
           <button id="storageAdd">Adicionar</button>
+          <button id="smClose">Fechar</button>
         </div>
-        <div id="storageList"></div>
-        <textarea id="cssInput" placeholder="Cole seu CSS aqui" style="width:100%;height:60px;margin-top:10px;border-radius:8px;padding:8px;font-family:monospace;"></textarea>
-        <div class="pm-actions" style="margin-top:8px;">
-          <button id="applyCSS">Aplicar CSS</button>
-        </div>
+      </header>
+      <div id="storageList"></div>
+      <textarea id="cssInput" placeholder="Cole seu CSS aqui" style="width:100%;height:60px;margin-top:10px;border-radius:8px;padding:8px;font-family:monospace;"></textarea>
+      <div class="pm-actions" style="margin-top:8px;">
+        <button id="applyCSS">Aplicar CSS</button>
       </div>
+    </div>
+    <!-- Painel do terminal (inicialmente oculto) -->
+    <div id="terminalPanel" role="dialog" aria-modal="true" aria-labelledby="tmTitle" style="display:none; position:fixed; right:14px; bottom: calc(60px + env(safe-area-inset-bottom)); z-index:100003; width:min(560px, 92vw); max-height:min(70vh,560px); overflow:auto; padding:12px; border-radius:14px; background: rgba(10,12,16,.78); color:#EDEFF7; border: 1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px);">
+      <header>
+        <strong id="tmTitle">Terminal</strong>
+        <div class="pm-actions">
+          <button id="tmClose">Fechar</button>
+        </div>
+      </header>
+      <iframe id="terminalFrame" src="Dual-terminal-0.html" style="width:100%;height:420px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(10,12,16,.78);"></iframe>
     </div>
     <!-- Spacer to reserve space for the footer and ensure controls are not covered -->
     <div id="kdx-footer-spacer"></div>
