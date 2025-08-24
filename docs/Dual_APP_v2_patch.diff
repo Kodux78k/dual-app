@@ -1,0 +1,727 @@
+--- Dual_APP_v2_THEME_REACTIVE.html	2025-08-24 07:39:04.775546785 +0000
++++ Dual_APP_v2_THEME_REACTIVE_PATCHED_IO29_7.html	2025-08-24 08:42:36.614934057 +0000
+@@ -14,6 +14,7 @@
+       --bg: linear-gradient(to bottom, #000, #1a1a1a);
+       --text: #d7d7d7;
+       --fast: .4s; --med: .8s; --slow: 1.8s;
++      --safe-b: max(12px, env(safe-area-inset-bottom));
+     }
+     body.light { --bg: linear-gradient(to bottom,#666,#e0e0e0); --text:#444; }
+     body.medium{ --bg: linear-gradient(to bottom,#555,#333); --text:#eee; }
+@@ -212,8 +213,10 @@
+     /* ————— FIM DO CSS ————— */
+   
+ 
++/* Aumenta o espaço inferior do container de respostas para não sobrepor o input e considerar a safe-area */
+ .response-container {
+-  bottom: 99px !important;
++  /* Move the response container up by about 18px to avoid overlapping the input */
++  bottom: 98px !important;
+ }
+ 
+ .input-container.hidden,
+@@ -258,7 +261,8 @@
+ 
+     .content {
+       width: 100%;
+-      height: 100%;
++      /* Reserve safe-area space at the bottom so the iframe doesn’t get cropped */
++      height: calc(100% - var(--safe-b));
+       position: relative;
+       display: flex;
+       align-items: center;
+@@ -1459,6 +1463,7 @@
+ <button class="copy-button" title="Copiar">
+ <object data="assets/icons/BW_quad_Dual_Infodose.svg" height="27" type="image/svg+xml" width="27"></object>
+ </button>
++
+ <button class="paste-button" title="Colar">
+ <object data="assets/icons/BW_Dual_Infodose.svg" height="24" type="image/svg+xml" width="24"></object>
+ </button>
+@@ -1480,6 +1485,10 @@
+ <circle cx="9" cy="12" r="2"></circle>
+ </svg>
+ </button>
++<!-- Botão para abrir o gerenciador de patches -->
++<!-- Botão do gerenciador de patches usa o símbolo ”⃝ (aspa curva com círculo) -->
++<!-- Updated patch manager button symbol to U+20CB (Combining Diacritical Marks overlay). Using HTML entity &#x20CB; to ensure proper rendering. Note: this symbol is a combining mark and may require a preceding space or dot for visibility. -->
++<button id="patchMgrBtn" class="upload-symbolic-button" title="Patches">&#x20CB;</button>
+ </div>
+ <div class="pagination">
+ <button data-action="prev">⟵</button>
+@@ -1488,6 +1497,254 @@
+ </div>
+ </div>
+ </div>
++<!-- ========= Patch Manager Injection Begin ========= -->
++<!-- Style definitions specific to the Patch Manager -->
++<style id="patchMgrStyles">
++  #patchMgrBtn{
++    width: 32px;
++    height: 32px;
++    border-radius: 8px;
++    background: var(--bg);
++    color: var(--text);
++    border: 1px solid rgba(0,255,255,0.2);
++    box-shadow: 0 0 6px rgba(0,255,255,0.2), 0 0 10px rgba(255,0,255,0.2);
++    font-size: 20px;
++    display:flex;
++    align-items:center;
++    justify-content:center;
++    cursor:pointer;
++    transition: all .3s ease;
++  }
++  #patchMgrBtn:hover{
++    background: rgba(0,255,255,0.2);
++    transform: scale(1.1);
++    box-shadow: 0 0 12px rgba(0,255,255,0.4);
++  }
++  #patchMgrPanel{
++    position: fixed;
++    right: 14px;
++    /* Ajusta a posição do painel de patches para considerar a área segura */
++    bottom: calc(60px + var(--safe-b));
++    z-index: 100002;
++    width: min(560px, 92vw);
++    max-height: min(70vh, 560px);
++    overflow: auto;
++    padding: 12px;
++    border-radius: 14px;
++    background: rgba(10,12,16,.78);
++    color: #EDEFF7;
++    border: 1px solid rgba(255,255,255,.12);
++    backdrop-filter: blur(10px);
++    display: none;
++  }
++  #patchMgrPanel header{
++    display:flex;
++    gap:.6rem;
++    align-items:center;
++    justify-content: space-between;
++    margin-bottom:.6rem;
++  }
++  #patchMgrPanel pre{
++    white-space: pre-wrap;
++    word-wrap: break-word;
++    background: rgba(255,255,255,.06);
++    padding:.6rem;
++    border-radius:8px;
++  }
++  #patchList{
++    display:flex;
++    flex-direction: column;
++    gap:.5rem;
++    margin-top:.5rem;
++  }
++  .pm-item{
++    display:flex;
++    gap:.5rem;
++    align-items:center;
++    justify-content: space-between;
++    background: rgba(255,255,255,.06);
++    padding:.5rem .6rem;
++    border-radius: 10px;
++  }
++  .pm-actions{ display:flex; gap:.4rem; }
++  .pm-actions button{
++    padding:.35rem .6rem;
++    border-radius:8px;
++    border:0;
++    cursor:pointer;
++  }
++  .pm-on{ background: rgba(0,255,200,.16); }
++  .pm-off{ background: rgba(255,80,120,.16); }
++  #storageManager{ display:none; margin-top:1rem; }
++  #storageManager textarea{
++    width:100%;
++    height:60px;
++    margin-top:10px;
++    border-radius:8px;
++    padding:8px;
++    font-family:monospace;
++  }
++  #terminalManager{ display:none; margin-top:1rem; }
++  #terminalManager iframe{
++    width:100%;
++    height:420px;
++    border-radius:10px;
++    border:1px solid rgba(255,255,255,.12);
++    background:rgba(10,12,16,.78);
++  }
++  #kdx-footer-spacer{
++    /* Espaço reservado no final da página apenas para a área segura (não cria folga extra) */
++    height: var(--safe-b);
++  }
++
++  /* Perfil do usuário e avatar */
++  .pm-profile{
++    display:flex;
++    align-items:center;
++    gap:0.8rem;
++    background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.05));
++    border-radius:16px;
++    padding:0.8rem;
++    margin-bottom:0.8rem;
++  }
++  .pm-profile svg{
++    width:42px;
++    height:42px;
++    border-radius:50%;
++    background: rgba(255,255,255,0.1);
++    padding:4px;
++    flex-shrink:0;
++  }
++  .pm-profile-info strong{
++    font-size:1.4rem;
++    color: var(--accent-1);
++  }
++  .pm-profile-info small{
++    font-size:0.8rem;
++    color: rgba(255,255,255,0.7);
++  }
++
++  /* Social login buttons */
++  .pm-socials{
++    display:flex;
++    flex-wrap: wrap;
++    gap:0.4rem;
++    margin-top:0.5rem;
++  }
++  .pm-socials .social-btn{
++    padding:0.3rem 0.6rem;
++    border-radius:8px;
++    border:1px solid rgba(255,255,255,0.3);
++    font-size:0.8rem;
++    cursor:pointer;
++    background: rgba(255,255,255,0.1);
++    color: var(--text);
++    transition: opacity 0.2s ease;
++  }
++  .pm-socials .social-btn:hover{
++    opacity:0.8;
++  }
++  .pm-socials .git{
++    background:#171515;
++    color:#fff;
++  }
++  .pm-socials .apple{
++    background:#f5f5f5;
++    color:#000;
++  }
++  .pm-socials .fb{
++    background:#1877F2;
++    color:#fff;
++  }
++  .pm-socials .google{
++    background:#EA4335;
++    color:#fff;
++  }
++
++  /* Quick injection panel styling */
++  #quickManager{
++    display:none;
++    margin-top:1rem;
++  }
++  #quickManager label{
++    font-size:0.85rem;
++    color: rgba(255,255,255,0.8);
++  }
++  #quickManager textarea{
++    width:100%;
++    height:80px;
++    margin-top:6px;
++    border-radius:10px;
++    padding:8px;
++    background: rgba(255,255,255,0.05);
++    border: 1px solid rgba(255,255,255,0.1);
++    color: var(--text);
++    font-family: monospace;
++  }
++  #quickManager .pm-actions{
++    margin-top:0.5rem;
++  }
++</style>
++<!-- Botão de patches será adicionado na barra de controles -->
++<!-- Painel do gerenciador de patches (inicialmente oculto) -->
++<div id="patchMgrPanel" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
++  <!-- Perfil do usuário / card humanizado -->
++  <div class="pm-profile">
++    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 20a8 8 0 0 1 16 0z"></path></svg>
++    <div class="pm-profile-info">
++      <strong id="pmUserName">Seu Perfil</strong>
++      <small>Gerencie seus patches e preferências</small>
++      <div class="pm-socials">
++        <button class="social-btn git" title="Conectar com GitHub" onclick="window.open('https://github.com/login','_blank')">GitHub</button>
++        <button class="social-btn apple" title="Conectar com Apple" onclick="window.open('https://appleid.apple.com/auth/authorize','_blank')">Apple</button>
++        <button class="social-btn fb" title="Conectar com Facebook" onclick="window.open('https://www.facebook.com/login','_blank')">Facebook</button>
++        <button class="social-btn google" title="Conectar com Google" onclick="window.open('https://accounts.google.com/signin','_blank')">Google</button>
++      </div>
++    </div>
++    <!-- Hidden file input for uploading avatar -->
++    <input id="avatarUpload" type="file" accept="image/*" style="display:none;" />
++  </div>
++  <header>
++    <strong id="pmTitle">Gerenciador de Patches</strong>
++    <div class="pm-actions">
++      <button id="pmImport">Importar .json</button>
++      <button id="pmPaste">Colar JSON</button>
++      <button id="pmExport">Exportar</button>
++      <button id="pmStorage">Storage</button>
++      <button id="pmQuick">Rápido</button>
++      <button id="pmTerminal">Terminal</button>
++      <button id="pmClose">Fechar</button>
++    </div>
++  </header>
++  <small>Os patches são salvos localmente e aplicados em ordem de prioridade.</small>
++  <div id="patchList"></div>
++  <div id="storageManager">
++    <div class="pm-actions">
++      <button id="storageRefresh">Atualizar</button>
++      <button id="storageClear">Limpar tudo</button>
++      <button id="storageExport">Exportar</button>
++      <button id="storageAdd">Adicionar</button>
++    </div>
++    <div id="storageList"></div>
++    <textarea id="cssInput" placeholder="Cole seu CSS aqui"></textarea>
++    <div class="pm-actions">
++      <button id="applyCSS">Aplicar CSS</button>
++    </div>
++  </div>
++  <div id="terminalManager">
++    <iframe id="pmTerminalFrame" src="Dual-terminal-0.html"></iframe>
++  </div>
++  <!-- Área de injeção rápida de CSS/JS -->
++  <div id="quickManager">
++    <label for="quickInput">Injeção rápida:</label>
++    <textarea id="quickInput" placeholder="Cole CSS ou JS aqui..."></textarea>
++    <div class="pm-actions">
++      <button id="applyQuick">Injetar</button>
++    </div>
++  </div>
++</div>
++<div id="kdx-footer-spacer"></div>
++<!-- ========= Patch Manager Injection End ========= -->
+ <div class="input-container">
+ <input id="userInput" placeholder="Diga: 'oi, Dual'..." type="text"/>
+ <button id="sendBtn" title="Enviar">➤</button>
+@@ -3850,5 +4107,420 @@
+ 
+   const b=document.createElement('button'); b.id='kdx-reload'; b.type='button'; b.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v4l3 1"></path></svg>`; b.onclick=()=>location.reload(); document.body.appendChild(b);
+ });
++</script>
++<!-- Patch Manager logic -->
++<script>
++(() => {
++  const LS_KEY = 'dualapp.patches';
++  const dom = {
++    btn: document.getElementById('patchMgrBtn'),
++    panel: document.getElementById('patchMgrPanel'),
++    list: document.getElementById('patchList'),
++    patchList: document.getElementById('patchList'),
++    imp: document.getElementById('pmImport'),
++    paste: document.getElementById('pmPaste'),
++    exp: document.getElementById('pmExport'),
++    close: document.getElementById('pmClose'),
++    storageBtn: document.getElementById('pmStorage'),
++    storagePanel: document.getElementById('storageManager'),
++    storageList: document.getElementById('storageList'),
++    storageRefresh: document.getElementById('storageRefresh'),
++    storageClear: document.getElementById('storageClear'),
++    storageExport: document.getElementById('storageExport'),
++    storageAdd: document.getElementById('storageAdd'),
++    cssInput: document.getElementById('cssInput'),
++    applyCSSBtn: document.getElementById('applyCSS'),
++    terminalBtn: document.getElementById('pmTerminal'),
++    terminalPanel: document.getElementById('terminalManager'),
++    terminalFrame: document.getElementById('pmTerminalFrame'),
++    // Quick injection panel elements
++    quickBtn: document.getElementById('pmQuick'),
++    quickPanel: document.getElementById('quickManager'),
++    quickInput: document.getElementById('quickInput'),
++    applyQuickBtn: document.getElementById('applyQuick'),
++    // Avatar upload and profile elements
++    avatarUpload: document.getElementById('avatarUpload'),
++    pmAvatarSvg: document.querySelector('.pm-profile svg'),
++    pmUserName: document.getElementById('pmUserName'),
++  };
++  const guards = {
++    maxCss: 50000,
++    maxJs: 50000,
++    blocked: [/document\.write\s*\(/i, /new\s+Function\s*\(/i, /\beval\s*\(/i],
++  };
++  function load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch{ return []; } }
++  function save(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr||[])); }
++  function byPriority(a,b){ return (a.priority??0) - (b.priority??0); }
++  function validate(p){
++    if(!p || typeof p!=='object') throw new Error('patch inválido');
++    if(!p.id || typeof p.id!=='string') throw new Error('id obrigatório');
++    if(p.css && p.css.length>guards.maxCss) throw new Error('CSS muito grande');
++    if(p.js && p.js.length>guards.maxJs) throw new Error('JS muito grande');
++    const bad = (p.js||'');
++    guards.blocked.forEach(rx=>{ if(rx.test(bad)) throw new Error('JS bloqueado por política'); });
++    return true;
++  }
++  function removeOne(id){
++    document.querySelectorAll(`[data-patch="${id}"]`).forEach(el=>el.remove());
++  }
++  function applyOne(p){
++    removeOne(p.id);
++    if(p.css){
++      const st = document.createElement('style');
++      st.setAttribute('data-patch', p.id);
++      st.textContent = p.css;
++      document.head.appendChild(st);
++    }
++    if(p.js){
++      const sc = document.createElement('script');
++      sc.setAttribute('data-patch', p.id);
++      sc.textContent = `(function(){ try{ ${p.js}\n }catch(e){console.warn('Patch JS falhou',e)} })();`;
++      document.body.appendChild(sc);
++    }
++  }
++  function applyAll(){
++    const arr = load().filter(p=>p.enabled!==false).sort(byPriority);
++    arr.forEach(applyOne);
++  }
++  function upsert(patch){
++    validate(patch);
++    const arr = load();
++    const i = arr.findIndex(x=>x.id===patch.id);
++    if(i>=0) arr[i] = {...arr[i], ...patch};
++    else arr.push({...patch, enabled:true});
++    save(arr); render(); applyAll();
++  }
++  function toggle(id,on){
++    const arr = load();
++    const i = arr.findIndex(x=>x.id===id);
++    if(i>=0){ arr[i].enabled = on; save(arr); render(); applyAll(); }
++  }
++  function remove(id){
++    const arr = load().filter(x=>x.id!==id);
++    save(arr);
++    removeOne(id);
++    render();
++    applyAll();
++  }
++  function exportAll(){
++    const data = JSON.stringify(load(), null, 2);
++    const blob = new Blob([data], {type:'application/json'});
++    const a = document.createElement('a');
++    a.href = URL.createObjectURL(blob);
++    a.download = 'dualapp-patches.json';
++    a.click();
++    URL.revokeObjectURL(a.href);
++  }
++  function renderStorage() {
++    if (!dom.storageList) return;
++    const list = dom.storageList;
++    list.innerHTML = '';
++    const keys = [];
++    for (let i = 0; i < localStorage.length; i++) {
++      const k = localStorage.key(i);
++      if (k !== LS_KEY) keys.push(k);
++    }
++    if (keys.length === 0) {
++      const empty = document.createElement('div');
++      empty.className = 'pm-item';
++      empty.innerHTML = '<em>Sem dados</em>';
++      list.appendChild(empty);
++      return;
++    }
++    keys.sort();
++    keys.forEach(key => {
++      const val = localStorage.getItem(key) || '';
++      const displayVal = val.length > 40 ? val.slice(0, 40) + '…' : val;
++      const row = document.createElement('div');
++      row.className = 'pm-item';
++      row.innerHTML = `<div><strong>${key}</strong><small style="opacity:.7;display:block">${displayVal}</small></div><div class="pm-actions"><button data-act="edit">Editar</button><button data-act="rm">Remover</button></div>`;
++      row.querySelector('[data-act="edit"]').onclick = () => {
++        const current = localStorage.getItem(key);
++        const nv = prompt('Novo valor para ' + key, current);
++        if (nv !== null) {
++          try {
++            localStorage.setItem(key, nv);
++            renderStorage();
++          } catch (e) { alert('Erro ao gravar no localStorage: ' + e.message); }
++        }
++      };
++      row.querySelector('[data-act="rm"]').onclick = () => {
++        if (confirm('Remover ' + key + '?')) {
++          localStorage.removeItem(key);
++          renderStorage();
++        }
++      };
++      list.appendChild(row);
++    });
++  }
++  function clearStorage() {
++    if (confirm('Limpar TODOS os dados do localStorage?')) {
++      localStorage.clear();
++      renderStorage();
++    }
++  }
++  function exportStorage() {
++    const data = {};
++    for (let i = 0; i < localStorage.length; i++) {
++      const k = localStorage.key(i);
++      data[k] = localStorage.getItem(k);
++    }
++    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
++    const a = document.createElement('a');
++    a.href = URL.createObjectURL(blob);
++    a.download = 'dualapp-localstorage.json';
++    a.click();
++    URL.revokeObjectURL(a.href);
++  }
++  function addStorage() {
++    const key = prompt('Nome da chave');
++    if (!key) return;
++    const val = prompt('Valor para ' + key);
++    if (val === null) return;
++    try {
++      localStorage.setItem(key, val);
++      renderStorage();
++    } catch (e) { alert('Erro ao gravar no localStorage: ' + e.message); }
++  }
++  function applyCSS() {
++    if (!dom.cssInput) return;
++    const css = dom.cssInput.value || '';
++    let styleEl = document.getElementById('customCssPatch');
++    if (!styleEl) {
++      styleEl = document.createElement('style');
++      styleEl.id = 'customCssPatch';
++      document.head.appendChild(styleEl);
++    }
++    styleEl.textContent = css;
++    try { localStorage.setItem('dualapp_custom_css', css); } catch (_) {}
++  }
++  function loadCustomCSS() {
++    try {
++      const css = localStorage.getItem('dualapp_custom_css');
++      if (css && dom.cssInput) {
++        dom.cssInput.value = css;
++        applyCSS();
++      }
++    } catch (_) {}
++  }
++  function render(){
++    const arr = load().sort(byPriority);
++    dom.list.innerHTML = '';
++    arr.forEach(p=>{
++      const row = document.createElement('div'); row.className = 'pm-item';
++      row.innerHTML = `<div><strong>${p.id}</strong><small style="opacity:.7;display:block">prio: ${p.priority??0} · css:${p.css?'✔︎':'–'} · js:${p.js?'✔︎':'–'}</small></div><div class="pm-actions"><button class="${p.enabled!==false?'pm-on':'pm-off'}" data-act="toggle">${p.enabled!==false?'On':'Off'}</button><button data-act="edit">Editar</button><button data-act="rm">Remover</button></div>`;
++      row.querySelector('[data-act="toggle"]').onclick = () => toggle(p.id, !(p.enabled!==false));
++      row.querySelector('[data-act="rm"]').onclick = () => remove(p.id);
++      row.querySelector('[data-act="edit"]').onclick = () => {
++        const txt = prompt('Edite o JSON do patch', JSON.stringify(p, null, 2));
++        if(!txt) return;
++        try{ upsert(JSON.parse(txt)); }catch(e){ alert('JSON inválido: ' + e.message); }
++      };
++      dom.list.appendChild(row);
++    });
++  }
++  async function importFile(){
++    const input = Object.assign(document.createElement('input'), {type:'file', accept:'application/json'});
++    input.onchange = () => {
++      const f = input.files?.[0]; if(!f) return;
++      const r = new FileReader();
++      r.onload = () => {
++        try{
++          const j = JSON.parse(r.result);
++          (Array.isArray(j) ? j : [j]).forEach(upsert);
++        }catch(e){ alert('JSON inválido: ' + e.message); }
++      };
++      r.readAsText(f);
++    };
++    input.click();
++  }
++  async function pasteJson(){
++    const txt = prompt('Cole o JSON do patch:');
++    if(!txt) return;
++    try{
++      const j = JSON.parse(txt);
++      (Array.isArray(j) ? j : [j]).forEach(upsert);
++    }catch(e){ alert('JSON inválido: ' + e.message); }
++  }
++  if(dom.btn){
++    dom.btn.onclick = () => {
++      dom.panel.style.display = (dom.panel.style.display==='block'?'none':'block');
++    };
++  }
++  if(dom.close) dom.close.onclick = () => dom.panel.style.display = 'none';
++  if(dom.imp) dom.imp.onclick = importFile;
++  if(dom.paste) dom.paste.onclick = pasteJson;
++  if(dom.exp) dom.exp.onclick = exportAll;
++  if(dom.storageBtn){
++    dom.storageBtn.onclick = () => {
++      if(!dom.storagePanel) return;
++      const visible = dom.storagePanel.style.display === 'block';
++      if(visible){
++        dom.storagePanel.style.display = 'none';
++        dom.patchList.style.display = '';
++      } else {
++        dom.storagePanel.style.display = 'block';
++        dom.patchList.style.display = 'none';
++        if(dom.terminalPanel) dom.terminalPanel.style.display = 'none';
++        renderStorage();
++        loadCustomCSS();
++      }
++    };
++  }
++  if(dom.storageRefresh) dom.storageRefresh.onclick = renderStorage;
++  if(dom.storageClear) dom.storageClear.onclick = clearStorage;
++  if(dom.storageExport) dom.storageExport.onclick = exportStorage;
++  if(dom.storageAdd) dom.storageAdd.onclick = addStorage;
++  if(dom.applyCSSBtn) dom.applyCSSBtn.onclick = applyCSS;
++  if(dom.terminalBtn){
++    dom.terminalBtn.onclick = () => {
++      if(!dom.terminalPanel) return;
++      const visible = dom.terminalPanel.style.display === 'block';
++      if(visible){
++        dom.terminalPanel.style.display = 'none';
++        dom.patchList.style.display = '';
++      } else {
++        dom.terminalPanel.style.display = 'block';
++        dom.patchList.style.display = 'none';
++        if(dom.storagePanel) dom.storagePanel.style.display = 'none';
++      }
++    };
++  }
++
++  // -----------------------
++  // Quick Manager toggle logic
++  // Show or hide the quick injection panel when clicking the Rápido button
++  if(dom.quickBtn){
++    dom.quickBtn.onclick = () => {
++      if(!dom.quickPanel) return;
++      const visible = dom.quickPanel.style.display === 'block';
++      if(visible){
++        dom.quickPanel.style.display = 'none';
++        dom.patchList.style.display = '';
++      } else {
++        dom.quickPanel.style.display = 'block';
++        dom.patchList.style.display = 'none';
++        if(dom.storagePanel) dom.storagePanel.style.display = 'none';
++        if(dom.terminalPanel) dom.terminalPanel.style.display = 'none';
++      }
++    };
++  }
++
++  // Apply quick injection of CSS or JS entered by the user
++  if(dom.applyQuickBtn){
++    dom.applyQuickBtn.onclick = () => {
++      if(!dom.quickInput) return;
++      const txt = dom.quickInput.value.trim();
++      if(!txt) return;
++      const id = 'quick-' + Date.now();
++      const patch = { id };
++      // Determine if the payload is likely JavaScript by looking for common JS keywords
++      if(/[;{}]/.test(txt) && /(function|const|let|var|=>|console|return)/.test(txt)){
++        patch.js = txt;
++      } else {
++        patch.css = txt;
++      }
++      try {
++        upsert(patch);
++        // clear the input after injection
++        dom.quickInput.value = '';
++      } catch(e){ alert('Erro ao injetar: ' + e.message); }
++    };
++  }
++
++  // Avatar upload handling: allow the user to click on the avatar to select an image
++  if(dom.pmAvatarSvg && dom.avatarUpload){
++    dom.pmAvatarSvg.style.cursor = 'pointer';
++    dom.pmAvatarSvg.addEventListener('click', () => {
++      dom.avatarUpload.click();
++    });
++    dom.avatarUpload.addEventListener('change', () => {
++      const file = dom.avatarUpload.files?.[0];
++      if(!file) return;
++      const reader = new FileReader();
++      reader.onload = (e) => {
++        const dataUrl = e.target.result;
++        try {
++          localStorage.setItem('dualapp.userAvatar', dataUrl);
++        } catch(err){}
++        const img = document.createElement('img');
++        img.src = dataUrl;
++        img.width = dom.pmAvatarSvg.clientWidth || 42;
++        img.height = dom.pmAvatarSvg.clientHeight || 42;
++        img.style.borderRadius = '50%';
++        dom.pmAvatarSvg.replaceWith(img);
++        dom.pmAvatarSvg = img;
++        // Also set the avatar as background on the patch manager button
++        if(dom.btn){
++          dom.btn.style.backgroundImage = `url(${dataUrl})`;
++          dom.btn.style.backgroundSize = 'cover';
++          dom.btn.style.backgroundPosition = 'center';
++          dom.btn.style.backgroundRepeat = 'no-repeat';
++          dom.btn.textContent = '';
++        }
++      };
++      reader.readAsDataURL(file);
++    });
++  }
++
++  // Load avatar from localStorage if present and replace the default icon
++  function loadAvatar(){
++    try{
++      const dataUrl = localStorage.getItem('dualapp.userAvatar');
++      if(dataUrl && dom.pmAvatarSvg){
++        const img = document.createElement('img');
++        img.src = dataUrl;
++        img.width = dom.pmAvatarSvg.clientWidth || 42;
++        img.height = dom.pmAvatarSvg.clientHeight || 42;
++        img.style.borderRadius = '50%';
++        dom.pmAvatarSvg.replaceWith(img);
++        dom.pmAvatarSvg = img;
++        // Also set the avatar on the patch manager button at load time
++        if(dom.btn){
++          dom.btn.style.backgroundImage = `url(${dataUrl})`;
++          dom.btn.style.backgroundSize = 'cover';
++          dom.btn.style.backgroundPosition = 'center';
++          dom.btn.style.backgroundRepeat = 'no-repeat';
++          dom.btn.textContent = '';
++        }
++      }
++    }catch(e){}
++  }
++  window.addEventListener('DOMContentLoaded', () => {
++    render();
++    applyAll();
++    loadCustomCSS();
++    // restore the user’s avatar if one is saved
++    loadAvatar();
++  });
++})();
++</script>
++<!-- Pulsos log hook: forward all console messages to logMistico so actions are recorded in the Pulsos pane -->
++<script>
++(function(){
++  try {
++    const pulseLogger = window.logMistico;
++    if (typeof pulseLogger === 'function') {
++      const origLog = console.log;
++      console.log = function(...args) {
++        try { pulseLogger(args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); } catch (e) {}
++        return origLog.apply(console, args);
++      };
++      const origWarn = console.warn;
++      console.warn = function(...args) {
++        try { pulseLogger('⚠️ ' + args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); } catch (e) {}
++        return origWarn.apply(console, args);
++      };
++      const origError = console.error;
++      console.error = function(...args) {
++        try { pulseLogger('❌ ' + args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ')); } catch (e) {}
++        return origError.apply(console, args);
++      };
++    }
++  } catch (err) {
++    // swallow errors and fallback to standard console
++    console.warn && console.warn('Pulsos logger hook failed', err);
++  }
++})();
+ </script></body>
+ </html>
