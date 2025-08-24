@@ -1,0 +1,74 @@
+[
+  {
+    "id": "pack-glass-pro",
+    "name": "Glass Pro",
+    "priority": 10,
+    "enabled": true,
+    "scope": "global",
+    "css": " :root{--safe-b:max(12px,env(safe-area-inset-bottom));} .response-container{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:16px!important;backdrop-filter:blur(8px) saturate(140%)!important;box-shadow:0 6px 24px rgba(0,0,0,.35)!important} .input-container{background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:16px!important;backdrop-filter:blur(8px)!important} .input-container input{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:18px!important} .footer-text{margin-bottom:var(--safe-b)!important} "
+  },
+  {
+    "id": "pack-neon-terminal",
+    "name": "Neon Terminal",
+    "priority": 20,
+    "enabled": false,
+    "scope": "global",
+    "css": " body{background:#000!important;color:#0ff!important;font-family:ui-monospace,monospace!important} .response-block{border-left:4px solid #0ff!important;background:rgba(0,0,0,.6)!important} .input-container input{background:#111!important;color:#0ff!important;border:1px solid #0ff!important} .input-container button{color:#fff!important;text-shadow:0 0 8px #0ff,0 0 12px #f0f!important} .response-block pre,.response-block code{background:rgba(0,0,0,.8)!important;border:1px solid #0ff!important;color:#e6ffff!important;border-radius:8px!important;padding:8px!important} "
+  },
+  {
+    "id": "pack-kill-switch",
+    "name": "Kill-Switch (Perf)",
+    "priority": 5,
+    "enabled": false,
+    "scope": "global",
+    "css": " #particles-js{display:none!important} .response-block,.svg-container object{animation:none!important} .response-container,.input-container,.footer-text{filter:none!important;box-shadow:none!important} body *{transition:none!important} "
+  },
+  {
+    "id": "pack-cards-3d",
+    "name": "Cart\u00f5es 3D",
+    "priority": 30,
+    "enabled": true,
+    "scope": "global",
+    "css": " .response-block{transform-style:preserve-3d;transition:transform .25s ease,box-shadow .25s ease} .response-block:hover{transform:translateZ(10px) scale(1.01);box-shadow:0 10px 28px rgba(0,0,0,.35)} .response-block.active{transform:translateZ(14px) scale(1.03);box-shadow:0 14px 36px rgba(0,0,0,.45)} "
+  },
+  {
+    "id": "pack-safe-area-105",
+    "name": "Safe-Area Bottom 105",
+    "priority": 40,
+    "enabled": true,
+    "scope": "global",
+    "css": " :root{--safe-b:max(12px,env(safe-area-inset-bottom))} .response-container{bottom:calc(105px + var(--safe-b))!important} .input-container{bottom:calc(24px + var(--safe-b))!important} .footer-text{bottom:var(--safe-b)!important} "
+  },
+  {
+    "id": "pack-vibe",
+    "name": "Vibe",
+    "priority": 15,
+    "enabled": false,
+    "scope": "global",
+    "css": " body{background: radial-gradient(1200px 600px at 50% 0%,rgba(15,18,28,1),#06070c) !important;color:#EDEFF7 !important;} .response-container,.input-container{background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:18px!important;backdrop-filter: blur(12px) saturate(160%) !important;} .response-block{background:linear-gradient(135deg,rgba(0,255,255,.06),rgba(255,0,255,.06))!important;border-left:2px solid rgba(0,255,255,.6)!important;} .input-container button{background: linear-gradient(45deg,#0ff,#f0f) !important;color:#0b0d11!important;border:none!important;border-radius:14px!important;} "
+  },
+  {
+    "id": "pack-matrix",
+    "name": "Matrix",
+    "priority": 16,
+    "enabled": false,
+    "scope": "global",
+    "css": " body{background:#020603!important;color:#8AFF8A!important;font-family:ui-monospace,monospace!important} .response-container{background:rgba(0,0,0,.7)!important;border:1px solid #0a2!important} .response-block{background:rgba(0,20,0,.6)!important;border-left:3px solid #1f7a1f!important} .response-block code,.response-block pre{background:#001700!important;color:#b6ffb6!important} .input-container input{background:#001400!important;color:#8AFF8A!important;border:1px solid #1f7a1f!important} .input-container button{background:#052 !important;border:1px solid #0a2 !important;color:#b6ffb6 !important} "
+  },
+  {
+    "id": "pack-luxara-min",
+    "name": "Luxara Minimal (Preto&Dourado)",
+    "priority": 17,
+    "enabled": false,
+    "scope": "global",
+    "css": " body{background:#050506!important;color:#F4D26B!important} .response-container{background:rgba(12,12,14,.78)!important;border:1px solid rgba(244,210,107,.25)!important;border-radius:14px!important} .response-block{background:rgba(255,255,255,.04)!important;border-left:2px solid #F4D26B!important} h1,h2,h3,strong{color:#F4D26B!important} .input-container input{background:rgba(10,10,12,.75)!important;border:1px solid rgba(244,210,107,.35)!important;color:#F9E6AA!important} .input-container button{background:#F4D26B!important;color:#1a1a1f!important;border:none!important} "
+  },
+  {
+    "id": "pack-monodark-plus",
+    "name": "Mono Dark+",
+    "priority": 18,
+    "enabled": false,
+    "scope": "global",
+    "css": " body{background:#0b0d11!important;color:#EDEFF7!important} .response-container,.input-container{background:#12151c!important;border:1px solid #1d2230!important;border-radius:12px!important} .response-block{background:#0f131a!important;border-left:3px solid #2bd1ff!important} a{color:#8ab4ff!important} .input-container input{background:#0e1219!important;border:1px solid #1f2635!important;color:#EDEFF7!important} .input-container button{background:#1a2130!important;border:1px solid #2bd1ff!important;color:#e9f7ff!important} "
+  }
+]
