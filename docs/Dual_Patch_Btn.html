@@ -1,0 +1,189 @@
+<!-- PATCH MANAGER — botão + painel -->
+<style>
+  #patchMgrBtn{
+    position:fixed; left:12px; top:450px; z-index:100001;
+    padding:.44rem .6rem; border:0; border-radius:10px;
+    background: rgba(255,255,255,.06); color: var(--text);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 6px rgba(0,255,255,.2), 0 0 10px rgba(255,0,255,.2);
+    font: 600 12px/1 system-ui; cursor:pointer; opacity:.85;
+  }
+  #patchMgrBtn:hover{ opacity:1; transform: translateY(-1px); transition:.2s }
+  #patchMgrPanel{
+    position:fixed; right:14px; bottom: calc(72px + env(safe-area-inset-bottom) + 14px);
+    z-index:100002; width:min(560px,92vw); max-height:min(70vh,560px); overflow:auto;
+    padding:12px; border-radius:14px;
+    background: rgba(10,12,16,.78); color:#EDEFF7;
+    border:1px solid rgba(255,255,255,.12); backdrop-filter: blur(10px);
+    display:none;
+  }
+  #patchMgrPanel header{display:flex;gap:.6rem;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+  #patchMgrPanel pre{white-space:pre-wrap;word-wrap:break-word;background:rgba(255,255,255,.06);padding:.6rem;border-radius:8px}
+  #patchList{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
+  .pm-item{display:flex;gap:.5rem;align-items:center;justify-content:space-between;
+    background:rgba(255,255,255,.06);padding:.5rem .6rem;border-radius:10px}
+  .pm-actions{display:flex;gap:.4rem}
+  .pm-actions button{padding:.35rem .6rem;border-radius:8px;border:0;cursor:pointer}
+  .pm-on{background:rgba(0,255,200,.16)} .pm-off{background:rgba(255,80,120,.16)}
+</style>
+
+<button id="patchMgrBtn" class="upload-symbolic-button">Patches</button>
+<div id="patchMgrPanel" role="dialog" aria-modal="true" aria-labelledby="pmTitle">
+  <header>
+    <strong id="pmTitle">Patch Manager</strong>
+    <div class="pm-actions">
+      <button id="pmImport">Importar .json</button>
+      <button id="pmPaste">Colar JSON</button>
+      <button id="pmExport">Exportar</button>
+      <button id="pmClose">Fechar</button>
+    </div>
+  </header>
+  <small>Os patches são salvos localmente e aplicados em ordem de prioridade.</small>
+  <div id="patchList"></div>
+</div>
+
+<script>
+(()=>{
+  const LS_KEY = 'dualapp.patches';
+  const dom = {
+    btn: document.getElementById('patchMgrBtn'),
+    panel: document.getElementById('patchMgrPanel'),
+    list: document.getElementById('patchList'),
+    imp: document.getElementById('pmImport'),
+    paste: document.getElementById('pmPaste'),
+    exp: document.getElementById('pmExport'),
+    close: document.getElementById('pmClose'),
+  };
+
+  const guards = {
+    maxCss: 50_000, // 50KB
+    maxJs:  50_000, // 50KB
+    // bloqueios simples para evitar JS perigoso
+    blocked: [/document\.write\s*\(/i, /new\s+Function\s*\(/i, /\beval\s*\(/i],
+  };
+
+  function load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||'[]'); }catch{ return []; } }
+  function save(arr){ localStorage.setItem(LS_KEY, JSON.stringify(arr||[])); }
+  function byPriority(a,b){ return (a.priority??0) - (b.priority??0); }
+
+  function validate(p){
+    if(!p || typeof p!=='object') throw new Error('patch inválido');
+    if(!p.id || typeof p.id!=='string') throw new Error('id obrigatório');
+    if(p.css && p.css.length>guards.maxCss) throw new Error('CSS muito grande');
+    if(p.js && p.js.length>guards.maxJs) throw new Error('JS muito grande');
+    const bad = (p.js||'');
+    guards.blocked.forEach(rx=>{ if(rx.test(bad)) throw new Error('JS bloqueado por política'); });
+    return true;
+  }
+
+  function applyOne(p){
+    removeOne(p.id); // garante idempotência
+    if(p.css){
+      const st = document.createElement('style');
+      st.setAttribute('data-patch', p.id);
+      st.textContent = p.css;
+      document.head.appendChild(st);
+    }
+    if(p.js){
+      const sc = document.createElement('script');
+      sc.setAttribute('data-patch', p.id);
+      sc.textContent = `(function(){ try{ ${p.js}\n }catch(e){console.warn('Patch JS falhou:', e)} })();`;
+      document.body.appendChild(sc);
+    }
+  }
+  function removeOne(id){
+    document.querySelectorAll(`[data-patch="${id}"]`).forEach(n=>n.remove());
+  }
+
+  function applyAll(){
+    const arr = load().filter(p=>p.enabled!==false).sort(byPriority);
+    arr.forEach(applyOne);
+  }
+
+  function upsert(patch){
+    validate(patch);
+    const arr = load();
+    const i = arr.findIndex(x=>x.id===patch.id);
+    if(i>=0) arr[i] = {...arr[i], ...patch};
+    else arr.push({...patch, enabled:true});
+    save(arr); render(); applyAll();
+  }
+  function toggle(id, on){
+    const arr = load();
+    const i = arr.findIndex(x=>x.id===id);
+    if(i>=0){ arr[i].enabled = on; save(arr); render(); applyAll(); }
+  }
+  function remove(id){
+    const arr = load().filter(x=>x.id!==id);
+    save(arr); removeOne(id); render(); applyAll();
+  }
+  function exportAll(){
+    const data = JSON.stringify(load(), null, 2);
+    const blob = new Blob([data], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'dualapp-patches.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function render(){
+    const arr = load().sort(byPriority);
+    dom.list.innerHTML = '';
+    arr.forEach(p=>{
+      const row = document.createElement('div'); row.className='pm-item';
+      row.innerHTML = `
+        <div>
+          <strong>${p.id}</strong>
+          <small style="opacity:.7;display:block">prio: ${p.priority??0} · css:${p.css? '✔︎':'–'} · js:${p.js? '✔︎':'–'}</small>
+        </div>
+        <div class="pm-actions">
+          <button class="${p.enabled!==false?'pm-on':'pm-off'}" data-act="toggle">${p.enabled!==false?'On':'Off'}</button>
+          <button data-act="edit">Editar</button>
+          <button data-act="rm">Remover</button>
+        </div>`;
+      row.querySelector('[data-act="toggle"]').onclick=()=> toggle(p.id, !(p.enabled!==false));
+      row.querySelector('[data-act="rm"]').onclick=()=> remove(p.id);
+      row.querySelector('[data-act="edit"]').onclick=()=>{
+        const txt = prompt('Edite o JSON do patch', JSON.stringify(p, null, 2));
+        if(!txt) return;
+        try{ upsert(JSON.parse(txt)); }catch(e){ alert('JSON inválido: '+e.message); }
+      };
+      dom.list.appendChild(row);
+    });
+  }
+
+  async function importFile(){
+    const input = Object.assign(document.createElement('input'), {type:'file', accept:'application/json'});
+    input.onchange = () => {
+      const f = input.files?.[0]; if(!f) return;
+      const r = new FileReader();
+      r.onload = () => {
+        try{
+          const j = JSON.parse(r.result);
+          (Array.isArray(j) ? j : [j]).forEach(upsert);
+        }catch(e){ alert('JSON inválido: '+e.message); }
+      }; r.readAsText(f);
+    };
+    input.click();
+  }
+
+  async function pasteJson(){
+    const txt = prompt('Cole o JSON do patch:');
+    if(!txt) return;
+    try{
+      const j = JSON.parse(txt);
+      (Array.isArray(j) ? j : [j]).forEach(upsert);
+    }catch(e){ alert('JSON inválido: '+e.message); }
+  }
+
+  dom.btn.onclick = ()=> dom.panel.style.display = (dom.panel.style.display==='block'?'none':'block');
+  dom.close.onclick = ()=> dom.panel.style.display = 'none';
+  dom.imp.onclick = importFile;
+  dom.paste.onclick = pasteJson;
+  dom.exp.onclick = exportAll;
+
+  // aplica os patches salvos ao carregar
+  window.addEventListener('DOMContentLoaded', ()=>{ render(); applyAll(); });
+})();
+</script>

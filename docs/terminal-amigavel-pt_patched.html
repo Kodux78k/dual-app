@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>DUAL INFODOSE — Terminal Amigável (Mobile)</title>
+  <meta name="theme-color" content="#0a0a10" />
+
+  <style>
+    /* =============================
+       KODUX • DUAL • HORUS — Mobile
+       Versão PT-BR + otimizações landscape + shell flutuante
+       ============================= */
+    :root{
+      --bg-1: #0a0a10;
+      --bg-2: #0e0e18;
+      --txt: #EDEFF7;
+      --muted: #B9C0D4;
+      --border: rgba(255,255,255,.14);
+      --glass: rgba(255,255,255,.06);
+      --accent1: #0FF;
+      --accent2: #F0F;
+      --danger: #ff4d6d;
+      --ok: #41d3a2;
+
+      --radius: 18px;
+      --blur: 16px;
+      --shadow: 0 18px 48px rgba(0,0,0,.50);
+
+      --tap: 48px; /* min tap-target size */
+      --base: 18px; /* ≥16px em tudo; 18px para conforto */
+      --h: 1.25;
+
+      --nav-h: 64px;
+      --cmdbar-h: 64px;
+
+      --page-pad: 14px; /* padding externo nas bordas do body */
+      --shell-pad: 12px; /* padding interno da casca flutuante */
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      color: var(--txt);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, sans-serif;
+      font-size: var(--base);
+      line-height: var(--h);
+      background:
+        radial-gradient(1100px 520px at -15% -20%, rgba(0,255,255,.10), transparent 55%),
+        radial-gradient(900px 560px at 115% 10%, rgba(255,0,255,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      padding:
+        calc(var(--page-pad) + env(safe-area-inset-top, 0px))
+        calc(var(--page-pad) + env(safe-area-inset-right, 0px))
+        calc(var(--page-pad) + env(safe-area-inset-bottom, 0px))
+        calc(var(--page-pad) + env(safe-area-inset-left, 0px));
+    }
+
+    /* Casca flutuante que envolve todo o app (bordinhas redondas + sombra) */
+    .shell{
+      min-height: calc(100dvh - (var(--page-pad)*2) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(20,20,30,.66), rgba(20,20,30,.40));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+  /* Centro adaptativo: permite rolagem horizontal e centraliza a casca em telas maiores */
+  html, body {
+    overflow-x: auto;
+  }
+  @media (min-width: 600px) {
+    .shell {
+      max-width: 520px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+    .app{
+      min-height: 100%;
+      padding: var(--shell-pad);
+      padding-bottom: calc(var(--shell-pad) + var(--nav-h));
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header{
+      position: sticky; top: 0; z-index: 5;
+      padding: 12px;
+      margin-bottom: 6px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      backdrop-filter: blur(var(--blur));
+      background: linear-gradient(180deg, rgba(10,10,16,.55), rgba(10,10,16,.2));
+    }
+    .title{
+      display: flex; align-items: center; gap: 12px;
+      font-weight: 800; letter-spacing: .3px;
+    }
+    .spark{
+      width: 14px; height: 14px; border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, var(--accent1), transparent 60%),
+                  radial-gradient(circle at 60% 60%, var(--accent2), transparent 60%);
+      box-shadow: 0 0 24px rgba(0,255,255,.35), 0 0 24px rgba(255,0,255,.25);
+    }
+    .sub{ color: var(--muted); font-size: 0.95em; margin-top: 6px; }
+
+    .screen{ display: none; padding: 10px; }
+    .screen.active{ display: block; }
+
+    .card{
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 36px rgba(0,0,0,.35);
+    }
+    .panel{ padding: 12px; }
+
+    .ascii{
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 16px; /* exatamente 16 para blocos mono */
+      line-height: 1.25;
+    }
+
+    /* Terminal */
+    .term-wrap{ display: grid; gap: 10px; }
+    .term-head .ascii{
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius: 14px;
+      padding: 10px;
+      border: 1px solid var(--border);
+    }
+    .term-output{
+      min-height: 34dvh;
+      max-height: 46dvh;
+      overflow: auto;
+      padding: 12px;
+    }
+    .term-line{ margin: 0 0 8px; }
+    .term-line .cmd{ color: var(--accent2); }
+    .term-line .err{ color: var(--danger); }
+    .term-line .ok{ color: var(--ok); }
+
+    .term-input{
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 8px; align-items: center;
+    }
+    .input{
+      width: 100%;
+      padding: 14px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      color: var(--txt);
+      font-size: 18px; /* evita zoom iOS */
+      outline: none;
+    }
+    .btn{
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: var(--tap); padding: 0 14px;
+      border-radius: 12px; border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--txt); text-decoration: none; cursor: pointer;
+      font-weight: 700;
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      border-color: rgba(0,255,255,.35);
+      background: linear-gradient(135deg, rgba(0,255,255,.15), rgba(255,0,255,.15));
+      box-shadow: 0 0 24px rgba(0,255,255,.15), inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .btn.danger{
+      border-color: rgba(255,77,109,.45);
+      background: linear-gradient(135deg, rgba(255,77,109,.18), rgba(255,0,128,.14));
+    }
+    .btn.ghost{ background: rgba(255,255,255,.03); }
+
+    .quickbar{
+      position: sticky; bottom: calc(var(--nav-h) + 6px);
+      display: flex; gap: 8px; overflow: auto; padding: 10px 2px 2px;
+      scrollbar-width: none;
+    }
+    .quickbar::-webkit-scrollbar{ display:none; }
+    .chip{
+      flex: 0 0 auto; padding: 10px 12px; border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      font-weight: 700;
+      min-height: var(--tap);
+      display:flex; align-items:center; justify-content:center;
+    }
+
+    /* Pastas */
+    .crumbs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+    .crumb{ padding: 8px 10px; border-radius: 999px; border:1px solid var(--border); background: rgba(255,255,255,.04); }
+    .fs-list{ display: grid; gap: 8px; }
+    .fs-item{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 12px; border-radius: 12px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      min-height: var(--tap);
+      position: relative;
+    }
+    .fs-kind{ font-size:.95em; color: var(--muted); }
+    .fs-actions{ display:flex; gap:8px; }
+    .more{ width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,.06); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; }
+
+    /* Logs */
+    .logs{ white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; padding: 12px; min-height: 38dvh; }
+
+    /* Ajuda */
+    .help h3{ margin: 16px 0 6px; }
+    .help code{ padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,.06); border:1px solid var(--border); }
+
+    /* Navegação inferior (dentro da shell) */
+    nav{
+      position: fixed; left: calc(var(--page-pad) + env(safe-area-inset-left,0px)); 
+      right: calc(var(--page-pad) + env(safe-area-inset-right,0px));
+      bottom: calc(var(--page-pad) + env(safe-area-inset-bottom,0px)); 
+      z-index: 10;
+      height: var(--nav-h);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(var(--blur));
+      background: linear-gradient(180deg, rgba(10,10,16,.25), rgba(10,10,16,.70));
+      box-shadow: 0 10px 28px rgba(0,0,0,.45);
+      overflow: hidden;
+    }
+    .tabs{ height: 100%; display:grid; grid-template-columns: repeat(5,1fr); }
+    .tab{
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:6px; font-weight:800; color: var(--muted);
+    }
+    .tab.active{ color: var(--txt); }
+    .tab .bar{ width: 32px; height: 3px; border-radius: 3px; background: transparent; }
+    .tab.active .bar{
+      background: linear-gradient(90deg, var(--accent1), var(--accent2));
+      box-shadow: 0 0 12px rgba(0,255,255,.6), 0 0 12px rgba(255,0,255,.5);
+    }
+
+    /* Ajustar tamanho dos ícones da barra de navegação e empilhar CTAs da Home */
+    /* Aumenta o tamanho da fonte do primeiro div (os emojis) dentro de cada tab para deixá-los mais visíveis */
+    .tabs .tab div:first-child {
+      font-size: 22px;
+      line-height: 1;
+    }
+    /* Empilha os botões de chamada para ação na home em coluna */
+    .row.home-cta {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    /* FAB/paleta */
+    .fab{
+      position: fixed; right: calc(var(--page-pad) + 16px); bottom: calc(var(--page-pad) + var(--nav-h) + 18px);
+      width: var(--tap); height: var(--tap); border-radius: 16px;
+      display:flex; align-items:center; justify-content:center;
+      background: linear-gradient(135deg, rgba(0,255,255,.18), rgba(255,0,255,.18));
+      border:1px solid rgba(255,255,255,.2);
+      box-shadow: var(--shadow);
+      z-index: 12;
+      font-weight: 800;
+    }
+
+    /* Modais */
+    .modal{
+      position: fixed; 
+      left: calc(var(--page-pad)); right: calc(var(--page-pad));
+      top: calc(var(--page-pad)); bottom: calc(var(--page-pad) + var(--nav-h) + 6px);
+      display:none; z-index: 20;
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(8px);
+      align-items:flex-end; justify-content:center;
+      padding: 10px;
+      border-radius: 16px;
+    }
+    .modal.open{ display:flex; }
+    .sheet{
+      width: 100%;
+      background: rgba(18,18,26,.96);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      max-height: 80dvh; overflow:auto;
+      padding: 14px;
+    }
+    .sheet h3{ margin-top: 0; }
+    .row{ display:flex; gap: 8px; }
+    .row.wrap{ flex-wrap: wrap; }
+    .grow{ flex: 1; }
+
+    /* Editor */
+    .editor-area{
+      width: 100%; min-height: 40dvh;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 18px; line-height: 1.35;
+      color: var(--txt);
+      background: rgba(255,255,255,.04);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      outline: none;
+      resize: vertical;
+    }
+
+    /* Toast */
+    .toast{
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: calc(var(--page-pad) + var(--nav-h) + 72px);
+      background: rgba(30,30,40,.96);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 12px;
+      font-weight: 800; z-index: 30; display:none;
+    }
+    .toast.show{ display:block; }
+
+    /* High-contrast */
+    .hc :is(.card, .fs-item, .input, .btn, .chip){ border-color: rgba(255,255,255,.34); }
+    .hc .muted{ color: #CED4EA; }
+
+    /* Reduce motion */
+    .reduce-motion *{ animation: none !important; transition: none !important; }
+
+    /* Util */
+    .muted{ color: var(--muted); }
+    .spacer{ height: 6px; }
+    .grid2{ display:grid; gap:8px; grid-template-columns: 1fr 1fr; }
+    .hidden{ display:none !important; }
+
+    /* ====== Landscape Tuning ====== */
+    @media (orientation: landscape) {
+      :root{ --nav-h: 56px; }
+      .screen{ padding: 8px; }
+      header{ padding: 10px; }
+      .term-output{ min-height: 28dvh; max-height: 38dvh; }
+      .ascii{ font-size: 14px; }
+      .btn{ min-height: 44px; }
+      .input{ font-size: 17px; }
+      .logs{ min-height: 30dvh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="app" id="app">
+      <header>
+        <div class="title"><span class="spark" aria-hidden="true"></span> DUAL INFODOSE — Terminal Amigável</div>
+        <div class="sub">“Digite menos. Toque mais. Fique curioso.”</div>
+      </header>
+
+      <!-- TELAS -->
+      <main>
+        <!-- INÍCIO -->
+        <section id="home" class="screen active">
+          <div class="card panel">
+            <div class="ascii">
+╔══════════════════════════════════════╗
+║  DUAL INFODOSE — TERMINAL AMIGÁVEL   ║
+╠══════════════════════════════════════╣
+║  Mobile • Glass UI • FS local        ║
+║  Comandos seguros + atalhos          ║
+╚══════════════════════════════════════╝
+            </div>
+            <p class="muted" style="margin-top:10px;">
+              Bem-vindo(a)! Este app simula um mini sistema de arquivos dentro do seu navegador (<code>localStorage</code>).
+              Use as <b>Abas</b> abaixo ou vá direto para o <b>Terminal</b>.
+            </p>
+            <div class="row home-cta">
+              <button class="btn primary grow" data-goto="terminal">Abrir Terminal</button>
+              <button class="btn ghost" id="btnOnboarding">Introdução</button>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="card panel">
+            <h3 style="margin: 0 0 8px;">Comece assim</h3>
+            <ol>
+              <li>Vá ao <b>Terminal</b> → toque <b>ls</b>, <b>cd notes</b> e depois <b>pwd</b>.</li>
+              <li>Abra um arquivo: <code>open /notes/hello.txt</code> ou <code>cat /samples/readme.txt</code>.</li>
+              <li>Navegue em <b>Pastas</b>; toque e segure um item para mais ações.</li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- PASTAS -->
+        <section id="folders" class="screen">
+          <div class="card panel">
+            <div class="crumbs" id="crumbs"></div>
+            <div class="row wrap" style="margin-bottom:10px;">
+              <button class="btn" id="btnNewFolder">Nova pasta</button>
+              <button class="btn" id="btnNewFile">Novo arquivo</button>
+              <button class="btn" id="btnUp">Subir</button>
+            </div>
+            <div class="fs-list" id="fsList"></div>
+          </div>
+        </section>
+
+        <!-- TERMINAL -->
+        <section id="terminal" class="screen">
+          <div class="term-wrap">
+            <div class="term-head">
+              <div class="ascii card panel">
+╔══════════════════════════════════════╗
+║  DUAL INFODOSE — TERMINAL AMIGÁVEL   ║
+╠══════════════════════════════════════╣
+║  “Digite menos. Toque mais.”         ║
+╚══════════════════════════════════════╝
+              </div>
+            </div>
+
+            <div class="card term-output" id="termOut" aria-live="polite" aria-label="Saída do terminal"></div>
+
+            <div class="term-input">
+              <input id="cmd" class="input" type="text" inputmode="text" placeholder="Digite um comando… ex.: ls, cd notes, help"
+                     autocomplete="off" aria-label="Entrada de comando" />
+              <button class="btn primary" id="run">Executar</button>
+            </div>
+
+            <div class="quickbar" aria-label="Barra de comandos rápidos">
+              <button class="chip" data-insert="ls">ls</button>
+              <button class="chip" data-insert="pwd">pwd</button>
+              <button class="chip" data-insert="cd ..">cd ..</button>
+              <button class="chip" data-insert="mkdir nova-pasta">mkdir</button>
+              <button class="chip" data-insert="touch novo.txt">touch</button>
+              <button class="chip" data-insert="cat /notes/hello.txt">cat</button>
+              <button class="chip" data-insert="open /notes/hello.txt">open</button>
+              <button class="chip" data-insert="rm /samples -r">rm -r</button>
+              <button class="chip" data-insert="clear">clear</button>
+              <button class="chip" data-insert="help">help</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- LOGS -->
+        <section id="logs" class="screen">
+          <div class="card panel">
+            <div class="row">
+              <button class="btn" id="copyLogs">Copiar logs</button>
+              <button class="btn danger" id="clearLogs">Limpar logs</button>
+            </div>
+            <div class="logs card" id="logsBox"></div>
+          </div>
+        </section>
+
+        <!-- AJUDA -->
+        <section id="help" class="screen">
+          <div class="card panel help">
+            <h3>Comandos Amigáveis</h3>
+            <p class="muted">Pense nisso como a gaveta privada do seu celular. Botões grandes executam ações seguras. As vermelhas sempre pedem confirmação.</p>
+            <ul>
+              <li><code>ls [caminho]</code> — lista uma pasta (padrão: atual)</li>
+              <li><code>cd [caminho]</code>, <code>cd ..</code> — muda de pasta</li>
+              <li><code>pwd</code> — mostra o caminho atual</li>
+              <li><code>cat &lt;arquivo&gt;</code> — mostra arquivo no terminal</li>
+              <li><code>open &lt;arquivo&gt;</code> — abre no editor</li>
+              <li><code>touch &lt;arquivo&gt;</code> — cria arquivo vazio</li>
+              <li><code>mkdir &lt;pasta&gt;</code> — cria pasta(s)</li>
+              <li><code>rm &lt;caminho&gt; [-r]</code> — remove (com confirmação)</li>
+              <li><code>mv &lt;origem&gt; &lt;destino&gt;</code> — move/renomeia</li>
+              <li><code>cp &lt;origem&gt; &lt;destino&gt;</code> — copia</li>
+              <li><code>download &lt;arquivo&gt;</code> — baixa como .txt (texto)</li>
+              <li><code>clear</code> — limpa a saída do terminal</li>
+              <li><code>help [cmd]</code> — ajuda rápida</li>
+            </ul>
+
+            <h3>Preferências</h3>
+            <div class="row">
+              <button class="btn" id="toggleHC">Alternar alto contraste</button>
+              <button class="btn" id="toggleRM">Reduzir animações</button>
+            </div>
+
+            <h3>Backup</h3>
+            <div class="row wrap" style="margin-top:6px;">
+              <button class="btn" id="exportFS">Exportar FS</button>
+              <label class="btn">
+                Importar FS
+                <input id="importFS" type="file" accept="application/json" style="position:absolute;opacity:0;width:0;height:0;" />
+              </label>
+              <button class="btn danger" id="resetAll">Resetar TUDO (2 confirmações)</button>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Navegação inferior (fica dentro da casca para respeitar padding) -->
+    <nav>
+      <div class="tabs">
+        <button class="tab active" data-goto="home" aria-label="Início">
+          <div>🏠</div><div class="bar"></div>
+        </button>
+        <button class="tab" data-goto="folders" aria-label="Pastas">
+          <div>🗂️</div><div class="bar"></div>
+        </button>
+        <button class="tab" data-goto="terminal" aria-label="Terminal">
+          <div>⌨️</div><div class="bar"></div>
+        </button>
+        <button class="tab" data-goto="logs" aria-label="Logs">
+          <div>📜</div><div class="bar"></div>
+        </button>
+        <button class="tab" data-goto="help" aria-label="Ajuda">
+          <div>❔</div><div class="bar"></div>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- Botão flutuante: Paleta de Comandos -->
+  <button class="fab" id="paletteBtn" title="Paleta de Comandos" aria-label="Paleta de comandos">🔎</button>
+
+  <!-- Modais -->
+  <div class="modal" id="paletteModal" aria-hidden="true">
+    <div class="sheet">
+      <div class="row" style="margin-bottom:10px;">
+        <input id="paletteSearch" class="input grow" placeholder="Pesquisar ação… ex.: ls, open, rm" />
+        <button class="btn" id="paletteClose">Fechar</button>
+      </div>
+      <div id="paletteList"></div>
+    </div>
+  </div>
+
+  <div class="modal" id="editorModal" aria-hidden="true">
+    <div class="sheet">
+      <h3 id="editorTitle">Editor</h3>
+      <textarea id="editorArea" class="editor-area" spellcheck="false"></textarea>
+      <div class="row" style="margin-top:10px;">
+        <label class="btn"><input type="checkbox" id="editorAutosave" />&nbsp;Autossalvar</label>
+        <div class="grow"></div>
+        <button class="btn" id="editorCancel">Fechar</button>
+        <button class="btn primary" id="editorSave">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="onboardModal" aria-hidden="true">
+    <div class="sheet">
+      <h3>Bem-vindo(a) ao Terminal Amigável</h3>
+      <ol>
+        <li>Não é bicho de sete cabeças — é sua gaveta privada.</li>
+        <li>Arquivos e pastas vivem apenas no seu navegador (localStorage).</li>
+        <li>Botões grandes fazem ações seguras. As vermelhas sempre confirmam.</li>
+      </ol>
+      <div class="row">
+        <button class="btn" id="seedFS">Criar arquivos de exemplo</button>
+        <button class="btn danger" id="wipeFS">Resetar tudo</button>
+        <div class="grow"></div>
+        <button class="btn primary" id="closeOnboard">Bora!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu de contexto (Pastas) -->
+  <div class="modal" id="ctxModal" aria-hidden="true">
+    <div class="sheet">
+      <h3 id="ctxTitle">Item</h3>
+      <div class="row wrap">
+        <button class="btn" id="ctxOpen">Abrir / Cat</button>
+        <button class="btn" id="ctxRename">Renomear</button>
+        <button class="btn" id="ctxDuplicate">Duplicar</button>
+        <button class="btn danger" id="ctxDelete">Excluir</button>
+      </div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn grow" id="ctxClose">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    /************************************
+     * MODELO DE FS (blob JSON no localStorage)
+     ************************************/
+    const LS_FS = 'dual.fs';
+    const LS_FS_BAK = 'dual.fs.bak';
+    const LS_LOGS = 'dual.logs';
+    const LS_SETTINGS = 'dual.settings';
+    const LS_FIRST = 'dual.firstRun';
+
+    let fsRoot = null;       // diretório raiz
+    let cwd = '/';           // diretório atual
+    let settings = { highContrast:false, reduceMotion:false };
+    let logs = [];
+
+    const $ = (sel)=>document.querySelector(sel);
+
+    function now() { return new Date().toISOString(); }
+
+    function saveFS(){
+      try {
+        const json = JSON.stringify(fsRoot);
+        localStorage.setItem(LS_FS_BAK, localStorage.getItem(LS_FS) || json);
+        localStorage.setItem(LS_FS, json);
+      } catch(e){
+        toast('Erro ao salvar: ' + e.message);
+      }
+    }
+    function loadFS(){
+      const raw = localStorage.getItem(LS_FS);
+      if(raw){
+        try{
+          fsRoot = JSON.parse(raw);
+        }catch(e){
+          const bak = localStorage.getItem(LS_FS_BAK);
+          fsRoot = bak ? JSON.parse(bak) : makeRoot();
+          toast('Recuperado do backup.');
+          saveFS();
+        }
+      } else {
+        fsRoot = makeRoot();
+        seedSamples();
+        saveFS();
+        localStorage.setItem(LS_FIRST, '1');
+      }
+    }
+    function makeRoot(){
+      return { __type:'dir', children:{} };
+    }
+
+    function loadSettings(){
+      const raw = localStorage.getItem(LS_SETTINGS);
+      if(raw){ try { settings = JSON.parse(raw) || settings; } catch{} }
+      applySettings();
+    }
+    function saveSettings(){
+      localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
+      applySettings();
+    }
+    function applySettings(){
+      document.body.classList.toggle('hc', !!settings.highContrast);
+      document.body.classList.toggle('reduce-motion', !!settings.reduceMotion);
+    }
+
+    function loadLogs(){
+      const raw = localStorage.getItem(LS_LOGS);
+      if(raw){ try { logs = JSON.parse(raw) || []; } catch{} }
+    }
+    function saveLogs(){ localStorage.setItem(LS_LOGS, JSON.stringify(logs)); }
+
+    function seedSamples(){
+      // Conteúdo padrão
+      mkdirp('/notes');
+      writeFile('/notes/hello.txt',
+`Bem-vindo(a) ao Terminal Amigável!
+
+Experimente:
+  ls
+  cd notes
+  open /notes/hello.txt
+  cat /samples/readme.txt
+
+Isto fica apenas no seu navegador.
+Divirta-se! — DUAL INFODOSE`);
+      mkdirp('/samples');
+      writeFile('/samples/readme.txt',
+`EXEMPLOS
+
+Comandos:
+  ls [caminho]  - lista
+  cd [caminho]  - muda de pasta
+  pwd           - caminho atual
+  touch <arq>   - cria arquivo
+  mkdir <dir>   - cria pasta
+  rm <path> -r  - apaga (confirma)
+  mv a b        - mover/renomear
+  cp a b        - copiar
+  open <arq>    - editor
+  cat <arq>     - imprimir
+  download <arq> - baixar .txt`);
+      mkdirp('/inbox');
+    }
+
+    /* ---------- Caminhos ---------- */
+    function simplify(p){
+      const out = [];
+      p.split('/').forEach(seg=>{
+        if(!seg || seg === '.') return;
+        if(seg === '..'){ out.pop(); }
+        else out.push(seg);
+      });
+      return '/' + out.join('/');
+    }
+    function normRelative(name){
+      if(name.startsWith('/')) return simplify(name);
+      return simplify(cwd.replace(/\/$/,'') + '/' + name);
+    }
+    function splitParent(p){
+      p = simplify(p);
+      if(p === '/') return ['/', ''];
+      const arr = p.split('/').filter(Boolean);
+      const name = arr.pop();
+      const parent = '/' + arr.join('/');
+      return [parent || '/', name];
+    }
+
+    /* ---------- Nós ---------- */
+    function isDir(n){ return n && n.__type === 'dir'; }
+    function isFile(n){ return n && n.__type === 'file'; }
+
+    function getNode(path){
+      path = simplify(path);
+      if(path === '/') return fsRoot;
+      const segs = path.split('/').filter(Boolean);
+      let cur = fsRoot;
+      for(const s of segs){
+        if(!cur || !isDir(cur)) return null;
+        cur = cur.children[s];
+      }
+      return cur || null;
+    }
+    function ensureDir(path){
+      const n = getNode(path);
+      if(!n || !isDir(n)) throw new Error('Não é diretório: ' + path);
+      return n;
+    }
+    function mkdirp(path){
+      path = simplify(path);
+      if(path === '/') return;
+      const segs = path.split('/').filter(Boolean);
+      let cur = fsRoot;
+      for(const s of segs){
+        if(!cur.children[s]) cur.children[s] = { __type:'dir', children:{} };
+        if(!isDir(cur.children[s])) throw new Error('Caminho ocupado: ' + s);
+        cur = cur.children[s];
+      }
+    }
+    function writeFile(path, data, mime='text/plain'){
+      const [parent, name] = splitParent(path);
+      const dir = ensureDir(parent);
+      dir.children[name] = { __type:'file', mime, data: String(data ?? ''), mtime: Date.now() };
+    }
+    function removePath(path, recursive=false){
+      const [parent, name] = splitParent(path);
+      const dir = ensureDir(parent);
+      const node = dir.children[name];
+      if(!node) throw new Error('Não encontrado: ' + path);
+      if(isDir(node) && Object.keys(node.children).length && !recursive){
+        throw new Error('Diretório não vazio (use -r): ' + path);
+      }
+      delete dir.children[name];
+    }
+    function movePath(src, dst){
+      const srcNode = getNode(src);
+      if(!srcNode) throw new Error('Não encontrado: ' + src);
+      const [srcPar, srcName] = splitParent(src);
+      const srcDir = ensureDir(srcPar);
+
+      const [dstPar, dstName] = splitParent(dst);
+      mkdirp(dstPar);
+      const dstDir = ensureDir(dstPar);
+      dstDir.children[dstName] = srcNode;
+      delete srcDir.children[srcName];
+    }
+    function copyPath(src, dst){
+      const srcNode = getNode(src);
+      if(!srcNode) throw new Error('Não encontrado: ' + src);
+      const clone = JSON.parse(JSON.stringify(srcNode));
+      const [dstPar, dstName] = splitParent(dst);
+      mkdirp(dstPar);
+      const dstDir = ensureDir(dstPar);
+      dstDir.children[dstName] = clone;
+    }
+    function list(path){
+      const dir = ensureDir(path);
+      const out = [];
+      for(const [name, node] of Object.entries(dir.children)){
+        out.push({ name, type: node.__type });
+      }
+      out.sort((a,b)=> (a.type===b.type? a.name.localeCompare(b.name) : (a.type==='dir'?-1:1)));
+      return out;
+    }
+
+    /***********************
+     * Terminal / Comandos *
+     ***********************/
+    const termOut = document.getElementById('termOut');
+    const cmdInput = document.getElementById('cmd');
+    const runBtn = document.getElementById('run');
+
+    // Aliases PT → comandos padrão
+    // Mapear aliases para comandos principais.  Inclusão de ajuda ao localStorage (kv)
+    const aliases = { 
+      dir:'ls', listar:'ls',
+      ajuda:'help', limpar:'clear', baixar:'download', abrir:'open',
+      mover:'mv', renomear:'mv', copiar:'cp', remover:'rm', excluir:'rm', criar:'touch',
+      lskeys:'kv', storage:'kv', kv:'kv'
+    };
+
+    function print(line, cls=''){
+      const p = document.createElement('div');
+      p.className = 'term-line';
+      p.innerHTML = cls ? `<span class="${cls}">${escapeHtml(line)}</span>` : escapeHtml(line);
+      termOut.appendChild(p);
+      termOut.scrollTop = termOut.scrollHeight;
+    }
+    function promptLine(command){
+      print(`${cwd} $ ${command}`, 'cmd');
+    }
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    }
+
+    function execCommand(raw){
+      const command = raw.trim();
+      if(!command) return;
+      promptLine(command);
+      const [name, ...rest] = tokenize(command);
+      const cmd = (aliases[name] || name).toLowerCase();
+
+      try{
+        switch(cmd){
+          case 'help': return doHelp(rest);
+          case 'clear': termOut.innerHTML = ''; return;
+          case 'pwd': print(cwd); return;
+          case 'ls': return doLs(rest);
+          case 'cd': return doCd(rest);
+          case 'cat': return doCat(rest);
+          case 'open': return doOpen(rest);
+          case 'touch': return doTouch(rest);
+          case 'mkdir': return doMkdir(rest);
+          case 'rm': return doRm(rest);
+          case 'mv': return doMv(rest);
+          case 'cp': return doCp(rest);
+          case 'download': return doDownload(rest);
+          case 'kv': return doKv(rest);
+          default:
+            print(`Comando desconhecido: ${name}. Tente 'help'.`, 'err');
+        }
+      }catch(e){
+        print(e.message, 'err');
+      }
+    }
+
+    function tokenize(s){
+      // tokenização simples com aspas
+      const out = [];
+      let cur = '', q = null;
+      for(let i=0;i<s.length;i++){
+        const c = s[i];
+        if(q){
+          if(c === q){ q = null; }
+          else cur += c;
+        } else {
+          if(c === '"' || c === "'") q = c;
+          else if(/\s/.test(c)){ if(cur){ out.push(cur); cur=''; } }
+          else cur += c;
+        }
+      }
+      if(cur) out.push(cur);
+      return out;
+    }
+
+    function doHelp(args){
+      const lines = [
+        'help [cmd] — ajuda',
+        'ls [caminho] — listar',
+        'cd [caminho]|.. — mudar pasta',
+        'pwd — diretório atual',
+        'cat <arquivo> — imprimir arquivo',
+        'open <arquivo> — editor',
+        'touch <arquivo> — criar vazio',
+        'mkdir <pasta> — criar pasta(s)',
+        'rm <caminho> [-r] — remover (confirma)',
+        'mv <origem> <destino> — mover/renomear',
+        'cp <origem> <destino> — copiar',
+        'download <arquivo> — baixar .txt',
+        'kv [cmd] — gerenciar localStorage (ls/get/set/rm/clear/export)',
+        'clear — limpar terminal',
+      ];
+      if(!args.length){ lines.forEach(l=>print(l)); return; }
+      const cmd = args[0];
+      const map = {
+        ls:'Lista conteúdo. Ex.: ls /notes',
+        cd:'Troca de pasta. Ex.: cd ..  | cd /notes',
+        pwd:'Mostra o diretório atual.',
+        cat:'Imprime um arquivo. Ex.: cat /notes/hello.txt',
+        open:'Abre no editor. Ex.: open /notes/hello.txt',
+        touch:'Cria arquivo vazio. Ex.: touch rascunho.txt',
+        mkdir:'Cria pasta(s). Ex.: mkdir docs | mkdir a/b/c',
+        rm:'Remove arquivo/pasta. Use -r para pastas. Ex.: rm /samples -r',
+        mv:'Move/renomeia. Ex.: mv draft.txt notes/draft.txt',
+        cp:'Copia. Ex.: cp notes/hello.txt notes/copia.txt',
+        download:'Baixa arquivo de texto como .txt',
+        kv:'Gerenciar localStorage. Comandos: kv ls, kv get CHAVE, kv set CHAVE VALOR, kv rm CHAVE, kv clear, kv export',
+        clear:'Limpa saída do terminal',
+      };
+      print(map[cmd] || ('Sem ajuda para ' + cmd));
+    }
+
+    function doLs(args){
+      const target = args[0] ? normRelative(args[0]) : cwd;
+      const items = list(target);
+      const header = `Lista: ${target}`;
+      print(header);
+      print('────────────────────────────────────────');
+      items.forEach(it => {
+        const mark = it.type === 'dir' ? '📁' : '📄';
+        print(`${mark}  ${it.name}`);
+      });
+    }
+    function doCd(args){
+      const target = args[0] ? normRelative(args[0]) : '/';
+      const node = getNode(target);
+      if(!node) throw new Error('Caminho não encontrado: ' + target);
+      if(!isDir(node)) throw new Error('Não é diretório: ' + target);
+      cwd = target;
+      renderFolders(); // sincroniza
+      print('OK', 'ok');
+    }
+    function doCat(args){
+      if(!args[0]) throw new Error('Uso: cat <arquivo>');
+      const p = normRelative(args[0]);
+      const n = getNode(p);
+      if(!n || !isFile(n)) throw new Error('Não é arquivo: ' + p);
+      print(n.data || '');
+    }
+    function doOpen(args){
+      if(!args[0]) throw new Error('Uso: open <arquivo>');
+      const p = normRelative(args[0]);
+      const n = getNode(p);
+      if(!n || !isFile(n)) throw new Error('Não é arquivo: ' + p);
+      openEditor(p, n.data);
+    }
+    function doTouch(args){
+      if(!args[0]) throw new Error('Uso: touch <arquivo>');
+      const p = normRelative(args[0]);
+      writeFile(p, '');
+      saveFS();
+      log(`touch ${p}`);
+      print('Criado: ' + p, 'ok');
+      renderFolders();
+    }
+    function doMkdir(args){
+      if(!args[0]) throw new Error('Uso: mkdir <pasta>');
+      const p = normRelative(args[0]);
+      mkdirp(p);
+      saveFS();
+      log(`mkdir ${p}`);
+      print('Criado: ' + p, 'ok');
+      renderFolders();
+    }
+    async function doRm(args){
+      if(!args[0]) throw new Error('Uso: rm <caminho> [-r]');
+      const target = normRelative(args[0]);
+      const recursive = args.includes('-r');
+      if(recursive){
+        const go = await confirmBox(`Excluir (recursivo): ${target}?`);
+        if(!go) return print('Cancelado.');
+        const go2 = await confirmBox(`Tem certeza? Isso remove TUDO em ${target}.`);
+        if(!go2) return print('Cancelado.');
+      } else {
+        const go = await confirmBox(`Excluir: ${target}?`);
+        if(!go) return print('Cancelado.');
+      }
+      removePath(target, recursive);
+      saveFS();
+      log(`rm ${target} ${recursive?'-r':''}`);
+      print('Excluído: ' + target, 'ok');
+      renderFolders();
+    }
+    async function doMv(args){
+      if(args.length<2) throw new Error('Uso: mv <origem> <destino>');
+      const src = normRelative(args[0]);
+      const dst = normRelative(args[1]);
+      const exists = getNode(dst);
+      if(exists){
+        const go = await confirmBox(`Sobrescrever ${dst}?`);
+        if(!go) return print('Cancelado.');
+      }
+      movePath(src, dst);
+      saveFS();
+      log(`mv ${src} ${dst}`);
+      print('Movido.', 'ok');
+      renderFolders();
+    }
+    async function doCp(args){
+      if(args.length<2) throw new Error('Uso: cp <origem> <destino>');
+      const src = normRelative(args[0]);
+      const dst = normRelative(args[1]);
+      const exists = getNode(dst);
+      if(exists){
+        const go = await confirmBox(`Sobrescrever ${dst}?`);
+        if(!go) return print('Cancelado.');
+      }
+      copyPath(src, dst);
+      saveFS();
+      log(`cp ${src} ${dst}`);
+      print('Copiado.', 'ok');
+      renderFolders();
+    }
+    function doDownload(args){
+      if(!args[0]) throw new Error('Uso: download <arquivo>');
+      const p = normRelative(args[0]);
+      const n = getNode(p);
+      if(!n || !isFile(n)) throw new Error('Não é arquivo: ' + p);
+      if(n.mime !== 'text/plain') throw new Error('Apenas text/plain é suportado.');
+      const blob = new Blob([n.data || ''], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      const name = p.split('/').pop() || 'download.txt';
+      a.download = name.endsWith('.txt') ? name : (name + '.txt');
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+      print('Baixado: ' + name, 'ok');
+    }
+
+    /*
+     * Comandos de apoio ao LocalStorage. O comando `kv` permite listar,
+     * obter, definir, remover, limpar e exportar chaves armazenadas no
+     * window.localStorage.  Chaves reservadas usadas pelo sistema de
+     * arquivos (dual.fs, logs, settings, etc.) são ignoradas ao listar
+     * ou limpar, para evitar apagar dados internos.  Exemplos:
+     *   kv            → listar chaves do usuário
+     *   kv ls        → mesmo que acima
+     *   kv get foo   → mostrar valor da chave "foo"
+     *   kv set foo valor → definir valor da chave "foo"
+     *   kv rm foo    → remover chave "foo"
+     *   kv clear     → limpar todas as chaves de usuário (pede confirmação)
+     *   kv export    → baixar todas as chaves como JSON
+     */
+    function doKv(args){
+      const reserved = [LS_FS, LS_FS_BAK, LS_LOGS, LS_SETTINGS, LS_FIRST, 'dual.editor'];
+      const sub = (args[0] || '').toLowerCase();
+      // listar
+      if(!sub || sub === 'ls' || sub === 'list' || sub === 'keys'){
+        const keys = [];
+        for(let i=0; i<localStorage.length; i++){
+          const k = localStorage.key(i);
+          if(reserved.includes(k)) continue;
+          const v = localStorage.getItem(k) || '';
+          keys.push({ key: k, size: v.length });
+        }
+        if(!keys.length){ print('Nenhuma chave de usuário no localStorage'); return; }
+        print('Chaves no localStorage:');
+        keys.forEach(item => print(`${item.key} (${item.size} caracteres)`));
+        return;
+      }
+      if(sub === 'get'){
+        if(args.length < 2) throw new Error('Uso: kv get <chave>');
+        const key = args[1];
+        const val = localStorage.getItem(key);
+        if(val === null){ print('Chave não encontrada: ' + key); return; }
+        print(val);
+        return;
+      }
+      if(sub === 'set'){
+        if(args.length < 3) throw new Error('Uso: kv set <chave> <valor>');
+        const key = args[1];
+        const value = args.slice(2).join(' ');
+        localStorage.setItem(key, value);
+        print('Definido ' + key, 'ok');
+        return;
+      }
+      if(sub === 'rm' || sub === 'del' || sub === 'delete'){
+        if(args.length < 2) throw new Error('Uso: kv rm <chave>');
+        const key = args[1];
+        localStorage.removeItem(key);
+        print('Removida: ' + key, 'ok');
+        return;
+      }
+      if(sub === 'clear'){
+        if(!confirm('Limpar todas as chaves de usuário do localStorage?')){ print('Cancelado.'); return; }
+        const toRemove = [];
+        for(let i=0; i<localStorage.length; i++){
+          const k = localStorage.key(i);
+          if(reserved.includes(k)) continue;
+          toRemove.push(k);
+        }
+        toRemove.forEach(k => localStorage.removeItem(k));
+        print('localStorage limpo', 'ok');
+        return;
+      }
+      if(sub === 'export'){
+        const obj = {};
+        for(let i=0; i<localStorage.length; i++){
+          const k = localStorage.key(i);
+          obj[k] = localStorage.getItem(k);
+        }
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type:'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'localStorage.json';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+        print('Exportado localStorage','ok');
+        return;
+      }
+      print('Comando kv desconhecido. Use kv ls|get|set|rm|clear|export','err');
+    }
+
+    /* ---------- Logs ---------- */
+    function log(msg){
+      const line = `[${now()}] ${msg}`;
+      logs.push(line);
+      saveLogs();
+      renderLogs();
+    }
+    function renderLogs(){
+      const box = document.getElementById('logsBox');
+      box.textContent = logs.join('\n');
+    }
+
+    /*****************
+     * Pastas (UI)   *
+     *****************/
+    const crumbsEl = document.getElementById('crumbs');
+    const fsListEl = document.getElementById('fsList');
+    let ctxPath = null; // caminho do menu de contexto
+
+    function renderCrumbs(){
+      crumbsEl.innerHTML = '';
+      const segs = cwd.split('/').filter(Boolean);
+      let acc = '/';
+      const rootBtn = makeCrumb('/', () => { cwd='/'; renderFolders(); });
+      crumbsEl.appendChild(rootBtn);
+      for(const s of segs){
+        acc = simplify(acc + '/' + s);
+        crumbsEl.appendChild( makeCrumb(s, ()=>{ cwd=acc; renderFolders(); }) );
+      }
+    }
+    function makeCrumb(label, onClick){
+      const b = document.createElement('button');
+      b.className = 'crumb';
+      b.textContent = label;
+      b.onclick = onClick;
+      return b;
+    }
+
+    function renderFolders(){
+      renderCrumbs();
+      fsListEl.innerHTML = '';
+      const items = list(cwd);
+      if(!items.length){
+        const empty = document.createElement('div');
+        empty.className = 'muted';
+        empty.textContent = '(vazio)';
+        fsListEl.appendChild(empty);
+        return;
+      }
+      items.forEach(it=>{
+        const row = document.createElement('div');
+        row.className = 'fs-item';
+        const left = document.createElement('div');
+        left.innerHTML = `<strong>${it.name}</strong><div class="fs-kind">${it.type==='dir'?'Pasta':'Arquivo'}</div>`;
+        const right = document.createElement('div');
+        right.className = 'fs-actions';
+        const openBtn = document.createElement('button');
+        openBtn.className = 'btn';
+        openBtn.textContent = 'Abrir';
+        openBtn.onclick = ()=>{
+          const p = normRelative(it.name);
+          if(it.type==='dir'){ cwd = p; renderFolders(); }
+          else openEditor(p, getNode(p).data);
+        };
+        const moreBtn = document.createElement('button');
+        moreBtn.className = 'more';
+        moreBtn.innerHTML = '⋯';
+        moreBtn.onclick = ()=> openCtx(normRelative(it.name), it.name);
+        row.append(left, right);
+        right.append(openBtn, moreBtn);
+
+        // Pressionar e segurar → contexto
+        let t=null;
+        row.addEventListener('touchstart', ()=>{ t=setTimeout(()=>openCtx(normRelative(it.name), it.name), 500); }, {passive:true});
+        row.addEventListener('touchend', ()=>{ if(t){ clearTimeout(t); t=null; } }, {passive:true});
+        row.addEventListener('touchmove', ()=>{ if(t){ clearTimeout(t); t=null; } }, {passive:true});
+
+        fsListEl.appendChild(row);
+      });
+    }
+    function openCtx(path, name){
+      ctxPath = path;
+      document.getElementById('ctxTitle').textContent = name;
+      openModal('ctxModal', true);
+    }
+
+    /* ---------- Editor ---------- */
+    const editorArea = document.getElementById('editorArea');
+    let editorPath = null;
+
+    function openEditor(path, data){
+      editorPath = path;
+      document.getElementById('editorTitle').textContent = 'Editando: ' + path;
+      editorArea.value = data || '';
+      const st = loadEditorPref();
+      document.getElementById('editorAutosave').checked = st.autosave;
+      openModal('editorModal', true);
+    }
+    function saveEditor(){
+      if(!editorPath) return;
+      writeFile(editorPath, editorArea.value);
+      saveFS(); log('save ' + editorPath);
+      toast('Salvo.');
+      renderFolders();
+    }
+    function loadEditorPref(){
+      const s = localStorage.getItem('dual.editor') || '{}';
+      try{ return JSON.parse(s); } catch{ return { autosave:false }; }
+    }
+    function saveEditorPref(obj){
+      localStorage.setItem('dual.editor', JSON.stringify(obj));
+    }
+
+    /*****************
+     * UI / Paleta   *
+     *****************/
+    function openModal(id, on=true){
+      document.getElementById(id).classList.toggle('open', !!on);
+    }
+    function toast(msg, ms=1600){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(()=> t.classList.remove('show'), ms);
+    }
+    function confirmBox(msg){
+      return new Promise(res=>{
+        const ok = confirm(msg); // simples, nativo mobile
+        res(ok);
+      });
+    }
+
+    function buildPalette(){
+      const actions = [
+        { label:'ls', insert:'ls', desc:'Listar diretório atual' },
+        { label:'pwd', insert:'pwd', desc:'Mostrar caminho atual' },
+        { label:'cd ..', insert:'cd ..', desc:'Subir' },
+        { label:'cd /notes', insert:'cd /notes', desc:'Ir para notes' },
+        { label:'open /notes/hello.txt', insert:'open /notes/hello.txt', desc:'Abrir exemplo' },
+        { label:'cat /samples/readme.txt', insert:'cat /samples/readme.txt', desc:'Ver exemplo' },
+        { label:'mkdir nova-pasta', insert:'mkdir nova-pasta', desc:'Criar pasta' },
+        { label:'touch novo.txt', insert:'touch novo.txt', desc:'Criar arquivo' },
+        { label:'rm /samples -r', insert:'rm /samples -r', desc:'Excluir pasta (recursivo)' },
+        { label:'clear', insert:'clear', desc:'Limpar terminal' },
+        { label:'help', insert:'help', desc:'Ajuda' },
+      ];
+      const list = document.getElementById('paletteList');
+      list.innerHTML = '';
+      actions.forEach(a=>{
+        const b = document.createElement('button');
+        b.className = 'btn grow';
+        b.style.display = 'block';
+        b.style.width = '100%';
+        b.style.marginBottom = '8px';
+        b.innerHTML = `<strong>${a.label}</strong><div class="muted">${a.desc}</div>`;
+        b.onclick = ()=>{ cmdInput.value = a.insert; openModal('paletteModal', false); cmdInput.focus(); };
+        list.appendChild(b);
+      });
+
+      const search = document.getElementById('paletteSearch');
+      search.oninput = ()=>{
+        const q = search.value.toLowerCase();
+        [...list.children].forEach(ch=>{
+          ch.style.display = ch.textContent.toLowerCase().includes(q) ? 'block' : 'none';
+        });
+      };
+    }
+
+    /*********************
+     * Exportar / Import *
+     *********************/
+    function exportFS(){
+      const blob = new Blob([JSON.stringify(fsRoot, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'dual-fs.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 100);
+    }
+    function importFS(file){
+      return new Promise((resolve, reject)=>{
+        const r = new FileReader();
+        r.onload = ()=>{
+          try{
+            const obj = JSON.parse(String(r.result||'{}'));
+            if(!obj || obj.__type!=='dir') throw new Error('JSON de FS inválido');
+            fsRoot = obj;
+            saveFS(); renderFolders(); toast('Importado.');
+            resolve();
+          }catch(e){ reject(e); }
+        };
+        r.onerror = reject;
+        r.readAsText(file);
+      });
+    }
+    async function resetAll(){
+      const a = await confirmBox('Resetar TODOS os dados?');
+      if(!a) return;
+      const b = await confirmBox('Tem certeza? Isso não pode ser desfeito.');
+      if(!b) return;
+      fsRoot = makeRoot();
+      seedSamples();
+      saveFS();
+      logs = [];
+      saveLogs();
+      cwd = '/';
+      renderAll();
+      toast('Tudo resetado.');
+    }
+
+    /*****************
+     * Navegação     *
+     *****************/
+    const screens = ['home','folders','terminal','logs','help'];
+    function goto(id){
+      screens.forEach(s=>{
+        document.getElementById(s).classList.toggle('active', s===id);
+        document.querySelector(`.tab[data-goto="${s}"]`).classList.toggle('active', s===id);
+      });
+    }
+
+    /*****************
+     * Render All    *
+     *****************/
+    function renderAll(){
+      renderFolders();
+      renderLogs();
+      buildPalette();
+    }
+
+    /*****************
+     * Ligações      *
+     *****************/
+    function init(){
+      loadSettings();
+      loadLogs();
+      loadFS();
+      renderAll();
+
+      // Onboarding no primeiro uso
+      if(localStorage.getItem(LS_FIRST) === '1'){
+        openModal('onboardModal', true);
+        localStorage.removeItem(LS_FIRST);
+      }
+
+      // Abas
+      document.querySelectorAll('.tab,[data-goto]').forEach(el=>{
+        el.addEventListener('click', ()=>{
+          const id = el.getAttribute('data-goto');
+          if(id) goto(id);
+        });
+      });
+
+      // Início
+      document.getElementById('btnOnboarding').onclick = ()=> openModal('onboardModal', true);
+
+      // Pastas
+      document.getElementById('btnNewFolder').onclick = async ()=>{
+        const name = prompt('Nome da nova pasta:');
+        if(!name) return;
+        mkdirp(normRelative(name));
+        saveFS(); log('mkdir ' + name); renderFolders();
+      };
+      document.getElementById('btnNewFile').onclick = async ()=>{
+        const name = prompt('Nome do novo arquivo (ex.: nota.txt):');
+        if(!name) return;
+        writeFile(normRelative(name), '');
+        saveFS(); log('touch ' + name); renderFolders();
+      };
+      document.getElementById('btnUp').onclick = ()=> { cwd = normRelative('..'); renderFolders(); };
+
+      // Menu de contexto
+      document.getElementById('ctxOpen').onclick = ()=>{
+        if(!ctxPath) return;
+        const node = getNode(ctxPath);
+        if(isDir(node)){ cwd = ctxPath; renderFolders(); }
+        else openEditor(ctxPath, node.data);
+        openModal('ctxModal', false);
+      };
+      document.getElementById('ctxRename').onclick = ()=>{
+        if(!ctxPath) return;
+        const [par, name] = splitParent(ctxPath);
+        const nn = prompt('Novo nome:', name);
+        if(!nn || nn===name) return;
+        movePath(ctxPath, simplify(par + '/' + nn));
+        saveFS(); log('rename ' + ctxPath + ' -> ' + nn);
+        ctxPath = null; renderFolders(); openModal('ctxModal', false);
+      };
+      document.getElementById('ctxDuplicate').onclick = ()=>{
+        if(!ctxPath) return;
+        const [par, name] = splitParent(ctxPath);
+        const nn = suggestCopyName(par, name);
+        copyPath(ctxPath, simplify(par + '/' + nn));
+        saveFS(); log('duplicate ' + ctxPath + ' -> ' + nn);
+        ctxPath = null; renderFolders(); openModal('ctxModal', false);
+      };
+      document.getElementById('ctxDelete').onclick = async ()=>{
+        if(!ctxPath) return;
+        const node = getNode(ctxPath);
+        if(isDir(node)){
+          const ok = await confirmBox('Excluir pasta recursivamente?');
+          if(!ok) return;
+          removePath(ctxPath, true);
+        } else {
+          const ok = await confirmBox('Excluir arquivo?');
+          if(!ok) return;
+          removePath(ctxPath, false);
+        }
+        saveFS(); log('delete ' + ctxPath);
+        ctxPath = null; renderFolders(); openModal('ctxModal', false);
+      };
+      document.getElementById('ctxClose').onclick = ()=> openModal('ctxModal', false);
+
+      // Terminal
+      runBtn.onclick = ()=> { execCommand(cmdInput.value); cmdInput.value=''; };
+      cmdInput.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter'){ e.preventDefault(); runBtn.click(); }
+      });
+      // Quando um atalho (chip) é tocado, executa o comando imediatamente e limpa a caixa de entrada
+      document.querySelectorAll('.chip').forEach(ch=>{
+        const cmdStr = ch.getAttribute('data-insert');
+        ch.onclick = ()=> {
+          execCommand(cmdStr);
+          cmdInput.value = '';
+        };
+      });
+
+      // Editor
+      document.getElementById('editorSave').onclick = saveEditor;
+      document.getElementById('editorCancel').onclick = ()=> openModal('editorModal', false);
+      document.getElementById('editorAutosave').onchange = (e)=>{
+        const st = loadEditorPref();
+        st.autosave = !!e.target.checked;
+        saveEditorPref(st);
+      };
+      editorArea.addEventListener('input', ()=>{
+        const st = loadEditorPref();
+        if(st.autosave) saveEditor();
+      });
+
+      // Paleta
+      document.getElementById('paletteBtn').onclick = ()=> openModal('paletteModal', true);
+      document.getElementById('paletteClose').onclick = ()=> openModal('paletteModal', false);
+
+      // Onboarding
+      document.getElementById('seedFS').onclick = ()=> { seedSamples(); saveFS(); renderFolders(); toast('Exemplos criados.'); };
+      document.getElementById('wipeFS').onclick = resetAll;
+      document.getElementById('closeOnboard').onclick = ()=> openModal('onboardModal', false);
+
+      // Ajuda
+      document.getElementById('toggleHC').onclick = ()=>{
+        settings.highContrast = !settings.highContrast; saveSettings();
+      };
+      document.getElementById('toggleRM').onclick = ()=>{
+        settings.reduceMotion = !settings.reduceMotion; saveSettings();
+      };
+      document.getElementById('exportFS').onclick = exportFS;
+      document.getElementById('importFS').onchange = async (e)=>{
+        const f = e.target.files?.[0]; if(!f) return;
+        try{ await importFS(f); toast('FS importado.'); }catch(err){ toast('Falha ao importar: '+err.message); }
+        e.target.value = '';
+      };
+      document.getElementById('resetAll').onclick = resetAll;
+
+      // Botões data-goto nos cards
+      document.querySelectorAll('[data-goto]').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          const id = b.getAttribute('data-goto'); if(id) goto(id);
+        });
+      });
+
+      // Copiar / limpar logs
+      document.getElementById('copyLogs').onclick = async ()=>{
+        try{ await navigator.clipboard.writeText(logs.join('\n')); toast('Logs copiados.'); }
+        catch(e){ toast('Não deu para copiar.'); }
+      };
+      document.getElementById('clearLogs').onclick = ()=>{
+        logs = []; saveLogs(); renderLogs(); toast('Logs limpos.');
+      };
+    }
+
+    function suggestCopyName(parent, name){
+      const base = name.replace(/(\.\w+)?$/, '');
+      const ext = (name.match(/(\.\w+)$/) || ['',''])[1];
+      let i = 1;
+      while(getNode(simplify(parent + '/' + base + ' cópia ' + i + ext))) i++;
+      return `${base} cópia ${i}${ext}`;
+    }
+
+    /* Inicializa */
+    init();
+  </script>
+</body>
+</html>
