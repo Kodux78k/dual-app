@@ -1,0 +1,135 @@
+{
+  "count_all_scripts": 43,
+  "count_defer": 0,
+  "count_async": 0,
+  "count_module": 1,
+  "defer_scripts": [],
+  "async_scripts": [],
+  "response_container_hits": [
+    [
+      "response[\\s_-]?container",
+      "  #assistantName{top:199px;font-size:1.1em;font-weight:600;opacity:.8;\n      transition:opacity var(--slow);\n    }\n    .response-container{\n      position:fixed;left:20px;right:20px;bottom:156px;padding:12px;\n      background:rgba(0,0,0,0.3);backdrop-filter:"
+    ],
+    [
+      "response[\\s_-]?container",
+      "z-index:999;transition:background var(--slow);\n      animation:fadeIn var(--slow) ease forwards;\n    }\n    body.light  .response-container{background:rgba(255,255,255,0.3)}\n    body.medium .response-container{background:rgba(0,0,0,0.2)}\n    body.vibe   .resp"
+    ],
+    [
+      "response[\\s_-]?container",
+      "var(--slow) ease forwards;\n    }\n    body.light  .response-container{background:rgba(255,255,255,0.3)}\n    body.medium .response-container{background:rgba(0,0,0,0.2)}\n    body.vibe   .response-container{background:rgba(255,255,255,0.2)}\n    .pages-wrapper{tr"
+    ],
+    [
+      "response[\\s_-]?container",
+      "iner{background:rgba(255,255,255,0.3)}\n    body.medium .response-container{background:rgba(0,0,0,0.2)}\n    body.vibe   .response-container{background:rgba(255,255,255,0.2)}\n    .pages-wrapper{transition:opacity var(--slow),height var(--slow);}\n    .pages-wra"
+    ],
+    [
+      "response[\\s_-]?container",
+      "—— */\n  \n\n/* Aumenta o espaço inferior do container de respostas para não sobrepor o input e considerar a safe-area */\n.response-container {\n  /* Move the response container up by about 18px to avoid overlapping the input */\n  bottom: 98px !important;\n}\n\n.in"
+    ],
+    [
+      "response[\\s_-]?container",
+      "ior do container de respostas para não sobrepor o input e considerar a safe-area */\n.response-container {\n  /* Move the response container up by about 18px to avoid overlapping the input */\n  bottom: 98px !important;\n}\n\n.input-container.hidden,\n.control-butt"
+    ],
+    [
+      "response[\\s_-]?container",
+      "ANAGER DESIGN (IO29_14/15) === */\n.input-container{\n  z-index: 200010 !important;\n  pointer-events: auto !important;\n}\n.response-container{ z-index: 200000 !important; }\n\n/* Visual layers shouldn't block input */\n#particles-js, .svg-container, #pulsos-contai"
+    ],
+    [
+      "response[\\s_-]?container",
+      ";\n    --resp-blur: 8px;\n    --resp-radius: 20px;\n    --resp-max: calc(100vh - 200px); /* altura máxima padrão */\n  }\n  .response-container, #responseContainer{\n    left: var(--resp-left) !important;\n    right: var(--resp-right) !important;\n    bottom: var(--"
+    ],
+    [
+      "response[\\s_-]?container",
+      "x;\n    --resp-radius: 20px;\n    --resp-max: calc(100vh - 200px); /* altura máxima padrão */\n  }\n  .response-container, #responseContainer{\n    left: var(--resp-left) !important;\n    right: var(--resp-right) !important;\n    bottom: var(--resp-bottom) !import"
+    ],
+    [
+      "response[\\s_-]?container",
+      "ado */\n  --resp-gap-high: 96px;  /* maior afastamento */\n}\n\n/* Response render styles */\nbody[data-resp-style=\"glass\"] .response-container{\n  background: rgba(12,16,22,0.35) !important;\n  backdrop-filter: blur(10px) saturate(140%) !important;\n  border: 1px s"
+    ],
+    [
+      "response[\\s_-]?container",
+      "a(255,255,255,0.12) !important;\n  box-shadow: 0 12px 40px rgba(0,0,0,0.35) !important;\n}\nbody[data-resp-style=\"paper\"] .response-container{\n  background: rgba(255,255,255,0.92) !important;\n  color: #0b0e13 !important;\n  border: 1px solid rgba(0,0,0,0.06) !im"
+    ],
+    [
+      "response[\\s_-]?container",
+      "-block{\n  background: #fff !important;\n  border: 1px solid rgba(0,0,0,0.06) !important;\n}\nbody[data-resp-style=\"neon\"] .response-container{\n  background: linear-gradient(135deg, rgba(0,255,255,0.08), rgba(255,0,255,0.08)) !important;\n  border: 1px solid rgba"
+    ],
+    [
+      "response[\\s_-]?container",
+      "20px rgba(0,255,255,0.15), 0 0 26px rgba(255,0,255,0.12) !important;\n}\n\n/* Font presets */\nbody[data-resp-font=\"sans\"] .response-container{ font-family: \"Inter\", \"Montserrat\", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }\nbody[d"
+    ],
+    [
+      "response[\\s_-]?container",
+      "ontserrat\", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }\nbody[data-resp-font=\"grotesk\"] .response-container{ font-family: \"Space Grotesk\", \"Montserrat\", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; "
+    ],
+    [
+      "response[\\s_-]?container",
+      " \"Montserrat\", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important; }\nbody[data-resp-font=\"mono\"] .response-container{ font-family: \"JetBrains Mono\", ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace !important;"
+    ],
+    [
+      "response[\\s_-]?container",
+      "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace !important; }\nbody[data-resp-font=\"serif\"] .response-container{ font-family: \"DM Serif Display\", Georgia, \"Times New Roman\", serif !important; }\n\n/* Subtle inner tweaks per style */\n"
+    ],
+    [
+      "response[\\s_-]?container",
+      ".response-controls .control-buttons{ gap:10px !important; }\n.response-controls .pagination{ display:none !important; }\n.response-container{\n  border: none !important;\n  border-image: none !important;\n  box-shadow: none !important;\n}\n/* block visual rhythm */"
+    ],
+    [
+      "response[\\s_-]?container",
+      "r\">\n<object data=\"assets/icons/3D_logo_Dual_Infodose_10.png\" id=\"logoObj\" type=\"image/png\"></object>\n</div>\n<div class=\"response-container\" id=\"response\">\n<div class=\"pages-wrapper\">\n<div class=\"page initial active\">\n<strong>Clique no ◉ e diga “Oi, Dual”.</s"
+    ],
+    [
+      "response[\\s_-]?container",
+      "{\n    \n      --mask-REDACTED: linear-gradient(45deg, #F0F, #0FF);\n    }\n\n    button,\n    .symbol-button,\n   \n\n    \n    .response-container,\n    .login-container,\n    #decoderBox,\n    #koblluxPlayer,\n    #pulsos-container {\n\n    -webkit-mask-image: var(--mask"
+    ],
+    [
+      "response[\\s_-]?container",
+      "ge.getItem('SUMBUS_LAST_ARCH'); if(last) document.body.dataset.arch=last;})();\n\n  (function rsScroll(){\n    const c=$('.response-container'); if(!c) return;\n    const K='SUMBUS_SCROLL_TOP'; const last=+localStorage.getItem(K); if(!isNaN(last)) c.scrollTop=la"
+    ],
+    [
+      "response[\\s_-]?container",
+      "esc(arch||'')}</span> <span class=\"dual-chip\">Vibração: ${esc(String(energy||''))}/10</span></div>`;\n    const cont=$('.response-container')||document.body; cont.appendChild(el); cont.scrollTop=cont.scrollHeight; return el;\n  }\n\n  if (typeof window.splitText"
+    ],
+    [
+      "response[\\s_-]?container",
+      " keys\n      renderKeys();\n    })();\n  </script>\n<script>\n// v6.2.2 footer-click → oculta/exibe respostas renderizadas (.response-container)\ndocument.addEventListener(\"DOMContentLoaded\", () => {\n  const footer = document.querySelector(\".footer-text\");\n  const"
+    ],
+    [
+      "response[\\s_-]?container",
+      "\ndocument.addEventListener(\"DOMContentLoaded\", () => {\n  const footer = document.querySelector(\".footer-text\");\n  const responseContainer = document.getElementById(\"response\");\n\n  if (!footer || !responseContainer) return;\n\n  // estado inicial persistente ("
+    ],
+    [
+      "response[\\s_-]?container",
+      "ment.querySelector(\".footer-text\");\n  const responseContainer = document.getElementById(\"response\");\n\n  if (!footer || !responseContainer) return;\n\n  // estado inicial persistente (opcional)\n  try {\n    const saved = localStorage.getItem(\"dual_footer_hide_r"
+    ],
+    [
+      "response[\\s_-]?container",
+      " (opcional)\n  try {\n    const saved = localStorage.getItem(\"dual_footer_hide_response\");\n    if (saved === \"1\") {\n      responseContainer.style.display = \"none\";\n      footer.classList.add(\"active\");\n    }\n  } catch(_) {}\n\n  footer.addEventListener(\"click\","
+    ],
+    [
+      "response[\\s_-]?container",
+      " footer.classList.add(\"active\");\n    }\n  } catch(_) {}\n\n  footer.addEventListener(\"click\", () => {\n    const isHidden = responseContainer.style.display === \"none\";\n    // alterna display\n    responseContainer.style.display = isHidden ? \"block\" : \"none\";\n   "
+    ],
+    [
+      "response[\\s_-]?container",
+      "ntListener(\"click\", () => {\n    const isHidden = responseContainer.style.display === \"none\";\n    // alterna display\n    responseContainer.style.display = isHidden ? \"block\" : \"none\";\n    footer.classList.toggle(\"active\", !isHidden);\n\n    // persiste prefere"
+    ],
+    [
+      "response[\\s_-]?container",
+      " 'none' : 'block');\n}\n\n/* Mostrar / Ocultar principais áreas (Response, Input, Footer) */\nfunction mostrarTodos(){\n  ['.response-container','.input-container','.footer-text']\n    .forEach(sel => document.querySelectorAll(sel).forEach(el => el && (el.style.di"
+    ],
+    [
+      "response[\\s_-]?container",
+      "ch(sel => document.querySelectorAll(sel).forEach(el => el && (el.style.display = '')));\n}\nfunction ocultarTodos(){\n  ['.response-container','.input-container','.footer-text']\n    .forEach(sel => document.querySelectorAll(sel).forEach(el => el && (el.style.di"
+    ],
+    [
+      "ResponseContainer",
+      "x;\n    --resp-radius: 20px;\n    --resp-max: calc(100vh - 200px); /* altura máxima padrão */\n  }\n  .response-container, #responseContainer{\n    left: var(--resp-left) !important;\n    right: var(--resp-right) !important;\n    bottom: var(--resp-bottom) !import"
+    ]
+  ],
+  "init_calls_sample": [
+    "ata=srcs[1];\n        } else obj.data=srcs;\n        cont.classList.remove('fading');\n      });\n    }\n\n    async function init(){\n      applyTheme(localStorage.getItem(THEME_KEY)||'dark');\n      $('#themeToggle').addEventListener('click',toggleThe",
+    "\"dualapp.settings\"]\n   Espelho compat: infodoseEnabled ('1'|'0'), infodoseTheme, userName, assistantBase\n   Inputs auto-bind (se existirem): \n     #archetype, #assistant, #theme, #style, #density, #accent,\n     #userName, #assistantInput, #skInpu"
+  ],
+  "response_assignments_count": 0
+}

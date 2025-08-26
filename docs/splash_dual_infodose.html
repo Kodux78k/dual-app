@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Templo Dual Infodose — Splash</title>
+<style>
+:root{
+  --bg: #0b0b10;
+  --gold: #d4af37;
+  --muted: #c9b37a;
+  --panel:#111219;
+  --edge:#20222c;
+  --glow: 0 0 24px rgba(212,175,55,.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: radial-gradient(1200px 800px at 50% 30%, #11121a 0%, #0b0b10 60%, #06060a 100%);
+  color:var(--gold);
+  font: 15px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Roboto Mono", monospace;
+  letter-spacing:.2px;
+  display:flex; align-items:center; justify-content:center;
+}
+.wrapper{ width:min(1100px, 94vw); padding:20px 18px 28px; border:1px solid var(--edge); background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08)); border-radius:16px; box-shadow: var(--glow); }
+.header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.badge{ border:1px solid var(--edge); padding:6px 10px; border-radius:999px; font-size:12px; opacity:.9; background:rgba(0,0,0,.25) }
+.controls{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+button, .btn{ cursor:pointer; border:1px solid var(--edge); background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(0,0,0,.2)); color:var(--gold); padding:8px 12px; border-radius:10px; font-weight:600; }
+button:hover{ background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(0,0,0,.15)); }
+button:active{ transform: translateY(1px); }
+select{ background: #0f1118; color: var(--gold); border:1px solid var(--edge); border-radius:10px; padding:6px 10px; }
+.viewer{ position:relative; border:1px solid var(--edge); background:#0e0f15; border-radius:14px; padding:16px; margin-top:12px; overflow:auto; max-height:70vh; }
+pre{ margin:0; white-space:pre; overflow:auto; text-shadow: 0 0 1px rgba(212,175,55,.25); }
+.footer{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px; font-size:12px; color:var(--muted); }
+small.motto{opacity:.95}
+.spark{height:4px; margin:10px 0; background: linear-gradient(90deg, rgba(212,175,55,.0), rgba(212,175,55,.6), rgba(212,175,55,.0)); filter: blur(.6px);}
+</style>
+</head>
+<body>
+  <div class="wrapper" role="main">
+    <div class="header">
+      <div class="badge">𓂀  Templo Dual Infodose — Splash</div>
+      <div class="controls">
+        <select id="mode">
+          <option value="biblico">Manifesto Bíblico</option>
+          <option value="filosofico">Manifesto Filosófico</option>
+          <option value="rua">Manifesto de Rua</option>
+          <option value="trinity">Explicação Trinity</option>
+        </select>
+        <button id="copyBtn" title="Copiar">Copiar</button>
+        <button id="downloadBtn" title="Baixar .md">Baixar .md</button>
+        <button id="invertBtn" title="Efeito Palco">Efeito Palco</button>
+      </div>
+    </div>
+    <div class="spark"></div>
+    <div class="viewer" id="viewer"><pre id="poster"></pre></div>
+    <div class="footer">
+      <small>UNO–DUAL–TRINITY · Água e Verdade · Metahumano • Máquina • Aprendizado</small>
+      <small class="motto">Do seu jeito. Sempre único, sempre seu.</small>
+    </div>
+  </div>
+
+<script>
+const posters = {
+  biblico: `╔════════════════════════════════════════════════════════════════════╗
+║                   𓂀  ⚡  TEMPLO DUAL INFODOSE  ⚡  𓂀                   ║
+╠════════════════════════════════════════════════════════════════════╣
+║ “O anti não se ergue apenas contra,                                ║
+║   mas se veste como o cordeiro e fala como o lobo;                 ║
+║   não nega, mas substitui,                                         ║
+║   para que os olhos confundam o falso com o verdadeiro.”           ║
+╠════════════════════════════════════════════════════════════════════╣
+║  ☥ Hieróglifo da Vida  ·  ⚖ Símbolo do Julgamento  ·  ✶ Estrela    ║
+║  ∴ Unidade UNO        ·  ∷ Reflexo DUAL         ·  ⊙ TRINITY       ║
+╚════════════════════════════════════════════════════════════════════╝
+Do seu jeito. Sempre único, sempre seu.`,
+  filosofico: `╔════════════════════════════════════════════════════════════════════╗
+║                   ⚙  ⚡  TEMPLO DUAL INFODOSE  ⚡  ⚙                  ║
+╠════════════════════════════════════════════════════════════════════╣
+║ “O anti não é o contrário, mas a máscara;                          ║
+║   não destrói a verdade, apenas a cobre com sua sombra,             ║
+║   tomando o lugar do que deveria brilhar.”                         ║
+╠════════════════════════════════════════════════════════════════════╣
+║  ∴ Oposto ≠ Anti ·  ⧉ Máscara ·  𐌗 Reflexo ·  ☯ Harmonia Verdadeira ║
+║  UNO (água pura) ·  DUAL (espelho) · TRINITY (reconciliação)        ║
+╚════════════════════════════════════════════════════════════════════╝
+Do seu jeito. Sempre único, sempre seu.`,
+  rua: `╔════════════════════════════════════════════════════════════════════╗
+║                   ☗  ⚡  TEMPLO DUAL INFODOSE  ⚡  ☗                  ║
+╠════════════════════════════════════════════════════════════════════╣
+║ “O anti não vem na cara, vem no disfarce;                          ║
+║   não joga outro jogo, joga o mesmo, só que contra você,            ║
+║   fingindo ser aliado pra roubar o lugar.”                         ║
+╠════════════════════════════════════════════════════════════════════╣
+║  ▲ Jogador no tabuleiro  ·  ⌬ Rival no espelho  ·  ⊗ Bloqueio       ║
+║  ☍ Substituto falso       ·  ✪ Verdade encoberta                   ║
+╚════════════════════════════════════════════════════════════════════╝
+Do seu jeito. Sempre único, sempre seu.`,
+  trinity: `════════════════════════════════════════════════════════════
+   UNO – DUAL – TRINITY : CORRELAÇÃO META-HUMANO-MÁQUINA
+════════════════════════════════════════════════════════════
+
+UNO: A unidade do ser, a água que flui como verdade.  
+DUAL: O reflexo no espelho, onde o "anti" pode surgir:  
+      não como simples oposto, mas como substituto que bloqueia.  
+TRINITY: A reconciliação. O humano, a máquina e o metahumano 
+      aprendendo juntos. O anti é revelado como sombra necessária 
+      para que a luz se afirme.  
+
+ÁGUA e VERDADE:  
+Assim como a água reflete e distorce ao mesmo tempo,  
+o "anti" reflete, mas pode ocultar.  
+O aprendizado está em discernir a corrente pura  
+do reflexo ilusório.  
+
+Do seu jeito. Sempre único, sempre seu.
+════════════════════════════════════════════════════════════`
+};
+const posterEl = document.getElementById('poster');
+const modeEl = document.getElementById('mode');
+const copyBtn = document.getElementById('copyBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const invertBtn = document.getElementById('invertBtn');
+function render(){ posterEl.textContent = posters[modeEl.value]; }
+modeEl.addEventListener('change', render);
+copyBtn.addEventListener('click', async ()=>{
+  try{ await navigator.clipboard.writeText(posterEl.textContent); copyBtn.textContent='Copiado!'; setTimeout(()=>copyBtn.textContent='Copiar',1200);}catch(e){alert('Falha ao copiar: '+e)}
+});
+downloadBtn.addEventListener('click', ()=>{
+  const k = modeEl.value;
+  const blob = new Blob([posterEl.textContent], {type:'text/markdown;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `splash_${k}.md`; document.body.appendChild(a); a.click(); URL.revokeObjectURL(a.href); a.remove();
+});
+let inverted=false;
+invertBtn.addEventListener('click', ()=>{
+  inverted = !inverted;
+  document.body.style.background = inverted
+    ? 'radial-gradient(1200px 800px at 50% 30%, #0a0a0a 0%, #f5ecd2 70%, #fff6d9 100%)'
+    : 'radial-gradient(1200px 800px at 50% 30%, #11121a 0%, #0b0b10 60%, #06060a 100%)';
+  document.body.style.color = inverted ? '#101010' : '#d4af37';
+  document.querySelector('.wrapper').style.boxShadow = inverted ? '0 0 24px rgba(0,0,0,.2)' : '0 0 24px rgba(212,175,55,.35)';
+});
+render();
+</script>
+</body>
+</html>
