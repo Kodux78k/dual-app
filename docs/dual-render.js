@@ -7,7 +7,7 @@
     const pre = document.createElement('pre');
     pre.className = 'dual-pre';
     pre.textContent = text;
-    el.innerHTML = '';
+    DualRender.renderSmart(el, '');
     el.appendChild(pre);
     return pre;
   }
@@ -31,7 +31,7 @@
   // Decide automático
   window.DualRender.renderSmart = function(container, text){
     if (ASCII_RE.test(text)) return window.DualRender.renderASCII(container, text);
-    container.innerHTML = text;
+    DualRender.renderSmart(container, text);
   };
 
   // Mutation Observer para containers de resposta
