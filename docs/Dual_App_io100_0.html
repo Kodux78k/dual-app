@@ -5158,12 +5158,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 <!-- Dual Splash Integration (route + modal) -->
-<script type="module" src="./routes_patch.js"></script>
+<!-- script type="module" src="/routes_patch.js"></script>
 <script type="module">
-  import { initSplashRoute } from './routes_patch.js';
+  import { initSplashRoute } from '/routes_patch.js';
   initSplashRoute({ mountId: 'app', defaultRoute: '#/chat', asModal: true });
   // Opcional: abrir modal manualmente: window.DualSplash?.open();
-</script>
+</script--!>
 
 <!-- Dual IA Pipeline (UNO/DUAL/TRINITY unificado + OI, DUAL.) -->
 <script type="module" src="./ai_pipeline_patch.js"></script>
