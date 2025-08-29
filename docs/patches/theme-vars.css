@@ -1,0 +1,32 @@
+
+/* Theme Tokens (apply via body[data-theme]) */
+:root{
+  --bg:#090b12; --ink:#e8ecf1; --muted:#9aa4b2;
+  --c1:#7df9ff; --c2:#f0f; --surface:rgba(12,16,26,.65);
+  --ring: 0 0 0 1px rgba(125,249,255,.22), 0 10px 40px rgba(0,0,0,.45);
+}
+body[data-theme="dark"]{
+  --bg:#0a0c12; --ink:#eaeef5; --muted:#96a2b2; --c1:#7df9ff; --c2:#9aa4b2;
+  --surface:rgba(12,16,26,.65);
+  --ring: 0 0 0 1px rgba(125,249,255,.22), 0 10px 40px rgba(0,0,0,.45);
+}
+body[data-theme="light"]{
+  --bg:#f6f8fb; --ink:#0b0d12; --muted:#4c5663; --c1:#0aa2ff; --c2:#7e56da;
+  --surface:rgba(255,255,255,.75);
+  --ring: 0 0 0 1px rgba(10,162,255,.25), 0 10px 40px rgba(0,0,0,.18);
+}
+body[data-theme="neon"]{
+  --bg:#070a0f; --ink:#e8ecf1; --muted:#9aa4b2; --c1:#00ffff; --c2:#ff00ff;
+  --surface:rgba(12,17,28,.72);
+  --ring: 0 0 12px rgba(0,255,255,.45), 0 0 22px rgba(255,0,255,.25);
+}
+body[data-theme="vibe"]{
+  --bg:#0b0d12; --ink:#eff2f7; --muted:#a2abb9; --c1:#ff8a00; --c2:#7a5cff;
+  --surface:rgba(20,16,28,.6);
+  --ring: 0 0 0 1px rgba(122,92,255,.25), 0 10px 40px rgba(0,0,0,.45);
+}
+body[data-theme="lux"]{
+  --bg:#0a0b0f; --ink:#f2f3f5; --muted:#a9b0bd; --c1:#d4af37; --c2:#ffd34d;
+  --surface:rgba(18,16,10,.72);
+  --ring: 0 0 0 1px rgba(212,175,55,.25), 0 10px 40px rgba(0,0,0,.45);
+}

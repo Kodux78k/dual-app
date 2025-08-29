@@ -1,0 +1,40 @@
+
+/* KOBLLUX Player — modular CSS (não altera DOM existente) */
+#koblluxPlayer, .kobllux-player {
+  position: fixed; top: 18px; left: 16px; z-index: 99999;
+  background: rgba(14,16,22,.78);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(125,249,255,.25);
+  border-radius: 16px; box-shadow: 0 18px 52px rgba(0,0,0,.45);
+  color: #e8ecf1; padding: 12px; width: min(94vw, 320px);
+  font: 13px/1.4 system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial;
+}
+.kx-row{ display:flex; align-items:center; gap:8px; margin-top:8px }
+.kx-row:first-child{ margin-top:0 }
+#koblluxPlayer .kx-title{ font-weight:700; letter-spacing:.2px; }
+.kx-btn, .kx-select, .kx-range, .kx-text {
+  background: rgba(255,255,255,.06); color:#e8ecf1;
+  border: 1px solid rgba(125,249,255,.25);
+  border-radius: 10px; padding: 8px 10px;
+}
+.kx-btn{ cursor:pointer; user-select:none }
+.kx-btn:active{ transform: translateY(1px) }
+.kx-select{ flex:1; min-width: 0 }
+.kx-range{ flex:1; height: 28px }
+.kx-small{ font-size:12px; opacity:.8 }
+.kx-hide{ display:none !important }
+.kx-col{ display:flex; flex-direction:column; gap:6px; flex:1 }
+.kx-grow{ flex:1 }
+.kx-header{ display:flex; align-items:center; gap:8px }
+.kx-spacer{ flex:1 }
+.kx-dot{ width:10px; height:10px; border-radius:50%; background:#0ff; box-shadow: 0 0 10px rgba(0,255,255,.6) }
+.kx-chip{ font-size:11px; padding:2px 6px; border-radius:999px; border:1px solid rgba(125,249,255,.25); background: rgba(255,255,255,.06) }
+.kx-min{ position:absolute; right:8px; top:8px }
+.kx-hidden{ max-height: 44px; overflow:hidden }
+.kx-row.compact{ gap:6px }
+.kx-row.compact .kx-btn{ padding:6px 8px }
+.kx-footer{ margin-top:8px; display:flex; gap:8px }
+.kx-muted{ opacity:.7 }
+.kx-inline-note{ font-size: 11px; opacity: .75; margin-top: 4px }
+@media (max-width: 400px){ #koblluxPlayer{ left: 8px; right: 8px; width:auto } }

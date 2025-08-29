@@ -1,0 +1,47 @@
+:root{
+  --resp-gap-base: 72px;
+  --resp-gap-extra: 36px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --vh: 1vh;
+}
+:where(.response-container, #responseContainer){
+  position: fixed; left: 20px; right: 20px;
+  bottom: calc(var(--resp-gap-base) + var(--resp-gap-extra) + var(--safe-bottom));
+  padding: 12px;
+  max-height: calc(100 * var(--vh) - (var(--resp-gap-base) + var(--resp-gap-extra)) - 110px);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  z-index: 200000 !important;
+  transition: bottom .25s ease, max-height .25s ease, background .4s ease;
+  backdrop-filter: blur(8px);
+  border-radius: 18px;
+}
+:where(.input-container){
+  position: fixed; left: 20px; right: 20px;
+  bottom: calc(24px + var(--safe-bottom));
+  display: grid; grid-template-columns: 1fr 56px 56px; gap: 6px;
+  z-index: 200010 !important; pointer-events: auto !important;
+}
+:where(#btn-expandir-ritual){ position: fixed; right: 24px; bottom: calc(120px + var(--safe-bottom)); z-index: 200020 !important; }
+:where(.symbol-bar){ position: fixed; right: 10px; top: 45%; transform: translateY(-50%); z-index: 200015 !important; pointer-events: none !important; }
+:where(.symbol-bar .symbol-button){ pointer-events: auto !important; }
+:where(#koblluxPlayer){ pointer-events: none !important; z-index: 200012 !important; }
+:where(#koblluxPlayer *){ pointer-events: auto !important; }
+:where(#patchMgrPanel){
+  bottom: calc(110px + var(--safe-bottom)) !important;
+  z-index: 200050 !important;
+  width: min(560px, 92vw);
+  max-height: calc(70vh - 120px);
+  overflow: auto;
+  border-radius: 14px;
+  background: rgba(10,12,16,.84);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+:where(#particles-js, .svg-container, #pulsos-container, .pages-wrapper){ pointer-events: none !important; }
+:where(body[data-kb="open"]) .response-container{
+  max-height: calc(100 * var(--vh) - (var(--resp-gap-base) + 12px) - 84px);
+}
+:where(body[data-gap="low"])  { --resp-gap-extra: 12px; }
+:where(body[data-gap="med"])  { --resp-gap-extra: 36px; }
+:where(body[data-gap="high"]) { --resp-gap-extra: 84px; }

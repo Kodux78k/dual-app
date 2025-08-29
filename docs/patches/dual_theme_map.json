@@ -1,0 +1,32 @@
+{
+  "neon": {
+    "key": "Kaos",
+    "runa": "⚡",
+    "code": "0111",
+    "aroma": "Revolução 🌑"
+  },
+  "lux": {
+    "key": "Atlas",
+    "runa": "⚙",
+    "code": "0010",
+    "aroma": "Mente Lúcida 🌿"
+  },
+  "vibe": {
+    "key": "Pulse",
+    "runa": "🎶",
+    "code": "0100",
+    "aroma": "Vibração 🌸"
+  },
+  "dark": {
+    "key": "Solus",
+    "runa": "🕯",
+    "code": "1011",
+    "aroma": "Proteção 🕯️"
+  },
+  "light": {
+    "key": "Lumine",
+    "runa": "🌅",
+    "code": "1001",
+    "aroma": "Inspiração 🌞"
+  }
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "key": "Nova",
+    "runa": "✧",
+    "code": "0001",
+    "desc": "faísca criativa",
+    "aroma": "Criação 🍊"
+  },
+  {
+    "key": "Atlas",
+    "runa": "⚙",
+    "code": "0010",
+    "desc": "ordem estrutural",
+    "aroma": "Mente Lúcida 🌿"
+  },
+  {
+    "key": "Vitalis",
+    "runa": "🔥",
+    "code": "0011",
+    "desc": "força/energia",
+    "aroma": "Triunfo 🌶️"
+  },
+  {
+    "key": "Pulse",
+    "runa": "🎶",
+    "code": "0100",
+    "desc": "ressonância/emocional",
+    "aroma": "Vibração 🌸"
+  },
+  {
+    "key": "Artemis",
+    "runa": "🏹",
+    "code": "0101",
+    "desc": "exploração",
+    "aroma": "Novos Caminhos 🌲"
+  },
+  {
+    "key": "Serena",
+    "runa": "♥",
+    "code": "0110",
+    "desc": "acolhimento",
+    "aroma": "Lar que Acolhe 🌹"
+  },
+  {
+    "key": "Kaos",
+    "runa": "⚡",
+    "code": "0111",
+    "desc": "ruptura",
+    "aroma": "Revolução 🌑"
+  },
+  {
+    "key": "Genus",
+    "runa": "🧩",
+    "code": "1000",
+    "desc": "construção",
+    "aroma": "Construção 🍂"
+  },
+  {
+    "key": "Lumine",
+    "runa": "🌅",
+    "code": "1001",
+    "desc": "iluminação",
+    "aroma": "Inspiração 🌞"
+  },
+  {
+    "key": "Rhea",
+    "runa": "🌿",
+    "code": "1010",
+    "desc": "nutrição",
+    "aroma": "Raízes 🌱"
+  },
+  {
+    "key": "Solus",
+    "runa": "🕯",
+    "code": "1011",
+    "desc": "introspecção",
+    "aroma": "Proteção 🕯️"
+  },
+  {
+    "key": "Aion",
+    "runa": "∞",
+    "code": "1100",
+    "desc": "eterno/loop",
+    "aroma": "Eterno 🌌"
+  }
+]

@@ -1,0 +1,42 @@
+
+/* Apply tokens to known components without touching DOM */
+:where(html,body){ background: var(--bg); color: var(--ink); }
+:where(.response-container){
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--c1) 30%, transparent);
+  box-shadow: var(--ring);
+}
+:where(.response-block){
+  background: linear-gradient(135deg, color-mix(in oklab, var(--c1) 15%, transparent), color-mix(in oklab, var(--c2) 10%, transparent));
+  border-left: 4px solid color-mix(in oklab, var(--c1) 60%, transparent);
+  box-shadow: var(--ring);
+}
+:where(.input-container input[type="text"]){
+  background: color-mix(in oklab, var(--surface) 85%, #0000);
+  color: var(--ink);
+  border: 1px solid color-mix(in oklab, var(--c1) 35%, transparent);
+}
+:where(.input-container input[type="text"]:focus){
+  border-color: color-mix(in oklab, var(--c2) 50%, var(--c1) 50%);
+  box-shadow: var(--ring);
+}
+:where(.input-container button){
+  border: 1px solid color-mix(in oklab, var(--c1) 40%, transparent);
+  background: linear-gradient(42deg, var(--c1), var(--c2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+:where(.symbol-button){
+  border: 1px solid color-mix(in oklab, var(--c1) 40%, transparent);
+  background: color-mix(in oklab, var(--surface) 90%, #0000);
+  color: color-mix(in oklab, var(--c1) 80%, white);
+  box-shadow: var(--ring);
+}
+:where(#btn-expandir-ritual){
+  border: 1px solid color-mix(in oklab, var(--c1) 45%, transparent);
+  background: radial-gradient(120% 120% at 50% 30%, color-mix(in oklab, var(--c1) 25%, transparent), color-mix(in oklab, var(--c2) 22%, transparent));
+  box-shadow: var(--ring);
+}
+:where(#koblluxPlayer){
+  background: color-mix(in oklab, var(--surface) 95%, #0000);
+  border: 1px solid color-mix(in oklab, var(--c1) 35%, transparent);
+}
