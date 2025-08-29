@@ -1,0 +1,50 @@
+{
+  "profiles": [
+    {
+      "file": "neon.json",
+      "theme": "neon",
+      "archetype": "Mago",
+      "rate": 1.12,
+      "pitch": 0.98,
+      "volume": 1.0,
+      "voice": "pt-BR (auto)"
+    },
+    {
+      "file": "lux.json",
+      "theme": "lux",
+      "archetype": "Governante",
+      "rate": 0.98,
+      "pitch": 0.95,
+      "volume": 1.0,
+      "voice": "pt-BR (auto)"
+    },
+    {
+      "file": "vibe.json",
+      "theme": "vibe",
+      "archetype": "Criador",
+      "rate": 1.06,
+      "pitch": 1.05,
+      "volume": 1.0,
+      "voice": "pt-BR (auto)"
+    },
+    {
+      "file": "dark.json",
+      "theme": "dark",
+      "archetype": "Sábio",
+      "rate": 0.94,
+      "pitch": 0.98,
+      "volume": 1.0,
+      "voice": "pt-BR (auto)"
+    },
+    {
+      "file": "light.json",
+      "theme": "light",
+      "archetype": "Inocente",
+      "rate": 1.02,
+      "pitch": 1.06,
+      "volume": 1.0,
+      "voice": "pt-BR (auto)"
+    }
+  ],
+  "notes": "Copie a pasta 'profiles' para o mesmo diretório dos seus HTMLs. Use o botão 'Perfis do Tema' no Theme Menu."
+}
