@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Infodose · Símbolo ⇄ Som (HTML Único)</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#121521; --ink:#e8ecf1; --muted:#9aa4b2;
+    --acc:#7df9ff; --ok:#48e59b; --warn:#ffc857; --err:#ff6b6b;
+    --frame:#2a3042; --hi:#1b2030;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:linear-gradient(180deg,#0b0d12,#0a0d16 60%,#0b0d12);
+    color:var(--ink); font:14px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;
+  }
+  header{
+    padding:18px 16px; border-bottom:1px solid #1d2333; background:#0c0f17;
+    position:sticky; top:0; z-index:5;
+  }
+  header h1{margin:0; font-size:18px; letter-spacing:.5px}
+  header small{display:block; color:var(--muted)}
+  main{display:grid; gap:16px; grid-template-columns: 320px 1fr; padding:16px}
+  section, .card{background:var(--panel); border:1px solid #1b2140; border-radius:12px; overflow:hidden}
+  .card h3, section h3{margin:0; padding:12px 14px; border-bottom:1px solid #1b2140; background:#111629}
+  .card .content, section .content{padding:12px 14px}
+  textarea{
+    width:100%; min-height:220px; resize:vertical; background:#0f1322; color:var(--ink);
+    border:1px solid #212844; border-radius:10px; padding:12px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  input[type="text"], input[type="number"], select{
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid #212844;
+    background:#0f1322; color:var(--ink);
+  }
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+  .row > *{flex:1}
+  .btn{
+    appearance:none; border:1px solid #293052; background:#131a30; color:#eaf6ff; padding:10px 12px;
+    border-radius:10px; cursor:pointer; font-weight:600; letter-spacing:.2px;
+  }
+  .btn.primary{background:linear-gradient(180deg,#1a94ff,#1b6bff); border-color:#1b6bff}
+  .btn.ok{background:linear-gradient(180deg,#1fbe7a,#13a86a); border-color:#13a86a}
+  .btn.warn{background:linear-gradient(180deg,#ffc857,#ffb347); border-color:#ffb347; color:#1a1200}
+  .btn.ghost{background:#0f1322}
+  .stack{display:grid; gap:10px}
+  .lib-list{display:grid; gap:10px; max-height:280px; overflow:auto; padding-right:4px}
+  .lib-item{border:1px dashed #2a304a; border-radius:10px; padding:8px; background:#0c111f}
+  .lib-item .row{align-items:center}
+  .badge{display:inline-block; padding:1px 8px; border-radius:999px; background:#0e1426; border:1px solid #273055; color:#a7b3cc; font-size:12px}
+  .small{font-size:12px; color:var(--muted)}
+  .timeline{max-height:330px; overflow:auto; background:#0f1322; border:1px solid #222a48; border-radius:10px; padding:8px}
+  .cue{padding:8px; border-radius:8px; border:1px solid #20284a; background:#0b1020; margin-bottom:8px; white-space:pre-wrap}
+  .cue .meta{display:flex; gap:6px; flex-wrap:wrap; margin:4px 0}
+  .cue.active{border-color:#2da8ff; background:linear-gradient(180deg,#0c1122,#0b1428)}
+  .legend{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:6px}
+  .legend .L{border:1px solid #233055; border-radius:8px; padding:8px; background:#0f1426}
+  code.k{background:#0b1020; border:1px solid #22305a; padding:2px 6px; border-radius:6px}
+  footer{padding:18px; text-align:center; color:#8191b3}
+  .ascii{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background:#0b1020; border:1px solid #20305a; border-radius:10px; padding:10px; color:#bfe8ff;
+  }
+</style>
+<!-- INLINE PATCH: theme tokens + apply + player + layout + themes -->
+<style>
+/* Theme Tokens (apply via body[data-theme]) */
+:root{
+  --bg:#090b12; --ink:#e8ecf1; --muted:#9aa4b2;
+  --c1:#7df9ff; --c2:#f0f; --surface:rgba(12,16,26,.65);
+  --ring: 0 0 0 1px rgba(125,249,255,.22), 0 10px 40px rgba(0,0,0,.45);
+}
+body[data-theme="dark"]{
+  --bg:#0a0c12; --ink:#eaeef5; --muted:#96a2b2; --c1:#7df9ff; --c2:#9aa4b2;
+  --surface:rgba(12,16,26,.65);
+  --ring: 0 0 0 1px rgba(125,249,255,.22), 0 10px 40px rgba(0,0,0,.45);
+}
+body[data-theme="light"]{
+  --bg:#f6f8fb; --ink:#0b0d12; --muted:#4c5663; --c1:#0aa2ff; --c2:#7e56da;
+  --surface:rgba(255,255,255,.75);
+  --ring: 0 0 0 1px rgba(10,162,255,.25), 0 10px 40px rgba(0,0,0,.18);
+}
+body[data-theme="neon"]{
+  --bg:#070a0f; --ink:#e8ecf1; --muted:#9aa4b2; --c1:#00ffff; --c2:#ff00ff;
+  --surface:rgba(12,17,28,.72);
+  --ring: 0 0 12px rgba(0,255,255,.45), 0 0 22px rgba(255,0,255,.25);
+}
+body[data-theme="vibe"]{
+  --bg:#0b0d12; --ink:#eff2f7; --muted:#a2abb9; --c1:#ff8a00; --c2:#7a5cff;
+  --surface:rgba(20,16,28,.6);
+  --ring: 0 0 0 1px rgba(122,92,255,.25), 0 10px 40px rgba(0,0,0,.45);
+}
+body[data-theme="lux"]{
+  --bg:#0a0b0f; --ink:#f2f3f5; --muted:#a9b0bd; --c1:#d4af37; --c2:#ffd34d;
+  --surface:rgba(18,16,10,.72);
+  --ring: 0 0 0 1px rgba(212,175,55,.25), 0 10px 40px rgba(0,0,0,.45);
+}
+</style>
+<style>
+/* Apply tokens to known components without touching DOM */
+:where(html,body){ background: var(--bg); color: var(--ink); }
+:where(.response-container){
+  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--c1) 30%, transparent);
+  box-shadow: var(--ring);
+}
+:where(.response-block){
+  background: linear-gradient(135deg, color-mix(in oklab, var(--c1) 15%, transparent), color-mix(in oklab, var(--c2) 10%, transparent));
+  border-left: 4px solid color-mix(in oklab, var(--c1) 60%, transparent);
+  box-shadow: var(--ring);
+}
+:where(.input-container input[type="text"]){
+  background: color-mix(in oklab, var(--surface) 85%, #0000);
+  color: var(--ink);
+  border: 1px solid color-mix(in oklab, var(--c1) 35%, transparent);
+}
+:where(.input-container input[type="text"]:focus){
+  border-color: color-mix(in oklab, var(--c2) 50%, var(--c1) 50%);
+  box-shadow: var(--ring);
+}
+:where(.input-container button){
+  border: 1px solid color-mix(in oklab, var(--c1) 40%, transparent);
+  background: linear-gradient(42deg, var(--c1), var(--c2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+:where(.symbol-button){
+  border: 1px solid color-mix(in oklab, var(--c1) 40%, transparent);
+  background: color-mix(in oklab, var(--surface) 90%, #0000);
+  color: color-mix(in oklab, var(--c1) 80%, white);
+  box-shadow: var(--ring);
+}
+:where(#btn-expandir-ritual){
+  border: 1px solid color-mix(in oklab, var(--c1) 45%, transparent);
+  background: radial-gradient(120% 120% at 50% 30%, color-mix(in oklab, var(--c1) 25%, transparent), color-mix(in oklab, var(--c2) 22%, transparent));
+  box-shadow: var(--ring);
+}
+:where(#koblluxPlayer){
+  background: color-mix(in oklab, var(--surface) 95%, #0000);
+  border: 1px solid color-mix(in oklab, var(--c1) 35%, transparent);
+}
+</style>
+<style>
+/* KOBLLUX Player — modular CSS (não altera DOM existente) */
+#koblluxPlayer, .kobllux-player {
+  position: fixed; top: 18px; left: 16px; z-index: 99999;
+  background: rgba(14,16,22,.78);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(125,249,255,.25);
+  border-radius: 16px; box-shadow: 0 18px 52px rgba(0,0,0,.45);
+  color: #e8ecf1; padding: 12px; width: min(94vw, 320px);
+  font: 13px/1.4 system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial;
+}
+.kx-row{ display:flex; align-items:center; gap:8px; margin-top:8px }
+.kx-row:first-child{ margin-top:0 }
+#koblluxPlayer .kx-title{ font-weight:700; letter-spacing:.2px; }
+.kx-btn, .kx-select, .kx-range, .kx-text {
+  background: rgba(255,255,255,.06); color:#e8ecf1;
+  border: 1px solid rgba(125,249,255,.25);
+  border-radius: 10px; padding: 8px 10px;
+}
+.kx-btn{ cursor:pointer; user-select:none }
+.kx-btn:active{ transform: translateY(1px) }
+.kx-select{ flex:1; min-width: 0 }
+.kx-range{ flex:1; height: 28px }
+.kx-small{ font-size:12px; opacity:.8 }
+.kx-hide{ display:none !important }
+.kx-col{ display:flex; flex-direction:column; gap:6px; flex:1 }
+.kx-grow{ flex:1 }
+.kx-header{ display:flex; align-items:center; gap:8px }
+.kx-spacer{ flex:1 }
+.kx-dot{ width:10px; height:10px; border-radius:50%; background:#0ff; box-shadow: 0 0 10px rgba(0,255,255,.6) }
+.kx-chip{ font-size:11px; padding:2px 6px; border-radius:999px; border:1px solid rgba(125,249,255,.25); background: rgba(255,255,255,.06) }
+.kx-min{ position:absolute; right:8px; top:8px }
+.kx-hidden{ max-height: 44px; overflow:hidden }
+.kx-row.compact{ gap:6px }
+.kx-row.compact .kx-btn{ padding:6px 8px }
+.kx-footer{ margin-top:8px; display:flex; gap:8px }
+.kx-muted{ opacity:.7 }
+.kx-inline-note{ font-size: 11px; opacity: .75; margin-top: 4px }
+@media (max-width: 400px){ #koblluxPlayer{ left: 8px; right: 8px; width:auto } }
+</style>
+<style>:root{
+  --resp-gap-base: 72px;
+  --resp-gap-extra: 36px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --vh: 1vh;
+}
+:where(.response-container, #responseContainer){
+  position: fixed; left: 20px; right: 20px;
+  bottom: calc(var(--resp-gap-base) + var(--resp-gap-extra) + var(--safe-bottom));
+  padding: 12px;
+  max-height: calc(100 * var(--vh) - (var(--resp-gap-base) + var(--resp-gap-extra)) - 110px);
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  z-index: 200000 !important;
+  transition: bottom .25s ease, max-height .25s ease, background .4s ease;
+  backdrop-filter: blur(8px);
+  border-radius: 18px;
+}
+:where(.input-container){
+  position: fixed; left: 20px; right: 20px;
+  bottom: calc(24px + var(--safe-bottom));
+  display: grid; grid-template-columns: 1fr 56px 56px; gap: 6px;
+  z-index: 200010 !important; pointer-events: auto !important;
+}
+:where(#btn-expandir-ritual){ position: fixed; right: 24px; bottom: calc(120px + var(--safe-bottom)); z-index: 200020 !important; }
+:where(.symbol-bar){ position: fixed; right: 10px; top: 45%; transform: translateY(-50%); z-index: 200015 !important; pointer-events: none !important; }
+:where(.symbol-bar .symbol-button){ pointer-events: auto !important; }
+:where(#koblluxPlayer){ pointer-events: none !important; z-index: 200012 !important; }
+:where(#koblluxPlayer *){ pointer-events: auto !important; }
+:where(#patchMgrPanel){
+  bottom: calc(110px + var(--safe-bottom)) !important;
+  z-index: 200050 !important;
+  width: min(560px, 92vw);
+  max-height: calc(70vh - 120px);
+  overflow: auto;
+  border-radius: 14px;
+  background: rgba(10,12,16,.84);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+:where(#particles-js, .svg-container, #pulsos-container, .pages-wrapper){ pointer-events: none !important; }
+:where(body[data-kb="open"]) .response-container{
+  max-height: calc(100 * var(--vh) - (var(--resp-gap-base) + 12px) - 84px);
+}
+:where(body[data-gap="low"])  { --resp-gap-extra: 12px; }
+:where(body[data-gap="med"])  { --resp-gap-extra: 36px; }
+:where(body[data-gap="high"]) { --resp-gap-extra: 84px; }
+</style>
+<style id="theme-neon-inline">:root{
+  --dual-c1:#00ffff; --dual-c2:#ff00ff;
+  --dual-ink:#e8ecf1; --dual-muted:#9aa4b2;
+  --dual-glow: 0 0 12px rgba(0,255,255,.45), 0 0 22px rgba(255,0,255,.25);
+}
+:where(.response-container){
+  border:1px solid rgba(0,255,255,.26);
+  background: linear-gradient(180deg, rgba(12,17,28,.72), rgba(12,17,28,.58));
+  box-shadow: 0 18px 52px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.05);
+}
+:where(.response-block){
+  background: linear-gradient(135deg, rgba(0,255,255,.12), rgba(255,0,255,.08));
+  border-left:4px solid rgba(0,255,255,.6);
+  box-shadow: var(--dual-glow);
+}
+:where(.input-container input[type="text"]){
+  color:var(--dual-ink);
+  border-color: rgba(0,255,255,.3);
+  background: rgba(255,255,255,.06);
+}
+:where(.input-container input[type="text"]:focus){
+  border-color: rgba(255,0,255,.48);
+  background: rgba(255,255,255,.12);
+  box-shadow: var(--dual-glow);
+}
+:where(.input-container button){
+  border-color: rgba(0,255,255,.28);
+  background: linear-gradient(42deg, var(--dual-c1), var(--dual-c2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+:where(.symbol-button){
+  border-color: rgba(0,255,255,.32);
+  background: rgba(12,17,28,.72);
+  color: #9afcff;
+  box-shadow: var(--dual-glow);
+}
+:where(#btn-expandir-ritual){
+  border-color: rgba(0,255,255,.35);
+  background: radial-gradient(120% 120% at 50% 30%, rgba(0,255,255,.25), rgba(255,0,255,.22));
+  box-shadow: var(--dual-glow);
+}
+:where(#koblluxPlayer){
+  background: rgba(12,17,28,.7);
+  border:1px solid rgba(0,255,255,.3);
+}
+</style>
+<style id="theme-lux-inline">
+:root{
+  --gold:#d4af37; --gold-2:#ffd34d; --ink:#f2f3f5;
+  --ring: 0 0 0 1px rgba(212,175,55,.25), 0 10px 40px rgba(0,0,0,.45);
+}
+:where(.response-container){
+  border:1px solid rgba(212,175,55,.28);
+  background: linear-gradient(180deg, rgba(18,16,10,.72), rgba(18,16,10,.58));
+  box-shadow: 0 18px 52px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,215,128,.05);
+}
+:where(.response-block){
+  background: linear-gradient(135deg, rgba(212,175,55,.12), rgba(255,215,128,.08));
+  border-left:4px solid rgba(212,175,55,.6);
+  box-shadow: var(--ring);
+}
+:where(.input-container input[type="text"]){
+  color:var(--ink);
+  border-color: rgba(212,175,55,.3);
+  background: rgba(255,255,255,.06);
+}
+:where(.input-container input[type="text"]:focus){
+  border-color: rgba(212,175,55,.6);
+  background: rgba(255,255,255,.12);
+  box-shadow: var(--ring);
+}
+:where(.input-container button){
+  border-color: rgba(212,175,55,.35);
+  background: linear-gradient(90deg, var(--gold), var(--gold-2));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+:where(.symbol-button){
+  border-color: rgba(212,175,55,.35);
+  background: rgba(22,18,10,.72);
+  color: #ffe8a6;
+  box-shadow: var(--ring);
+}
+:where(#btn-expandir-ritual){
+  border-color: rgba(212,175,55,.45);
+  background: radial-gradient(120% 120% at 50% 30%, rgba(212,175,55,.25), rgba(255,215,128,.22));
+  box-shadow: var(--ring);
+}
+:where(#koblluxPlayer){
+  background: rgba(22,18,10,.76);
+  border:1px solid rgba(212,175,55,.32);
+}
+</style>
+</head>
+<body data-theme="neon">
+<header>
+  <h1>Infodose · Símbolo ⇄ Som <span class="badge">HTML Único</span></h1>
+  <small>Suba faixas (upload ou link), cole seu texto/ASCII, gere <em>cues</em>, aperte ▶ e viva o fluxo simbiótico.</small>
+</header>
+
+<main>
+  <!-- COLUNA ESQUERDA: Biblioteca de Trilhas -->
+  <section>
+    <h3>🎧 Biblioteca de Trilhas</h3>
+    <div class="content stack">
+      <div class="row">
+        <label class="btn ghost" for="fileInput">+ Upload (mp3/wav)</label>
+        <input id="fileInput" type="file" accept="audio/*" multiple style="display:none">
+        <button id="btnClearUploads" class="btn">Limpar uploads (sessão)</button>
+      </div>
+
+      <div class="row">
+        <input id="repoTitle" type="text" placeholder="Título da trilha (ex.: Pulse — Groove 01)">
+      </div>
+      <div class="row">
+        <input id="repoURL" type="text" placeholder="URL direta do .mp3/.wav (S3/CDN ou seu link público)">
+      </div>
+      <div class="row">
+        <select id="repoTag">
+          <option value="general">Tag: general</option>
+          <option value="calm">Tag: calm</option>
+          <option value="focus">Tag: focus</option>
+          <option value="energy">Tag: energy</option>
+          <option value="mystic">Tag: mystic</option>
+        </select>
+        <button id="btnAddRepo" class="btn ok">+ Adicionar do Repositório</button>
+      </div>
+
+      <div class="lib-list" id="libList"></div>
+      <div class="small">Dica: as trilhas de upload ficam disponíveis nesta sessão. As do repositório (links) ficam salvas em <code class="k">localStorage</code>.</div>
+    </div>
+  </section>
+
+  <!-- COLUNA DIREITA: Texto, Cues e Player -->
+  <section>
+    <h3>📝 Texto / ASCII → Cues</h3>
+    <div class="content stack">
+      <textarea id="inputText" placeholder="Cole aqui sua resposta/manifesto com símbolos (⊙, ⇄, △, ☆彡, ∞, §, ♫, #, ▦...). Uma linha = um bloco que vira cue."></textarea>
+
+      <div class="row">
+        <div>
+          <label>Seg/linha</label>
+          <input id="secPerLine" type="number" min="1" max="30" value="4">
+        </div>
+        <div>
+          <label>Crossfade (s)</label>
+          <input id="crossfade" type="number" min="0" max="10" value="1.0">
+        </div>
+        <div>
+          <label>Loop ∞</label>
+          <select id="loopMode">
+            <option value="auto">Auto (símbolo ∞)</option>
+            <option value="forceOn">Forçar ON</option>
+            <option value="forceOff">Forçar OFF</option>
+          </select>
+        </div>
+        <div>
+          <label>Modo fonte</label>
+          <select id="sourceMode">
+            <option value="tag">Por tag do símbolo</option>
+            <option value="rotate">Rotação simples</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="btnGen" class="btn primary">Analisar & Agendar</button>
+        <button id="btnExport" class="btn">Exportar Cues (JSON)</button>
+        <button id="btnLoadDemo" class="btn">Demo Texto</button>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+
+      <div class="row">
+        <button id="btnPlay" class="btn ok">▶ Play</button>
+        <button id="btnPause" class="btn">⏸ Pausar</button>
+        <button id="btnStop" class="btn">⏹️ Parar</button>
+        <button id="btnPrev" class="btn">⏮️ Voltar</button>
+        <button id="btnNext" class="btn">⏭️ Avançar</button>
+      </div>
+
+      <div class="row">
+        <div class="card" style="flex:1">
+          <h3>🧭 Agora</h3>
+          <div class="content stack">
+            <div>Estado: <span id="state">idle</span></div>
+            <div>Faixa: <span id="nowTrack">—</span></div>
+            <div>Cue: <span id="nowCue">—</span></div>
+          </div>
+        </div>
+        <div class="card" style="flex:1">
+          <h3>🔣 Legenda Símbolos → Perfil</h3>
+          <div class="content legend">
+            <div class="L">⊙ UNO → <b>calm</b> (centro)</div>
+            <div class="L">⇄ DUAL → <b>energy</b> (autopan)</div>
+            <div class="L">△ TRINITY → <b>mystic</b> (reverb)</div>
+            <div class="L">☆彡 ESTÉTICO → <b>bright</b> (high-shelf)</div>
+            <div class="L">§ QA → <b>focus</b> (lowpass suave)</div>
+            <div class="L">∞ SAFE → <b>loop</b> (repetição)</div>
+            <div class="L">♫ PULSE → <b>energy+</b> (ganho)</div>
+            <div class="L"># 78K → <b>master</b> (compressor)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ascii" aria-hidden="true">
+╔═╗  PORTAL SONORO
+║ ⊙ UNO | ⇄ DUAL | △ TRINITY | ☆彡
+╚═╝  STATUS: ONLINE
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer>
+  Feito com Web Audio API · Salva o repositório em localStorage · Uploads vivem só na sessão · ⟲ símbolo ⇄ som
+</footer>
+
+<script>
+/* ============================================================
+   INFODOSE · SÍMBOLO ⇄ SOM  —  HTML ÚNICO
+   - Upload/repositório de trilhas
+   - Parse de texto/ASCII → cues temporizados
+   - Mapeamento de símbolos → perfis (EQ, pan, reverb, loop)
+   - Crossfade entre faixas, autopan DUAL, reverb TRINITY
+   - Persistência básica de repositório (localStorage)
+   - Controles: ▶ ⏸ ⏹ ⏮ ⏭
+============================================================ */
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+const els = {
+  fileInput: $('#fileInput'),
+  btnClearUploads: $('#btnClearUploads'),
+  repoTitle: $('#repoTitle'),
+  repoURL: $('#repoURL'),
+  repoTag: $('#repoTag'),
+  btnAddRepo: $('#btnAddRepo'),
+  libList: $('#libList'),
+  inputText: $('#inputText'),
+  secPerLine: $('#secPerLine'),
+  crossfade: $('#crossfade'),
+  loopMode: $('#loopMode'),
+  sourceMode: $('#sourceMode'),
+  btnGen: $('#btnGen'),
+  btnExport: $('#btnExport'),
+  btnLoadDemo: $('#btnLoadDemo'),
+  timeline: $('#timeline'),
+  btnPlay: $('#btnPlay'),
+  btnPause: $('#btnPause'),
+  btnStop: $('#btnStop'),
+  btnPrev: $('#btnPrev'),
+  btnNext: $('#btnNext'),
+  state: $('#state'),
+  nowTrack: $('#nowTrack'),
+  nowCue: $('#nowCue'),
+};
+
+let AudioCtx;
+let ctx;
+let master = { gain:null, comp:null };
+let fx = { panner:null, lowpass:null, highshelf:null, lowshelf:null, convolver:null, lfo:null, lfoGain:null };
+let deckA = null, deckB = null, activeDeck = 'A';
+let library = { uploads:[], repo: loadRepoFromLS() };
+let cues = [];
+let playTimer = null;
+let cueIndex = -1;
+let isPlaying = false;
+let startAt = 0;
+let t0 = 0;
+
+// ====== INIT AUDIO ======
+function ensureAudio(){
+  if(ctx) return;
+  AudioCtx = window.AudioContext || window.webkitAudioContext;
+  ctx = new AudioCtx();
+
+  // Master
+  master.gain = ctx.createGain();
+  master.gain.gain.value = 0.9;
+
+  master.comp = ctx.createDynamicsCompressor();
+  master.comp.threshold.setValueAtTime(-16, ctx.currentTime);
+  master.comp.ratio.setValueAtTime(3.0, ctx.currentTime);
+  master.comp.attack.setValueAtTime(0.01, ctx.currentTime);
+  master.comp.release.setValueAtTime(0.25, ctx.currentTime);
+
+  // FX chain
+  fx.lowpass = ctx.createBiquadFilter(); fx.lowpass.type = 'lowpass'; fx.lowpass.frequency.value = 20000;
+  fx.highshelf = ctx.createBiquadFilter(); fx.highshelf.type = 'highshelf'; fx.highshelf.frequency.value = 6000; fx.highshelf.gain.value = 0;
+  fx.lowshelf = ctx.createBiquadFilter(); fx.lowshelf.type = 'lowshelf'; fx.lowshelf.frequency.value = 200; fx.lowshelf.gain.value = 0;
+
+  fx.panner = ctx.createStereoPanner(); fx.panner.pan.value = 0;
+
+  fx.convolver = ctx.createConvolver();
+  fx.convolver.buffer = makeSimpleIR(ctx, 1.4); // reverb curto
+
+  // LFO para autopan do DUAL
+  fx.lfo = ctx.createOscillator(); fx.lfo.type = 'sine'; fx.lfo.frequency.value = 0.25;
+  fx.lfoGain = ctx.createGain(); fx.lfoGain.gain.value = 0; // ligado quando DUAL
+  fx.lfo.connect(fx.lfoGain).connect(fx.panner.pan);
+  fx.lfo.start();
+
+  // Master chain
+  // source -> lowshelf -> lowpass -> highshelf -> panner -> convolver -> comp -> gain -> dest
+  fx.lowshelf.connect(fx.lowpass);
+  fx.lowpass.connect(fx.highshelf);
+  fx.highshelf.connect(fx.panner);
+  fx.panner.connect(fx.convolver);
+  fx.convolver.connect(master.comp);
+  master.comp.connect(master.gain).connect(ctx.destination);
+
+  // Decks
+  deckA = makeDeck('A'); deckB = makeDeck('B');
+}
+
+// Simple noise IR
+function makeSimpleIR(ctx, seconds=1.2){
+  const rate = ctx.sampleRate;
+  const length = rate * seconds;
+  const ir = ctx.createBuffer(2, length, rate);
+  for(let ch=0; ch<2; ch++){
+    const data = ir.getChannelData(ch);
+    for(let i=0; i<length; i++){
+      // decaimento exponencial
+      data[i] = (Math.random()*2-1) * Math.pow(1 - i/length, 2.5) * 0.6;
+    }
+  }
+  return ir;
+}
+
+function makeDeck(name){
+  const audio = new Audio();
+  audio.crossOrigin = "anonymous";
+  audio.loop = false;
+  audio.preload = 'metadata';
+  const src = ctx.createMediaElementSource(audio);
+  const gain = ctx.createGain();
+  gain.gain.value = 0.0; // começa mutado
+  src.connect(fx.lowshelf); // ambos decks convergem no início da cadeia FX
+  return { name, audio, src, gain };
+}
+
+// ====== LIBRARY HANDLING ======
+function loadRepoFromLS(){
+  try{ return JSON.parse(localStorage.getItem('infodose_repo')||'[]'); }catch(e){ return [] }
+}
+function saveRepoToLS(){
+  localStorage.setItem('infodose_repo', JSON.stringify(library.repo));
+}
+function renderLibrary(){
+  els.libList.innerHTML = '';
+  const all = [...library.uploads, ...library.repo];
+  if(!all.length){
+    els.libList.innerHTML = `<div class="small">Sem trilhas ainda. Faça upload (botão acima) ou adicione links do seu repositório.</div>`;
+    return;
+  }
+  all.forEach((t,i)=>{
+    const div = document.createElement('div');
+    div.className = 'lib-item';
+    div.innerHTML = `
+      <div class="row">
+        <div style="flex:2; min-width:160px">
+          <div><b>${escapeHTML(t.title||'(sem título)')}</b></div>
+          <div class="small">${t.type==='upload' ? 'upload (sessão)' : 'repositório'}</div>
+        </div>
+        <div>
+          <select data-idx="${i}" class="tagSel">
+            ${['general','calm','focus','energy','mystic'].map(tag=>`<option ${t.tag===tag?'selected':''} value="${tag}">${tag}</option>`).join('')}
+          </select>
+        </div>
+        <div style="flex:1" class="small">${t.type==='repo' ? truncate(t.url,42) : '(blob local)'}</div>
+        <div><button class="btn ghost rm" data-idx="${i}">remover</button></div>
+      </div>
+    `;
+    els.libList.appendChild(div);
+  });
+
+  // handlers
+  $$('.tagSel').forEach(sel=>{
+    sel.onchange = (e)=>{
+      const idx = Number(sel.dataset.idx);
+      const all = [...library.uploads, ...library.repo];
+      const item = all[idx];
+      item.tag = sel.value;
+      // write back
+      if(item.type==='repo'){
+        const pos = library.repo.findIndex(x=>x.id===item.id);
+        if(pos>-1){ library.repo[pos]=item; saveRepoToLS(); }
+      }else{
+        const pos = library.uploads.findIndex(x=>x.id===item.id);
+        if(pos>-1){ library.uploads[pos]=item; }
+      }
+    }
+  });
+  $$('.rm').forEach(btn=>{
+    btn.onclick = ()=>{
+      const idx = Number(btn.dataset.idx);
+      // count uploads len to determine which bucket
+      const totalUp = library.uploads.length;
+      if(idx<totalUp){
+        library.uploads.splice(idx,1);
+      }else{
+        library.repo.splice(idx-totalUp,1); saveRepoToLS();
+      }
+      renderLibrary();
+    };
+  });
+}
+
+function truncate(s,n){ return s.length>n ? s.slice(0,n-1)+'…' : s }
+function escapeHTML(s){ return s.replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])) }
+
+// Uploads
+els.fileInput.addEventListener('change', (e)=>{
+  ensureAudio();
+  const files = Array.from(e.target.files||[]);
+  files.forEach(file=>{
+    const url = URL.createObjectURL(file);
+    library.uploads.push({ id: 'up_'+crypto.randomUUID(), type:'upload', title:file.name, url, tag:'general' });
+  });
+  renderLibrary();
+});
+
+// Clear uploads
+els.btnClearUploads.onclick = ()=>{
+  library.uploads = [];
+  renderLibrary();
+};
+
+// Add repo
+els.btnAddRepo.onclick = ()=>{
+  const title = els.repoTitle.value.trim();
+  const url = els.repoURL.value.trim();
+  const tag = els.repoTag.value;
+  if(!url){ alert('Informe URL direta do áudio (.mp3/.wav).'); return; }
+  const item = { id:'repo_'+crypto.randomUUID(), type:'repo', title: title||url.split('/').pop(), url, tag };
+  library.repo.push(item);
+  saveRepoToLS();
+  els.repoTitle.value=''; els.repoURL.value='';
+  renderLibrary();
+};
+
+// ====== CUES ======
+function analyzeSymbols(line){
+  const sym = {
+    uno: /⊙|UNO/i.test(line),
+    dual: /⇄|DUAL/i.test(line),
+    tri: /△|TRINITY/i.test(line),
+    star: /☆彡/.test(line),
+    qa: /§/.test(line),
+    inf: /∞/.test(line),
+    pulse: /♫/.test(line),
+    root: /#|78K/.test(line),
+  };
+  // choose style/tag
+  let style = 'general';
+  if(sym.dual || sym.pulse) style = 'energy';
+  else if(sym.tri) style = 'mystic';
+  else if(sym.qa) style = 'focus';
+  else if(sym.uno) style = 'calm';
+
+  return { symbols: sym, style, raw: line };
+}
+
+function genCuesFromText(){
+  const raw = els.inputText.value;
+  const sec = Number(els.secPerLine.value)||4;
+  const lines = raw.split(/\r?\n/).map(s=>s.trim()).filter(s=>s.length>0);
+  let t = 0;
+  cues = lines.map((line, idx)=>{
+    const a = analyzeSymbols(line);
+    const dur = sec;
+    const loop = els.loopMode.value==='forceOn' ? true : els.loopMode.value==='forceOff' ? false : a.symbols.inf;
+    return { i:idx, tStart:t, tEnd:t+dur, dur, line:line, style:a.style, symbols:a.symbols, loop };
+  });
+  renderCues();
+}
+
+function renderCues(){
+  els.timeline.innerHTML = '';
+  cues.forEach(c=>{
+    const d = document.createElement('div');
+    d.className = 'cue';
+    d.dataset.idx = c.i;
+    d.innerHTML = `
+      <div class="meta">
+        <span class="badge">#${c.i+1}</span>
+        <span class="badge">t=${c.tStart.toFixed(1)}s..${c.tEnd.toFixed(1)}s</span>
+        <span class="badge">estilo=${c.style}</span>
+        ${c.loop ? '<span class="badge">∞ loop</span>' : ''}
+      </div>
+      <div>${escapeHTML(c.line)}</div>
+    `;
+    els.timeline.appendChild(d);
+  });
+}
+
+function setCueActive(i){
+  $$('.cue').forEach(n=>n.classList.remove('active'));
+  const el = $(`.cue[data-idx="${i}"]`);
+  if(el){ el.classList.add('active'); el.scrollIntoView({block:'nearest'}); }
+  els.nowCue.textContent = `${i+1}/${cues.length}`;
+}
+
+// ====== PLAYBACK ======
+function pickTrackFor(style){
+  const all = [...library.uploads, ...library.repo];
+  if(all.length===0) return null;
+
+  if(els.sourceMode.value==='rotate'){
+    // simple round-robin across all
+    pickTrackFor._i = (pickTrackFor._i||-1)+1;
+    return all[pickTrackFor._i % all.length];
+  }else{
+    // by tag
+    const primary = all.filter(x=>x.tag===style);
+    if(primary.length) {
+      pickTrackFor._i = (pickTrackFor._i||-1)+1;
+      return primary[pickTrackFor._i % primary.length];
+    }
+    // fallback: general or anything
+    const general = all.filter(x=>x.tag==='general');
+    if(general.length){
+      pickTrackFor._j = (pickTrackFor._j||-1)+1;
+      return general[pickTrackFor._j % general.length];
+    }
+    return all[0];
+  }
+}
+
+async function playCue(i){
+  if(!ctx) ensureAudio();
+  if(!cues.length) return;
+  cueIndex = Math.max(0, Math.min(i, cues.length-1));
+  const c = cues[cueIndex];
+  setCueActive(cueIndex);
+
+  // choose deck to play next
+  const nextDeck = activeDeck==='A'? deckB : deckA;
+  const curDeck = activeDeck==='A'? deckA : deckB;
+  const xfade = Math.max(0, Number(els.crossfade.value)||0);
+
+  // select track
+  const track = pickTrackFor(c.style);
+  els.nowTrack.textContent = track ? (track.title || track.url || 'synth') : 'synth';
+
+  // load into nextDeck or synth fallback
+  if(track){
+    try{
+      nextDeck.audio.src = track.url;
+      nextDeck.audio.loop = !!c.loop;
+      await nextDeck.audio.play(); // will auto-pause when muted; needed to buffer
+      nextDeck.audio.pause(); nextDeck.audio.currentTime = 0;
+    }catch(err){
+      console.warn('Falha ao pré-carregar áudio, usando fallback synth:', err);
+      // fallback handled below
+    }
+  }
+
+  // Apply FX profiles by symbols
+  applySymbolProfile(c.symbols);
+
+  // Start times
+  const now = ctx.currentTime;
+  const startNext = now + 0.02;
+
+  // fade in next
+  nextDeck.gain.gain.cancelScheduledValues(now);
+  nextDeck.gain.gain.setValueAtTime(0, now);
+  nextDeck.gain.gain.linearRampToValueAtTime(1.0, now + xfade);
+
+  // connect deck gains into chain head
+  // (we keep both decks connected to lowshelf entry)
+  try{
+    nextDeck.src.disconnect(); // in case of prior
+  }catch{}
+  try{
+    curDeck.src.disconnect();
+  }catch{}
+
+  // Route: deck gain -> lowshelf
+  nextDeck.src.connect(nextDeck.gain).connect(fx.lowshelf);
+  curDeck.src.connect(curDeck.gain).connect(fx.lowshelf);
+
+  // Start playback of nextDeck
+  try{
+    await nextDeck.audio.play();
+  }catch(e){
+    // if cannot play (CORS or autoplay denied), use synth fallback
+    synthFallback(nextDeck, c.loop);
+  }
+
+  // fade out current
+  const curNow = ctx.currentTime;
+  curDeck.gain.gain.cancelScheduledValues(curNow);
+  curDeck.gain.gain.setValueAtTime(curDeck.gain.gain.value, curNow);
+  curDeck.gain.gain.linearRampToValueAtTime(0.0, curNow + xfade);
+  setTimeout(()=>{ try{ curDeck.audio.pause(); }catch{} }, xfade*1000+60);
+
+  activeDeck = (activeDeck==='A'?'B':'A');
+}
+
+function synthFallback(deck, loop=false){
+  // Simple oscillator as safety
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 220;
+  gain.gain.value = 0.12;
+  osc.connect(gain).connect(fx.lowshelf);
+  osc.start();
+  setTimeout(()=>{ if(!loop){ try{osc.stop();}catch{} } }, 3500);
+}
+
+function applySymbolProfile(sym){
+  const now = ctx.currentTime;
+
+  // reset defaults
+  fx.lowpass.frequency.cancelScheduledValues(now);
+  fx.lowpass.frequency.linearRampToValueAtTime(20000, now+0.15);
+
+  fx.highshelf.gain.cancelScheduledValues(now);
+  fx.highshelf.gain.linearRampToValueAtTime(0, now+0.15);
+
+  fx.lowshelf.gain.cancelScheduledValues(now);
+  fx.lowshelf.gain.linearRampToValueAtTime(0, now+0.15);
+
+  fx.panner.pan.cancelScheduledValues(now);
+  fx.panner.pan.linearRampToValueAtTime(0, now+0.15);
+
+  fx.lfoGain.gain.cancelScheduledValues(now);
+  fx.lfoGain.gain.setValueAtTime(0, now);
+
+  // Compressor master for # / 78K
+  if(master.comp){
+    master.comp.threshold.setValueAtTime(sym.root? -22 : -16, now);
+    master.comp.ratio.setValueAtTime(sym.root? 4.5 : 3.0, now);
+  }
+
+  // per symbol boosts
+  if(sym.uno){ // calm center
+    fx.lowpass.frequency.linearRampToValueAtTime(6000, now+0.4);
+  }
+  if(sym.dual){ // autopan
+    fx.lfoGain.gain.linearRampToValueAtTime(0.8, now+0.25);
+    fx.lfo.frequency.setValueAtTime(0.3, now);
+  }
+  if(sym.tri){ // reverb presence via lowshelf trim + highshelf airy
+    fx.highshelf.gain.linearRampToValueAtTime(+6, now+0.5);
+  }
+  if(sym.star){ // bright aesthetic
+    fx.highshelf.gain.linearRampToValueAtTime(+8, now+0.4);
+  }
+  if(sym.qa){ // focus: lowpass stronger
+    fx.lowpass.frequency.linearRampToValueAtTime(3500, now+0.3);
+  }
+  if(sym.pulse){ // energy++
+    master.gain.gain.cancelScheduledValues(now);
+    master.gain.gain.setValueAtTime(master.gain.gain.value, now);
+    master.gain.gain.linearRampToValueAtTime(1.05, now+0.25);
+  }else{
+    master.gain.gain.cancelScheduledValues(now);
+    master.gain.gain.linearRampToValueAtTime(0.9, now+0.25);
+  }
+}
+
+// ====== TRANSPORT ======
+function play(){
+  if(!cues.length){ genCuesFromText(); if(!cues.length) return; }
+  ensureAudio();
+  if(ctx.state === 'suspended'){ ctx.resume(); }
+  isPlaying = true;
+  els.state.textContent = 'playing';
+  // schedule current cue (next if none)
+  if(cueIndex<0) cueIndex = 0;
+  playCue(cueIndex);
+  // timer to advance per cue duration
+  clearInterval(playTimer);
+  const tick = 125; // ms
+  let elapsed = 0;
+  playTimer = setInterval(()=>{
+    elapsed += tick/1000;
+    const c = cues[cueIndex];
+    if(!c) return;
+    if(elapsed >= c.dur){
+      elapsed = 0;
+      const next = cueIndex+1;
+      if(next < cues.length){
+        playCue(next);
+      }else{
+        // loop logic
+        const forceOn = els.loopMode.value==='forceOn';
+        const anyInf = c.loop || cues.some(q=>q.loop);
+        if(forceOn || anyInf){
+          playCue(0);
+        }else{
+          pause();
+        }
+      }
+    }
+  }, tick);
+}
+
+function pause(){
+  isPlaying = false;
+  els.state.textContent = 'paused';
+  try{ deckA.audio.pause(); }catch{}
+  try{ deckB.audio.pause(); }catch{}
+  if(ctx) ctx.suspend();
+  clearInterval(playTimer);
+}
+
+function stop(){
+  isPlaying = false;
+  els.state.textContent = 'stopped';
+  clearInterval(playTimer);
+  try{ deckA.audio.pause(); deckA.audio.currentTime=0; }catch{}
+  try{ deckB.audio.pause(); deckB.audio.currentTime=0; }catch{}
+  cueIndex = -1;
+  setCueActive(-1);
+}
+
+function prev(){ if(cues.length){ const n = Math.max(0, (cueIndex<=0?0:cueIndex-1)); playCue(n); } }
+function next(){ if(cues.length){ const n = Math.min(cues.length-1, cueIndex+1); playCue(n); } }
+
+// ====== EXPORT ======
+els.btnExport.onclick = ()=>{
+  if(!cues.length){ alert('Gere os cues primeiro.'); return; }
+  const data = {
+    createdAt: new Date().toISOString(),
+    secPerLine: Number(els.secPerLine.value)||4,
+    crossfade: Number(els.crossfade.value)||1,
+    loopMode: els.loopMode.value,
+    sourceMode: els.sourceMode.value,
+    cues
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'infodose_cues.json';
+  a.click();
+};
+
+// ====== UI EVENTS ======
+els.btnGen.onclick = ()=>{ genCuesFromText(); };
+els.btnPlay.onclick = ()=> play();
+els.btnPause.onclick = ()=> pause();
+els.btnStop.onclick = ()=> stop();
+els.btnPrev.onclick = ()=> prev();
+els.btnNext.onclick = ()=> next();
+
+document.addEventListener('keydown', (e)=>{
+  if(e.code==='Space'){ e.preventDefault(); isPlaying? pause() : play(); }
+  if(e.code==='ArrowRight'){ next(); }
+  if(e.code==='ArrowLeft'){ prev(); }
+});
+
+// Demo text
+els.btnLoadDemo.onclick = ()=>{
+  els.inputText.value =
+`╔═╗  PORTAL SONORO
+║ ⊙ UNO | ⇄ DUAL | △ TRINITY | ☆彡
+╚═╝  STATUS: ONLINE
+
+Oi dual, este é o começo, o primeiro pulso ⊙
+A ponte abre, a troca acontece ⇄ e o som respira
+A tríade expande △ e a estética acende ☆彡
+Entramos no fluxo ∞, sem crash, em presença
+QA observa §, a verdade vibra, seguimos
+
+♫ Pulse conduz a trilha, o corpo responde
+# 78K ativa o campo, todos os arquétipos em uníssono`;
+  genCuesFromText();
+};
+
+// render init
+renderLibrary();
+
+// ====== HELPERS ======
+</script>
+
+<!-- INLINE PATCH: TTS + layout helpers + shadow panel + keyboard→voice bridge -->
+<script>
+/*! KOBLLUX Voice Surgeon — Dual TTS (Artemis+Genus+Nova)
+ *  - Web Speech API (speechSynthesis) com 12 arquétipos
+ *  - Preferência pt-BR, fallback inteligentte
+ *  - Integra com inputs padrão do app (se existir) ou fala texto digitado
+ *  - UI embutível no #koblluxPlayer existente OU cria overlay não-destrutivo
+ */
+(function (global){
+  const LS_KEY = 'kobllux_tts_v1';
+  const Archetypes = [
+    // nome, {rate, pitch, volume, hints[]}
+    ["Inocente",       { rate: 1.0, pitch: 1.1, vol: 1.0, hints: ["pt-BR", "Brazil", "Google português (Brasil)", "Microsoft Maria"] }],
+    ["Cara Comum",     { rate: 1.0, pitch: 1.0, vol: 1.0, hints: ["pt-BR", "Google", "Microsoft"] }],
+    ["Herói",          { rate: 1.15, pitch: 0.95, vol: 1.0, hints: ["pt-BR", "Ricardo", "Gustavo", "Antônio"] }],
+    ["Cuidador",       { rate: 0.95, pitch: 1.05, vol: 1.0, hints: ["pt-BR", "Maria", "Letícia"] }],
+    ["Explorador",     { rate: 1.10, pitch: 1.05, vol: 1.0, hints: ["pt-BR"] }],
+    ["Criador",        { rate: 1.0,  pitch: 1.15, vol: 1.0, hints: ["pt-BR"] }],
+    ["Governante",     { rate: 0.95, pitch: 0.9,  vol: 1.0, hints: ["pt-BR"] }],
+    ["Mago",           { rate: 1.08, pitch: 1.08, vol: 1.0, hints: ["pt-BR"] }],
+    ["Amante",         { rate: 0.98, pitch: 1.12, vol: 1.0, hints: ["pt-BR"] }],
+    ["Bobo",           { rate: 1.2,  pitch: 1.2,  vol: 1.0, hints: ["pt-BR"] }],
+    ["Sábio",          { rate: 0.95, pitch: 1.02, vol: 1.0, hints: ["pt-BR"] }],
+    ["Fora da Lei",    { rate: 1.05, pitch: 0.85, vol: 1.0, hints: ["pt-BR"] }],
+  ];
+
+  const Util = {
+    qs: (s, r=document)=>r.querySelector(s),
+    qsa: (s, r=document)=>Array.from(r.querySelectorAll(s)),
+    save(state){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){} },
+    load(){ try{ return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e){ return {}; } },
+    prefers(lang, voice){ return voice && (voice.lang||"").toLowerCase().startsWith(lang.toLowerCase()); },
+    matchVoice(hints, list){
+      const lower = (s)=>s.toLowerCase();
+      for(const hint of hints){
+        const v = list.find(v=> lower(v.name).includes(lower(hint)) || lower(v.lang||"").includes(lower(hint)));
+        if(v) return v;
+      }
+      return null;
+    },
+    findInput(){
+      // tenta IDs comuns do app; fallback: primeiro input de texto visível
+      const ids = ['#userInput', '#txt', '.input-container input[type="text"]', 'input[type="text"]'];
+      for(const id of ids){
+        const el = Util.qs(id);
+        if(el) return el;
+      }
+      return null;
+    },
+    findLastMessage(){
+      const containers = ['.response-list', '#responseList', '#list'];
+      for(const c of containers){
+        const wrap = Util.qs(c);
+        if(!wrap) continue;
+        const arts = Util.qsa('article', wrap);
+        if(arts.length){
+          const last = arts[arts.length-1];
+          const div = Util.qs('div:last-child', last) || last;
+          return (div.textContent||"").trim();
+        }
+      }
+      return "";
+    }
+  };
+
+  const TTS = {
+    synth: window.speechSynthesis,
+    state: {
+      theme: 'neon',
+      autoSpeak: false,
+      archetype: 0, voiceURI: "", rate: 1.0, pitch: 1.0, vol: 1.0, hidden:false, lang: "pt-BR"
+    },
+    voices: [],
+    ui: null,
+    ensureUI(opts={}){
+      // Shadow host support via opts.attachNode
+      if(opts && opts.attachNode && opts.attachNode.nodeType===1){
+        let host = opts.attachNode;
+        if(!host.id) host.id = 'koblluxPlayer';
+        host.innerHTML = '';
+        this._buildUIInto(host);
+        return;
+      }
+
+      let host = document.getElementById('koblluxPlayer');
+      if(!host && opts.attachTo){
+        host = Util.qs(opts.attachTo);
+      }
+      if(!host){
+        host = document.createElement('div');
+        host.id = 'koblluxPlayer';
+        host.className = 'kobllux-player';
+        document.body.appendChild(host);
+      }
+      this._buildUIInto(host);
+    },
+
+    _buildUIInto(host){
+      host.innerHTML = `
+        <div class="kx-header">
+          <span class="kx-title">KOBLLUX • Voice</span>
+          <span class="kx-chip">TTS</span>
+          <span class="kx-dot" id="kxDot"></span>
+          <div class="kx-spacer"></div>
+          <button class="kx-btn kx-min" id="kxMin">–</button>
+        </div>
+        <div id="kxBody">
+          <div class="kx-row">
+            <button class="kx-btn" id="kxPlay">▶</button>
+            <button class="kx-btn" id="kxPause">⏸</button>
+            <button class="kx-btn" id="kxStop">■</button>
+            <div class="kx-spacer"></div>
+            <button class="kx-btn" id="kxSpeakInput" title="Falar input">⌨︎</button>
+            <button class="kx-btn" id="kxSpeakLast"  title="Falar última resposta">⟲</button>
+          </div>
+
+          <div class="kx-row">
+            <div class="kx-col">
+              <label class="kx-small">Arquétipo</label>
+              <select class="kx-select" id="kxArch"></select>
+            </div>
+            <div class="kx-col">
+              <label class="kx-small">Voz</label>
+              <select class="kx-select" id="kxVoice"></select>
+            </div>
+          </div>
+
+          <div class="kx-row compact">
+            <div class="kx-col">
+              <label class="kx-small">Rate <span id="kxRateVal"></span></label>
+              <input class="kx-range" id="kxRate" type="range" min="0.5" max="2" step="0.01" value="1.0">
+            </div>
+            <div class="kx-col">
+              <label class="kx-small">Pitch <span id="kxPitchVal"></span></label>
+              <input class="kx-range" id="kxPitch" type="range" min="0" max="2" step="0.01" value="1.0">
+            </div>
+            <div class="kx-col">
+              <label class="kx-small">Vol <span id="kxVolVal"></span></label>
+              <input class="kx-range" id="kxVol" type="range" min="0" max="1" step="0.01" value="1.0">
+            </div>
+          </div>
+
+          <div class="kx-row compact"><label class="kx-small"><input type="checkbox" id="kxAuto"> Falar automaticamente ao enviar</label></div>
+          <div class="kx-footer">
+            <select class="kx-select" id="kxTheme"><option value="dark">Dark</option><option value="light">Light</option><option value="neon">Neon</option><option value="vibe">Vibe</option><option value="lux">Lux</option></select>
+            <input id="kxText" class="kx-text kx-grow" placeholder="Texto para falar (opcional)">
+            <button class="kx-btn" id="kxSpeakText">Falar</button>
+            <button class="kx-btn" id="kxHide">Ocultar</button>
+          </div>
+          <div class="kx-inline-note kx-muted">Dica: defina o arquétipo e ajuste {rate, pitch, vol}. As vozes reais dependem do seu sistema/navegador.</div>
+        </div>
+      `;
+      this.ui = { /* toggle auto-speak will be bound later */
+        host,
+        min: Util.qs('#kxMin', host),
+        body: Util.qs('#kxBody', host),
+        dot: Util.qs('#kxDot', host),
+        play: Util.qs('#kxPlay', host),
+        pause: Util.qs('#kxPause', host),
+        stop: Util.qs('#kxStop', host),
+        arch: Util.qs('#kxArch', host),
+        voice: Util.qs('#kxVoice', host),
+        rate: Util.qs('#kxRate', host),
+        pitch: Util.qs('#kxPitch', host),
+        vol: Util.qs('#kxVol', host),
+        rateVal: Util.qs('#kxRateVal', host),
+        pitchVal: Util.qs('#kxPitchVal', host),
+        volVal: Util.qs('#kxVolVal', host),
+        text: Util.qs('#kxText', host),
+        speakText: Util.qs('#kxSpeakText', host),
+        speakInput: Util.qs('#kxSpeakInput', host),
+        speakLast: Util.qs('#kxSpeakLast', host),
+        hide: Util.qs('#kxHide', host),
+        themeSel: Util.qs('#kxTheme', host),
+        auto: Util.qs('#kxAuto', host),
+      };
+      this.ui.min.addEventListener('click', ()=>{
+        const h = this.ui.host;
+        const c = h.classList.toggle('kx-hidden');
+        this.state.hidden = c;
+        Util.save(this.state);
+      });
+    },
+
+    populateArchetypes(){
+      const s = this.ui.arch;
+      s.innerHTML = "";
+      Archetypes.forEach(([name], i)=>{
+        const opt = document.createElement('option');
+        opt.value = i; opt.textContent = `${i+1}. ${name}`;
+        s.appendChild(opt);
+      });
+      s.value = String(this.state.archetype);
+      s.addEventListener('change', ()=>{
+        this.state.archetype = parseInt(s.value,10);
+        this.applyArchetypeDefaults();
+        this.updateUIFromState();
+        Util.save(this.state);
+      });
+    },
+
+    loadVoicesOnce(){
+      return new Promise(resolve=>{
+        const load = ()=>{
+          const list = this.synth.getVoices();
+          if(list && list.length){
+            this.voices = list.slice().sort((a,b)=> (a.lang||"").localeCompare(b.lang||""));
+            resolve(this.voices);
+          } else {
+            // alguns navegadores precisam de async load
+            setTimeout(load, 150);
+          }
+        };
+        load();
+      });
+    },
+
+    populateVoices(){
+      const s = this.ui.voice;
+      s.innerHTML = "";
+      this.voices.forEach(v=>{
+        const opt = document.createElement('option');
+        opt.value = v.voiceURI || v.name;
+        opt.textContent = `${v.name} — ${v.lang}`;
+        s.appendChild(opt);
+      });
+      // escolher baseado no estado/hints
+      let chosen = this.voices.find(v=> (v.voiceURI||v.name) === this.state.voiceURI);
+      if(!chosen){
+        const [_, cfg] = Archetypes[this.state.archetype];
+        chosen = Util.matchVoice([this.state.lang, ...(cfg.hints||[])], this.voices) || this.voices.find(v=>Util.prefers(this.state.lang, v)) || this.voices[0];
+      }
+      if(chosen){
+        this.state.voiceURI = chosen.voiceURI || chosen.name;
+        s.value = this.state.voiceURI;
+      }
+      s.addEventListener('change', ()=>{
+        this.state.voiceURI = s.value;
+        Util.save(this.state);
+      });
+    },
+
+    applyArchetypeDefaults(){
+      const [_, cfg] = Archetypes[this.state.archetype];
+      if(!cfg) return;
+      this.state.rate  = cfg.rate;
+      this.state.pitch = cfg.pitch;
+      this.state.vol   = cfg.vol;
+    },
+
+    updateUIFromState(){
+      const st = this.state;
+      this.ui.rate.value = st.rate; this.ui.pitch.value = st.pitch; this.ui.vol.value = st.vol;
+      this.ui.rateVal.textContent = Number(st.rate).toFixed(2);
+      this.ui.pitchVal.textContent = Number(st.pitch).toFixed(2);
+      this.ui.volVal.textContent = Number(st.vol).toFixed(2);
+      if(st.hidden) this.ui.host.classList.add('kx-hidden'); else this.ui.host.classList.remove('kx-hidden');
+    },
+
+    bindControls(){
+      const st = this.state;
+      this.ui.rate.addEventListener('input', ()=>{ st.rate = +this.ui.rate.value; this.updateUIFromState(); Util.save(st); });
+      this.ui.pitch.addEventListener('input', ()=>{ st.pitch = +this.ui.pitch.value; this.updateUIFromState(); Util.save(st); });
+      this.ui.vol.addEventListener('input', ()=>{ st.vol = +this.ui.vol.value; this.updateUIFromState(); Util.save(st); });
+
+      this.ui.play.addEventListener('click', ()=>{
+        const txt = this.ui.text.value.trim() || Util.findInput()?.value?.trim() || Util.findLastMessage() || 'Sem texto.';
+        this.speak(txt);
+      });
+      this.ui.speakText.addEventListener('click', ()=>{
+        const txt = this.ui.text.value.trim();
+        if(txt) this.speak(txt);
+      });
+      this.ui.speakInput.addEventListener('click', ()=>{
+        const input = Util.findInput();
+        const txt = input ? (input.value||"").trim() : "";
+        if(txt) this.speak(txt); else alert("Não encontrei texto no input.");
+      });
+      this.ui.speakLast.addEventListener('click', ()=>{
+        const txt = Util.findLastMessage();
+        if(txt) this.speak(txt); else alert("Sem última resposta para falar.");
+      });
+      this.ui.pause.addEventListener('click', ()=>{
+        if(this.synth.speaking && !this.synth.paused) this.synth.pause();
+        else if(this.synth.paused) this.synth.resume();
+      });
+      this.ui.stop.addEventListener('click', ()=>{
+        this.synth.cancel();
+      });
+      this.ui.auto = Util.qs('#kxAuto', this.ui.host);
+      this.ui.auto.checked = this.state.autoSpeak;
+      this.ui.auto.addEventListener('change', ()=>{ this.state.autoSpeak=this.ui.auto.checked; Util.save(this.state); });
+
+      this.ui.hide.addEventListener('click', ()=>{
+        this.ui.host.style.display = 'none';
+        this.state.hidden = true; Util.save(this.state);
+      });
+    },
+
+    isAutoSpeakEnabled(){ return !!this.state.autoSpeak; },
+
+    setTheme(theme){
+      try{
+        this.state.theme = theme; Util.save(this.state);
+        document.body.setAttribute('data-theme', theme);
+        // notify shadow panels too
+        window.dispatchEvent(new CustomEvent('DualThemeChanged', { detail:{ theme } }));
+      }catch(e){}
+    },
+
+    currentVoice(){
+      return this.voices.find(v=> (v.voiceURI||v.name) === this.state.voiceURI) || null;
+    },
+
+    speak(text){
+      if(!('speechSynthesis' in window)){
+        alert("Seu navegador não suporta Speech Synthesis.");
+        return;
+      }
+      this.synth.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = this.state.rate;
+      u.pitch = this.state.pitch;
+      u.volume = this.state.vol;
+      const v = this.currentVoice();
+      if(v){ u.voice = v; u.lang = v.lang || this.state.lang; }
+      else { u.lang = this.state.lang; }
+      const dot = this.ui.dot;
+      u.onstart = ()=> dot.style.background = '#0f0';
+      u.onend = ()=> dot.style.background = '#0ff';
+      u.onerror = ()=>{ dot.style.background = '#f00'; };
+      this.synth.speak(u);
+    },
+
+    async init(opts={}){
+      // estado
+      const saved = Util.load();
+      Object.assign(this.state, saved, opts || {});
+      this.ensureUI(opts);
+      this.populateArchetypes();
+      this.applyArchetypeDefaults();
+      await this.loadVoicesOnce();
+      this.populateVoices();
+      this.bindControls();
+      if(this.ui.themeSel){ this.ui.themeSel.value = this.state.theme || 'neon'; this.ui.themeSel.addEventListener('change', ()=> this.setTheme(this.ui.themeSel.value)); }
+      this.setTheme(this.state.theme || 'neon');
+      this.updateUIFromState();
+      // atualiza lista ao evento assíncrono (Chrome)
+      window.speechSynthesis.onvoiceschanged = async ()=>{
+        await this.loadVoicesOnce();
+        this.populateVoices();
+      };
+      return this;
+    }
+  };
+
+  global.DualTTS = TTS;
+})(window);
+</script>
+<script>(function(){
+  function setVH(){ const vh = window.innerHeight * 0.01; document.documentElement.style.setProperty('--vh', vh + 'px'); }
+  setVH(); addEventListener('resize', setVH);
+  function setSafeBottom(){
+    const test = getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)');
+    const px = (parseInt(test) || 0) + 'px';
+    document.documentElement.style.setProperty('--safe-bottom', px);
+  }
+  setSafeBottom();
+  let lastH = window.innerHeight;
+  function detectKB(){
+    const h = window.innerHeight;
+    const delta = Math.abs(h - lastH);
+    if (delta > 120){ document.body.setAttribute('data-kb', h < lastH ? 'open' : 'closed'); lastH = h; }
+  }
+  addEventListener('resize', detectKB);
+  if(!document.body.dataset.gap){ document.body.dataset.gap = 'med'; }
+})();
+</script>
+<script>
+/*! Dual Shadow Surgeon Panel — hosts KOBLLUX player inside Shadow DOM */
+(function(){
+  // Create panel host
+  const panel = document.createElement('div');
+  panel.id = 'dual-shadow-panel-host';
+  Object.assign(panel.style, {
+    position:'fixed', right:'12px', bottom:'12px', zIndex:'99998',
+    width:'min(96vw, 360px)', maxWidth:'360px',
+    borderRadius:'18px', border:'1px solid rgba(125,249,255,.22)',
+    backdropFilter:'blur(10px) saturate(160%)',
+    WebkitBackdropFilter:'blur(10px) saturate(160%)',
+    boxShadow:'0 16px 48px rgba(0,0,0,.45)', overflow:'hidden'
+  });
+  document.body.appendChild(panel);
+  const root = panel.attachShadow({mode:'open'});
+
+  // Minimal CSS for player inside Shadow
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Theme bridge */
+    :host,[data-theme]{ --c1: inherit; --c2: inherit; --ink: inherit; }
+
+    :host{ all:initial; contain: content; }
+    .wrap{ all:unset; display:block; background:rgba(14,16,22,.78); color:#e8ecf1; font: 13px/1.4 system-ui, -apple-system, Segoe UI, Inter, Roboto, Arial; }
+    .drag{ all:unset; display:flex; align-items:center; gap:8px; padding:8px 10px; border-bottom:1px solid rgba(125,249,255,.18); background:linear-gradient(180deg, rgba(10,14,23,.9), rgba(10,14,23,0)); cursor: default;}
+    .title{ font-weight:700; letter-spacing:.2px }
+    .pill{ font-size:11px; padding:2px 6px; border-radius:999px; border:1px solid rgba(125,249,255,.22); background:rgba(255,255,255,.06) }
+    #shadowPlayerHost{ all:unset; display:block; padding:10px }
+    .min{ margin-left:auto; border:1px solid rgba(125,249,255,.25); border-radius:8px; padding:4px 8px; background:rgba(255,255,255,.06); color:#e8ecf1; cursor:pointer}
+    .hidden #shadowPlayerHost{ display:none }
+  `;
+  root.appendChild(style);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'wrap';
+  wrap.innerHTML = `
+    <div class="drag"><span class="title">Shadow Surgeon</span><span class="pill">Sandbox</span><button class="min" id="minBtn">–</button></div>
+    <div id="shadowPlayerHost"></div>
+  `;
+  root.appendChild(wrap);
+
+  // minimize toggle
+  root.getElementById('minBtn').addEventListener('click', ()=> wrap.classList.toggle('hidden'));
+
+  // Theme sync
+  function applyTheme(theme){ wrap.setAttribute('data-theme', theme); }
+  window.addEventListener('DualThemeChanged', (e)=> applyTheme(e.detail?.theme||'neon'));
+  applyTheme((window.DualTTS && DualTTS.state && DualTTS.state.theme) || 'neon');
+
+  // Initialize TTS into shadow using attachNode
+  if (window.DualTTS && typeof window.DualTTS.init === 'function'){
+    window.DualTTS.init({ lang:'pt-BR', attachNode: root.getElementById('shadowPlayerHost') });
+  } else {
+    // If script loaded later, try again
+    window.addEventListener('DualTTSReady', ()=>{
+      window.DualTTS.init({ lang:'pt-BR', attachNode: root.getElementById('shadowPlayerHost') });
+    }, { once:true });
+  }
+})();
+</script>
+<script>
+/*! Keyboard↔Voice Bridge — auto-fala no envio */
+(function(){
+  function captureInputValue(){
+    const el = document.querySelector('#userInput, #txt, .input-container input[type="text"], input[type="text"]');
+    return el ? (el.value||"").trim() : "";
+  }
+  function onSendTriggered(){
+    const txt = captureInputValue();
+    if(!txt) return;
+    setTimeout(()=>{
+      if(window.DualTTS && typeof window.DualTTS.speak === 'function' && window.DualTTS.state.autoSpeak){
+        window.DualTTS.speak(txt);
+      }
+    }, 80);
+  }
+  // Hook buttons
+  function hook(){
+    const btns = Array.from(document.querySelectorAll('#btnSend, #send, .input-container button[title="Enviar"], .input-container button'));
+    btns.forEach(b=>{
+      if(b.__kvHooked) return;
+      b.__kvHooked = true;
+      b.addEventListener('click', onSendTriggered, true);
+      b.addEventListener('mousedown', ()=>setTimeout(onSendTriggered,0), true);
+    });
+    // Hook Enter key on inputs
+    const inputs = Array.from(document.querySelectorAll('.input-container input[type="text"], input[type="text"]'));
+    inputs.forEach(i=>{
+      if(i.__kvHooked) return;
+      i.__kvHooked = true;
+      i.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ onSendTriggered(); } }, true);
+    });
+  }
+  hook();
+  // Observe dynamic changes
+  const mo = new MutationObserver(hook);
+  mo.observe(document.documentElement, { childList:true, subtree:true });
+})();
+</script>
+<script>
+  // Boot: default theme Neon; init TTS and layout helpers (mobile)
+  document.documentElement.setAttribute('data-theme', 'neon');
+  if(!document.body.hasAttribute('data-theme')) document.body.setAttribute('data-theme','neon');
+  if (window.DualTTS && typeof window.DualTTS.init === 'function') {
+    window.DualTTS.init({ lang: 'pt-BR', attachTo: '#koblluxPlayer' });
+    window.dispatchEvent(new Event('DualTTSReady'));
+  } else {
+    window.addEventListener('DualTTSReady', ()=>{
+      window.DualTTS.init({ lang: 'pt-BR', attachTo: '#koblluxPlayer' });
+    }, { once:true });
+  }
+</script>
+
+</body>
+</html>
