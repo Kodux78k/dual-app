@@ -1,0 +1,762 @@
+/* Base CSS replicating the visual style of the original Dual_App. */
+
+/* Theme tokens and general animations */
+:root {
+  --bg: linear-gradient(to bottom, #000, #1a1a1a);
+  --text: #d7d7d7;
+  --fast: .4s;
+  --med: .8s;
+  --slow: 1.8s;
+  --safe-b: max(12px, env(safe-area-inset-bottom));
+}
+
+/* Theme variants */
+body.light { --bg: linear-gradient(to bottom, #666, #e0e0e0); --text: #444; }
+body.medium { --bg: linear-gradient(to bottom, #555, #333); --text: #eee; }
+body.vibe { --bg: linear-gradient(135deg, #00d8d8, #d800d8); --text: #fff; }
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+  transition: background var(--slow), color var(--slow);
+  animation: fadeIn var(--slow) ease forwards;
+}
+
+/* Key animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes clickPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes expandFooter {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.96);
+  }
+}
+
+@keyframes moveGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.012);
+  }
+}
+
+/* Theme toggle button */
+#themeToggle {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--text);
+  border-radius: 50%;
+  background: transparent;
+  opacity: .3;
+  cursor: pointer;
+  transition: opacity var(--med), border-color var(--med);
+  z-index: 10;
+}
+
+#themeToggle:hover {
+  opacity: .8;
+}
+
+/* Assistant graphic container */
+.svg-container {
+  position: absolute;
+  top: 220px;
+  left: 50%;
+  width: 180px;
+  height: 180px;
+  transform: translateX(-50%);
+  z-index: 1;
+  filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.15));
+  transition: opacity var(--slow);
+}
+
+.svg-container.fading {
+  opacity: 0;
+}
+
+.svg-container object {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  animation: pulse 6s infinite ease-in-out;
+}
+
+#assistantName {
+  top: 199px;
+  font-size: 1.1em;
+  font-weight: 600;
+  opacity: .8;
+  transition: opacity var(--slow);
+}
+
+/* Response container */
+.response-container {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 156px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  z-index: 999;
+  transition: background var(--slow);
+  animation: fadeIn var(--slow) ease forwards;
+}
+
+body.light .response-container {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+body.medium .response-container {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+body.vibe .response-container {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Pages wrapper */
+.pages-wrapper {
+  transition: opacity var(--slow), height var(--slow);
+}
+
+.pages-wrapper.collapsed {
+  display: none;
+}
+
+.page {
+  display: none;
+  opacity: 0;
+  transition: opacity var(--slow);
+}
+
+.page.active {
+  display: block;
+  opacity: 1;
+}
+
+.page.initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+/* Footer text */
+.footer-text {
+  display: block;
+  margin: 12px auto;
+  padding: 6px 12px;
+  background: var(--bg);
+  opacity: .5;
+  color: var(--text);
+  font-size: 0.8em;
+  text-align: center;
+  font-style: italic;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: opacity var(--slow), transform var(--slow);
+  animation: moveGradient 8s linear infinite;
+}
+
+.footer-text.loading {
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+.footer-text.loading span {
+  background: none !important;
+}
+
+.footer-text:hover {
+  opacity: .6;
+}
+
+.footer-text.active {
+  opacity: .8;
+  animation: expandFooter var(--med) ease-out;
+}
+
+/* Response block controls */
+.response-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.light .response-controls {
+  border-top-color: rgba(0, 0, 0, 0.2);
+}
+
+body.medium .response-controls {
+  border-top-color: rgba(255, 255, 255, 0.2);
+}
+
+body.vibe .response-controls {
+  border-top-color: rgba(0, 0, 0, 0.4);
+}
+
+.control-buttons,
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.copy-button,
+.paste-button,
+.toggle-button,
+.kitty-button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--fast), opacity var(--slow);
+  opacity: .7;
+}
+
+.toggle-button,
+.kitty-button {
+  border-radius: 50%;
+}
+
+.copy-button:hover,
+.paste-button:hover,
+.toggle-button:hover,
+.kitty-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.toggle-button.active,
+.kitty-button.active {
+  opacity: 1;
+}
+
+.pagination button {
+  border: none;
+  background: linear-gradient(45deg, #0ff, #f0f);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: transform var(--fast);
+}
+
+.pagination button:hover {
+  transform: scale(1.2);
+}
+
+/* Response blocks */
+.response-block {
+  margin: 1rem 0;
+  padding: 1.8rem;
+  border-radius: 12px;
+  line-height: 1.8;
+  position: relative;
+  overflow: hidden;
+  animation: fadeIn var(--slow) ease forwards, pulse 12s infinite ease-in-out;
+  transition: box-shadow var(--fast), transform var(--fast);
+}
+
+.response-block:hover {
+  box-shadow: 0 0 15px rgba(0, 255, 255, .4);
+}
+
+.response-block.clicked {
+  animation: clickPulse var(--med) ease-out;
+}
+
+.response-block.expanded {
+  transform: scale(1.03);
+  background: rgba(0, 0, 0, .6);
+  z-index: 2;
+}
+
+/* Variants of response blocks */
+.intro {
+  background: linear-gradient(135deg, rgba(0, 255, 255, .2), rgba(0, 100, 100, .1));
+  border-left: 4px solid #0ff;
+}
+
+.middle {
+  background: linear-gradient(135deg, rgba(255, 255, 255, .05), rgba(50, 50, 50, .1));
+  border-left: 4px solid rgba(255, 255, 255, .4);
+}
+
+.ending {
+  background: linear-gradient(135deg, rgba(255, 0, 255, .2), rgba(100, 0, 100, .1));
+  border-left: 4px solid #f0f;
+}
+
+/* Input container */
+.input-container {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 90px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.input-container input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .1);
+  color: inherit;
+  font-size: 16px;
+  transition: background var(--fast);
+  opacity: 0.7;
+}
+
+.input-container input:focus {
+  background: rgba(255, 255, 255, .2);
+}
+
+.input-container button {
+  width: 60px;
+  height: 60px;
+  border: none;
+  background: linear-gradient(42deg, #0ff, #f0f);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 48px;
+  cursor: pointer;
+  animation: pulse 2s infinite ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--med);
+  opacity: .7;
+}
+
+.input-container button:hover {
+  transform: scale(1.1);
+}
+
+/* Login container (hidden by default) */
+.login-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  padding: 1.5rem 1rem;
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .15);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+  display: none;
+}
+
+.login-container.active {
+  display: block;
+}
+
+.login-container input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, .3);
+  margin: .8rem 0;
+  padding: .4rem 0;
+  font-size: .95em;
+  color: #fff;
+}
+
+.login-container input::placeholder {
+  color: rgba(255, 255, 255, .5);
+}
+
+.login-container button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: .5rem 0;
+  border: 1px solid #0ff;
+  border-radius: 8px;
+  background: transparent;
+  font-size: .95em;
+  color: #0ff;
+  cursor: pointer;
+  transition: background .25s, color .25s;
+}
+
+.login-container button:hover {
+  background: #0ff;
+  color: #000;
+}
+
+/* Additional overrides for patch manager and safe area */
+.response-container {
+  bottom: 98px !important;
+}
+
+.input-container.hidden,
+.control-buttons.hidden,
+.pagination.hidden {
+  display: none !important;
+}
+
+.footer-text.move-to-bottom {
+  position: fixed;
+  left: 20px;
+  right: 20px;
+  bottom: 12px;
+  margin: 0 auto;
+  z-index: 99999;
+  animation: moveFooterDown var(--fast) ease-out forwards;
+}
+
+@keyframes moveFooterDown {
+  from {
+    bottom: 69px;
+    opacity: 0.5;
+  }
+  to {
+    bottom: 12px;
+    opacity: 1;
+  }
+}
+
+.input-container {
+  bottom: 30px !important;
+}
+
+#btn-expandir-ritual {
+  bottom: 210px !important;
+}
+
+/* Click fix & patch manager design (preserved from original) */
+.input-container {
+  z-index: 200010 !important;
+  pointer-events: auto !important;
+}
+
+.response-container {
+  z-index: 200000 !important;
+}
+
+#particles-js,
+.svg-container,
+#pulsos-container,
+.symbol-bar {
+  pointer-events: none !important;
+}
+
+.symbol-bar .symbol-button {
+  pointer-events: auto !important;
+}
+
+#koblluxPlayer {
+  pointer-events: none !important;
+}
+
+#koblluxPlayer * {
+  pointer-events: auto !important;
+}
+
+.lock-button {
+  z-index: 200005 !important;
+}
+
+#patchMgrPanel {
+  bottom: calc(110px + var(--safe-b)) !important;
+  z-index: 200050 !important;
+  width: min(560px, 92vw);
+  max-height: calc(70vh - 120px) !important;
+  overflow: auto;
+  border-radius: 14px;
+  background: rgba(10, 12, 16, .84);
+  border: 1px solid rgba(255, 255, 255, .12);
+  backdrop-filter: blur(10px) saturate(160%);
+}
+
+#patchMgrPanel header {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, 0));
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+  margin: -12px -12px 8px;
+  padding: 10px 12px;
+  border-radius: 14px 14px 0 0;
+  cursor: move;
+}
+
+#patchList .pm-item {
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, .04);
+}
+
+#patchMgrBtn {
+  min-width: 34px;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* Secondary style section from original for controls and extras */
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.content {
+  width: 100%;
+  height: calc(100% - var(--safe-b));
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  position: absolute;
+  z-index: 1;
+}
+
+iframe.active {
+  opacity: 1;
+}
+
+.symbol-bar {
+  position: fixed;
+  top: 39%;
+  right: 15px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 40;
+}
+
+.symbol-button {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  opacity: 0.7;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.symbol-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.lock-button {
+  position: fixed;
+  bottom: 43px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  z-index: 183000;
+}
+
+/* Action buttons */
+#uploadComponentBtn,
+#remoteComponentBtn,
+#toggleDecoderBtn {
+  position: fixed;
+  left: 12px;
+  z-index: 90000;
+  padding: 4px;
+  border: none;
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-weight: bold;
+  font-size: 0.9em;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  border: 2px solid transparent;
+  box-shadow: 0 0 4px rgba(0, 255, 255, 0.2), 0 0 8px rgba(255, 0, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+#uploadComponentBtn { top: 330px; }
+#remoteComponentBtn { top: 370px; }
+#toggleDecoderBtn { top: 410px; }
+
+#uploadComponentBtn:hover,
+#remoteComponentBtn:hover,
+#toggleDecoderBtn:hover {
+  transform: scale(1.05);
+  background: rgba(0, 255, 255, 0.2);
+}
+
+#decoderBox {
+  display: none;
+  position: fixed;
+  top: 140px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  z-index: 70;
+}
+
+#decoderBox input {
+  padding: 0.6rem;
+  width: 200px;
+  text-align: center;
+  border-radius: 10px;
+  border: none;
+  font-size: 1em;
+}
+
+#decoderBox button {
+  margin-top: 10px;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 255, 255, 0.2);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  cursor: pointer;
+}
+
+my-frame-loader::part(container) {
+  width: 90%;
+  height: 85%;
+  z-index: 8;
+}
+
+/* Button to expand ritual */
+#btn-expandir-ritual {
+  position: fixed;
+  bottom: 33px;
+  right: 35px;
+  z-index: 99999;
+  border-radius: 50%;
+  font-size: 18px;
+  background: linear-gradient(42deg, #0ff, #f0f);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+
+#btn-expandir-ritual:hover {
+  opacity: 1 !important;
+  transform: scale(1.05);
+}
+
+/* Duplicate definition for pulse animation to ensure proper scope */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.021);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+}

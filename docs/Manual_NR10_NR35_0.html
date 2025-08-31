@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Manual Rápido • NR10 & NR35 — Dual.Infodose</title>
+<meta name="theme-color" content="#0a0a0a" />
+<style>
+  /* ===== MOBILE-ONLY, PALETA OBRA (laranja/amarelo/azul) ===== */
+  :root{
+    --bg:#0a0a0a;           /* fundo preto/cinza escuro */
+    --fg:#f2f6fb;           /* texto principal (quase branco) */
+    --muted:#b8c2cc;        /* texto secundário */
+    --azul:#2aa7ff;         /* azul obra */
+    --laranja:#ff8a00;      /* laranja segurança */
+    --amarelo:#ffd341;      /* amarelo sinalização */
+    --borda:#23272f;        /* borda */
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{ margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+
+  /* ===== SPLASH ===== */
+  .splash{ position:fixed; inset:0; background: radial-gradient(900px 900px at 110% -10%, rgba(255,138,0,.12), transparent 60%), radial-gradient(700px 700px at -10% 120%, rgba(42,167,255,.12), transparent 60%), var(--bg); z-index:50; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .splash .box{ width:100%; max-width:520px; border:1px solid var(--borda); border-radius:20px; padding:22px; text-align:center; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); box-shadow:0 20px 50px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,211,65,.18); }
+  .logo{ font-weight:900; letter-spacing:.4px; font-size:clamp(22px,6vw,28px) }
+  .logo .dot{ color:var(--azul) }
+  .subtitle{ color:var(--muted); font-size:14px; margin-top:6px }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 16px; border-radius:14px; font-weight:800; text-decoration:none; cursor:pointer; width:100%; border:1px solid var(--borda); background:linear-gradient(90deg, var(--laranja), var(--amarelo)); color:#111; margin-top:14px }
+
+  header{ position:sticky; top:0; z-index:20; padding:12px 14px; background:linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.55)); border-bottom:1px solid var(--borda); display:flex; align-items:center; gap:10px }
+  .brand{ font-weight:900; letter-spacing:.3px }
+  .brand .dot{ color:var(--azul) }
+  .role{ font-size:12px; color:var(--muted) }
+
+  main{ padding:14px; padding-bottom:90px }
+
+  /* CARTÕES/SEÇÕES */
+  .artiask{ position:relative; border:1px dashed var(--borda); border-radius:16px; padding:16px; margin:10px 0 14px; background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(42,167,255,.10) }
+  .artiask::before,.artiask::after{ content:""; position:absolute; width:14px; height:14px; background:var(--azul); filter:drop-shadow(0 0 4px rgba(42,167,255,.6)); }
+  .artiask::before{ left:-1px; top:-1px; clip-path: polygon(0 0,100% 0,0 100%);}  /* ╔ */
+  .artiask::after{ right:-1px; bottom:-1px; clip-path: polygon(0 0,100% 0,100% 100%);} /* ╝ */
+
+  h1{ font-size:clamp(20px,5.2vw,26px); margin:4px 0 8px }
+  h2{ font-size:clamp(18px,4.6vw,22px); margin:4px 0 8px; color:var(--azul) }
+  h3{ font-size:clamp(16px,4.2vw,20px); margin:6px 0 8px; color:var(--amarelo) }
+  p.lead{ color:var(--muted) }
+  .chip{ display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border:1px solid var(--borda); border-radius:999px; background:rgba(255,255,255,.04); font-size:12px; margin:4px 6px 0 0 }
+  .btn-ghost{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 14px; border-radius:12px; border:1px solid var(--borda); background:rgba(255,255,255,.04); color:var(--fg); font-weight:700; cursor:pointer; width:100% }
+  .btn-ghost:hover{ border-color: rgba(255,138,0,.5) }
+  .note{ font-size:12px; color:var(--muted) }
+  .list{ padding-left:18px }
+  .list li{ margin:6px 0 }
+
+  /* NAVEGAÇÃO MOBILE */
+  .bottomnav{ position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; gap:8px; padding:10px 12px; background:linear-gradient(180deg, rgba(0,0,0,.2), rgba(0,0,0,.78)); border-top:1px solid var(--borda); backdrop-filter: blur(8px) }
+  .tab{ flex:1; text-align:center; font-size:12px; color:var(--muted) }
+  .tab button{ width:100%; border:1px solid var(--borda); background:rgba(255,255,255,.04); color:var(--fg); border-radius:12px; padding:10px 6px; font-weight:800 }
+  .tab.active button{ border-color: rgba(255,138,0,.45); background: rgba(255,255,255,.08) }
+
+  .hide{ display:none !important }
+  .center{ text-align:center }
+  .ttsbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap }
+  .ttsbar button{ flex:1 1 120px }
+
+  @media (min-width:769px){ body{ max-width:480px; margin:0 auto } } /* força visão mobile */
+</style>
+</head>
+<body>
+<div class="splash" id="splash">
+  <div class="box">
+    <div class="logo">Dual<span class="dot">.</span>Infodose</div>
+    <div class="subtitle">Manual Rápido de Obra — <strong>NR10</strong> & <strong>NR35</strong></div>
+    <div class="chip">Cores de obra: <span style="color:var(--laranja);font-weight:800">Laranja</span> • <span style="color:var(--amarelo);font-weight:800">Amarelo</span> • <span style="color:var(--azul);font-weight:800">Azul</span></div>
+    <button class="btn" onclick="startApp()">🚧 Entrar no Manual</button>
+    <div class="note" style="margin-top:8px">Foco 100% mobile. Leitura por voz opcional.</div>
+  </div>
+</div>
+
+<header>
+  <div class="brand">Manual Rápido — NR10 & NR35</div>
+  <div class="role">Eng.JHBarros • Dual.Infodose</div>
+</header>
+
+<main>
+  <!-- SEÇÃO: DICAS RÁPIDAS -->
+  <section id="home" class="artiask">
+    <h1>⚡ Dicas Rápidas</h1>
+    <p class="lead">Consultas de bolso para obra: linguagem simples, direto ao ponto.</p>
+    <div class="ttsbar">
+      <button class="btn-ghost" onclick="read('#home')">🔊 Ouvir seção</button>
+      <button class="btn-ghost" onclick="stopTTS()">⏹️ Parar</button>
+    </div>
+    <h3>NR10 — Eletricidade</h3>
+    <ul class="list">
+      <li><b>Treinamento 40h</b> para quem trabalha com eletricidade.</li>
+      <li><b>Prontuário elétrico</b> atualizado e acessível.</li>
+      <li><b>Procedimento escrito</b> por atividade (checklist).</li>
+      <li><b>Lockout/Tagout</b>: desligar, bloquear e etiquetar antes de abrir painel.</li>
+      <li><b>EPI</b>: luva e <b>ferramenta isoladas</b>, piso/tapete isolante, sinalização.</li>
+    </ul>
+    <h3>NR35 — Altura (≥ 2m)</h3>
+    <ul class="list">
+      <li><b>Treinamento 8h</b> mínimo.</li>
+      <li><b>Análise de risco</b> antes de subir.</li>
+      <li><b>Proteção</b>: cinto paraquedista + talabarte + linha de vida.</li>
+      <li><b>Plano de resgate</b> definido e comunicado.</li>
+      <li><b>Aptidão</b> física e mental verificada.</li>
+    </ul>
+    <div class="chip">Integração: em poste/torre, aplicar <b>NR10 + NR35</b>.</div>
+  </section>
+
+  <!-- SEÇÃO: CHECKLIST PRÉ-OBRA -->
+  <section id="pre" class="artiask">
+    <h2 style="color:var(--laranja)">✅ Checklist Pré-Obra</h2>
+    <ul class="list" id="prelist"></ul>
+    <div class="ttsbar">
+      <button class="btn-ghost" onclick="read('#pre')">🔊 Ouvir checklist</button>
+      <button class="btn-ghost" onclick="exportTxt('Checklist_Pre_Obra.txt', collectChecklist('pre'))">⬇️ Exportar TXT</button>
+    </div>
+  </section>
+
+  <!-- SEÇÃO: CHECKLIST PÓS-OBRA -->
+  <section id="pos" class="artiask">
+    <h2 style="color:var(--amarelo)">🧹 Checklist Pós-Obra</h2>
+    <ul class="list" id="poslist"></ul>
+    <div class="ttsbar">
+      <button class="btn-ghost" onclick="read('#pos')">🔊 Ouvir checklist</button>
+      <button class="btn-ghost" onclick="exportTxt('Checklist_Pos_Obra.txt', collectChecklist('pos'))">⬇️ Exportar TXT</button>
+    </div>
+  </section>
+
+  <!-- SEÇÃO: REFERÊNCIAS RÁPIDAS -->
+  <section id="ref" class="artiask">
+    <h2 style="color:var(--azul)">📘 Referências Rápidas</h2>
+    <div class="chip">NR10: 40h • Prontuário • Lockout/Tagout • EPI isolante</div>
+    <div class="chip">NR35: ≥2m • 8h • Cinto+Talabarte • Linha de vida • Resgate</div>
+    <div class="chip">Integração: risco de <b>choque</b> + <b>queda</b> → dupla proteção</div>
+    <div class="ttsbar" style="margin-top:8px">
+      <button class="btn-ghost" onclick="read('#ref')">🔊 Ouvir referências</button>
+      <button class="btn-ghost" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    </div>
+    <p class="note">Este material é um resumo prático e não substitui os procedimentos oficiais e treinamentos formais.</p>
+  </section>
+</main>
+
+<!-- NAV INFERIOR -->
+<nav class="bottomnav" role="tablist">
+  <div class="tab active" id="t_home"><button onclick="go('home')">⚡ Dicas</button></div>
+  <div class="tab" id="t_pre"><button onclick="go('pre')">✅ Pré</button></div>
+  <div class="tab" id="t_pos"><button onclick="go('pos')">🧹 Pós</button></div>
+  <div class="tab" id="t_ref"><button onclick="go('ref')">📘 Ref</button></div>
+</nav>
+
+<script>
+/* ===== Splash ===== */
+function startApp(){ document.getElementById('splash').style.display='none'; }
+
+/* ===== Navegação Mobile ===== */
+function go(id){
+  for(const s of document.querySelectorAll('main > section')) s.classList.add('hide');
+  document.getElementById(id).classList.remove('hide');
+  for(const t of document.querySelectorAll('.bottomnav .tab')) t.classList.remove('active');
+  document.getElementById('t_'+id).classList.add('active');
+  location.hash = '#'+id;
+}
+window.addEventListener('load', ()=>{ if(location.hash){ const id=location.hash.slice(1); if(document.getElementById(id)) go(id); } });
+
+/* ===== TTS ===== */
+function read(selector){
+  try{
+    if(!('speechSynthesis' in window)) return alert('Leitura por voz indisponível neste navegador.');
+    const el = document.querySelector(selector); if(!el) return;
+    const text = (el.innerText||'').replace(/\s+\n/g,' ').trim();
+    const u = new SpeechSynthesisUtterance(text); u.lang='pt-BR'; u.rate=1.02; u.pitch=1;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
+}
+function stopTTS(){ try{ speechSynthesis.cancel(); }catch(e){} }
+
+/* ===== Checklists ===== */
+const PRE_ITEMS = [
+  'Análise de risco realizada e comunicada à equipe.',
+  'Prontuário elétrico consultado (NR10) quando aplicável.',
+  'Desligamento, <Lockout/Tagout> e etiquetagem conferidos (NR10).',
+  'Sistema de proteção contra quedas definido: cinto, talabarte, linha de vida (NR35).',
+  'Plano de resgate revisado e responsável designado (NR35).',
+  'Inspeção de EPI: luvas/ferramentas isoladas, piso isolante, cinto e conexões.',
+  'Sinalização e isolamento da área instalados.',
+  'Condições físicas e mentais avaliadas (aptidão).',
+  'Ferramentas e materiais conferidos e organizados.',
+  'Comunicação e autorização de trabalho registradas.'
+];
+const POS_ITEMS = [
+  'Desenergização confirmada e bloqueios removidos com segurança.',
+  'Área limpa, sem resíduos ou ferramentas soltas.',
+  'Sinalizações removidas ou atualizadas conforme necessidade.',
+  'EPI inspecionado após uso (danos? necessidade de troca?).',
+  'Relato de ocorrências/observações registrado (lições aprendidas).',
+  'Prontuário/ordem de serviço atualizado.',
+  'Time informado sobre conclusão e liberações.',
+  'Plano de resgate (se acionado) documentado e revisado.',
+  'Checklist de materiais: o que precisa repor.',
+  'Encerramento formal da atividade/autorização.'
+];
+
+function buildChecklist(id, items){
+  const ul = document.getElementById(id+'list'); ul.innerHTML='';
+  items.forEach((t,i)=>{
+    const li = document.createElement('li');
+    const lab = document.createElement('label'); lab.style.display='flex'; lab.style.justifyContent='space-between'; lab.style.alignItems='center'; lab.style.gap='8px';
+    const span = document.createElement('span'); span.textContent = t;
+    const chk = document.createElement('input'); chk.type='checkbox'; chk.id = id+'_'+i;
+    chk.checked = localStorage.getItem('chk_'+chk.id)==='1';
+    chk.addEventListener('change', ()=> localStorage.setItem('chk_'+chk.id, chk.checked?'1':'0'));
+    lab.appendChild(span); lab.appendChild(chk); li.appendChild(lab); ul.appendChild(li);
+  });
+}
+
+function collectChecklist(id){
+  const items = id==='pre'? PRE_ITEMS : POS_ITEMS;
+  return (id==='pre'? 'Checklist Pré-Obra' : 'Checklist Pós-Obra') + ' — Dual.Infodose\n' +
+    items.map((t,i)=> (document.getElementById(id+'_'+i)?.checked?'[x] ':'[ ] ') + t).join('\n');
+}
+function exportTxt(name, content){
+  const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* init */
+buildChecklist('pre', PRE_ITEMS);
+buildChecklist('pos', POS_ITEMS);
+function loadTermos(){
+  const box = document.getElementById('termos-user');
+  if(!box) return;
+  const raw = localStorage.getItem('termos_obra');
+  const list = raw? JSON.parse(raw) : [];
+  if(!list.length){ box.innerHTML = '<p style="color:#ffe0b2; font-size:13px">Sem termos cadastrados ainda. Use o formulário acima para incluir os termos do time. </p>'; return; }
+  let html = '<h3 style="color:#ffc107; font-size:16px; margin:0 0 8px">Termos da equipe</h3><ul style="padding-left:18px; margin:0">';
+  list.forEach(t=>{ html += `<li style="margin:6px 0"><b>${t.nome}</b> — ${t.def}</li>`; });
+  html += '</ul>';
+  box.innerHTML = html;
+}
+function addTermo(){
+  const nome = (document.getElementById('termo-nome')?.value||'').trim();
+  const def  = (document.getElementById('termo-def')?.value||'').trim();
+  if(!nome || !def){ alert('Preencha termo e significado.'); return; }
+  const raw = localStorage.getItem('termos_obra');
+  const list = raw? JSON.parse(raw) : [];
+  list.push({nome, def});
+  localStorage.setItem('termos_obra', JSON.stringify(list));
+  document.getElementById('termo-nome').value='';
+  document.getElementById('termo-def').value='';
+  loadTermos();
+}
+window.addEventListener('load', loadTermos);
+</script>
+</body>
+</html>

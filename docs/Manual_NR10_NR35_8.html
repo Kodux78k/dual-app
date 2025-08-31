@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>IgnYra Dual.Infodose • ASSERT — Manual Vivo NR10 & NR35</title>
+<meta name="theme-color" content="#0a0a0a" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+<style>
+/* =========================
+   TOKENS — Obra (default) / Luxara (hard)
+========================= */
+:root{
+  --bg:#0a0a0a; --panel:#101114; --fg:#EEEFF7; --muted:#b7bec9;
+  --gold:#F4D26B; --blue:#2E59FF; --azul:#2aa7ff; --laranja:#ff8a00; --amarelo:#ffd341; --borda:#21242b;
+  --ok:#1ec28b; --warn:#ffc107; --err:#ff5b5d; --info:#62b8ff;
+  --radius:20px; --shadow:0 26px 64px rgba(0,0,0,.55);
+  --font:'Inter', system-ui, -apple-system, Segoe UI, Roboto;
+  --base:18px;
+  --hi-contrast:rgba(255,255,255,.08);
+}
+:root[data-theme="luxara"]{
+  --bg:#0b0b0c; --panel:#0f0f12; --fg:#efe9d1; --muted:#c9c1a1;
+  --gold:#f2c94c; --blue:#7aa2ff; --azul:#7aa2ff; --laranja:#f2c94c; --amarelo:#f2c94c; --borda:#1a1b20;
+  --ok:#82e4bf; --warn:#ffd772; --err:#ff6d71; --info:#8ecaff;
+  --hi-contrast:rgba(242,201,76,.10);
+}
+
+/* =========================
+   BASE / LAYOUT
+========================= */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg); font:var(--base)/1.46 var(--font);
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+}
+a{color:var(--blue); text-decoration:none}
+.bg{
+  background:
+    radial-gradient(900px 900px at 110% -10%, rgba(255,138,0,.08), transparent 60%),
+    radial-gradient(700px 700px at -10% 120%, rgba(122,162,255,.08), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.03) 0 1px, transparent 1px 32px),
+    var(--bg);
+}
+:root[data-theme="luxara"] .bg{
+  background:
+    radial-gradient(900px 900px at 110% -10%, rgba(242,201,76,.10), transparent 60%),
+    radial-gradient(700px 700px at -10% 120%, rgba(122,162,255,.08), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(242,201,76,.06) 0 1px, transparent 1px 32px),
+    var(--bg);
+}
+
+/* Header & Coachbar */
+header{position:sticky; top:0; z-index:50; padding:12px 14px; border-bottom:1px solid var(--borda);
+  background:linear-gradient(180deg, rgba(0,0,0,.88), rgba(0,0,0,.50)); backdrop-filter: blur(10px);}
+.row{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.brand{font-weight:900; letter-spacing:.3px; font-size:clamp(18px,4.8vw,24px)}
+.triad{font-size:12px; color:var(--muted)}
+.tag{display:inline-flex; gap:8px; align-items:center; border:1px solid var(--borda); padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.03); font-size:12px}
+.badge{display:inline-flex; gap:6px; align-items:center; padding:4px 8px; border-radius:10px; font-size:11px; border:1px solid var(--borda); background:rgba(255,255,255,.04)}
+.coach{position:sticky; top:58px; z-index:45; display:flex; gap:8px; padding:8px 14px; border-bottom:1px solid var(--borda);
+  background:linear-gradient(180deg, rgba(0,0,0,.74), rgba(0,0,0,.34)); backdrop-filter: blur(8px)}
+.coach .pill{padding:8px 12px; border-radius:999px; border:1px solid var(--borda); background:rgba(255,255,255,.04); font-weight:800; cursor:pointer}
+
+/* Cards / Hierarquia de peso */
+main{padding:14px; padding-bottom:122px}
+.card{
+  position:relative; border:1px solid var(--borda); border-radius:var(--radius); padding:16px; margin:12px 0;
+  background:linear-gradient(180deg, rgba(255,255,255,.038), rgba(255,255,255,.015));
+  box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.03);
+}
+.artiask{border-style:dashed}
+.artiask::before,.artiask::after{content:""; position:absolute; width:12px; height:12px; background:var(--azul); filter:drop-shadow(0 0 4px rgba(122,162,255,.55))}
+.artiask::before{left:-1px; top:-1px; clip-path: polygon(0 0,100% 0,0 100%);}
+.artiask::after{right:-1px; bottom:-1px; clip-path: polygon(0 0,100% 0,100% 100%);}
+h1{font-size:clamp(22px,6.2vw,28px); margin:4px 0 8px}
+h2{font-size:clamp(20px,5.4vw,24px); margin:4px 0 8px; color:var(--gold)}
+h3{font-size:clamp(18px,4.8vw,22px); margin:6px 0 8px; color:var(--amarelo)}
+p.lead{color:var(--muted)}
+.note{font-size:12px; color:var(--muted)}
+.hide{display:none !important}
+
+.grid{display:grid; gap:10px; grid-template-columns:repeat(2,1fr)}
+.btn,.btn-ghost{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 16px; border-radius:14px; font-weight:800; cursor:pointer; border:1px solid var(--borda)}
+.btn{background:linear-gradient(90deg, var(--laranja), var(--amarelo)); color:#111}
+.btn-ghost{background:rgba(255,255,255,.035); color:var(--fg)}
+.btn-line{background:linear-gradient(90deg, #22d2a5, #78ffd6); color:#111}
+.btn-danger{background:linear-gradient(90deg, #ff5b5d, #ff888a); color:#111}
+.btn-info{background:linear-gradient(90deg, var(--info), #cfe8ff); color:#111}
+
+/* Peso de blocos */
+.priority-high{border:1px solid rgba(255,255,255,.18); box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px var(--hi-contrast) inset}
+.priority-medium{border:1px solid rgba(255,255,255,.12)}
+.priority-low{border:1px dashed var(--borda)}
+
+/* Componentes didáticos */
+.helper{border-left:3px solid var(--info); padding:10px 12px; background:rgba(98,184,255,.08); border-radius:12px}
+:root[data-theme="luxara"] .helper{background:rgba(242,201,76,.10); border-left-color:var(--gold)}
+.exanti{display:grid; gap:8px; grid-template-columns:1fr 1fr}
+.exanti .ex{border:1px solid rgba(34,210,165,.45); border-radius:12px; padding:10px; background:rgba(34,210,165,.09)}
+.exanti .anti{border:1px solid rgba(255,91,93,.45); border-radius:12px; padding:10px; background:rgba(255,91,93,.09)}
+.stepper{counter-reset:step; display:grid; gap:8px}
+.st{border:1px dashed var(--borda); border-radius:12px; padding:10px}
+.st::before{counter-increment:step; content:counter(step) ". "; font-weight:900; color:var(--gold)}
+.tipchip{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border:1px solid var(--borda); border-radius:999px; background:rgba(255,255,255,.05); font-size:12px}
+
+/* EPIs – estados */
+.epi{padding:12px; border-radius:14px; border:1px solid var(--borda); background:rgba(255,255,255,.03)}
+.epi[data-have="0"][data-ok="0"]{box-shadow:0 0 0 1px rgba(255,91,93,.35) inset}
+.epi[data-have="1"][data-ok="0"]{box-shadow:0 0 0 1px rgba(255,215,0,.35) inset}
+.epi[data-have="1"][data-ok="1"]{box-shadow:0 0 0 1px rgba(34,210,165,.45) inset}
+
+/* Bottom nav */
+.bottomnav{position:fixed; left:0; right:0; bottom:0; z-index:60; display:flex; gap:8px; padding:12px; background:linear-gradient(180deg, rgba(0,0,0,.22), rgba(0,0,0,.85)); border-top:1px solid var(--borda); backdrop-filter: blur(8px)}
+.tab{flex:1; text-align:center; font-size:13px; color:var(--muted)}
+.tab button{width:100%; border:1px solid var(--borda); background:rgba(255,255,255,.035); color:var(--fg); border-radius:12px; padding:12px 8px; font-weight:800}
+.tab.active button{border-color: rgba(255,138,0,.45); background: rgba(255,255,255,.075)}
+
+/* Splash — minimal tech */
+.splash{position:fixed; inset:0; z-index:90; display:grid; place-items:center; padding:24px; background:var(--bg)}
+.splash::before{
+  content:""; position:absolute; inset:0;
+  background:
+    radial-gradient(62% 58% at 50% 40%, rgba(255,255,255,.06), transparent 60%),
+    conic-gradient(from 180deg at 50% 50%, rgba(255,255,255,.06), transparent 40%, rgba(255,255,255,.06));
+  mask-image: radial-gradient(60% 60% at 50% 50%, #000 60%, transparent 100%);
+  opacity:.6; pointer-events:none;
+}
+:root[data-theme="luxara"] .splash::before{
+  background:
+    radial-gradient(62% 58% at 50% 40%, rgba(242,201,76,.12), transparent 60%),
+    conic-gradient(from 180deg at 50% 50%, rgba(122,162,255,.08), transparent 40%, rgba(242,201,76,.09));
+}
+.sbox{width:100%; max-width:580px; border:1px solid var(--borda); border-radius:22px; padding:28px 24px; background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); box-shadow:0 24px 64px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.06); text-align:center}
+.logoline{display:flex; align-items:center; justify-content:center; gap:10px}
+.logo{font-weight:900; letter-spacing:.35px; font-size:clamp(24px,7vw,30px)}
+.lDot{width:10px; height:10px; border-radius:50%; background:var(--blue); box-shadow:0 0 12px var(--blue)}
+.sline{color:var(--muted); font-size:14px; margin:10px 0 0}
+.sctrl{display:flex; gap:10px; margin-top:16px}
+.sctrl .btn,.sctrl .btn-ghost{flex:1}
+.smini{font-size:12px; color:var(--muted); margin-top:10px}
+
+/* Modal */
+.modal{position:fixed; inset:0; z-index:85; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.6)}
+.modal.show{display:flex}
+.modal .box{width:100%; max-width:560px; border:1px solid var(--borda); border-radius:20px; padding:22px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); box-shadow:var(--shadow)}
+
+/* Acessibilidade */
+.zoom-1{font-size:calc(var(--base)*1.10)} .zoom-2{font-size:calc(var(--base)*1.22)} .zoom-3{font-size:calc(var(--base)*1.35)}
+</style>
+</head>
+<body class="bg">
+
+<!-- Splash -->
+<div id="splash" class="splash">
+  <div class="sbox animate__animated animate__fadeInUp">
+    <div class="logoline">
+      <div class="logo">IgnYra Dual.Infodose — <b>ASSERT</b></div>
+      <div class="lDot"></div>
+    </div>
+    <div class="sline">EngJhBarros Dual.Infodose • Tríade: ⚡︎︎ ψ ◐ — “Energizando insights, iluminando o futuro.”</div>
+    <div class="sctrl">
+      <button class="btn" onclick="startApp()">🚧 Entrar</button>
+      <button class="btn-ghost" onclick="startApp(true)">🎙️ Apresentação</button>
+    </div>
+    <div class="sctrl">
+      <button class="btn-ghost" onclick="toggleTheme()">🌓 Tema</button>
+      <label class="btn-ghost" style="gap:10px; cursor:pointer"><input id="nosplash" type="checkbox"> Não mostrar novamente</label>
+    </div>
+    <div class="smini">Minimalismo tecnológico • Sempre único, sempre seu</div>
+  </div>
+</div>
+
+<!-- Header + Coach -->
+<header>
+  <div class="row">
+    <div>
+      <div class="brand">EngJhBarros Dual.Infodose — <b>ASSERT</b></div>
+      <div class="triad">IgnYra • UI/UX Inteligente • Obra ↔ Luxara • Tríade: ⚡︎︎ ψ ◐</div>
+      <div class="tag">Manual Vivo NR10 & NR35 • Ultra</div>
+    </div>
+    <div class="row" style="gap:6px">
+      <span class="badge">Modo: <span id="modeLabel">Didático</span></span>
+      <button class="btn-ghost" onclick="toggleDidatico()">🎓 Didático</button>
+      <button class="btn-ghost" onclick="toggleTheme()">🌓 Tema</button>
+      <button class="btn-ghost" onclick="toggleTips()">✨ Dica</button>
+    </div>
+  </div>
+  <div class="coach">
+    <div class="pill" onclick="go('mapa')">🧭 Guia</div>
+    <div class="pill" onclick="go('nr10')">⚡ NR10</div>
+    <div class="pill" onclick="go('nr35')">🧗 NR35</div>
+    <div class="pill" onclick="go('checklists')">📋 Pré/Pós</div>
+    <div class="pill" onclick="go('epis')">🛡️ EPIs</div>
+    <div class="pill" onclick="go('sinais')">✋ Sinais</div>
+    <div class="pill" onclick="go('sos')">🆘 SOS</div>
+    <div class="pill" onclick="go('apresentacao')">🎙️ Apres.</div>
+  </div>
+</header>
+
+<!-- Main -->
+<main>
+  <!-- HOME — Dica do dia (prioridade alta) -->
+  <section id="home" class="card artiask priority-high">
+    <h1>⚡ Dica do Dia</h1>
+    <p class="lead" id="tipText">Carregando dica...</p>
+    <div class="grid">
+      <button class="btn" onclick="speakEl('#tipText')">🔊 Ouvir</button>
+      <button class="btn-ghost" onclick="nextTip()">➡️ Próxima</button>
+    </div>
+    <div class="helper dida" style="margin-top:10px"><b>Uso rápido:</b> abra o <i>Guia</i>, execute NR10/NR35, rode Checklists, alinhe Sinais, reporte risco se houver, finalize no Pós.</div>
+  </section>
+
+  <!-- GUIA 1-2-3 (prioridade alta) -->
+  <section id="mapa" class="card artiask priority-high">
+    <h2>🧭 Guia 1-2-3 • Fluxo de Obra</h2>
+    <div class="stepper">
+      <div class="st" data-longpress="#mapaExp1"><b>Planejar</b> — Análise de risco • LOTO • EPIs • ancoragem • plano de resgate</div>
+      <div class="st" data-longpress="#mapaExp2"><b>Executar</b> — NR10/NR35 (técnicas) • Sinais & STOP</div>
+      <div class="st" data-longpress="#mapaExp3"><b>Encerrar</b> — Pós (desenergização • limpeza • EPI • registros) + Relato de risco</div>
+    </div>
+    <div id="mapaExp1" class="helper dida hide">Checklist mental: Desliga → Bloqueia → Etiqueta → Testa → Trabalha • Linha de vida no ponto mais alto.</div>
+    <div id="mapaExp2" class="helper dida hide">NR10: medir com uma mão; NR35: 3 pontos de apoio. STOP definido antes de subir.</div>
+    <div id="mapaExp3" class="helper dida hide">Área limpa, EPI inspecionado, registros feitos, aprendizado anotado para o time.</div>
+    <div class="exanti dida" style="margin-top:10px">
+      <div class="ex"><b>Ex (Certo):</b> Detector testado, ancoragem rígida, STOP combinado.</div>
+      <div class="anti"><b>Anti-Ex (Errado):</b> Abrir painel sem testar, ancorar em escada, silêncio na equipe.</div>
+    </div>
+  </section>
+
+  <!-- NR10 (prioridade alta) -->
+  <section id="nr10" class="card priority-high">
+    <h2>⚡ NR10 — Técnicas de Campo</h2>
+    <div class="helper dida"><b>Explicação:</b> eletricidade engana; pode haver residual/retorno. Nosso trabalho é <i>enxergar o invisível</i>.</div>
+    <ul id="nr10list" style="margin-top:8px"></ul>
+    <div class="exanti dida" style="margin-top:8px">
+      <div class="ex"><b>Ex:</b> Medir com “uma mão”, piso isolante seco, kit isolado dedicado.</div>
+      <div class="anti"><b>Anti-Ex:</b> Confiar no disjuntor sem testar no ponto.</div>
+    </div>
+    <div class="grid" style="margin-top:10px">
+      <button class="btn-info" onclick="miniSim('nr10')">🧪 Simular</button>
+      <button class="btn-ghost" onclick="showInsight('Use detector testado ANTES e DEPOIS. O “parecia desligado” já machucou muita gente.')">💡 Insight</button>
+      <button class="btn-ghost" onclick="speakEl('#nr10')">🔊 Ouvir</button>
+      <button class="btn-ghost" onclick="exportTXT('nr10_tips.txt', listToText('nr10list'))">⬇️ Exportar TXT</button>
+    </div>
+  </section>
+
+  <!-- NR35 (prioridade alta) -->
+  <section id="nr35" class="card priority-high">
+    <h2>🧗 NR35 — Técnicas de Campo</h2>
+    <div class="helper dida"><b>Explicação:</b> queda é o acidente mais rápido; só dá tempo de <i>já estar preso</i>.</div>
+    <ul id="nr35list" style="margin-top:8px"></ul>
+    <div class="exanti dida" style="margin-top:8px">
+      <div class="ex"><b>Ex:</b> 3 pontos de apoio, talabarte testado, rota definida.</div>
+      <div class="anti"><b>Anti-Ex:</b> Ancorar em escada/tubo fino; subir sem STOP combinado.</div>
+    </div>
+    <div class="grid" style="margin-top:10px">
+      <button class="btn-info" onclick="miniSim('nr35')">🧪 Simular</button>
+      <button class="btn-ghost" onclick="showInsight('Talabarte mal clipado derruba profissional experiente. Teste puxando ANTES de confiar.')">💡 Insight</button>
+      <button class="btn-ghost" onclick="speakEl('#nr35')">🔊 Ouvir</button>
+      <button class="btn-ghost" onclick="exportTXT('nr35_tips.txt', listToText('nr35list'))">⬇️ Exportar TXT</button>
+    </div>
+  </section>
+
+  <!-- Checklists (prioridade alta) -->
+  <section id="checklists" class="card artiask priority-high">
+    <h2>📋 Checklists Dinâmicos</h2>
+    <h3>Pré-Obra</h3><ul id="prelist"></ul>
+    <h3 style="margin-top:12px">Pós-Obra</h3><ul id="poslist"></ul>
+    <div class="grid" style="margin-top:10px">
+      <button class="btn-ghost" onclick="exportTXT('Checklist_Pre.txt', collectChecklist('pre'))">⬇️ Exportar Pré</button>
+      <button class="btn-ghost" onclick="exportTXT('Checklist_Pos.txt', collectChecklist('pos'))">⬇️ Exportar Pós</button>
+      <button class="btn-line" onclick="exportZIP()">🗜️ ZIP</button>
+      <button class="btn-ghost" onclick="resetChecks()">♻️ Reset</button>
+    </div>
+    <p class="note dida">Ao marcar “não ok”, abrimos correção imediata (3×6×9) no modal.</p>
+  </section>
+
+  <!-- EPIs (prioridade alta) -->
+  <section id="epis" class="card priority-high">
+    <h2>🛡️ EPIs — “comigo” + “inspecionado”</h2>
+    <div id="epiGrid" class="grid"></div>
+    <div class="tipchip">Dúvida/defeito? <b>Troca imediata</b>. Luva: teste microfuro (encher de ar).</div>
+  </section>
+
+  <!-- Sinais (média) -->
+  <section id="sinais" class="card priority-medium">
+    <h2>✋ Sinais Rápidos</h2>
+    <div class="grid">
+      <button class="btn-ghost" onclick="beep()">🔔 Beep</button>
+      <button class="btn-ghost" onclick="speak('Parar agora!')">🛑 STOP (voz)</button>
+      <button class="btn-ghost" onclick="speak('Tudo certo')">✅ OK (voz)</button>
+      <button class="btn-ghost" onclick="speak('Atenção')">⚠️ Atenção (voz)</button>
+    </div>
+    <p class="note dida">Defina STOP/OK/ATENÇÃO antes de iniciar — uma palavra salva.</p>
+  </section>
+
+  <!-- SOS (prioridade máxima visual) -->
+  <section id="sos" class="card priority-high" style="box-shadow:0 0 0 1px rgba(255,91,93,.35) inset, var(--shadow)">
+    <h2>🆘 SOS / Emergência</h2>
+    <div class="grid">
+      <div class="btn-line" style="justify-content:space-between; display:flex"><span>Telefone da empresa</span><a class="btn-line" href="tel:+550000000000">Ligar</a></div>
+      <div class="btn-danger" style="justify-content:space-between; display:flex"><span>Bombeiros (193)</span><a class="btn-danger" href="tel:193">Ligar</a></div>
+      <div class="btn-danger" style="justify-content:space-between; display:flex"><span>SAMU (192)</span><a class="btn-danger" href="tel:192">Ligar</a></div>
+    </div>
+  </section>
+
+  <!-- Glossário (média) -->
+  <section id="glossario" class="card priority-medium">
+    <h2>📚 Glossário Vivo (Termos & Áudio)</h2>
+    <div class="grid">
+      <input id="termo-nome" placeholder="Novo termo (ex.: Cabo-guia)" class="btn-ghost" />
+      <input id="termo-def" placeholder="Significado" class="btn-ghost" />
+    </div>
+    <div class="grid" style="margin-top:8px">
+      <button class="btn" onclick="addTermo()">➕ Adicionar</button>
+      <button class="btn-ghost" onclick="speakEl('#termos-user')">🔊 Ouvir termos</button>
+    </div>
+    <div class="grid" style="margin-top:8px">
+      <button class="btn-ghost" onclick="recIniciar()">⏺️ Gravar</button>
+      <button class="btn-ghost" onclick="recParar()">⏹️ Parar</button>
+    </div>
+    <div id="termos-user" class="note" style="margin-top:10px"></div>
+    <div id="audios" class="note" style="margin-top:10px"></div>
+  </section>
+
+  <!-- Reportar Risco (média) -->
+  <section id="relatos" class="card artiask priority-medium">
+    <h2>📸 Reportar Risco (Offline)</h2>
+    <input type="file" accept="image/*" capture="environment" onchange="fotoSelecionada(event)" class="btn-ghost" />
+    <input id="relato-texto" placeholder="Descreva o risco..." class="btn-ghost" />
+    <div class="grid" style="margin-top:8px">
+      <button class="btn" onclick="salvarRelato()">💾 Salvar</button>
+      <button class="btn-ghost" onclick="exportRelatos()">⬇️ JSON</button>
+    </div>
+    <div id="relatos-list" style="margin-top:10px"></div>
+  </section>
+
+  <!-- Apresentação (média) -->
+  <section id="apresentacao" class="card artiask priority-medium hide">
+    <h2>🎙️ Apresentação — Profissionais & Técnicos</h2>
+    <p class="lead">EngJhBarros Dual.Infodose — ASSERT • “Energizando insights, iluminando o futuro.”</p>
+    <div id="slideBox" class="card" style="margin-top:10px">
+      <div class="note" id="slideIndex">Slide 1 / 15</div>
+      <h3 id="slideTitle" style="color:var(--gold); margin:6px 0"></h3>
+      <p id="slideBody" style="margin:4px 0 6px"></p>
+      <div id="slideReward" class="note"></div>
+    </div>
+    <div class="grid" style="margin-top:10px">
+      <button class="btn-ghost" onclick="prevSlide()">⬅️ Prev</button>
+      <button class="btn-ghost" onclick="nextSlide()">Next ➡️</button>
+      <button class="btn" onclick="speakCurrent()">🔊 Play</button>
+      <button class="btn-ghost" onclick="stopTTS()">⏹️ Stop</button>
+      <button class="btn-line" onclick="playAll()">▶️ Play All</button>
+      <button class="btn-ghost" onclick="copySlide()">📋 Copiar</button>
+    </div>
+  </section>
+
+  <div class="footerpad"></div>
+</main>
+
+<!-- Bottom Nav -->
+<nav class="bottomnav" role="tablist">
+  <div class="tab active" id="t_home"><button onclick="go('home')">✨ Início</button></div>
+  <div class="tab" id="t_mapa"><button onclick="go('mapa')">🧭 Guia</button></div>
+  <div class="tab" id="t_nr10"><button onclick="go('nr10')">⚡ NR10</button></div>
+  <div class="tab" id="t_nr35"><button onclick="go('nr35')">🧗 NR35</button></div>
+  <div class="tab" id="t_checklists"><button onclick="go('checklists')">📋 Checklists</button></div>
+  <div class="tab" id="t_epis"><button onclick="go('epis')">🛡️ EPIs</button></div>
+  <div class="tab" id="t_sinais"><button onclick="go('sinais')">✋ Sinais</button></div>
+  <div class="tab" id="t_sos"><button onclick="go('sos')">🆘 SOS</button></div>
+  <div class="tab" id="t_glossario"><button onclick="go('glossario')">📚 Glossário</button></div>
+  <div class="tab" id="t_relatos"><button onclick="go('relatos')">📸 Riscos</button></div>
+  <div class="tab" id="t_apresentacao"><button onclick="go('apresentacao')">🎙️ Apres.</button></div>
+</nav>
+
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="box">
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px">
+      <h3 style="margin:0; color:var(--gold)">Sugestão</h3>
+      <button class="btn-ghost" onclick="closeModal()">✖</button>
+    </div>
+    <div id="modal-text" class="lead" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<script>
+/* =========================
+   BOOT / SPLASH / TEMA
+========================= */
+function startApp(goToPresentation=false){
+  if(document.getElementById('nosplash')?.checked){ localStorage.setItem('dual_nosplash','1'); }
+  document.getElementById('splash').style.display='none';
+  go(goToPresentation?'apresentacao':'home');
+}
+window.addEventListener('load', ()=>{
+  const savedTheme = localStorage.getItem('dual_theme');
+  if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
+  if(localStorage.getItem('dual_nosplash')==='1'){ document.getElementById('splash').style.display='none'; }
+  // anima bg inicial
+  try{ gsap.from('header',{duration:.35, y:-10, opacity:0}); }catch(e){}
+});
+
+/* Tema */
+function toggleTheme(){
+  const cur=document.documentElement.getAttribute('data-theme');
+  const next = cur==='luxara' ? '' : 'luxara';
+  if(next) document.documentElement.setAttribute('data-theme', next);
+  else document.documentElement.removeAttribute('data-theme');
+  localStorage.setItem('dual_theme', next);
+}
+
+/* =========================
+   NAVEGAÇÃO / ANIMAÇÕES
+========================= */
+function go(id){
+  document.querySelectorAll('main > section').forEach(s=>s.classList.add('hide'));
+  const target=document.getElementById(id); if(target) target.classList.remove('hide');
+  document.querySelectorAll('.bottomnav .tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('t_'+id)?.classList.add('active');
+  location.hash = '#'+id;
+  try{ gsap.from(target, {duration:.35, y:12, opacity:0}); }catch(e){}
+}
+
+/* LongPress (explicações rápidas) */
+let lpTimer=null;
+document.addEventListener('mousedown', e=>{
+  const sel = e.target.closest('[data-longpress]')?.getAttribute('data-longpress');
+  if(!sel) return;
+  lpTimer=setTimeout(()=>{ const box=document.querySelector(sel); if(box){ box.classList.remove('hide'); try{ gsap.from(box,{duration:.25, y:8, opacity:0}); }catch(e){} }}, 550);
+});
+document.addEventListener('mouseup', ()=>{ clearTimeout(lpTimer); });
+
+/* =========================
+   DICA DO DIA / TTS
+========================= */
+function speak(text){
+  try{
+    if(!('speechSynthesis' in window)) return alert('Leitura por voz indisponível.');
+    const u=new SpeechSynthesisUtterance(text); u.lang='pt-BR'; u.rate=1.02; u.pitch=1;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
+}
+function stopTTS(){ try{ speechSynthesis.cancel(); }catch(e){} }
+function speakEl(sel){ const el=document.querySelector(sel); if(!el) return; speak((el.innerText||'').replace(/\s+\n/g,' ').trim()); }
+
+const TIPS=[
+  'NR10: Teste o detector num ponto vivo ANTES de medir o painel.',
+  'NR35: Três pontos de apoio; se usar as duas mãos, o talabarte segura você.',
+  'STOP/OK/ATENÇÃO: defina antes de iniciar.',
+  'Luva isolante: teste microfuro; suspeitou, troque.',
+  'Linha de vida: ponto mais alto e resistente. Nunca em escada.',
+  'LOTO: Desliga > Bloqueia > Etiqueta > Testa > Trabalha.',
+  'Vento forte → reavalie ancoragens; reduza ritmo.',
+  'Ferramentas isoladas dedicadas (marcadas).',
+  'Plano de resgate: quem liga, quem executa, onde ancorar.',
+  'Piso/tapete isolante limpo e seco = margem de segurança.'
+];
+function toggleTips(){ nextTip(); go('home'); }
+function nextTip(){ const i=(+localStorage.tip_idx||0)+1; localStorage.tip_idx=i; const t=TIPS[i%TIPS.length]; const el=document.getElementById('tipText'); el.innerText=t; try{ gsap.from(el,{duration:.25, y:6, opacity:0}); }catch(e){} }
+
+/* =========================
+   EPIs
+========================= */
+const EPIS=[
+  {id:'capacete', nome:'Capacete (CA válido)'},
+  {id:'oculos', nome:'Óculos de proteção'},
+  {id:'luva_iso', nome:'Luva isolante'},
+  {id:'bota', nome:'Bota antiderrapante'},
+  {id:'cinto', nome:'Cinto paraquedista'},
+  {id:'talabarte', nome:'Talabarte (em Y)'},
+  {id:'linha_vida', nome:'Linha de vida/ancoragem'},
+  {id:'piso_iso', nome:'Piso/Tapete isolante'},
+  {id:'sinalizacao', nome:'Sinalização da área'},
+  {id:'ferr_iso', nome:'Ferramentas isoladas'}
+];
+function renderEPIs(){
+  const box=document.getElementById('epiGrid'); box.innerHTML='';
+  EPIS.forEach(e=>{
+    const have=localStorage.getItem('epi_have_'+e.id)==='1';
+    const ok=localStorage.getItem('epi_ok_'+e.id)==='1';
+    const li=document.createElement('div'); li.className='epi';
+    li.setAttribute('data-have', have?'1':'0'); li.setAttribute('data-ok', ok?'1':'0');
+    li.innerHTML=`<div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
+      <div><b>${e.nome}</b><div class="note">Comigo: <span class="${have?'ok':'warn'}">${have?'Sim':'Não'}</span> • Inspecionado: <span class="${ok?'ok':'warn'}">${ok?'Sim':'Não'}</span></div></div>
+      <div style="display:flex; gap:6px">
+        <button class="btn-ghost" title="Comigo" onclick="toggleHave('${e.id}')">🎒</button>
+        <button class="btn-ghost" title="Inspecionado" onclick="toggleOk('${e.id}')">🔎</button>
+      </div>
+    </div>`;
+    box.appendChild(li);
+  });
+}
+function toggleHave(id){ const k='epi_have_'+id; localStorage.setItem(k, localStorage.getItem(k)==='1'?'0':'1'); renderEPIs(); }
+function toggleOk(id){ const k='epi_ok_'+id; localStorage.setItem(k, localStorage.getItem(k)==='1'?'0':'1'); renderEPIs(); }
+
+/* =========================
+   NR10 / NR35 — listas
+========================= */
+const NR10_TIPS=[
+  'Antes de abrir painel: verifique ausência de tensão com instrumento TESTADO.',
+  'Meça com “uma mão” (minimiza caminho de corrente pelo tórax).',
+  'Use kit de ferramentas isoladas dedicado (marcado).',
+  'Sequência mental: Desliga > Bloqueia > Etiqueta > Testa > Trabalha.',
+  'Piso/tapete isolante limpo e seco; sem oleosidade.',
+  'Não confie só no disjuntor; confirme no ponto de trabalho.'
+];
+const NR35_TIPS=[
+  'Talabarte no ponto mais alto e resistente disponível.',
+  'Três pontos de apoio; sem movimentos bruscos.',
+  'Proibido ancorar em escadas soltas/tubos finos.',
+  'Rota de subida/descida definida antes de iniciar.',
+  'Vento aumentou? Reduza ritmo e reavalie ancoragens.',
+  'Sinais combinados com a equipe — voz clara ou rádio.'
+];
+function buildList(id, arr){ const ul=document.getElementById(id); ul.innerHTML=''; arr.forEach(t=>{ const li=document.createElement('li'); li.textContent=t; ul.appendChild(li);}); }
+function listToText(id){ return Array.from(document.getElementById(id).querySelectorAll('li')).map(li=>'- '+li.textContent).join('\n'); }
+
+/* =========================
+   CHECKLISTS dinâmicos (3×6×9 no “não ok”)
+========================= */
+const PRE_ITEMS=[
+  {t:'Análise de risco comunicada à equipe.', tip:'Sem análise? Pare 2 min e alinhe os riscos.'},
+  {t:'LOTO confirmado e TESTADO.', tip:'Teste o detector em ponto vivo antes e depois.'},
+  {t:'Proteção contra quedas definida (cinto, talabarte, linha de vida).', tip:'Ancore alto e rígido.'},
+  {t:'Plano de resgate revisado e responsável definido.', tip:'Quem liga? Quem executa? Onde ancorar?'},
+  {t:'Inspeção de EPI e ferramentas isoladas.', tip:'Dúvida? Troca imediata.'},
+  {t:'Sinalização e isolamento da área.', tip:'Barreiras visuais evitam surpresas.'},
+  {t:'STOP/OK/ATENÇÃO combinados.', tip:'Uma palavra salva.'}
+];
+const POS_ITEMS=[
+  {t:'Desenergização confirmada; bloqueios removidos com segurança.', tip:'Faça o passo reverso com calma.'},
+  {t:'Área limpa e organizada (sem sobras).', tip:'Risco menor para o próximo time.'},
+  {t:'EPI inspecionado e guardado corretamente.', tip:'Registre dano para troca.'},
+  {t:'Prontuário/OS atualizado.', tip:'Registre o que aprendeu.'},
+  {t:'Time informado sobre liberações/pendências.', tip:'Evita retrabalho.'}
+];
+function buildChecklist(which, items){
+  const ul=document.getElementById(which+'list'); ul.innerHTML='';
+  items.forEach((obj,i)=>{
+    const li=document.createElement('li');
+    const lab=document.createElement('label'); lab.style.display='flex'; lab.style.justifyContent='space-between'; lab.style.alignItems='center'; lab.style.gap='8px';
+    const span=document.createElement('span'); span.textContent=obj.t;
+    const chk=document.createElement('input'); chk.type='checkbox'; chk.id=which+'_'+i;
+    chk.checked=localStorage.getItem('chk_'+chk.id)==='1';
+    chk.addEventListener('change', ()=>{
+      localStorage.setItem('chk_'+chk.id, chk.checked?'1':'0');
+      if(!chk.checked){ show369(obj); }
+    });
+    lab.appendChild(span); lab.appendChild(chk); li.appendChild(lab); ul.appendChild(li);
+  });
+}
+function collectChecklist(which){
+  const items = which==='pre'? PRE_ITEMS : POS_ITEMS;
+  return (which==='pre'? 'Checklist Pré-Obra' : 'Checklist Pós-Obra') + ' — EngJhBarros Dual.Infodose ASSERT\n' +
+    items.map((o,i)=> (document.getElementById(which+'_'+i)?.checked?'[x] ':'[ ] ') + o.t).join('\n');
+}
+function resetChecks(){
+  Object.keys(localStorage).forEach(k=>{ if(k.startsWith('chk_')) localStorage.removeItem(k); });
+  buildChecklist('pre', PRE_ITEMS); buildChecklist('pos', POS_ITEMS);
+}
+/* Modal 3×6×9 — Explicação, Aplicação, Antecipação */
+function show369(obj){
+  const msg = `⚙ 3×6×9\n\n• Explicação: ${obj.tip}\n• Aplicação: procure recurso/alternativa segura agora.\n• Antecipação: quer ver o comparativo visual e um caso real? Toque em “💡 Insight” no bloco.`;
+  showTip(msg);
+}
+
+/* =========================
+   EXPORT / ZIP
+========================= */
+function exportTXT(name, content){
+  const blob=new Blob([content], {type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+async function exportZIP(){
+  try{
+    if(typeof JSZip==='undefined'){ alert('JSZip não carregou.'); return; }
+    const zip=new JSZip();
+    zip.file('Checklist_Pre.txt', collectChecklist('pre'));
+    zip.file('Checklist_Pos.txt', collectChecklist('pos'));
+    zip.file('NR10_tips.txt', listToText('nr10list'));
+    zip.file('NR35_tips.txt', listToText('nr35list'));
+    const relatos = JSON.stringify((JSON.parse(localStorage.getItem('relatos')||'[]')), null, 2);
+    zip.file('relatos.json', relatos);
+    const out=await zip.generateAsync({type:'blob'});
+    saveAs(out, 'IGNYRA_ASSERT_Obra.zip');
+  }catch(e){ alert('Falha ao gerar ZIP.'); }
+}
+
+/* =========================
+   GLOSSÁRIO + ÁUDIO
+========================= */
+function loadTermos(){
+  const box=document.getElementById('termos-user');
+  const raw=localStorage.getItem('termos_obra'); const list=raw? JSON.parse(raw) : [];
+  if(!list.length){ box.innerHTML='<p class="note">Sem termos cadastrados.</p>'; return; }
+  box.innerHTML='<ul style="padding-left:18px; margin:0">'+list.map(t=>`<li style="margin:6px 0"><b>${t.nome}</b> — ${t.def}</li>`).join('')+'</ul>';
+}
+function addTermo(){
+  const nome=(document.getElementById('termo-nome')?.value||'').trim();
+  const def=(document.getElementById('termo-def')?.value||'').trim();
+  if(!nome||!def){ alert('Preencha termo e significado.'); return; }
+  const raw=localStorage.getItem('termos_obra'); const list=raw? JSON.parse(raw) : [];
+  list.push({nome, def}); localStorage.setItem('termos_obra', JSON.stringify(list));
+  document.getElementById('termo-nome').value=''; document.getElementById('termo-def').value='';
+  loadTermos();
+}
+let mediaRecorder,chunks=[];
+async function recIniciar(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRecorder=new MediaRecorder(stream);
+    mediaRecorder.ondataavailable=e=>chunks.push(e.data);
+    mediaRecorder.onstop=e=>{
+      const blob=new Blob(chunks,{type:'audio/webm'}); chunks=[];
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('audio'); a.controls=true; a.src=url;
+      document.getElementById('audios').appendChild(a);
+    };
+    mediaRecorder.start();
+  }catch(e){ alert('Permita o microfone para gravar.'); }
+}
+function recParar(){ try{ mediaRecorder && mediaRecorder.stop(); }catch(e){} }
+
+/* =========================
+   REPORTAR RISCO
+========================= */
+let fotoDataURL=null;
+function fotoSelecionada(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const fr=new FileReader();
+  fr.onload=()=>{ const img=new Image(); img.onload=()=>{
+    const max=800, scale=Math.min(1, max/Math.max(img.width, img.height));
+    const c=document.createElement('canvas'); c.width=Math.round(img.width*scale); c.height=Math.round(img.height*scale);
+    const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,c.width,c.height);
+    fotoDataURL=c.toDataURL('image/jpeg', .8);
+  }; img.src=fr.result; }; fr.readAsDataURL(file);
+}
+function salvarRelato(){
+  const txt=(document.getElementById('relato-texto')?.value||'').trim();
+  const arr=JSON.parse(localStorage.getItem('relatos')||'[]');
+  arr.push({quando:new Date().toISOString(), texto:txt, foto:fotoDataURL});
+  localStorage.setItem('relatos', JSON.stringify(arr));
+  document.getElementById('relato-texto').value=''; fotoDataURL=null;
+  renderRelatos();
+}
+function renderRelatos(){
+  const arr=JSON.parse(localStorage.getItem('relatos')||'[]');
+  const box=document.getElementById('relatos-list'); box.innerHTML='';
+  arr.forEach(r=>{
+    const card=document.createElement('div'); card.className='card priority-low';
+    card.innerHTML=`<div class="note">${new Date(r.quando).toLocaleString()}</div><div>${r.texto||''}</div>`;
+    if(r.foto){ const img=new Image(); img.src=r.foto; img.style.width='100%'; img.style.borderRadius='12px'; img.style.marginTop='8px'; card.appendChild(img); }
+    box.appendChild(card);
+  });
+}
+function exportRelatos(){
+  const arr=JSON.parse(localStorage.getItem('relatos')||'[]');
+  const blob=new Blob([JSON.stringify(arr,null,2)], {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='relatos.json'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* =========================
+   SINAIS
+========================= */
+let audioCtx;
+function beep(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type='sine'; o.frequency.value=880; g.gain.value=0.001;
+    g.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime+0.01);
+    o.connect(g).connect(audioCtx.destination); o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.2);
+    o.stop(audioCtx.currentTime+0.21);
+  }catch(e){}
+}
+
+/* =========================
+   OFFLINE (Service Worker inline)
+========================= */
+async function regSW(){
+  if(!('serviceWorker' in navigator)){ alert('Sem suporte a SW.'); return; }
+  const code = `
+    self.addEventListener('install', e=>{ e.waitUntil(caches.open('ignYra-obra-v1').then(c=>c.addAll(['./']))); self.skipWaiting(); });
+    self.addEventListener('activate', e=> self.clients.claim());
+    self.addEventListener('fetch', e=>{ e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request).catch(()=>caches.match('./')))); });
+  `;
+  const blob=new Blob([code], {type:'text/javascript'});
+  const url=URL.createObjectURL(blob);
+  try{ await navigator.serviceWorker.register(url); alert('Modo offline ativado.'); }catch(e){ alert('Falha ao ativar offline.'); }
+}
+
+/* =========================
+   MODO DIDÁTICO
+========================= */
+let didatico=true;
+function toggleDidatico(){
+  didatico=!didatico;
+  document.getElementById('modeLabel').innerText = didatico? 'Didático':'Compacto';
+  document.querySelectorAll('.dida').forEach(el=> el.style.display = didatico? '' : 'none');
+}
+
+/* =========================
+   APRESENTAÇÃO — Slides + TTS
+========================= */
+const SLIDES=[
+  {t:"Identidade & Pulso", b:"EngJhBarros Dual.Infodose — ASSERT. Transformamos norma em cultura que volta gente pra casa.", r:"“Energizando insights, iluminando o futuro.”"},
+  {t:"A Chave", b:"Protocolos práticos, pressão-resistente, consciência no instante certo.", r:"Segurança é vida. E vida pulsa."},
+  {t:"Estrutura 3×6×9", b:"3: Explicação→Aplicação→Antecipação. 6 reforços. 9 recompensas.", r:"Dopamina do bem para foco."},
+  {t:"NR10 — Invisível", b:"Pode haver residual/retorno. Enxergue o invisível com método.", r:"Desliga → Bloqueia → Etiqueta → Testa → Trabalha."},
+  {t:"NR10 — Campo", b:"Detector testado; mão única; piso seco; kit isolado dedicado.", r:"Não confie só no disjuntor."},
+  {t:"NR35 — Rápido", b:"Queda é rápida. Só dá tempo de já estar preso.", r:"Decida passos antes de subir."},
+  {t:"NR35 — Campo", b:"3 pontos; talabarte testado; nada de escada/tubo fino; rota; sinais.", r:"STOP/OK/ATENÇÃO."},
+  {t:"Riscos combinados", b:"Poste, vento, fio energizado. Proteções cruzadas e STOP.", r:"Dois riscos, uma vida."},
+  {t:"EPIs — Duplo Estado", b:"Comigo & Inspecionado. Dúvida → troca. Dano → não usa.", r:"Luva: teste microfuro."},
+  {t:"Checklists", b:"Pré: risco/LOTO/queda/resgate/EPI/sinalização/STOP. Pós: desenergização/limpeza/EPI/prontuário/time.", r:"“Não ok” abre correção."},
+  {t:"Risco Offline", b:"Foto + nota; imagem reduzida; exporta JSON.", r:"Documento hoje = prevenção amanhã."},
+  {t:"Glossário Vivo", b:"Termos + áudios do time; padroniza e integra rápido.", r:"O time ensina o time."},
+  {t:"Dica & Ritual", b:"Toque no ⚡; ao fechar checklist, frase-âncora.", r:"“Pulso seguro, missão cumprida.”"}
+];
+let slideIdx=0;
+function renderSlide(){
+  const box=document.getElementById('slideBox');
+  document.getElementById('slideIndex').textContent=`Slide ${slideIdx+1} / ${SLIDES.length}`;
+  document.getElementById('slideTitle').textContent=SLIDES[slideIdx].t;
+  document.getElementById('slideBody').textContent=SLIDES[slideIdx].b;
+  document.getElementById('slideReward').textContent=SLIDES[slideIdx].r||'';
+  try{ gsap.from(box,{duration:.35,y:12,opacity:0}); }catch(e){}
+}
+function nextSlide(){ slideIdx=(slideIdx+1)%SLIDES.length; renderSlide(); }
+function prevSlide(){ slideIdx=(slideIdx-1+SLIDES.length)%SLIDES.length; renderSlide(); }
+function speakCurrent(){ const s=SLIDES[slideIdx]; speak(`${s.t}. ${s.b}. ${s.r||''}`); }
+async function playAll(){ for(let i=0;i<SLIDES.length;i++){ slideIdx=i; renderSlide(); speakCurrent(); await new Promise(r=>setTimeout(r,3900)); } }
+function copySlide(){ const s=SLIDES[slideIdx]; const txt=`# ${s.t}\n\n${s.b}\n\n${s.r||''}\n`; navigator.clipboard?.writeText(txt).then(()=>alert('Slide copiado!')); }
+(function hook(){ const _go=window.go; window.go=function(id){ _go(id); if(id==='apresentacao') renderSlide(); }; })();
+
+/* =========================
+   SIMULAÇÕES / INSIGHTS / MODAL
+========================= */
+function miniSim(t){
+  if(t==='nr10'){
+    showTip('SIM (NR10): Vai abrir painel. Detector não testado hoje. → Teste em ponto vivo confiável; só então meça ausência no painel. Sem detector? Não prossiga.');
+  } else {
+    showTip('SIM (NR35): Única ancoragem é escada solta. → NÃO ancorar. Procure ponto alto e rígido. Sem ponto seguro, não subir.');
+  }
+}
+function showInsight(msg){ showTip('💡 INSIGHT: '+msg); }
+function showTip(msg){
+  const m=document.getElementById('modal'); document.getElementById('modal-text').innerText=msg; m.classList.add('show');
+  try{ gsap.from(m.querySelector('.box'),{duration:.25, y:10, opacity:0}); }catch(e){}
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+
+/* =========================
+   INIT
+========================= */
+window.addEventListener('load', ()=>{
+  nextTip(); renderEPIs();
+  buildList('nr10list', NR10_TIPS); buildList('nr35list', NR35_TIPS);
+  buildChecklist('pre', PRE_ITEMS); buildChecklist('pos', POS_ITEMS);
+  loadTermos(); renderRelatos();
+  if(location.hash){ const id=location.hash.slice(1); if(document.getElementById(id)) go(id); }
+});
+</script>
+</body>
+</html>
