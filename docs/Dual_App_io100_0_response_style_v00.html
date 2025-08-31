@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dual APP io100_0 — Estilo Original</title>
+  <!--
+    Esta versão foi construída a partir do HTML original do Dual_App, preservando
+    a estrutura da UI (container de respostas com páginas, botões de controle,
+    tema escuro/claro/médio e barra de símbolos), mas simplificando a lógica
+    interna para maior legibilidade. O arquivo CSS externo `dual_base_beautiful.css`
+    contém os estilos visuais originais, incluindo gradientes, bordas e animações.
+  -->
+  <link rel="stylesheet" href="dual_base_beautiful.css" />
+  <!-- Estilos adicionais para controles, painéis e partículas -->
+  <style>
+    /* Uniformiza botões de controle (voz, player, upload, patches, key manager) */
+    .voice-button, .player-button, .layout-button, #patchMgrBtn, .upload-symbolic-button, .keymgr-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background var(--fast), opacity var(--slow);
+      opacity: 0.7;
+    }
+    .voice-button:hover, .player-button:hover, .layout-button:hover, #patchMgrBtn:hover, .upload-symbolic-button:hover, .keymgr-btn:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    .player-button {
+      border-radius: 50%;
+    }
+
+    /* Ajusta o contêiner de botões de controle para manter alinhamento horizontal */
+    .control-buttons {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* Botão de "mais controles" que exibe a seção de controles extras */
+    .more-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background var(--fast), opacity var(--slow);
+      opacity: 0.7;
+    }
+    .more-btn:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    .extra-controls {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .extra-controls button {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Botão de ditar voz no campo de entrada */
+    .voice-send-button {
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background var(--fast), transform var(--med);
+      opacity: .8;
+    }
+    .voice-send-button:hover {
+      background: rgba(255,255,255,0.15);
+      transform: scale(1.1);
+    }
+    .voice-send-button object {
+      pointer-events: none;
+    }
+
+    /* Tornar o rodapé interativo */
+    .footer-text {
+      cursor: pointer;
+    }
+
+    /* Traço do botão de reset de página: agora vertical com gradiente via máscara */
+    #resetPage {
+      position: absolute;
+      /* posiciona um pouco mais abaixo e deslocado para a direita em relação ao botão de tema */
+      top: 60px;
+      left: calc(50% + 50px);
+      width: 2px;
+      height: 40px;
+      border-radius: 1px;
+      background: #00ffff;
+      /* gradiente aplicado como máscara para criar efeito de desvanecimento */
+      -webkit-mask-image: linear-gradient(#0f0f0f, #00ffff);
+      mask-image: linear-gradient(#0f0f0f, #00ffff);
+      cursor: pointer;
+      transition: opacity var(--fast);
+      z-index: 10;
+      opacity: 0.6;
+    }
+    #resetPage:hover {
+      opacity: 1;
+    }
+
+    /* Esconder rodapé quando marcado como hidden */
+    .footer-text.hidden {
+      display: none;
+    }
+
+    /* Ajuste de background: escurecer com transparência na modalidade padrão (não light/medium/vibe) */
+    body:not(.light):not(.medium):not(.vibe) {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(20,20,20,0.9));
+    }
+    /* Painéis de gerenciamento e player com visual similar ao original */
+    #keyMgrPanel, #patchMgrPanel {
+      position: fixed;
+      right: 18px;
+      bottom: 160px;
+      z-index: 1000;
+      width: min(520px, calc(100vw - 36px));
+      max-height: 60vh;
+      overflow: auto;
+      border-radius: 16px;
+      padding: 14px 14px 10px;
+      background: rgba(10,12,16,.78);
+      backdrop-filter: blur(10px) saturate(160%);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 14px 36px rgba(0,0,0,.4);
+    }
+    #keyMgrPanel { display: none; }
+    #patchMgrPanel { display: none; }
+    #koblluxPlayer {
+      position: fixed;
+      top: 80px;
+      left: 20px;
+      z-index: 200030;
+      background: rgba(0, 10, 20, 0.85);
+      backdrop-filter: blur(9px) saturate(180%);
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      color: var(--acc1, #00FFFF);
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 260px;
+    }
+
+    /* Estilos internos do player */
+    #koblluxPlayer button,
+    #koblluxPlayer select,
+    #koblluxPlayer input[type="range"] {
+      background: rgba(0, 255, 255, 0.05);
+      border: 1px solid rgba(0, 255, 255, 0.1);
+      border-radius: 8px;
+      color: inherit;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+    #koblluxPlayer button:hover,
+    #koblluxPlayer select:hover {
+      background: rgba(0, 255, 255, 0.1);
+    }
+    #togglePlayer {
+      width: 60px;
+      height: 60px;
+      border-radius: 50% !important;
+      border: none !important;
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.3), rgba(0, 120, 255, 0.35)) !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: inherit;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+      transition: transform 0.3s ease;
+    }
+    #togglePlayer:hover {
+      transform: rotate(90deg);
+      background: linear-gradient(135deg, rgba(0, 255, 255, 0.4), rgba(0, 120, 255, 0.5)) !important;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.5);
+    }
+    #playerControls {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #koblluxPlayer input[type="range"] {
+      -webkit-appearance: none;
+      height: 6px;
+      background: rgba(0, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 0;
+      margin-top: 4px;
+    }
+    #koblluxPlayer input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #00FFFF;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+      transition: transform 0.2s ease;
+    }
+    #koblluxPlayer input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+    }
+    #koblluxPlayer label {
+      font-size: 11px;
+      opacity: 0.8;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--acc1, #00FFFF);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Contêiner de partículas ocupa a tela inteira por trás do conteúdo */
+    #particles-js {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* Painel de Layout & Estilo (“joguinho”) */
+    .layout-panel {
+      position: fixed;
+      left: 20px;
+      bottom: 160px;
+      z-index: 1000;
+      width: min(420px, calc(100vw - 40px));
+      max-height: 70vh;
+      overflow-y: auto;
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(12,14,20,0.95);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      color: var(--text);
+      font-size: 14px;
+    }
+    .layout-panel h3 {
+      margin-top: 0;
+      margin-bottom: 6px;
+      font-size: 16px;
+      text-align: center;
+    }
+    .layout-panel .section {
+      margin-top: 10px;
+    }
+    .layout-panel .section button {
+      margin: 4px 6px 0 0;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 12px;
+      transition: background var(--fast), transform var(--fast);
+    }
+    .layout-panel .section button:hover {
+      background: rgba(255,255,255,0.18);
+      transform: scale(1.05);
+    }
+
+    /* Variações de estilo para os blocos de resposta */
+    body.style-glass .response-block {
+      background: rgba(255,255,255,0.06);
+    }
+    body.style-paper .response-block {
+      background: rgba(0,0,0,0.05);
+    }
+    body.style-neon .response-block {
+      background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(255,0,255,0.2));
+    }
+
+    /* Variações de tamanho de fonte */
+    body.font-small {
+      font-size: 12px;
+    }
+    body.font-medium {
+      font-size: 14px;
+    }
+    body.font-large {
+      font-size: 16px;
+    }
+
+    /* Variações de espaçamento entre blocos de resposta */
+    body.gap-low .response-block {
+      margin: 0.5rem 0;
+    }
+    body.gap-med .response-block {
+      margin: 1rem 0;
+    }
+    body.gap-high .response-block {
+      margin: 1.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Botão de alternância de tema -->
+  <!-- O botão de tema alterna entre os modos padrão, light, medium e vibe. Um pequeno
+       traço logo abaixo deste botão serve como botão de "reset" de página, como
+       na versão original. -->
+  <button id="themeToggle" title="Alternar tema">◐</button>
+  <!-- Traço de reset: clique nele para recarregar a página. -->
+  <div id="resetPage" title="Resetar página"></div>
+
+  <!-- Logotipo 3D original (opcional) -->
+  <div class="svg-container" id="logoContainer">
+    <object id="logoObj" data="assets/icons/3D_logo_Dual_Infodose_10.png" type="image/png"></object>
+  </div>
+  <!-- Contêiner de partículas (requere particles.js) -->
+  <div id="particles-js"></div>
+
+  <!-- Contêiner principal de respostas -->
+  <div class="response-container" id="response">
+    <!-- Páginas de mensagens -->
+    <div class="pages-wrapper">
+      <div class="page initial active">
+        <strong>Clique no ◉ e diga “Oi, Dual”.</strong>
+      </div>
+    </div>
+    <!-- Texto de rodapé -->
+    <p class="footer-text">
+      <em>Do seu jeito. <strong>Sempre</strong> único. <strong>Sempre</strong> seu.</em>
+    </p>
+    <!-- Controles de resposta: botões de ação -->
+    <div class="response-controls">
+      <div class="control-buttons">
+        <!-- Copiar última resposta -->
+        <button class="copy-button" title="Copiar">
+          <object data="assets/icons/BW_quad_Dual_Infodose.svg" width="27" height="27" type="image/svg+xml"></object>
+        </button>
+        <!-- Colar do clipboard -->
+        <button class="paste-button" title="Colar">
+          <object data="assets/icons/BW_Dual_Infodose.svg" width="24" height="24" type="image/svg+xml"></object>
+        </button>
+        <!-- Botão de voz / reset: usa o ícone original de reset -->
+        <button class="voice-button" id="voiceBtn" title="Dictar voz">
+          <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" width="36" height="36" type="image/svg+xml"></object>
+        </button>
+        <!-- Login / alternância de usuário -->
+        <button class="toggle-button" id="toggleBtn" title="Login Infodose">
+          <object data="assets/icons/KBLX-pack/SuS-logo-1.PNG" width="33" height="33" type="image/png"></object>
+        </button>
+        <!-- Botão Kitty / estudos -->
+        <button class="kitty-button" id="kittyBtn" title="Estudos">
+          <object data="assets/icons/DualKittyKard-icon-3.png" width="33" height="33" type="image/png"></object>
+        </button>
+        <!-- Enviar arquivo simbólico -->
+        <button class="upload-symbolic-button" id="uploadFileBtn" title="Enviar Arquivo">
+          ⧉
+        </button>
+        <input id="symbolicFileInput" type="file" accept=".txt,.html,.json,.pdf,.png,.jpg,.jpeg" style="display:none;" />
+        <!-- Gerenciador de chaves e treinamentos -->
+        <button class="keymgr-btn" id="keyMgrBtn" title="Chaves &amp; Treinamentos">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="26" height="26">
+            <path d="M3 12a6 6 0 1 1 11.31 3H22v3h-3v3h-3v-3h-3.69A6 6 0 0 1 3 12Z"></path>
+            <circle cx="9" cy="12" r="2"></circle>
+          </svg>
+        </button>
+        <!-- Botão de mais controles: exibe controles extras ao ser clicado -->
+        <button id="moreBtn" class="more-btn" title="Mais controles">⋮</button>
+      </div>
+      <!-- Contêiner de controles extras (expande para baixo) -->
+      <div id="extraControls" class="extra-controls" style="display:none;">
+        <!-- Gerenciador de patches -->
+        <button id="patchMgrBtn" class="upload-symbolic-button" title="Patches">&#x20CB;</button>
+        <!-- Botão do player de áudio -->
+        <button class="player-button" id="playerBtn" title="Reproduzir áudio">🎧</button>
+        <!-- Botão do painel de layout (estilo “joguinho”) -->
+        <button class="layout-button" id="layoutBtn" title="Layout &amp; Estilo">🎮</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra de símbolos para inserção rápida no input -->
+  <div class="symbol-bar">
+    <button class="symbol-button" data-symbol="Δ">Δ</button>
+    <button class="symbol-button" data-symbol="Ω">Ω</button>
+    <button class="symbol-button" data-symbol="λ">λ</button>
+    <button class="symbol-button" data-symbol="∞">∞</button>
+    <button class="symbol-button" data-symbol="⚡">⚡</button>
+  </div>
+
+  <!-- Campo de entrada de usuário e botão de envio -->
+  <div class="input-container">
+    <input id="userInput" type="text" placeholder="Digite aqui..." />
+    <!-- Botão de envio de texto -->
+    <button id="sendButton" title="Enviar">➤</button>
+    <!-- Botão de dictar voz/submit por fala (círculo reset) -->
+    <button id="voiceSendBtn" class="voice-send-button" title="Dictar voz">
+      <object data="assets/icons/Reset_buttom_Dual-Infodose.svg" width="32" height="32" type="image/svg+xml"></object>
+    </button>
+  </div>
+
+  <!-- Painel do Gerenciador de Chaves -->
+  <div id="keyMgrPanel" style="display:none;" class="keymgr-panel">
+    <div class="keymgr-hd">
+      <h3>Chaves &amp; Treinamentos — Dual.Infodose</h3>
+      <button class="keymgr-close" id="closeKeyMgrBtn">Fechar</button>
+    </div>
+    <p class="user-info">Usuário: <span id="keymgrUserName"></span> — Assistente: <span id="keymgrAssistantName"></span></p>
+    <label>API Key<br /><input id="apiKeyInput" type="text" placeholder="sk-..." /></label><br />
+    <label>Modelo<br />
+      <select id="modelSelect">
+        <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
+        <option value="gpt-4o">gpt-4o</option>
+      </select>
+    </label><br />
+    <label>Papel (role)<br />
+      <select id="roleSelect">
+        <option value="user">user</option>
+        <option value="assistant">assistant</option>
+        <option value="system">system</option>
+      </select>
+    </label><br />
+    <label>Role System (treinamento)<br />
+      <input id="roleSystemInput" type="text" placeholder="Instruções de sistema (Role)" />
+    </label><br />
+    <button id="saveKeyBtn">Salvar</button>
+  </div>
+
+  <!-- Painel do Patch Manager (placeholder) -->
+  <div id="patchMgrPanel" style="display:none;">
+    <header><h3>Patch Manager</h3></header>
+    <div id="patchList">
+      <p>Esta é uma interface de exemplo para o gerenciador de patches. Adicione seus patches aqui.</p>
+    </div>
+    <button id="closePatchMgrBtn">Fechar</button>
+  </div>
+
+  <!-- Painel de Layout & Estilo (modo “joguinho”) -->
+  <div id="layoutPanel" class="layout-panel" style="display:none;">
+    <h3>Layout &amp; Estilo</h3>
+    <div class="section">
+      <strong>Tema:</strong><br />
+      <button data-theme="">Padrão</button>
+      <button data-theme="light">Claro</button>
+      <button data-theme="medium">Médio</button>
+      <button data-theme="vibe">Vibe</button>
+    </div>
+    <div class="section">
+      <strong>Estilo:</strong><br />
+      <button data-style="glass">Glass</button>
+      <button data-style="paper">Paper</button>
+      <button data-style="neon">Neon</button>
+    </div>
+    <div class="section">
+      <strong>Fonte:</strong><br />
+      <button data-font="small">Pequena</button>
+      <button data-font="medium">Média</button>
+      <button data-font="large">Grande</button>
+    </div>
+    <div class="section">
+      <strong>Espaçamento:</strong><br />
+      <button data-gap="low">Baixo</button>
+      <button data-gap="med">Médio</button>
+      <button data-gap="high">Alto</button>
+    </div>
+    <div class="section">
+      <button id="layoutReset">Resetar</button>
+      <button id="layoutClose">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Player de áudio KOBLLUX -->
+  <div id="koblluxPlayer" style="display:none;">
+    <!-- Botão redondo para expandir/contrair os controles -->
+    <button id="togglePlayer" title="Alternar controles">≈</button>
+    <!-- Controles do player: escondidos inicialmente -->
+    <div id="playerControls" style="display:none;">
+      <!-- Botão play/pause -->
+      <button id="playPause">►</button>
+      <!-- Seleção de trilha principal -->
+      <select id="trackSelect">
+        <option value="">🎵 Escolha uma trilha</option>
+        <option value="Sono_Profundo">🌙 Sono Profundo</option>
+        <option value="Manifestação">✨ Manifestação</option>
+        <option value="Ativação_Pineal">🧠 Ativação Pineal</option>
+        <option value="Alívio_da_Ansiedade">🌿 Alívio da Ansiedade</option>
+        <option value="Meditação_Theta">◉ Meditação Theta</option>
+        <option value="Viagem_Astral">🌌 Viagem Astral</option>
+        <option value="Foco_Profundo">🎯 Foco Profundo</option>
+        <option value="Flow_State">🌊 Flow State</option>
+        <option value="Relaxamento_Rápido">💤 Relaxamento Rápido</option>
+        <option value="Concentração_Sustentada">📚 Concentração Sustentada</option>
+        <option value="Cura_Emocional">💖 Cura Emocional</option>
+        <option value="Recuperação_Física">🏋️ Recuperação Física</option>
+        <option value="matrix">🧪 Matrix</option>
+        <option value="tesseract">🧿 Tesseract</option>
+      </select>
+      <!-- Seleção de binaural -->
+      <select id="binauralSelect">
+        <option value="">🎶 Binaural Desativado</option>
+        <option value="Sono_Profundo">🌙 Sono Profundo</option>
+        <option value="Manifestação">✨ Manifestação</option>
+        <option value="Ativação_Pineal">🧠 Ativação Pineal</option>
+        <option value="Alívio_da_Ansiedade">🌿 Alívio da Ansiedade</option>
+        <option value="Meditação_Theta">◉ Meditação Theta</option>
+        <option value="Viagem_Astral">🌌 Viagem Astral</option>
+        <option value="Foco_Profundo">🎯 Foco Profundo</option>
+        <option value="Flow_State">🌊 Flow State</option>
+        <option value="Relaxamento_Rápido">💤 Relaxamento Rápido</option>
+        <option value="Concentração_Sustentada">📚 Concentração Sustentada</option>
+        <option value="Cura_Emocional">💖 Cura Emocional</option>
+        <option value="Recuperação_Física">🏋️ Recuperação Física</option>
+        <option value="matrix">🧪 Matrix</option>
+        <option value="tesseract">🧿 Tesseract</option>
+      </select>
+      <!-- Controles de volume -->
+      <label>
+        🎵 Volume Trilha
+        <input id="trackVolume" type="range" min="0" max="1" step="0.01" value="1" />
+      </label>
+      <label>
+        🧘 Volume Binaural
+        <input id="binauralVolume" type="range" min="0" max="1" step="0.01" value="1" />
+      </label>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Alternância de temas: ciclo entre padrão, light, medium e vibe
+      const themeBtn = document.getElementById('themeToggle');
+      const modes = ['', 'light', 'medium', 'vibe'];
+      themeBtn.addEventListener('click', function() {
+        const body = document.body;
+        const current = modes.indexOf(body.className);
+        const next = (current + 1) % modes.length;
+        body.className = modes[next];
+      });
+
+      // Rodapé "Do seu jeito..." pode ser ocultado/mostrado quando clicado. O estado
+      // é persistido em localStorage (dual.showFooter). Inicialmente, lê o valor
+      // salvo e aplica a classe "hidden" se necessário. Clicar alterna o estado.
+      const footer = document.querySelector('.footer-text');
+      if (footer) {
+        try {
+          const showFooter = JSON.parse(localStorage.getItem('dual.showFooter') ?? 'true');
+          if (!showFooter) footer.classList.add('hidden');
+        } catch (e) {}
+        footer.addEventListener('click', function() {
+          const currentlyHidden = footer.classList.toggle('hidden');
+          localStorage.setItem('dual.showFooter', JSON.stringify(!currentlyHidden));
+        });
+      }
+
+      // Resetar a página quando clicar no traço de reset
+      const resetLine = document.getElementById('resetPage');
+      if (resetLine) {
+        resetLine.addEventListener('click', function() {
+          location.reload();
+        });
+      }
+
+      // Barra de símbolos: insere símbolo no campo de entrada
+      document.querySelectorAll('.symbol-button').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const symbol = this.getAttribute('data-symbol');
+          const input = document.getElementById('userInput');
+          input.value += symbol;
+          input.focus();
+        });
+      });
+
+      // Contêiner das mensagens para rolagem infinita
+      const wrap = document.querySelector('.pages-wrapper');
+
+      // Copiar última resposta para o clipboard
+      document.querySelector('.copy-button').addEventListener('click', function() {
+        const wrapper = document.querySelector('.pages-wrapper');
+        const lastPage = wrapper ? wrapper.lastElementChild : null;
+        if (!lastPage) return;
+        const blocks = lastPage.querySelectorAll('.response-block p');
+        let text = '';
+        blocks.forEach(b => { text += b.textContent + '\n\n'; });
+        navigator.clipboard.writeText(text.trim()).then(() => {
+          alert('Copiado para a área de transferência!');
+        });
+      });
+
+      // Colar do clipboard para o campo de entrada
+      document.querySelector('.paste-button').addEventListener('click', function() {
+        navigator.clipboard.readText().then(text => {
+          const input = document.getElementById('userInput');
+          input.value += text;
+          input.focus();
+        });
+      });
+
+      // Voice recognition (dictar voz) — usa Web Speech API se disponível
+      const voiceBtn = document.getElementById('voiceBtn');
+      // Novo botão de voz próximo ao campo de entrada
+      const voiceSendBtn = document.getElementById('voiceSendBtn');
+      let recognition;
+      let recognizing = false;
+      if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.interimResults = false;
+        recognition.onresult = function(event) {
+          const transcript = event.results[0][0].transcript;
+          const input = document.getElementById('userInput');
+          input.value = transcript;
+          sendMessage();
+        };
+        recognition.onend = function() {
+          recognizing = false;
+          if (voiceBtn) voiceBtn.classList.remove('active');
+          if (voiceSendBtn) voiceSendBtn.classList.remove('active');
+        };
+        recognition.onerror = function() {
+          recognizing = false;
+          if (voiceBtn) voiceBtn.classList.remove('active');
+          if (voiceSendBtn) voiceSendBtn.classList.remove('active');
+        };
+        // Função para iniciar/parar reconhecimento de voz
+        function toggleSpeech() {
+          if (!recognizing) {
+            recognizing = true;
+            if (voiceBtn) voiceBtn.classList.add('active');
+            if (voiceSendBtn) voiceSendBtn.classList.add('active');
+            recognition.start();
+          } else {
+            recognition.stop();
+          }
+        }
+        if (voiceBtn) voiceBtn.addEventListener('click', toggleSpeech);
+        if (voiceSendBtn) voiceSendBtn.addEventListener('click', toggleSpeech);
+      } else {
+        if (voiceBtn) voiceBtn.addEventListener('click', function() {
+          alert('Reconhecimento de voz não suportado neste navegador.');
+        });
+        if (voiceSendBtn) voiceSendBtn.addEventListener('click', function() {
+          alert('Reconhecimento de voz não suportado neste navegador.');
+        });
+      }
+
+      // Alternância do painel de Chaves
+      const keyMgrBtn = document.getElementById('keyMgrBtn');
+      const keyMgrPanel = document.getElementById('keyMgrPanel');
+      const closeKeyMgrBtn = document.getElementById('closeKeyMgrBtn');
+      keyMgrBtn.addEventListener('click', function() {
+        const isHidden = keyMgrPanel.style.display === 'none' || keyMgrPanel.style.display === '';
+        if (isHidden) {
+          // Preencher campos com valores atuais salvos
+          let settings = {};
+          try {
+            settings = JSON.parse(localStorage.getItem('dual.clean') || '{}');
+          } catch (e) {}
+          document.getElementById('apiKeyInput').value = settings.token || '';
+          document.getElementById('modelSelect').value = settings.model || 'gpt-3.5-turbo';
+          document.getElementById('roleSelect').value = settings.role || 'user';
+          const roleSystemEl = document.getElementById('roleSystemInput');
+          if (roleSystemEl) roleSystemEl.value = settings.roleSystem || '';
+          // mostrar painel
+          keyMgrPanel.style.display = 'block';
+        } else {
+          keyMgrPanel.style.display = 'none';
+        }
+      });
+      closeKeyMgrBtn.addEventListener('click', function() {
+        keyMgrPanel.style.display = 'none';
+      });
+      document.getElementById('saveKeyBtn').addEventListener('click', function() {
+        const key = document.getElementById('apiKeyInput').value.trim();
+        const model = document.getElementById('modelSelect').value;
+        const role = document.getElementById('roleSelect').value;
+        const roleSystem = document.getElementById('roleSystemInput')?.value.trim();
+        const settings = JSON.parse(localStorage.getItem('dual.clean') || '{}');
+        if (key) settings.token = key;
+        if (model) settings.model = model;
+        if (role) settings.role = role;
+        if (roleSystem) settings.roleSystem = roleSystem;
+        localStorage.setItem('dual.clean', JSON.stringify(settings));
+        alert('Configurações salvas!');
+        keyMgrPanel.style.display = 'none';
+      });
+
+      // Alternância do Patch Manager
+      const patchMgrBtn = document.getElementById('patchMgrBtn');
+      const patchMgrPanel = document.getElementById('patchMgrPanel');
+      const closePatchMgrBtn = document.getElementById('closePatchMgrBtn');
+      patchMgrBtn.addEventListener('click', function() {
+        patchMgrPanel.style.display = patchMgrPanel.style.display === 'none' || patchMgrPanel.style.display === '' ? 'block' : 'none';
+      });
+      closePatchMgrBtn.addEventListener('click', function() {
+        patchMgrPanel.style.display = 'none';
+      });
+
+      // Alternância do menu de controles extras (últimos botões)
+      const moreBtn = document.getElementById('moreBtn');
+      const extraControls = document.getElementById('extraControls');
+      if (moreBtn && extraControls) {
+        moreBtn.addEventListener('click', function() {
+          // alterna entre esconder e mostrar a lista de controles extras
+          extraControls.style.display = (extraControls.style.display === 'none' || extraControls.style.display === '') ? 'flex' : 'none';
+        });
+      }
+
+      // ---------- Painel de Layout & Estilo (modo “joguinho”) ----------
+      const layoutBtn = document.getElementById('layoutBtn');
+      const layoutPanel = document.getElementById('layoutPanel');
+      const layoutClose = document.getElementById('layoutClose');
+      const layoutReset = document.getElementById('layoutReset');
+      // Alternar visibilidade do painel de layout
+      layoutBtn.addEventListener('click', function() {
+        layoutPanel.style.display = (layoutPanel.style.display === 'none' || layoutPanel.style.display === '') ? 'block' : 'none';
+      });
+      // Fechar painel
+      layoutClose.addEventListener('click', function() {
+        layoutPanel.style.display = 'none';
+      });
+      // Seleção de tema
+      layoutPanel.querySelectorAll('button[data-theme]').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const mode = this.getAttribute('data-theme');
+          const body = document.body;
+          body.classList.remove('light','medium','vibe');
+          if (mode) body.classList.add(mode); else body.className = '';
+        });
+      });
+      // Seleção de estilo visual
+      layoutPanel.querySelectorAll('button[data-style]').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const style = this.getAttribute('data-style');
+          ['style-glass','style-paper','style-neon'].forEach(c => document.body.classList.remove(c));
+          if (style) document.body.classList.add('style-' + style);
+        });
+      });
+      // Seleção de tamanho de fonte
+      layoutPanel.querySelectorAll('button[data-font]').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const font = this.getAttribute('data-font');
+          ['font-small','font-medium','font-large'].forEach(c => document.body.classList.remove(c));
+          if (font) document.body.classList.add('font-' + font);
+        });
+      });
+      // Seleção de espaçamento
+      layoutPanel.querySelectorAll('button[data-gap]').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const gap = this.getAttribute('data-gap');
+          ['gap-low','gap-med','gap-high'].forEach(c => document.body.classList.remove(c));
+          if (gap) document.body.classList.add('gap-' + gap);
+        });
+      });
+      // Resetar estilos personalizados
+      layoutReset.addEventListener('click', function() {
+        ['style-glass','style-paper','style-neon',
+         'font-small','font-medium','font-large',
+         'gap-low','gap-med','gap-high'].forEach(c => document.body.classList.remove(c));
+      });
+
+      // --------- Player de áudio KOBLLUX (novo) ---------
+      const playerBtn = document.getElementById('playerBtn');
+      const koblluxPlayer = document.getElementById('koblluxPlayer');
+      const togglePlayerBtn = document.getElementById('togglePlayer');
+      const playerControls = document.getElementById('playerControls');
+      const playPauseBtn = document.getElementById('playPause');
+      const trackSelect = document.getElementById('trackSelect');
+      const binauralSelect = document.getElementById('binauralSelect');
+      const trackVolume = document.getElementById('trackVolume');
+      const binauralVolume = document.getElementById('binauralVolume');
+      const trackAudio = new Audio();
+      const binauralAudio = new Audio();
+      // Alterna visibilidade do contêiner do player
+      playerBtn.addEventListener('click', function() {
+        koblluxPlayer.style.display = (koblluxPlayer.style.display === 'none' || koblluxPlayer.style.display === '') ? 'flex' : 'none';
+      });
+      // Expande/retrai controles internos
+      togglePlayerBtn.addEventListener('click', function() {
+        playerControls.style.display = (playerControls.style.display === 'none' || playerControls.style.display === '') ? 'flex' : 'none';
+      });
+      // Play/Pause para ambas as faixas
+      playPauseBtn.addEventListener('click', function() {
+        if (trackAudio.src) {
+          trackAudio.paused ? trackAudio.play() : trackAudio.pause();
+        }
+        if (binauralAudio.src) {
+          binauralAudio.paused ? binauralAudio.play() : binauralAudio.pause();
+        }
+        playPauseBtn.textContent = (trackAudio.paused && binauralAudio.paused) ? '►' : '⏸';
+      });
+      // Mudança de trilha principal
+      trackSelect.addEventListener('change', function() {
+        if (trackSelect.value) {
+          trackAudio.src = 'assets/sounds/trilhas/' + trackSelect.value + '.mp3';
+          trackAudio.loop = true;
+          trackAudio.volume = trackVolume.value;
+          trackAudio.play();
+          playPauseBtn.textContent = '⏸';
+        } else {
+          trackAudio.pause();
+          trackAudio.src = '';
+        }
+      });
+      // Mudança de faixa binaural
+      binauralSelect.addEventListener('change', function() {
+        if (binauralSelect.value) {
+          binauralAudio.src = 'assets/sounds/binaural/' + binauralSelect.value + '.wav';
+          binauralAudio.loop = true;
+          binauralAudio.volume = binauralVolume.value;
+          binauralAudio.play();
+        } else {
+          binauralAudio.pause();
+          binauralAudio.src = '';
+        }
+      });
+      // Ajuste de volume das trilhas
+      trackVolume.addEventListener('input', function() {
+        trackAudio.volume = trackVolume.value;
+      });
+      binauralVolume.addEventListener('input', function() {
+        binauralAudio.volume = binauralVolume.value;
+      });
+
+      // Enviar mensagem ao modelo
+      document.getElementById('sendButton').addEventListener('click', sendMessage);
+      document.getElementById('userInput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
+
+      // Adicionar eventos de envio para upload de arquivo (basic placeholder)
+      document.getElementById('uploadFileBtn').addEventListener('click', function() {
+        document.getElementById('symbolicFileInput').click();
+      });
+      document.getElementById('symbolicFileInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        alert('Arquivo selecionado: ' + file.name);
+        // Aqui você pode implementar processamento do arquivo conforme necessário
+      });
+
+      // Função para enviar a mensagem do usuário e exibir respostas
+      function sendMessage() {
+        const input = document.getElementById('userInput');
+        const text = input.value.trim();
+        if (!text) return;
+        // Renderizar mensagem do usuário
+        renderResponse(text, 'user');
+        input.value = '';
+        // Chamar o modelo (placeholder)
+        callAI(text).then(response => {
+          renderResponse(response, 'assistant');
+        });
+      }
+
+      // Chamada simulada ao modelo IA: retorna texto ecoado com o role
+      async function callAI(prompt) {
+        let settings = {};
+        try {
+          settings = JSON.parse(localStorage.getItem('dual.clean') || '{}');
+        } catch (e) {}
+        const role = settings.role || 'assistant';
+        const roleSystem = settings.roleSystem || '';
+        // Simulação de latência de rede
+        await new Promise(res => setTimeout(res, 500));
+        // Se existir roleSystem, inclui-o junto ao role no prefixo
+        const prefix = roleSystem ? `${role} | ${roleSystem}` : role;
+        return `[${prefix}] Você disse: ${prompt}`;
+      }
+
+      // Função para renderizar uma resposta (user ou assistant)
+      function renderResponse(msg, sender) {
+        // Dividir a mensagem em parágrafos separados por linhas em branco
+        let parts = String(msg).trim().split(/\n{2,}/);
+        if (parts.length === 0) parts = [''];
+        // Lista de rótulos usados nos blocos de resposta. Estes títulos foram inspirados na versão
+        // original do app, com quatro fases: Recompensacional, Crisidade,
+        // Exploração e Antecipação Vibracional. Se houver mais ou menos
+        // parágrafos que rótulos, o array será usado de forma cíclica.
+        const labels = ['🎁 Recompensa Inicial','✨ Curiosidade','👁️ Exploração','⚡️ Antecipação Vibracional'];
+
+        // Criar um contêiner para a nova mensagem (sem navegação)
+        const newPage = document.createElement('div');
+        newPage.className = 'page';
+        parts.forEach((txt, idx) => {
+          let cls;
+          if (idx === 0) cls = 'intro';
+          else if (idx === parts.length - 1) cls = 'ending';
+          else cls = 'middle';
+          const block = document.createElement('div');
+          block.className = `response-block ${cls}`;
+          // Rótulo calculado (não exibido) para cada bloco baseado na posição
+          const label = labels[idx % labels.length];
+          const p = document.createElement('p');
+          p.textContent = txt;
+          block.appendChild(p);
+          block.addEventListener('click', function() {
+            block.classList.toggle('expanded');
+          });
+          newPage.appendChild(block);
+        });
+        // Adicionar rodapé de identificador
+        const footer = document.createElement('p');
+        footer.className = 'footer-text';
+        footer.innerHTML = sender === 'assistant' ? '<em>Resposta do modelo</em>' : '<em>Mensagem enviada</em>';
+        newPage.appendChild(footer);
+        // Anexar a nova mensagem ao contêiner e rolar para o fim
+        wrap.appendChild(newPage);
+        // Rolagem automática para o fim do contêiner de respostas
+        const responseContainer = document.getElementById('response');
+        responseContainer.scrollTop = responseContainer.scrollHeight;
+      }
+
+      // Carregar partículas se a biblioteca estiver disponível
+      if (window.particlesJS) {
+        try {
+          // O arquivo de configuração deve existir em assets/particles.json
+          window.particlesJS.load('particles-js', 'assets/particles.json');
+        } catch (e) {
+          console.warn('Falha ao carregar partículas:', e);
+        }
+      }
+    })();
+  </script>
+  <!-- Fallback scripts: Particles stub e Patch Manager avançado (placeholder) -->
+  <script src="particles_stub.js"></script>
+  <script src="patchMgr_advanced.js"></script>
+</body>
+</html>
