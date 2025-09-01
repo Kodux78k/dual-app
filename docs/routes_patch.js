@@ -3,7 +3,7 @@
 */
 export function initSplashRoute(opts = {}){
   const cfg = Object.assign({
-    splashPath: 'splash_dual_infodose.html',
+    splashPath: 'index.html',
     indexPath: 'index.html',
     storageKey: 'dual.splash.dismissed',
     defaultRoute: '#/chat',
