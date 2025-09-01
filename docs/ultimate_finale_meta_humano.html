@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ultimate Finale — MetaHumano • Máquina • Aprendizado</title>
+<meta name="description" content="Gerador standalone (single-file) que converte frames ASCII (portais) em prompts de Texto, Imagem e Música. Rótulos compreensíveis por IA e humanos.">
+<style>
+  :root{
+    --bg:#07090d; --bg2:#0b0f15; --panel:#0f141c; --panel2:#0c1017; --line:rgba(255,255,255,.08);
+    --txt:#e6edf3; --muted:#a0a8b4; --soft:#cdd6e1; --r:18px; --shadow:0 20px 60px rgba(0,0,0,.45);
+    --maxw:1180px; --maxw-m:428px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; color:var(--txt); background:
+    radial-gradient(900px 600px at 0% -10%, rgba(103,232,249,.12), transparent 60%),
+    radial-gradient(900px 600px at 100% 0%, rgba(167,139,250,.12), transparent 60%),
+    linear-gradient(180deg, var(--bg), var(--bg2));
+    overflow-x:hidden; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial;}
+  header{position:sticky; top:0; z-index:10; backdrop-filter: blur(8px);
+    background: linear-gradient(180deg, rgba(7,9,13,.9), rgba(7,9,13,.55)); border-bottom:1px solid var(--line)}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:14px 16px}
+  .title{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  h1{font-size:20px; margin:0}
+  .pill,.badge{padding:6px 10px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--soft)}
+  .pill{background:linear-gradient(90deg, rgba(110,231,255,.16), rgba(167,139,250,.16))}
+  .grid{display:grid; gap:16px}
+  @media(min-width:920px){ .grid-2{grid-template-columns: 1.05fr .95fr} }
+  .card{background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015)); border:1px solid var(--line); border-radius:var(--r); box-shadow: var(--shadow)}
+  .card .hd{padding:14px 16px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .card .bd{padding:14px 16px}
+  label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+  input, textarea{width:100%; background:var(--panel2); border:1px solid rgba(255,255,255,.12); color:var(--txt); border-radius:12px; padding:10px 12px; outline:none}
+  textarea{min-height:140px; white-space:pre-wrap; overflow-wrap:anywhere; font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace}
+  .row{display:grid; gap:12px}
+  @media(min-width:680px){ .row-2{grid-template-columns: repeat(2,1fr)} .row-3{grid-template-columns: repeat(3,1fr)} }
+  .toolbar{display:flex; flex-wrap:wrap; gap:8px}
+  .btn{appearance:none; border:1px solid rgba(255,255,255,.16); color:var(--txt); background: linear-gradient(90deg, rgba(110,231,255,.16), rgba(167,139,250,.16)); padding:9px 12px; border-radius:12px; cursor:pointer; font-weight:700; font-size:12px}
+  .btn.ghost{background:transparent}
+  .btn.sm{font-size:11px; padding:7px 9px}
+  .symbar{display:flex; gap:8px; overflow:auto; padding:8px; background:rgba(255,255,255,.04); border:1px dashed var(--line); border-radius:12px; -webkit-overflow-scrolling:touch}
+  .sym{padding:8px 10px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); white-space:nowrap}
+  .chips{display:flex; gap:8px; overflow:auto; padding-bottom:4px; -webkit-overflow-scrolling:touch}
+  .chip{display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border:1px dashed rgba(255,255,255,.18); border-radius:999px; font-size:11px; color:var(--soft); white-space:nowrap}
+  .out{min-height:120px}
+  .actions{position:fixed; left:0; right:0; bottom:0; z-index:12; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(7,9,13,0), rgba(7,9,13,.95) 40%, rgba(7,9,13,.98)); border-top:1px solid var(--line)}
+  .actions .bar{max-width:var(--maxw-m); margin:0 auto; display:flex; gap:8px}
+  .actions .bar .btn{flex:1}
+  .actions .bar .btn.min{flex:0 0 auto; width:46px; text-align:center; padding:8px 0}
+  .help{position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:16px; z-index:20; background:rgba(0,0,0,.5); backdrop-filter: blur(6px)}
+  .help .modal{max-width:860px; width:100%; max-height:88vh; overflow:auto; background:var(--panel); border:1px solid var(--line); border-radius:var(--r)}
+  .ghost{position:absolute; inset:12px; opacity:.35; color:var(--muted); font-size:12px; pointer-events:none}
+  .no-x{overflow-x:hidden}
+  /* Modo Minus: tudo menor e mais compacto */
+  body.minus{--maxw-m:396px}
+  body.minus .btn{font-size:10px; padding:6px 8px}
+  body.minus .chip{font-size:10px; padding:6px 8px}
+  body.minus textarea{min-height:110px}
+</style>
+</head>
+<body class="no-x" data-identity="META•HUMANO•MÁQUINA•APRENDIZADO">
+<header aria-label="Cabeçalho">
+  <div class="wrap title">
+    <h1>Ultimate Finale</h1>
+    <span class="pill">Standalone</span>
+    <span class="badge">TXT • IMG • MUS</span>
+    <span class="badge">∞ • §</span>
+    <span class="badge" title="Metasígno de autoria">META•HUMANO•MÁQUINA•APRENDIZADO</span>
+  </div>
+</header>
+
+<main class="wrap grid grid-2" role="main">
+  <!-- Saída primeiro -->
+  <section class="card" data-role="outputs">
+    <div class="hd"><strong>[OUT]</strong>
+      <div class="toolbar">
+        <button class="btn sm ghost" id="btnDownloadMD" title="Baixar FULL.md" aria-label="Baixar Markdown">⬇MD</button>
+        <button class="btn sm ghost" id="btnDownloadJSON" title="Baixar JSON" aria-label="Baixar JSON">⬇JS</button>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="row">
+        <div class="card" style="margin-bottom:10px; position:relative" data-role="output-text">
+          <div class="hd"><strong>[TXT]</strong><button class="btn sm ghost" data-copy="#outText" title="Copiar" aria-label="Copiar texto">⎘</button></div>
+          <div class="bd">
+            <div class="ghost" id="ghostText">ex.: síntese UNO/DUAL/TRINITY → texto final pronto para uso</div>
+            <textarea id="outText" class="out" placeholder="" aria-label="[TXT] Saída de texto"></textarea>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:10px; position:relative" data-role="output-image">
+          <div class="hd"><strong>[IMG]</strong><button class="btn sm ghost" data-copy="#outImage" title="Copiar" aria-label="Copiar imagem">⎘</button></div>
+          <div class="bd">
+            <div class="ghost" id="ghostImage">ex.: descrição visual com composição, luz, lente, textura</div>
+            <textarea id="outImage" class="out" placeholder="" aria-label="[IMG] Saída de imagem"></textarea>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:10px; position:relative" data-role="output-music">
+          <div class="hd"><strong>[MUS]</strong><button class="btn sm ghost" data-copy="#outMusic" title="Copiar" aria-label="Copiar música">⎘</button></div>
+          <div class="bd">
+            <div class="ghost" id="ghostMusic">ex.: estrutura (BPM/key), timbres, variações, transições</div>
+            <textarea id="outMusic" class="out" placeholder="" aria-label="[MUS] Saída de música"></textarea>
+          </div>
+        </div>
+        <div class="card" style="position:relative" data-role="output-seal">
+          <div class="hd"><strong>[SEL]</strong><button class="btn sm ghost" data-copy="#outSelo" title="Copiar" aria-label="Copiar selo">⎘</button></div>
+          <div class="bd">
+            <div class="ghost" id="ghostSelo">ex.: [SELO DUAL] Modo/Densidade/Estética/Safe + timestamp</div>
+            <textarea id="outSelo" class="out mono" placeholder="" aria-label="[SEL] Selo Dual"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portal embaixo -->
+  <section class="card" data-role="portal">
+    <div class="hd">
+      <strong>[PRT]</strong>
+      <div class="toolbar">
+        <button class="btn ghost sm" id="btnUNO" title="UNO" aria-label="Preset UNO">⊙</button>
+        <button class="btn ghost sm" id="btnDUAL" title="DUAL" aria-label="Preset DUAL">◎</button>
+        <button class="btn ghost sm" id="btnTRI" title="TRINITY" aria-label="Preset TRINITY">△</button>
+        <button class="btn sm" id="btnHelp" title="Tabela ASCII" aria-label="Tabela ASCII">▤</button>
+      </div>
+    </div>
+    <div class="bd">
+      <label for="frame">[FRM] Portal ASCII</label>
+      <textarea id="frame" placeholder="Ex. ⊙UNO█▀█ ⇄DUAL╔═╗ △TRINITY☆彡&#10;╔═╗  #ROOT:KODUX  💠&#10;│ ◎  DUAL on    ◇ Validador&#10;│ §  QA         ▒&#10;═ █▀█&#10;╚═╝ ∞" aria-label="[FRM] Portal ASCII"></textarea>
+
+      <div style="height:8px"></div>
+      <div class="symbar" id="symbar" aria-label="[SYM] Símbolos ASCII">
+        <span class="sym" data-sym="╔═╗">╔═╗</span>
+        <span class="sym" data-sym="╚═╝">╚═╝</span>
+        <span class="sym" data-sym="│">│</span>
+        <span class="sym" data-sym="═">═</span>
+        <span class="sym" data-sym="█▀█">█▀█</span>
+        <span class="sym" data-sym="⊙">⊙</span>
+        <span class="sym" data-sym="⇄">⇄</span>
+        <span class="sym" data-sym="◎">◎</span>
+        <span class="sym" data-sym="△">△</span>
+        <span class="sym" data-sym="☆彡">☆彡</span>
+        <span class="sym" data-sym="◇">◇</span>
+        <span class="sym" data-sym="∞">∞</span>
+        <span class="sym" data-sym="§">§</span>
+        <span class="sym" data-sym="░">░</span>
+        <span class="sym" data-sym="▒">▒</span>
+        <span class="sym" data-sym="▓">▓</span>
+        <span class="sym" data-sym="#">#</span>
+        <span class="sym" data-sym="💠">💠</span>
+      </div>
+
+      <div style="height:10px"></div>
+      <!-- PRESETS: Frames + Campos 1-clique -->
+      <div class="chips" id="framePresets" aria-label="[PRE] Presets de frame e combos">
+        <button class="chip" data-preset="ritual">RITUAL</button>
+        <button class="chip" data-preset="neon">NEON</button>
+        <button class="chip" data-preset="copy">COPY</button>
+        <button class="chip" data-preset="curta">CURTA</button>
+        <button class="chip" data-preset="club">CLUB</button>
+        <button class="chip" data-preset="scifi">SCIFI</button>
+        <button class="chip" data-preset="flash">FLASH</button>
+        <button class="chip" data-preset="teaser">TEASER</button>
+        <button class="chip" data-preset="dual1">DUAL1</button>
+        <button class="chip" data-preset="trinity">TRI</button>
+        <button class="chip" data-preset="coblux">COBLUX</button>
+        <button class="chip" data-preset="codux">CODUX</button>
+        <button class="chip" data-preset="infodose">INFODOSE</button>
+        <button class="chip" data-preset="afroritual">AFRO RITUAL</button>
+        <button class="chip" data-preset="postergrime">POSTER GRIME</button>
+        <button class="chip" data-preset="copyfunil">COPY FUNIL</button>
+        <button class="chip" data-preset="teaser916">TEASER 9:16</button>
+      </div>
+
+      <div style="height:12px"></div>
+      <div class="row" data-role="fields">
+        <div>
+          <label>[TOP]</label>
+          <input id="topic" placeholder="ex.: trilha ritual com tambores" aria-label="[TOP] Tema"/>
+        </div>
+        <div>
+          <label>[STL]</label>
+          <input id="style" placeholder="ex.: neon tribal, cinematográfico" aria-label="[STL] Estilo"/>
+        </div>
+        <div>
+          <label>[AUD]</label>
+          <input id="aud" placeholder="ex.: DJs, geral, leitores" aria-label="[AUD] Público"/>
+        </div>
+      </div>
+
+      <div style="height:8px"></div>
+      <label>[EXT]</label>
+      <textarea id="extras" placeholder="ex.: 120-128 BPM, 16:9, evitar clichês" aria-label="[EXT] Extras"></textarea>
+
+      <div style="height:8px"></div>
+      <div class="toolbar" data-role="toggles">
+        <label class="chip" title="Cabelos X"><input type="checkbox" id="cabX"> X</label>
+        <label class="chip" title="Cabelos Y"><input type="checkbox" id="cabY"> Y</label>
+        <label class="chip" title="Cabelos Z"><input type="checkbox" id="cabZ"> Z</label>
+        <label class="chip" title="QA"><input type="checkbox" id="qaOn" checked> §</label>
+        <label class="chip" title="Safe"><input type="checkbox" id="safeOn" checked> ∞</label>
+        <label class="chip" title="Modo Minus"><input type="checkbox" id="minusOn"> MINUS</label>
+      </div>
+
+      <div style="height:10px"></div>
+      <div class="toolbar" data-role="io">
+        <button class="btn sm" id="btnImport" title="Importar .txt" aria-label="Importar .txt">IMP</button>
+        <input type="file" id="fileIn" accept=".txt" style="display:none"/>
+        <button class="btn sm" id="btnExport" title="Exportar .txt" aria-label="Exportar .txt">EXP</button>
+        <button class="btn sm ghost" id="btnClear" title="Limpar" aria-label="Limpar">CLR</button>
+        <button class="btn sm ghost" id="btnHelp2" title="Tabela" aria-label="Tabela">▤</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Sticky Actions -->
+<div class="actions" data-role="actions">
+  <div class="bar">
+    <button class="btn" id="btnGenerate" title="Gerar" aria-label="Gerar">⚡</button>
+    <button class="btn min" id="btnCopyAll" title="Copiar tudo" aria-label="Copiar tudo">⎘</button>
+    <button class="btn min" id="btnPack" title="Baixar FULL+JSON" aria-label="Baixar pacote">⬇</button>
+  </div>
+</div>
+
+<!-- Help Modal -->
+<div class="help" id="help" role="dialog" aria-modal="true" aria-label="Tabela ASCII">
+  <div class="modal">
+    <div class="hd"><strong>Tabela ASCII</strong></div>
+    <div class="bd" style="padding:14px 16px">
+<pre class="mono small">
+╔═╗ / ╚═╝ → portal raiz | │ → fluxo | ＝ → núcleo | █▀█ → força
+⊙ → UNO | ⇄/◎ → DUAL | △ → TRINITY | ☆彡 → estética
+◇ → API | § → QA | ∞ → safe | ░▒▓ → densidade | # → root | 💠 → mini-srv
+</pre>
+      <div class="toolbar"><button class="btn" id="btnCloseHelp">OK</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">OK</div>
+
+<script>
+// === Mini util ===
+const $ = (q, el=document)=> el.querySelector(q);
+const $$ = (q, el=document)=> Array.from(el.querySelectorAll(q));
+function toast(m="OK"){const t=$('#toast'); t.textContent=m; t.style.display='block'; setTimeout(()=>t.style.display='none',1100)}
+function insertAtCursor(ta,txt){const s=ta.selectionStart??ta.value.length, e=ta.selectionEnd??ta.value.length; ta.value=ta.value.slice(0,s)+txt+ta.value.slice(e); const pos=s+txt.length; ta.focus(); ta.setSelectionRange(pos,pos)}
+const autoFit=(t)=>{t.style.height='auto'; t.style.height=Math.min(t.scrollHeight, 380)+'px'};
+$$('textarea').forEach(t=>{t.addEventListener('input',()=>{autoFit(t); updateGhosts();}); autoFit(t)});
+
+// Ghost previews
+function updateGhosts(){
+  const pairs=[['#outText','#ghostText'],['#outImage','#ghostImage'],['#outMusic','#ghostMusic'],['#outSelo','#ghostSelo']];
+  for(const [ta,gh] of pairs){ const has = ($(ta).value||'').trim().length>0; $(gh).style.display = has? 'none':'block'; }
+}
+updateGhosts();
+
+// Symbol palette
+$('#symbar').addEventListener('click',e=>{const b=e.target.closest('.sym'); if(!b) return; insertAtCursor($('#frame'), b.dataset.sym)})
+
+// Help
+$('#btnHelp').onclick=()=> $('#help').style.display='flex';
+$('#btnHelp2').onclick=()=> $('#help').style.display='flex';
+$('#btnCloseHelp').onclick=()=> $('#help').style.display='none';
+
+// Presets UNO/DUAL/TRI
+$('#btnUNO').onclick=()=>{$('#frame').value=`╔═╗ #ROOT:KODUX
+│ ⊙ OBJ
+│ § ░
+═ █▀█
+╚═╝ ∞ ☆彡`;};
+$('#btnDUAL').onclick=()=>{$('#frame').value=`╔═╗ #ROOT:KODUX 💠
+│ ◎ DUAL ◇
+│ § ▒
+═ █▀█
+╚═╝ ∞ ☆彡`;};
+$('#btnTRI').onclick=()=>{$('#frame').value=`╔═╗ #ROOT:KODUX
+│ △ C1/C2/C3
+│ § ▓
+═ █▀█
+╚═╝ ∞ ☆彡`;};
+
+// Presets & combos
+const presets = {
+  ritual: { frame:`╔═╗ #ROOT:KODUX
+│ ◎ DUAL ◇ Validador
+│ △ C1 técnica • C2 simbólica • C3 prática
+│ § ▓
+═ █▀█
+╚═╝ ∞ ☆彡`, topic:'música ritual com tambores e drones', style:'neon tribal, cinematográfico', aud:'DJs e criadores', extras:'120-124 BPM, menor, texturas orgânicas' },
+  neon:   { frame:`╔═╗ #ROOT:KODUX
+│ ◎ DUAL
+│ § ▒
+═ █▀█
+╚═╝ ∞ ☆彡`, topic:'pôster de evento noturno urbano', style:'neon tribal, alto contraste, tipografia bold', aud:'jovem urbano', extras:'4:5, legível à distância' },
+  copy:   { frame:`╔═╗ #ROOT:KODUX 💠
+│ ⊙ UNO ◇ Validador
+│ § ░
+═ █▀█
+╚═╝ ∞`, topic:'landing page de app criativo', style:'claro e direto, punch', aud:'criadores digitais', extras:'CTA forte, 3 bullets de benefício' },
+  curta:  { frame:`╔═╗ #ROOT:KODUX
+│ △ roteiro em 3 camadas
+│ § ▓
+═ █▀█
+╚═╝ ∞`, topic:'curta urbano sobre tempo e memória', style:'neo-noir minimalista', aud:'festivais, geral', extras:'8-12 min, versão 9:16' },
+  club:   { frame:`╔═╗ #ROOT:KODUX
+│ ◎ DUAL
+│ § ▒
+═ █▀█
+╚═╝ ∞`, topic:'faixa club noturna com bass pesado', style:'techno melódico + afro-house', aud:'DJs e pista', extras:'124-128 BPM, groove percussivo' },
+  scifi:  { frame:`╔═╗ #ROOT:KODUX
+│ △ worldbuilding visual
+│ § ▓
+═ █▀█
+╚═╝ ∞ ☆彡`, topic:'pôster sci-fi retro-futurista', style:'paper grain, cromas frios, geometrias', aud:'fãs e colecionadores', extras:'16:9, silhueta forte' },
+  flash:  { frame:`╔═╗ #ROOT:KODUX 💠
+│ ⊙ micro-copy
+│ § ░
+═ █▀█
+╚═╝ ∞`, topic:'lançamento relâmpago em 24h', style:'urgente, direto, elegante', aud:'assinantes', extras:'3 CTAs, 100-140 caracteres' },
+  teaser: { frame:`╔═╗ #ROOT:KODUX
+│ △ teaser 30s (C1/C2/C3)
+│ § ▒
+═ █▀█
+╚═╝ ∞`, topic:'teaser 30s de arte imersiva', style:'ritmo + glitch suave', aud:'social media', extras:'1:1 e 9:16; legível sem áudio' },
+  dual1:  { frame:`╔═╗ #ROOT:KODUX
+│ ◎ DUAL (Tema 1)
+│ § ▒
+═ █▀█
+╚═╝ ∞`, topic:'tema 1 com duas perspectivas', style:'técnico + criativo', aud:'geral', extras:'síntese clara ao final' },
+  trinity:{ frame:`╔═╗ #ROOT:KODUX
+│ △ TRINITY (C1/C2/C3)
+│ § ▓
+═ █▀█
+╚═╝ ∞ ☆彡`, topic:'assunto para síntese em 3 camadas', style:'elegante e claro', aud:'geral', extras:'aplicação prática no fim' },
+  coblux: { frame:`╔═╗ #ROOT:KODUX
+│ ◎ COBLUX DUAL
+│ § ▒
+═ █▀█
+╚═╝ ∞`, topic:'estética coblux (urbano + luminescência)', style:'grime luminoso, industrial/neo', aud:'arte/branding', extras:'4:5; contraste alto; texturas sujas + glow' },
+  codux:  { frame:`╔═╗ #ROOT:KODUX
+│ ◎ CODUX DUAL◈
+│ § ▒
+═ █▀█
+╚═╝ ∞`, topic:'sistema codux (interfaces rituais)', style:'ascii frames + minimal UI', aud:'designers/devs', extras:'documentação concisa + exemplos' },
+  infodose:{ frame:`╔═╗ #ROOT:KODUX
+│ △ INFODOSE TRI
+│ § ▓
+═ █▀█
+╚═╝ ∞ ☆彡`, topic:'infodose (arte+ciência+execução)', style:'simbiose técnica/estética', aud:'criadores', extras:'aplicar em projeto real' },
+  afroritual:{ frame:`╔═╗ #ROOT:KODUX
+│ ◎ DUAL
+│ § ▒
+═ █▀█
+╚═╝ ∞`, topic:'faixa afro-house ritual com percussões orgânicas', style:'afro-tribal hipnótico', aud:'DJs e pista', extras:'124-126 BPM; tom menor; grooves polirrítmicos; texturas de campo' },
+  postergrime:{ frame:`╔═╗ #ROOT:KODUX
+│ △ visual urbano (grime)
+│ § ▓
+═ █▀█
+╚═╝ ∞`, topic:'pôster urbano com estética grime industrial', style:'grime industrial, tipografia bold, textura suja', aud:'diretores de arte', extras:'4:5; alto contraste; legibilidade a 3m; grain forte' },
+  copyfunil:{ frame:`╔═╗ #ROOT:KODUX 💠
+│ ⊙ FUNIL 3 etapas
+│ § ░
+═ █▀█
+╚═╝ ∞`, topic:'funil de conversão para app criativo (topo→meio→fundo)', style:'claro, direto, com prova social', aud:'público geral', extras:'CTA em 3 etapas; bullets de benefício; objeções e respostas' },
+  teaser916:{ frame:`╔═╗ #ROOT:KODUX
+│ △ teaser vertical 9:16 (C1/C2/C3)
+│ § ▒
+═ █▀█
+╚═╝ ∞`, topic:'teaser vertical 9:16 para lançamento de arte interativa', style:'montagem rítmica, cortes rápidos, glitch sutil', aud:'social media', extras:'9:16; legível sem áudio; 3 atos em 30s' }
+};
+$('#framePresets').addEventListener('click', e=>{
+  const b=e.target.closest('[data-preset]'); if(!b) return;
+  const p=presets[b.dataset.preset]; if(!p) return;
+  $('#frame').value=p.frame; $('#topic').value=p.topic; $('#style').value=p.style; $('#aud').value=p.aud; $('#extras').value=p.extras;
+  toast('Preset aplicado')
+});
+
+function parseFrame(txt){
+  const has=s=>txt.includes(s);
+  const mode=has('△')?'TRINITY':((has('⇄')||has('◎'))?'DUAL':(has('⊙')?'UNO':'UNO'));
+  const density=has('▓')?'alta':has('▒')?'média':has('░')?'baixa':'média';
+  const densLevel=has('▓')?3:has('▒')?2:1;
+  return { mode, density, densLevel, beauty:(txt.includes('☆')), force:txt.includes('█▀█'), api:has('◇'), qa:has('§')||$('#qaOn').checked, safe:has('∞')||$('#safeOn').checked }
+}
+function seloDual(meta){
+  const now=new Date();
+  return `[SELO DUAL]
+Modo:${meta.mode} • Dens:${meta.density} • Est:${meta.beauty?'on':'off'} • Força:${meta.force?'on':'off'}
+QA:${meta.qa?'on':'off'} • Safe:${meta.safe?'on':'off'}
+Sessão:${now.toISOString()}`
+}
+function buildPrompts(meta, topic, style, aud, extras, toggles){
+  const wordTarget = meta.densLevel===1? 'breve' : meta.densLevel===2? 'equilibrado' : 'detalhado';
+  const imgDetail = meta.densLevel===1? 'composição clean' : meta.densLevel===2? 'camadas equilibradas' : 'multi-planos e microdetalhes';
+  const musicDetail = meta.densLevel===1? '8/16 bars' : meta.densLevel===2? '32/64 bars' : '64+ bars com variações';
+  const vibe=[]; if(meta.beauty) vibe.push('☆彡'); if(meta.force) vibe.push('█▀█'); const t=toggles||{}; if(t.cabX) vibe.push('X'); if(t.cabY) vibe.push('Y'); if(t.cabZ) vibe.push('Z'); const vibeLine = vibe.length? `Estética: ${vibe.join(', ')}.`: '';
+  let textPrompt="", imagePrompt="", musicPrompt="";
+  if(meta.mode==='UNO'){
+    textPrompt=`Tema: "${topic}". Público: ${aud||'geral'}. Estilo: ${style||'claro'}. Objetivo: ${wordTarget}. ${vibeLine} Extras: ${extras||'—'}. Saída: texto final.`
+    imagePrompt=`Imagem de: "${topic}". Estilo: ${style||'contemporâneo'}. Diretrizes: ${imgDetail}. ${vibeLine} Extras: ${extras||'—'}.`
+    musicPrompt=`Música para: "${topic}". Estilo: ${style||'cinematográfico/eletrônico'}. Estrutura: ${musicDetail}. ${vibeLine} Extras: ${extras||'—'}.`
+  } else if(meta.mode==='DUAL'){
+    textPrompt=`DUAL: A técnica + B criativa sobre "${topic}". Público: ${aud||'geral'}. Estilo: ${style||'equilibrado'}. Síntese final prática. ${vibeLine} Extras: ${extras||'—'}.`
+    imagePrompt=`Imagem DUAL de "${topic}": contraste de dois elementos que convergem. ${imgDetail}. Estilo: ${style||'híbrido'}. ${vibeLine} Extras: ${extras||'—'}.`
+    musicPrompt=`Música DUAL para "${topic}": duas identidades que convergem no drop/outro. ${musicDetail}. Estilo: ${style||'híbrido'}. ${vibeLine} Extras: ${extras||'—'}.`
+  } else {
+    textPrompt=`TRINITY para "${topic}": 1) técnica 2) simbólica 3) prática. Público: ${aud||'geral'}. Estilo: ${style||'elegante'}. ${wordTarget}. ${vibeLine} Extras: ${extras||'—'}.`
+    imagePrompt=`Imagem TRINITY de "${topic}": técnica (${imgDetail}), simbólica (metáforas), prática (legibilidade/uso). Estilo: ${style||'alto impacto'}. ${vibeLine} Extras: ${extras||'—'}.`
+    musicPrompt=`Música TRINITY de "${topic}": técnica (BPM/key/estrutura ${musicDetail}), simbólica (clima/tema), prática (uso/duração). Estilo: ${style||'orgânico-sintético'}. ${vibeLine} Extras: ${extras||'—'}.`
+  }
+  return {textPrompt, imagePrompt, musicPrompt};
+}
+function buildFullMD(meta, topic, style, aud, extras, p){
+  return `# Ultimate Finale — MetaHumano/Máquina/Aprendizado
+
+Modo: ${meta.mode} | Densidade: ${meta.density} | Est:${meta.beauty?'on':'off'} | Força:${meta.force?'on':'off'} | QA:${meta.qa?'on':'off'} | Safe:${meta.safe?'on':'off'}
+
+Tema: ${topic||'-'}
+Estilo: ${style||'-'}
+Público: ${aud||'-'}
+Extras: ${extras||'-'}
+
+## Texto
+${p.textPrompt}
+
+## Imagem
+${p.imagePrompt}
+
+## Música
+${p.musicPrompt}
+
+## Selo
+${seloDual(meta)}
+`;
+}
+
+// Import/Export/Copy
+$('#btnImport').onclick=()=> $('#fileIn').click();
+$('#fileIn').addEventListener('change',ev=>{const f=ev.target.files?.[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{$('#frame').value=String(r.result||''); toast('IMP ok')}; r.readAsText(f)});
+$('#btnExport').onclick=()=>{const blob=new Blob([$('#frame').value],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='frame_portal.txt'; a.click(); URL.revokeObjectURL(a.href)}
+$('#btnClear').onclick=()=>{$('#frame').value=''; ['topic','style','aud','extras'].forEach(id=>$('#'+id).value=''); ['outText','outImage','outMusic','outSelo'].forEach(id=>$('#'+id).value=''); updateGhosts(); toast('CLR')}
+$$("[data-copy]").forEach(b=> b.addEventListener('click',()=>{const t=$(b.dataset.copy); t.select(); document.execCommand('copy'); toast('Copiado')}));
+
+// Generate
+function gen(){
+  const meta=parseFrame($('#frame').value); const t={ cabX:$('#cabX').checked, cabY:$('#cabY').checked, cabZ:$('#cabZ').checked };
+  const topic=$('#topic').value.trim(), style=$('#style').value.trim(), aud=$('#aud').value.trim(), extras=$('#extras').value.trim();
+  const p=buildPrompts(meta, topic, style, aud, extras, t);
+  $('#outText').value=p.textPrompt; $('#outImage').value=p.imagePrompt; $('#outMusic').value=p.musicPrompt; $('#outSelo').value=seloDual(meta);
+  updateGhosts(); toast('⚡ pronto');
+}
+$('#btnGenerate').onclick=gen;
+
+// Copy all
+$('#btnCopyAll').onclick=()=>{const all=`${$('#outText').value}
+
+${$('#outImage').value}
+
+${$('#outMusic').value}
+
+${$('#outSelo').value}`.trim(); navigator.clipboard.writeText(all).then(()=>toast('Tudo copiado')).catch(()=>{const ta=document.createElement('textarea'); ta.value=all; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); toast('Tudo copiado')})}
+
+// Pack (MD + JSON)
+$('#btnPack').onclick=()=>{
+  const meta=parseFrame($('#frame').value); const topic=$('#topic').value.trim(), style=$('#style').value.trim(), aud=$('#aud').value.trim(), extras=$('#extras').value.trim();
+  const p={ textPrompt:$('#outText').value, imagePrompt:$('#outImage').value, musicPrompt:$('#outMusic').value };
+  const md=buildFullMD(meta, topic, style, aud, extras, p);
+  const json=JSON.stringify({meta, input:{frame:$('#frame').value, topic, style, aud, extras}, outputs:{text:p.textPrompt, image:p.imagePrompt, music:p.musicPrompt, selo:$('#outSelo').value}}, null, 2);
+  const a1=document.createElement('a'); a1.href=URL.createObjectURL(new Blob([md],{type:'text/markdown;charset=utf-8'})); a1.download='ultimate_finale_FULL.md'; a1.click(); URL.revokeObjectURL(a1.href);
+  const a2=document.createElement('a'); a2.href=URL.createObjectURL(new Blob([json],{type:'application/json'})); a2.download='ultimate_finale_data.json'; a2.click(); URL.revokeObjectURL(a2.href);
+}
+
+// Modo Minus
+$('#minusOn').addEventListener('change', (e)=>{ document.body.classList.toggle('minus', e.target.checked); });
+</script>
+
+<footer class="wrap" style="padding-bottom:92px; color:var(--muted); font-size:12px">
+  Ultimate Finale • single-file • rótulos IA+humano • META•HUMANO•MÁQUINA•APRENDIZADO
+</footer>
+</body>
+</html>

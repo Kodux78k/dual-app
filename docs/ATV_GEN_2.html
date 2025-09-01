@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gerador de Ativações • IOBR Sequencial</title>
+  <style>
+    /* Paleta e base */
+    :root {
+      --bg: #0f1221;
+      --panel: #171a2b;
+      --panel-2: #1e2236;
+      --text: #e8ebf7;
+      --muted: #aab0c6;
+      --accent: #6aa4ff;
+      --accent-2: #8a7dff;
+      --ok: #46d28f;
+      --warn: #ffd166;
+      --err: #ff6b6b;
+      --border: #2a2f46;
+      --shadow: 0 10px 25px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto;
+      background: radial-gradient(1200px 700px at 20% -10%, rgba(138,125,255,.25), transparent),
+                  radial-gradient(1000px 600px at 100% 0%, rgba(106,164,255,.18), transparent),
+                  var(--bg);
+      color: var(--text);
+    }
+
+    header { padding: 28px 20px 18px; position: sticky; top: 0; background: linear-gradient(180deg, rgba(15,18,33,.9), rgba(15,18,33,.6) 60%, rgba(15,18,33,0)); backdrop-filter: blur(8px); }
+    .title { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; }
+    .badge { font-weight: 700; font-size: 12px; color: var(--bg); background: linear-gradient(90deg, var(--accent), var(--accent-2)); padding: 4px 8px; border-radius: 999px; }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 16px 64px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card { background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); display: flex; flex-direction: column; }
+    .card h3 { margin: 0; padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; }
+    .card .body { padding: 16px; flex: 1; }
+    .toolbar { display: flex; gap: 8px; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding: 12px 16px; background: #11162a; border-radius: 0 0 var(--radius) var(--radius); }
+
+    input, textarea, select { width: 100%; background: #0e1120; color: var(--text); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; outline: none; }
+    textarea { min-height: 120px; resize: vertical; }
+
+    .btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border); background: #0f1428; color: var(--text); padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: all .2s; }
+    .btn:hover { background: #121739; }
+    .btn.primary { background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: #0b0f1f; font-weight: 800; }
+    .btn.danger { background: linear-gradient(90deg, #ff7676, #ff9a7a); color: #230000; font-weight: 700; }
+
+    .list { max-height: 420px; overflow: auto; border-top: 1px solid var(--border); }
+    .item { display: grid; grid-template-columns: 64px 160px 1fr 120px; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,.15); }
+    .item.dragging { opacity: 0.6; background: rgba(106,164,255,.2); }
+    .item .idx { opacity: .65; }
+    .item .key { font-weight: 700; }
+    .item input.file { background: #0a0e1b; border-radius: 8px; border: 1px solid #252a41; padding: 8px 10px; }
+    .actions { display: flex; gap: 6px; }
+
+    .toast { position: fixed; right: 18px; bottom: 18px; background: #0b132a; border: 1px solid #223056; padding: 10px 14px; border-radius: 12px; color: var(--text); box-shadow: var(--shadow); opacity: 0; transform: translateY(10px); transition: .25s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="title">
+        <span>Gerador de Ativações</span>
+        <span class="badge">IOBR Sequencial</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <section class="card">
+        <h3>Entrada</h3>
+        <div class="body">
+          <label>Nome da Lista</label>
+          <input type="text" id="listName" value="Lista IOBR" />
+          <label>Prefixo</label>
+          <input type="text" id="prefix" value="IOBR" />
+          <label>Número inicial</label>
+          <input type="number" id="start" value="8" />
+          <label>Arquivos (um por linha)</label>
+          <textarea id="filesInput"></textarea>
+          <div class="btns">
+            <button class="btn" id="pasteBtn">📋 Colar</button>
+            <button class="btn primary" id="genBtn">⚙️ Gerar</button>
+            <button class="btn" id="addBtn">➕ Adicionar</button>
+            <button class="btn" id="clearInputBtn">🧹 Limpar entrada</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn" id="applyConfigBtn">Aplicar prefixo/número</button>
+          <button class="btn" id="reseqBtn">Resequenciar</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h3>Lista</h3>
+        <div class="body">
+          <div class="list" id="list"></div>
+        </div>
+        <div class="toolbar">
+          <button class="btn" id="copyJsonBtn">📤 Copiar JSON</button>
+          <button class="btn" id="downloadBtn">💾 Baixar JSON</button>
+          <label class="btn" for="importFile">📥 Importar
+            <input id="importFile" type="file" accept="application/json" hidden />
+          </label>
+          <button class="btn danger" id="clearListBtn">🗑️ Limpar lista</button>
+        </div>
+      </section>
+    </div>
+
+    <section class="card output" style="margin-top:16px;">
+      <h3>JSON Gerado</h3>
+      <div class="body">
+        <pre id="jsonOutput">{}</pre>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast">Pronto!</div>
+
+  <script>
+    const state = { prefix: 'IOBR', start: 8, files: [] };
+    const $ = id => document.getElementById(id);
+    const toast = msg => { const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1500); };
+    const sanitizeLines = t => t.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+
+    const keysFor = () => state.files.map((_,i)=>`${state.prefix}${Number(state.start)+i}`);
+    const toJSON = () => { const obj={}; keysFor().forEach((k,i)=>obj[k]=state.files[i]); return JSON.stringify(obj,null,2); };
+
+    const render = () => {
+      const list=$('list'); list.innerHTML='';
+      keysFor().forEach((k,i)=>{
+        const row=document.createElement('div'); row.className='item'; row.draggable=true;
+        row.innerHTML=`<div class="idx">${i+1}</div><div class="key">${k}</div><input class="file" value="${state.files[i]}"/><div class="actions"><button class="btn">⬆️</button><button class="btn">⬇️</button><button class="btn">📄</button><button class="btn danger">🗑️</button></div>`;
+        row.querySelector('input').addEventListener('input',e=>{ state.files[i]=e.target.value; renderJSON(); });
+        const [up,down,dup,del]=row.querySelectorAll('button');
+        up.onclick=()=>{ if(i>0){ [state.files[i-1],state.files[i]]=[state.files[i],state.files[i-1]]; render(); } };
+        down.onclick=()=>{ if(i<state.files.length-1){ [state.files[i+1],state.files[i]]=[state.files[i],state.files[i+1]]; render(); } };
+        dup.onclick=()=>{ state.files.splice(i+1,0,state.files[i]); render(); };
+        del.onclick=()=>{ state.files.splice(i,1); render(); };
+        row.addEventListener('dragstart',()=>row.classList.add('dragging'));
+        row.addEventListener('dragend',()=>row.classList.remove('dragging'));
+        list.append(row);
+      });
+      renderJSON();
+    };
+
+    const renderJSON = () => $('jsonOutput').textContent = toJSON();
+
+    $('genBtn').onclick=()=>{ state.files=sanitizeLines($('filesInput').value); render(); toast('Lista gerada'); };
+    $('addBtn').onclick=()=>{ state.files.push(...sanitizeLines($('filesInput').value)); render(); toast('Itens adicionados'); };
+    $('clearInputBtn').onclick=()=>{ $('filesInput').value=''; };
+    $('pasteBtn').onclick=async()=>{ try{ $('filesInput').value=await navigator.clipboard.readText(); toast('Colado'); }catch{} };
+    $('applyConfigBtn').onclick=()=>{ state.prefix=$('prefix').value.trim()||'IOBR'; state.start=parseInt($('start').value)||0; render(); };
+    $('reseqBtn').onclick=()=>render();
+    $('copyJsonBtn').onclick=async()=>{ await navigator.clipboard.writeText(toJSON()); toast('Copiado'); };
+    $('downloadBtn').onclick=()=>{ const blob=new Blob([toJSON()],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='lista.json'; a.click(); };
+    $('clearListBtn').onclick=()=>{ state.files=[]; render(); };
+    $('importFile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try{ const obj=JSON.parse(r.result); state.files=Object.values(obj); render(); }catch{} }; r.readAsText(f); };
+
+    render();
+  </script>
+</body>
+</html>
