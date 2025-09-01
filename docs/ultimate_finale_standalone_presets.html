@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ultimate Finale — ASCII Portal Generator (Presets • Texto • Imagem • Música)</title>
+<meta name="description" content="Gerador standalone (HTML único) que transforma frames ASCII (portais) em prompts de Texto, Imagem e Música. Agora com presets injetados.">
+<style>
+  :root{
+    --bg:#0b0d10; --panel:#12151a; --panel-2:#0f1216;
+    --accent:#6ee7ff; --accent-2:#a78bfa; --soft:#cbd5e1;
+    --text:#e6edf3; --muted:#9aa4b2; --shadow:0 10px 30px rgba(0,0,0,.45);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+    color:var(--text);
+    background:
+      radial-gradient(1200px 700px at 20% 0%, rgba(103,232,249,.10), transparent 60%),
+      radial-gradient(1000px 600px at 100% 10%, rgba(167,139,250,.12), transparent 60%),
+      linear-gradient(180deg, #0a0c10, #07090c 20%, #05070b 60%);
+    background-color:var(--bg);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header{
+    position:sticky; top:0; z-index:3; backdrop-filter: blur(8px);
+    background: linear-gradient(180deg, rgba(10,12,16,.92), rgba(10,12,16,.68));
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding: 14px 14px;}
+  .title{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .badge,.pill{padding:6px 10px; border:1px solid rgba(255,255,255,.14); border-radius:999px; font-size:12px; color:var(--soft)}
+  .pill{background:linear-gradient(90deg, rgba(110,231,255,.16), rgba(167,139,250,.16))}
+  h1{font-size:18px; margin:0}
+  h2{font-size:15px; margin:0; color:var(--soft)}
+  .grid{display:grid; gap:12px}
+  @media(min-width:980px){ .grid-2{grid-template-columns: 1.15fr .85fr;} }
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+    border:1px solid rgba(255,255,255,.08); border-radius: var(--radius); box-shadow: var(--shadow);
+  }
+  .card .hd{padding:12px; border-bottom:1px solid rgba(255,255,255,.06); display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap}
+  .card .bd{padding:12px}
+  label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+  textarea,input{width:100%; background:var(--panel-2); border:1px solid rgba(255,255,255,.12); color:var(--text); border-radius:12px; padding:12px; outline:none}
+  textarea{min-height:160px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Courier New", monospace;
+    white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;}
+  .row{display:grid; gap:10px}
+  @media(min-width:740px){ .row-2{grid-template-columns: repeat(2,1fr)} .row-3{grid-template-columns: repeat(3,1fr)} }
+  .btn{appearance:none; border:1px solid rgba(255,255,255,.16); color:var(--text);
+    background: linear-gradient(90deg, rgba(110,231,255,.15), rgba(167,139,250,.15));
+    padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:600; font-size:14px}
+  .btn.small{font-size:12px; padding:8px 10px}
+  .btn.ghost{background:transparent}
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap}
+  .symbar{display:flex; gap:8px; padding:8px; background:rgba(255,255,255,.04); border:1px dashed rgba(255,255,255,.12); border-radius:12px;
+    overflow:auto; -webkit-overflow-scrolling:touch}
+  .sym{padding:8px 10px; border-radius:10px; cursor:pointer; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); white-space:nowrap; flex:0 0 auto}
+  .sym:hover{background:rgba(255,255,255,.12)}
+  .presetbar{display:flex; gap:8px; overflow:auto; -webkit-overflow-scrolling:touch; padding:8px; border:1px dashed rgba(255,255,255,.12); border-radius:12px}
+  .chip{flex:0 0 auto; display:inline-flex; align-items:center; gap:6px; padding:8px 10px; border:1px solid rgba(255,255,255,.18); border-radius:999px; font-size:12px; color:var(--soft); background:rgba(255,255,255,.05)}
+  .chip:hover{filter:brightness(1.08); cursor:pointer}
+  .out{min-height:120px}
+  .switch{display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none}
+  .switch input{display:none}
+  .switch .knob{width:42px; height:26px; border-radius:20px; background: rgba(255,255,255,.14); position:relative; transition:.2s}
+  .switch .knob::after{content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff; transition:.2s}
+  .switch input:checked + .knob{background: linear-gradient(90deg, var(--accent), var(--accent-2))}
+  .switch input:checked + .knob::after{transform: translateX(16px)}
+  .help{position:fixed; inset:0; display:none; align-items:center; justify-content:center; padding:20px; z-index:10; background: rgba(0,0,0,.5); backdrop-filter: blur(6px)}
+  .help .modal{max-width:900px; width:100%; background: var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:18px; box-shadow: var(--shadow); max-height:88vh; overflow:auto}
+  .toast{position:fixed; right:12px; bottom:calc(12px + env(safe-area-inset-bottom)); background: rgba(20,24,30,.92); border:1px solid rgba(255,255,255,.14); padding:10px 14px; border-radius:12px; display:none}
+  .footer{text-align:center; color:var(--muted); padding:22px 12px; font-size:12px}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="title">
+      <h1>Ultimate Finale — ASCII Portal Generator</h1>
+      <span class="pill">Standalone • HTML único</span>
+      <span class="badge">Texto • Imagem • Música</span>
+      <span class="badge">∞ Safe • § QA</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap grid grid-2" style="margin-top:10px">
+  <section class="card">
+    <div class="hd">
+      <h2>1) Frame ASCII (portal) • Presets</h2>
+      <div class="toolbar">
+        <button class="btn small" id="btnUNO">⊙ UNO</button>
+        <button class="btn small" id="btnDUAL">◎ DUAL</button>
+        <button class="btn small" id="btnTRI">△ TRINITY</button>
+        <button class="btn small" id="btnHelp">Tabela ASCII ▤</button>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="presetbar" id="framePresets"></div>
+      <div style="height:8px"></div>
+      <label for="frame">Cole ou use um preset</label>
+      <textarea id="frame" placeholder="Ex.: ⊙UNO█▀█ ⇄DUAL╔═╗ △TRINITY☆彡&#10;╔═╗  #ROOT:KODUX  💠MINI-SRV&#10;│ ◎  DUAL on    ◇ Validador&#10;│ §  QA         ▒ densidade&#10;═ █▀█&#10;╚═╝ ∞"></textarea>
+      <div style="height:8px"></div>
+      <div class="symbar" id="symbar">
+        <span class="sym" data-sym="╔═╗">╔═╗</span><span class="sym" data-sym="╚═╝">╚═╝</span>
+        <span class="sym" data-sym="│">│</span><span class="sym" data-sym="═">═</span><span class="sym" data-sym="█▀█">█▀█</span>
+        <span class="sym" data-sym="⊙">⊙</span><span class="sym" data-sym="⇄">⇄</span><span class="sym" data-sym="◎">◎</span><span class="sym" data-sym="△">△</span>
+        <span class="sym" data-sym="☆彡">☆彡</span><span class="sym" data-sym="◇">◇</span><span class="sym" data-sym="∞">∞</span><span class="sym" data-sym="§">§</span>
+        <span class="sym" data-sym="▲">▲</span><span class="sym" data-sym="▼">▼</span><span class="sym" data-sym="►">►</span><span class="sym" data-sym="◄">◄</span>
+        <span class="sym" data-sym="░">░</span><span class="sym" data-sym="▒">▒</span><span class="sym" data-sym="▓">▓</span><span class="sym" data-sym="#">#</span><span class="sym" data-sym="💠">💠</span>
+      </div>
+      <div style="height:10px"></div>
+      <div class="row row-3">
+        <div>
+          <label>Tema/assunto</label>
+          <input id="topic" placeholder="Ex.: trilha mística com tambores e sintetizadores"/>
+          <div class="presetbar" id="topicPresets"></div>
+        </div>
+        <div>
+          <label>Estilo</label>
+          <input id="style" placeholder="Ex.: neon tribal, cinematográfico, minimalista"/>
+          <div class="presetbar" id="stylePresets"></div>
+        </div>
+        <div>
+          <label>Audiência</label>
+          <input id="aud" placeholder="Ex.: criadores, público geral, DJs, leitores"/>
+          <div class="presetbar" id="audPresets"></div>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <label>Extras / requisitos</label>
+      <textarea id="extras" placeholder="Ex.: foco em percussão, evitar clichês, usar linguagem inclusiva, 120-128 BPM, 16:9"></textarea>
+      <div class="presetbar" id="extraPresets"></div>
+      <div style="height:10px"></div>
+      <div class="toolbar">
+        <label class="switch"><input type="checkbox" id="cabX"><span class="knob"></span> Cabelos X</label>
+        <label class="switch"><input type="checkbox" id="cabY"><span class="knob"></span> Cabelos Y</label>
+        <label class="switch"><input type="checkbox" id="cabZ"><span class="knob"></span> Cabelos Z</label>
+        <label class="switch"><input type="checkbox" id="qaOn" checked><span class="knob"></span> § QA</label>
+        <label class="switch"><input type="checkbox" id="safeOn" checked><span class="knob"></span> ∞ Safe</label>
+      </div>
+      <div style="height:10px"></div>
+      <div class="toolbar">
+        <button class="btn" id="btnGenerate">⚡ Gerar prompts</button>
+        <button class="btn ghost" id="btnClear">Limpar</button>
+        <button class="btn ghost" id="btnImport">Importar frame (.txt)</button><input type="file" id="fileIn" accept=".txt" style="display:none"/>
+        <button class="btn ghost" id="btnExport">Exportar frame (.txt)</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="hd">
+      <h2>2) Saída (prompts gerados)</h2>
+      <div class="toolbar">
+        <button class="btn small" id="btnDownloadMD">⬇ FULL.md</button>
+        <button class="btn small" id="btnDownloadJSON">⬇ JSON</button>
+      </div>
+    </div>
+    <div class="bd">
+      <div class="row">
+        <div class="card">
+          <div class="hd"><strong>📝 Texto</strong><button class="btn small ghost" data-copy="#outText">Copiar</button></div>
+          <div class="bd"><textarea id="outText" class="out"></textarea></div>
+        </div>
+        <div class="card">
+          <div class="hd"><strong>🖼️ Imagem</strong><button class="btn small ghost" data-copy="#outImage">Copiar</button></div>
+          <div class="bd"><textarea id="outImage" class="out"></textarea></div>
+        </div>
+        <div class="card">
+          <div class="hd"><strong>🎵 Música</strong><button class="btn small ghost" data-copy="#outMusic">Copiar</button></div>
+          <div class="bd"><textarea id="outMusic" class="out"></textarea></div>
+        </div>
+        <div class="card">
+          <div class="hd"><strong>🔖 Selo Dual</strong><button class="btn small ghost" data-copy="#outSelo">Copiar</button></div>
+          <div class="bd"><textarea id="outSelo" class="out mono"></textarea></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section class="wrap">
+  <div class="card">
+    <div class="hd"><h2>3) Presets de Combinações (1 clique)</h2></div>
+    <div class="bd">
+      <div class="presetbar" id="comboPresets"></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="card">
+    <div class="hd"><h2>4) Notas</h2></div>
+    <div class="bd">
+      <ul style="color:var(--muted); font-size:12px; margin:0; padding-left:18px">
+        <li>Regra de certeza: ⊙ UNO (direto); Incerteza: ◎/⇄ DUAL; Síntese: △ TRINITY.</li>
+        <li>Densidade: ░ (curto), ▒ (médio), ▓ (detalhado). ☆彡 eleva estética; █▀█ aumenta força.</li>
+        <li>§ QA para coerência; ∞ garante saída segura; ◇ marca integrações (este app é offline).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="help" id="help">
+  <div class="modal">
+    <div class="hd" style="padding:12px; border-bottom:1px solid rgba(255,255,255,.06)"><h2>Tabela ASCII • Portais e Funções</h2></div>
+    <div class="bd" style="padding:12px">
+<pre class="mono" style="font-size:12px; white-space:pre-wrap">
+╔═╗ / ╚═╝   → Portal raiz / Estrutura do frame
+│           → Fluxo interno / Caminho ativo
+═           → Núcleo / Energia estabilizada
+█▀█         → Força / Abertura de camada
+⊙           → UNO / Centro do arquétipo
+⇄ / ◎       → DUAL / Troca de polaridade e presença contínua
+△           → TRINITY / Síntese em três camadas
+☆彡         → Estética / Expansão criativa
+◇           → API sensorial / Chamadas externas (n8n, apps)
+∞           → Safe mode / Saída sem crash
+§           → QA / Arbitragem inteligente
+▲▼►◄        → Direções / Navegação de estados
+░▒▓         → Densidade / Intensidade de ativação
+#           → Chave Mestra / Root fixo
+💠          → Mini-servidor dual (n8n hub)
+</pre>
+      <div class="toolbar"><button class="btn" id="btnCloseHelp">Fechar</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copiado!</div>
+
+<script>
+const $ = (q, el=document)=> el.querySelector(q);
+const $$ = (q, el=document)=> Array.from(el.querySelectorAll(q));
+function toast(msg="Copiado!"){ const t=$("#toast"); t.textContent=msg; t.style.display="block"; setTimeout(()=>t.style.display="none",1200); }
+function insertAtCursor(textarea, text){
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const end = textarea.selectionEnd ?? textarea.value.length;
+  const before = textarea.value.substring(0,start);
+  const after = textarea.value.substring(end);
+  textarea.value = before + text + after;
+  autoResize(textarea);
+  textarea.focus();
+  const pos = start + text.length;
+  textarea.setSelectionRange(pos,pos);
+}
+function autoResize(t){
+  t.style.height = "auto";
+  t.style.height = Math.min(320, Math.max(120, t.scrollHeight)) + "px";
+}
+
+// ===== PRESETS =====
+const frameLibrary = {
+  "Música Ritual": `╔═╗  #ROOT:KODUX  ARCH:INFODOSE12
+│ △  C1: técnica  C2: simbólica  C3: prática
+│ §  QA coerência     ▓
+═ █▀█  SEL0 DUAL
+╚═╝ ∞  ☆彡`,
+  "Arte Neon Tribal": `╔═╗  #ROOT:KODUX
+│ ◎  DUAL on     ◇ ValidadorPrompt
+│ §  QA          ▒  ☆彡
+═ █▀█
+╚═╝ ∞`,
+  "Copy Comercial": `╔═╗  #ROOT:KODUX
+│ ⊙  OBJ: conversão direta
+│ §  QA     ▒   █▀█
+╚═╝ ∞  ☆彡`,
+  "Roteiro Curta": `╔═╗  #ROOT:KODUX
+│ △  Técnica / Símbolo / Prática
+│ §  QA     ▓   ☆彡
+═ █▀█
+╚═╝ ∞`,
+  "Música Club Noturna": `╔═╗  #ROOT:KODUX
+│ ◎  DUAL on   ▓
+│ §  QA        █▀█
+╚═╝ ∞  ☆彡`,
+  "Pôster Sci‑Fi Retro": `╔═╗  #ROOT:KODUX
+│ ⊙   ▒  ☆彡
+│ §  QA
+╚═╝ ∞  █▀█`,
+  "Lançamento Relâmpago": `╔═╗  #ROOT:KODUX
+│ ⊙  call-to-action    ░
+│ §  QA
+╚═╝ ∞  █▀█`,
+  "Storyboard Teaser 30s": `╔═╗  #ROOT:KODUX
+│ △  técnica/simbólica/prática  ▒
+│ §  QA
+╚═╝ ∞  ☆彡`
+};
+
+const topicPresets = [
+  "trilha mística com tambores e sintetizadores",
+  "pôster sci‑fi retro com tipografia bold",
+  "copy de lançamento para app de música",
+  "roteiro de curta de ficção urbana",
+  "arte neon tribal para flyer de evento",
+  "identidade visual minimalista para marca pessoal"
+];
+const stylePresets = [
+  "neon tribal", "cinematográfico", "minimalista", "editorial premium",
+  "vaporwave sujo", "orgânico-sintético", "technoir"
+];
+const audPresets = [
+  "público geral", "criadores", "produtores musicais", "DJs", "diretores de arte", "leitores de não-ficção"
+];
+const extraPresets = [
+  "evitar clichês", "usar linguagem inclusiva", "16:9", "120-128 BPM",
+  "key D minor", "granulação leve e glow suave", "CTA claro em 12 palavras"
+];
+const comboPresets = [
+  {name:"Música Ritual Neon", frame:"Música Ritual", topic:topicPresets[0], style:"neon tribal", aud:"produtores musicais", extras:"120-128 BPM; key D minor; evitar clichês"},
+  {name:"Poster Sci‑Fi Bold", frame:"Pôster Sci‑Fi Retro", topic:topicPresets[1], style:"editorial premium", aud:"diretores de arte", extras:"16:9; granulação leve e glow suave"},
+  {name:"Copy Relâmpago App", frame:"Lançamento Relâmpago", topic:topicPresets[2], style:"minimalista", aud:"público geral", extras:"CTA claro em 12 palavras; usar linguagem inclusiva"},
+  {name:"Roteiro Curta Urbana", frame:"Roteiro Curta", topic:topicPresets[3], style:"cinematográfico", aud:"leitores de não-ficção", extras:"evitar clichês; estruturar em 5 cenas"},
+  {name:"Flyer Neon Tribal", frame:"Arte Neon Tribal", topic:topicPresets[4], style:"neon tribal", aud:"criadores", extras:"16:9; glow suave; contraste alto"}
+];
+
+function renderChips(container, items, onClick){
+  const el = $(container); el.innerHTML = "";
+  items.forEach(v => {
+    const div = document.createElement("span");
+    div.className = "chip";
+    div.textContent = (v.name || v);
+    div.addEventListener("click", ()=> onClick(v));
+    el.appendChild(div);
+  });
+}
+
+function setFramePreset(name){
+  const txt = frameLibrary[name];
+  if(!txt) return;
+  $("#frame").value = txt;
+  autoResize($("#frame"));
+  toast("Preset de frame aplicado: "+name);
+}
+
+function applyFieldPreset(fieldId, value){
+  const el = $(fieldId);
+  if(el.tagName === "INPUT"){
+    if(!el.value) el.value = value;
+    else el.value = value; // substitui (mais prático no mobile)
+  } else {
+    // textarea extras: concatena com ; se já existir
+    el.value = el.value ? (el.value.replace(/\s*;?\s*$/, '') + "; " + value) : value;
+  }
+  el.focus();
+}
+
+function applyComboPreset(p){
+  setFramePreset(p.frame);
+  $("#topic").value = p.topic;
+  $("#style").value = p.style;
+  $("#aud").value = p.aud;
+  $("#extras").value = p.extras;
+  ["#topic","#style","#aud","#extras","#frame"].forEach(sel => {
+    const el = $(sel); if(el.tagName==="TEXTAREA") autoResize(el);
+  });
+  toast("Combo preset aplicado: "+p.name);
+}
+
+// Render presets
+(function initPresets(){
+  // Frames
+  const fbar = $("#framePresets");
+  fbar.innerHTML = "";
+  Object.keys(frameLibrary).forEach(name=>{
+    const b = document.createElement("span");
+    b.className="chip"; b.textContent = name;
+    b.addEventListener("click", ()=> setFramePreset(name));
+    fbar.appendChild(b);
+  });
+  renderChips("#topicPresets", topicPresets, v => applyFieldPreset("#topic", v));
+  renderChips("#stylePresets", stylePresets, v => applyFieldPreset("#style", v));
+  renderChips("#audPresets", audPresets, v => applyFieldPreset("#aud", v));
+  renderChips("#extraPresets", extraPresets, v => applyFieldPreset("#extras", v));
+  renderChips("#comboPresets", comboPresets, applyComboPreset);
+})();
+
+// Symbol palette
+$("#symbar").addEventListener("click", e=>{
+  const b = e.target.closest(".sym"); if(!b) return;
+  insertAtCursor($("#frame"), b.dataset.sym);
+});
+
+// Help modal
+$("#btnHelp").onclick = ()=> $("#help").style.display="flex";
+$("#btnCloseHelp").onclick = ()=> $("#help").style.display="none";
+
+// Pre-fills
+$("#btnUNO").onclick = ()=> setFramePreset("Copy Comercial");
+$("#btnDUAL").onclick = ()=> setFramePreset("Arte Neon Tribal");
+$("#btnTRI").onclick = ()=> setFramePreset("Música Ritual");
+
+// Import/Export
+$("#btnImport").onclick = ()=> $("#fileIn").click();
+$("#fileIn").addEventListener("change", ev=>{
+  const f = ev.target.files?.[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ()=> { $("#frame").value = String(reader.result||""); autoResize($("#frame")); toast("Frame importado"); };
+  reader.readAsText(f);
+});
+$("#btnExport").onclick = ()=>{
+  const blob = new Blob([$("#frame").value], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "frame_portal.txt";
+  a.click(); URL.revokeObjectURL(a.href);
+};
+
+// Copy buttons
+$$("[data-copy]").forEach(btn=> btn.addEventListener("click", ()=>{
+  const target = $(btn.dataset.copy);
+  target.select(); document.execCommand("copy"); toast();
+}));
+
+// Clear
+$("#btnClear").onclick = ()=>{
+  $("#frame").value=""; $("#topic").value=""; $("#style").value=""; $("#aud").value=""; $("#extras").value="";
+  ["#outText","#outImage","#outMusic","#outSelo"].forEach(id=> $(id).value="");
+  toast("Limpou");
+};
+
+// Parser & Builders
+function parseFrame(txt){
+  const has = (s)=> txt.includes(s);
+  const mode = has('△') ? 'TRINITY' : (has('⇄') || has('◎')) ? 'DUAL' : has('⊙') ? 'UNO' : 'UNO';
+  const density = has('▓') ? 'alta' : has('▒') ? 'média' : has('░') ? 'baixa' : 'média';
+  const beauty = (txt.includes('☆') || txt.includes('☆彡'));
+  const force = txt.includes('█▀█');
+  const api = has('◇');
+  const qa = has('§') || $("#qaOn").checked;
+  const safe = has('∞') || $("#safeOn").checked;
+  const root = has('#'); const minisrv = txt.includes('💠'); const portal = (has('╔═╗')||has('╚═╝')||has('│'));
+  const densLevel = has('▓')?3:has('▒')?2:1;
+  return { mode, density, densLevel, beauty, force, api, qa, safe, root, minisrv, portal };
+}
+function miniPortal(frame){
+  let out = frame.replace(/[ \t]+/g,' ').trim().split('\n').slice(0,3).join(' ');
+  if(out.length>120) out = out.slice(0,117)+'…'; return out;
+}
+function seloDual(meta){
+  const now = new Date();
+  return `[SELO DUAL]
+Autor: Você + Dual Infodose
+Portal: ${miniPortal($("#frame").value)}
+Story: ${meta.mode} • densidade ${meta.density}${meta.beauty?' • estética on':''}${meta.force?' • força on':''}
+Proveniência: Ultimate Finale HTML offline; Integrações: ${meta.api?'marcadas (◇)':'nenhuma'}; QA: ${meta.qa?'on':'off'}; Safe: ${meta.safe?'on':'off'}
+Sessão: ${now.toISOString()}`;
+}
+function buildPrompts(meta, topic, style, aud, extras, toggles){
+  const wordTarget = meta.densLevel===1? "breve, direto" : meta.densLevel===2? "equilíbrio entre profundidade e concisão" : "detalhado, rico em nuances";
+  const imgDetail = meta.densLevel===1? "clean, composição simples" : meta.densLevel===2? "composição equilibrada e camadas de detalhe" : "composição complexa, múltiplos planos e microdetalhes";
+  const musicDetail = meta.densLevel===1? "estrutura simples 8/16 bars" : meta.densLevel===2? "estrutura 32/64 bars" : "estrutura 64+ bars com variações e breaks";
+  const vibe=[];
+  if(meta.beauty) vibe.push("estética elevada (☆彡)");
+  if(meta.force) vibe.push("intensidade e impacto (█▀█)");
+  if(toggles.cabX) vibe.push("paleta neon tribal (Cabelos X)");
+  if(toggles.cabY) vibe.push("organização técnica e precisão (Cabelos Y)");
+  if(toggles.cabZ) vibe.push("fluidez onírica e transições suaves (Cabelos Z)");
+  const vibeLine = vibe.length? `Estética: ${vibe.join(', ')}.` : "";
+  let textPrompt="", imagePrompt="", musicPrompt="";
+  if(meta.mode==='UNO'){
+    textPrompt = `Escreva sobre: "${topic}". Público: ${aud||"geral"}. Estilo: ${style||"claro e envolvente"}.
+Objetivo: entregar conteúdo ${wordTarget} com orientação prática.
+${meta.qa? "Mantenha coerência, evite contradições.": ""}
+${vibeLine}
+Extras: ${extras||"nenhum"}.
+Saída pedida: texto final pronto para uso.`.trim();
+    imagePrompt = `Crie uma descrição de imagem para: "${topic}". Estilo: ${style||"contemporâneo"}.
+Diretrizes: ${imgDetail}. Foco em clareza do assunto principal.
+${vibeLine}
+Extras: ${extras||"nenhum"}.
+Formato sugerido: 16:9 (adaptável).`.trim();
+    musicPrompt = `Crie um prompt de música para: "${topic}". Público: ${aud||"amplo"}. Estilo: ${style||"cinematográfico / eletrônico orgânico"}.
+Diretrizes: ${musicDetail}. Estrutura clara de introdução, desenvolvimento e fechamento.
+${vibeLine}
+Extras (BPM/tonalidade/tema): ${extras||"BPM livre, tonalidade a definir"}.`.trim();
+  } else if(meta.mode==='DUAL'){
+    textPrompt = `Produza um texto em duas perspectivas (DUAL) sobre: "${topic}". Público: ${aud||"geral"}. Estilo: ${style||"equilibrado e persuasivo"}.
+Camada A: visão técnica/objetiva. Camada B: visão criativa/narrativa. Convergência ao final (síntese prática).
+${meta.qa? "Valide coerência entre as duas camadas (§).": ""}
+${vibeLine}
+Extras: ${extras||"nenhum"}.
+Saída: texto final com seções A/B + síntese.`.trim();
+    imagePrompt = `Descreva uma imagem DUAL sobre "${topic}": contraponha dois elementos/estéticas e una-os numa composição ${imgDetail}.
+Estilo: ${style||"híbrido técnico-criativo"}. ${vibeLine}
+Extras: ${extras||"nenhum"}.
+Indique luz, enquadramento, textura e pós-processo.`.trim();
+    musicPrompt = `Gere um prompt musical DUAL para "${topic}", combinando duas identidades (A e B) que convergem no drop/outro.
+Estilo: ${style||"híbrido"}; ${musicDetail}. ${vibeLine}
+Defina BPM aproximado, timbres-chave e progressões.
+Extras: ${extras||"nenhum"}.`.trim();
+  } else { // TRINITY
+    textPrompt = `Crie um texto em TRINITY para "${topic}" (Público: ${aud||"geral"}, Estilo: ${style||"elegante e claro"}):
+1) Camada técnica/explicativa,
+2) Camada simbólica/analógica,
+3) Camada prática/aplicação.
+${meta.qa? "Garanta coerência entre as camadas (§).": ""}
+${vibeLine}
+Diretriz de densidade: ${wordTarget}. Extras: ${extras||"nenhum"}.`.trim();
+    imagePrompt = `Descreva uma imagem TRINITY para "${topic}":
+- Técnica: materiais, luz, lente, composição (${imgDetail}).
+- Simbólica: metáforas visuais e ícones.
+- Prática: uso/aplicação e legibilidade.
+Estilo: ${style||"alto impacto editorial"}. ${vibeLine}
+Extras: ${extras||"nenhum"}.`.trim();
+    musicPrompt = `Elabore um prompt musical TRINITY para "${topic}":
+1) Técnica: BPM, key, escala, instrumentos, estrutura (${musicDetail}).
+2) Simbólica: motivo/tema e clima emocional.
+3) Prática: contexto de uso, duração e transições.
+Estilo: ${style||"orgânico-sintético"}. ${vibeLine}
+Extras: ${extras||"nenhum"}.`.trim();
+  }
+  return {textPrompt, imagePrompt, musicPrompt};
+}
+
+function buildFullMD(meta, topic, style, aud, extras, prompts){
+  return `# Ultimate Finale — Saída
+
+**Modo:** ${meta.mode}  
+**Densidade:** ${meta.density}  
+**Estética:** ${(meta.beauty?'on':'off')}  
+**Força:** ${(meta.force?'on':'off')}  
+**Integrações (◇):** ${(meta.api?'marcadas':'não marcadas')}  
+**QA (§):** ${(meta.qa?'on':'off')}  
+**Safe (∞):** ${(meta.safe?'on':'off')}  
+**Tema:** ${topic||'-'}  
+**Estilo:** ${style||'-'}  
+**Audiência:** ${aud||'-'}  
+**Extras:** ${extras||'-'}  
+
+## 📝 Texto
+
+${prompts.textPrompt}
+
+## 🖼️ Imagem
+
+${prompts.imagePrompt}
+
+## 🎵 Música
+
+${prompts.musicPrompt}
+
+## 🔖 Selo Dual
+
+${seloDual(meta)}
+`;
+}
+
+// Generate
+$("#btnGenerate").onclick = ()=>{
+  const meta = parseFrame($("#frame").value);
+  const toggles = { cabX: $("#cabX").checked, cabY: $("#cabY").checked, cabZ: $("#cabZ").checked };
+  const topic = $("#topic").value.trim();
+  const style = $("#style").value.trim();
+  const aud = $("#aud").value.trim();
+  const extras = $("#extras").value.trim();
+  const prompts = buildPrompts(meta, topic, style, aud, extras, toggles);
+  $("#outText").value = prompts.textPrompt; autoResize($("#outText"));
+  $("#outImage").value = prompts.imagePrompt; autoResize($("#outImage"));
+  $("#outMusic").value = prompts.musicPrompt; autoResize($("#outMusic"));
+  $("#outSelo").value = seloDual(meta); autoResize($("#outSelo"));
+  toast("Prompts gerados ⚡");
+};
+
+// Downloads
+$("#btnDownloadMD").onclick = ()=>{
+  const meta = parseFrame($("#frame").value);
+  const topic = $("#topic").value.trim();
+  const style = $("#style").value.trim();
+  const aud = $("#aud").value.trim();
+  const extras = $("#extras").value.trim();
+  const toggles = { cabX: $("#cabX").checked, cabY: $("#cabY").checked, cabZ: $("#cabZ").checked };
+  const prompts = {
+    textPrompt: $("#outText").value || buildPrompts(meta, topic, style, aud, extras, toggles).textPrompt,
+    imagePrompt: $("#outImage").value || buildPrompts(meta, topic, style, aud, extras, toggles).imagePrompt,
+    musicPrompt: $("#outMusic").value || buildPrompts(meta, topic, style, aud, extras, toggles).musicPrompt
+  };
+  const md = buildFullMD(meta, topic, style, aud, extras, prompts);
+  const blob = new Blob([md], {type:"text/markdown;charset=utf-8"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ultimate_finale_FULL.md"; a.click();
+  URL.revokeObjectURL(a.href);
+};
+$("#btnDownloadJSON").onclick = ()=>{
+  const meta = parseFrame($("#frame").value);
+  const data = {
+    meta, input:{ frame: $("#frame").value, topic: $("#topic").value, style: $("#style").value, aud: $("#aud").value, extras: $("#extras").value },
+    outputs:{ text: $("#outText").value, image: $("#outImage").value, music: $("#outMusic").value, selo: $("#outSelo").value }
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ultimate_finale_data.json"; a.click();
+  URL.revokeObjectURL(a.href);
+};
+
+// Auto-resize on input
+["#frame","#outText","#outImage","#outMusic","#outSelo","#extras"].forEach(sel=>{
+  const el = $(sel);
+  el.addEventListener("input", ()=> autoResize(el));
+  autoResize(el);
+});
+</script>
+
+<footer class="footer">
+  Ultimate Finale • Standalone HTML (presets) • artes codex azure © • mobile-first (iPhone retrato).
+</footer>
+</body>
+</html>

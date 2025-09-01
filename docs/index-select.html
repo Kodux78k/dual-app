@@ -1,0 +1,100 @@
+<!doctype html><html lang="pt-br"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dual Clean — Seletor de Versões</title>
+<style>
+:root{--bg:#0a0c11;--fg:#e9edf8;--mut:#9aa4b2;--bd:#151a22;--hi:#7cc0ff}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:500 14px/1.4 system-ui,-apple-system,Segoe UI,Roboto}
+.header{padding:14px 16px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+h1{margin:0;font-size:16px} .mut{color:var(--mut)}
+.grid{display:grid;gap:12px;padding:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{border:1px solid var(--bd);border-radius:14px;background:#0d1118;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card h2{margin:0;font-size:15px} .desc{font-size:13px;color:var(--mut)}
+.btns{display:flex;gap:8px;flex-wrap:wrap} a.btn,button.btn{text-decoration:none;border:1px solid var(--bd);color:var(--fg);background:#111827;border-radius:10px;padding:8px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+small.tag{background:#0f1622;border:1px solid #172030;color:#b5c4d8;border-radius:8px;padding:2px 6px;font-size:11px}
+kbd{background:#121826;border:1px solid #1a2232;border-radius:6px;padding:1px 6px;font-size:11px}
+.footer{padding:16px;border-top:1px solid var(--bd);color:var(--mut)}
+</style></head><body>
+<div class="header">
+  <h1>Dual Clean — Seletor de Versões</h1>
+  <div class="mut">2025-09-01 18:36</div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>CLEAN (injected)</h2>
+    <div class="desc">Core 1:1 + patch Tabs opcional já embutido. Ative Tabs: <kbd>localStorage.setItem('ui.mergeKeyAndPatches','1')</kbd>.</div>
+    <div class="btns">
+      <a class="btn" href="./Dual_App_io100_0_base_1_R__CLEAN_injected.html">Abrir</a>
+    </div>
+    <small class="tag">visual 1:1</small> <small class="tag">tabs opcional</small>
+  </div>
+
+  <div class="card">
+    <h2>CLEAN (core only)</h2>
+    <div class="desc">Apenas o núcleo limpíssimo; zero CSS/JS de Tabs para evitar overrides.</div>
+    <div class="btns">
+      <a class="btn" href="./Dual_App_io100_0_base_1_R__CLEAN_coreOnly.html">Abrir</a>
+    </div>
+    <small class="tag">núcleo 1:1</small>
+  </div>
+
+  <div class="card">
+    <h2>LITE Path</h2>
+    <div class="desc">Desempenho leve: partículas no-op, players lazy, logs reduzidos. Alternar: <kbd>__dual_set_perf('lite'|'normal')</kbd>.</div>
+    <div class="btns">
+      <a class="btn" href="./Dual_App_io100_0_base_1_R__CLEAN_LITE_path.html">Abrir</a>
+    </div>
+    <small class="tag">lite</small> <small class="tag">no-op seguro</small>
+  </div>
+
+  <div class="card">
+    <h2>LITE+</h2>
+    <div class="desc">Dedup de CSS em runtime + lazy-mount de KeyMgr/PatchMgr.</div>
+    <div class="btns">
+      <a class="btn" href="./Dual_App_io100_0_base_1_R__CLEAN_LITE_plus.html">Abrir</a>
+    </div>
+    <small class="tag">dedupe CSS</small> <small class="tag">lazy panels</small>
+  </div>
+
+  <div class="card">
+    <h2>LITE+++</h2>
+    <div class="desc">CSS dedupe seletivo + compressão de classes + lazy-init de players via IntersectionObserver.</div>
+    <div class="btns">
+      <a class="btn" href="./Dual_App_io100_0_base_1_R__CLEAN_LITE_triple.html">Abrir</a>
+    </div>
+    <small class="tag">classes compactas</small> <small class="tag">lazy players</small>
+  </div>
+
+  <div class="card">
+    <h2>14KB CUT</h2>
+    <div class="desc">Cut estático do LiteTriple (minificação + dedup + limpeza). Teste A/B: <kbd>__testRenderAB()</kbd>.</div>
+    <div class="btns">
+      <a class="btn" href="./Dual_App_io100_0_base_1_R__CLEAN_14k_cut.html">Abrir</a>
+    </div>
+    <small class="tag">minificado</small>
+  </div>
+
+  <div class="card">
+    <h2>CORE14K (mínimo)</h2>
+    <div class="desc">Núcleo mínimo (~3.6 KB). Pluga seu fetch em <kbd>__dual_send_request(msg)</kbd> e use <kbd>__dual_core_send()</kbd>.</div>
+    <div class="btns">
+      <a class="btn" href="./Dual_APP_CORE14K.html">Abrir</a>
+    </div>
+    <small class="tag">ultra leve</small> <small class="tag">plugável</small>
+  </div>
+
+  <div class="card">
+    <h2>README — Lite Path</h2>
+    <div class="desc">Guia rápido do LITE Path, toggles e APIs expostas.</div>
+    <div class="btns">
+      <a class="btn" href="./README_Dual_Clean_Lite.txt">Abrir</a>
+    </div>
+    <small class="tag">instruções</small>
+  </div>
+</div>
+
+<div class="footer">
+  Dica: para validar equivalência do render, use <kbd>__testRenderAB()</kbd> nas variantes CLEAN/LITE/LITE++/14k.<br/>
+  Alternar desempenho: <kbd>__dual_set_perf('lite'|'normal')</kbd>. Toggles do LITE+++: <kbd>__dual_litepp_toggle(key,on/off)</kbd>.
+</div>
+
+</body></html>
