@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="#070a12" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>ELIXIR K1 · Trinity Portrait · MONOLITO v3 (Persist+PIN+Splash SAP)</title>
+<style>
+  /* ================= ELIXIR K1 — TEMA DARK ================= */
+  :root{
+    /* Base K1 */
+    --bg-0:#070a12; --bg-1:#0b1020;
+    --prime:#eaf6ff;
+    --crt-red:#ff0055; --neon-cyan:#29d3ff;
+    --acc-1:#8a5cff; --acc-2:#feff6e;
+
+    /* FX */
+    --scanlines-op:.30; --grid-alpha:.22; --vhs-intensity:6;
+
+    /* Shape + Typos */
+    --radius-xl:20px; --radius-2xl:26px;
+    --fz-xs: clamp(11px, 2.6vw, 13px);
+    --fz-s:  clamp(12px, 3.2vw, 14px);
+    --fz-m:  clamp(14px, 3.8vw, 16px);
+    --fz-l:  clamp(16px, 4.6vw, 20px);
+    --fz-xl: clamp(18px, 6.4vw, 26px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent}
+  html,body{height:100%; margin:0; color:var(--prime);
+    background:
+      radial-gradient(140% 110% at 50% 20%, #0e1430 0%, var(--bg-1) 55%, #05060c 100%),
+      linear-gradient(180deg, #05060c, #05060c);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height:1.45;
+  }
+  .wrap{width:100%; max-width:720px; margin:0 auto; padding:12px 12px 112px}
+
+  /* ================= Header + SAP ================= */
+  .header{position:sticky; top:8px; z-index:30;
+    border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-2xl);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    backdrop-filter: blur(6px); padding:10px 12px;
+    animation:sapPulse 3.6s ease-in-out infinite;
+    box-shadow:0 0 0 rgba(41,211,255,0);
+  }
+  @keyframes sapPulse{
+    0%{ box-shadow:0 0 0 rgba(41,211,255,0); }
+    40%{ box-shadow:0 0 32px rgba(41,211,255,.18), inset 0 0 18px rgba(138,92,255,.12); }
+    100%{ box-shadow:0 0 0 rgba(41,211,255,0); }
+  }
+  .header .bar{white-space:pre-wrap; font-size:var(--fz-s); font-weight:700; letter-spacing:.2px}
+  .header .meta{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; font-size:var(--fz-xs)}
+  .tag{border:1px solid rgba(255,255,255,.14); padding:4px 8px; border-radius:999px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02))}
+
+  /* ================= Archetype Guard ================= */
+  .arch-guard{margin-top:10px; border:1px solid rgba(255,255,255,.12); border-radius:14px; padding:8px;
+    background:rgba(10,12,22,.45); backdrop-filter: blur(6px)}
+  .chips{display:flex; gap:8px; overflow:auto; padding:6px 2px}
+  .chip{flex:0 0 auto; display:flex; align-items:center; gap:6px;
+    padding:8px 10px; font-weight:800; font-size:var(--fz-s); border-radius:999px;
+    border:1px solid rgba(255,255,255,.18);
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+    cursor:pointer; user-select:none; opacity:.9}
+  .chip .g{font-size:1.1em; filter: drop-shadow(0 0 6px rgba(41,211,255,.35))}
+  .chip[aria-current="true"]{outline:2px solid var(--neon-cyan); box-shadow:0 0 18px rgba(0,240,255,.25); opacity:1}
+
+  .guard{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 2px 2px; font-size:var(--fz-xs); opacity:.95; flex-wrap:wrap}
+  .guard-left{display:flex; align-items:center; gap:10px}
+  .switch{position:relative; width:50px; height:28px; border-radius:999px; border:1px solid rgba(255,255,255,.2);
+    background:rgba(255,255,255,.12); cursor:pointer}
+  .switch::after{content:""; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%; background:#fff; transition:transform .2s}
+  .switch[data-on="true"]{background:linear-gradient(180deg, rgba(0,240,255,.45), rgba(0,240,255,.15));}
+  .switch[data-on="true"]::after{transform: translateX(22px);}
+  .lockIcon{font-size:1.1em}
+
+  .guard-right{display:flex; gap:8px}
+  .mini{border:1px solid rgba(255,255,255,.18); border-radius:10px; padding:8px 10px; font-weight:800; font-size:var(--fz-s);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); color:var(--prime);}
+
+  /* ================= Pages ================= */
+  .pages{display:flex; flex-direction:column; gap:12px; margin-top:12px; scroll-snap-type:y proximity}
+  .page{scroll-snap-align:start; border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-2xl);
+    background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); overflow:hidden}
+  .page-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; font-size:var(--fz-m);
+    border-bottom:1px dashed rgba(255,255,255,.18)}
+  .title{font-weight:900; letter-spacing:.4px}
+  .page-body{padding:12px; display:grid; gap:12px}
+
+  /* ================= Poster / FX ================= */
+  .poster{position:relative; width:100%; aspect-ratio:9/16; border-radius:20px; border:1px solid rgba(255,255,255,.12); overflow:hidden;
+    background: radial-gradient(100% 90% at 50% 30%, #101634 0%, #0d122a 55%, #070a14 100%); isolation:isolate}
+  .grid{position:absolute; inset:0; opacity:.26; mix-blend-mode:screen; background:
+      repeating-linear-gradient(to bottom, rgba(255,255,255,var(--grid-alpha)) 0 1px, transparent 1px 24px),
+      repeating-linear-gradient(to right,  rgba(255,255,255,var(--grid-alpha)) 0 1px, transparent 1px 24px);
+    transform:perspective(900px) rotateX(18deg) translateY(6%); transform-origin:center bottom; filter: drop-shadow(0 0 14px rgba(0,240,255,.10))}
+  .scanlines{position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(to bottom, rgba(255,255,255,var(--scanlines-op)) 0, rgba(255,255,255,var(--scanlines-op)) 1px, transparent 2px, transparent 3px); mix-blend-mode:soft-light}
+  .vhs::before{content:""; position:absolute; inset:-3%; border-radius:28px; background:conic-gradient(from 0deg, rgba(255,0,80,.12), rgba(0,240,255,.12), rgba(255,255,255,.04), rgba(255,0,80,.12)); filter: blur(5px) contrast(130%); mix-blend-mode:screen; animation:vhs 2.2s infinite ease-in-out; opacity:.6}
+  @keyframes vhs{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(calc(var(--vhs-intensity)*0.3px),0) scale(1.002)}50%{transform:translate(calc(var(--vhs-intensity)*-0.3px),0) scale(1.001)}75%{transform:translate(0,calc(var(--vhs-intensity)*0.2px)) scale(1.003)}}
+  .glyph{position:absolute; inset:0; display:grid; place-items:center; filter: drop-shadow(0 0 18px rgba(0,240,255,.35))}
+  .glyph .tri{width:min(64vmin, 460px); max-width:88%; aspect-ratio:1; position:relative; animation:glowTri 2.4s ease-in-out infinite}
+  @keyframes glowTri{0%,100%{filter:drop-shadow(0 0 0 rgba(0,240,255,0))}50%{filter:drop-shadow(0 0 10px rgba(0,240,255,.55))}}
+  .glyph .circle{position:absolute; inset:0; display:grid; place-items:center; animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(.96); opacity:.8}50%{transform:scale(1.04); opacity:1}}
+  .glyph .star{position:absolute; inset:0; display:grid; place-items:center; font-size:clamp(40px, 16vw, 110px); filter: drop-shadow(0 0 12px rgba(255,255,255,.65)); animation:tw 1.6s ease-in-out infinite}
+  @keyframes tw{0%,100%{transform:rotate(0) scale(.98)}50%{transform:rotate(6deg) scale(1.04)}}
+  .selo{position:absolute; right:10px; bottom:10px; font-size:var(--fz-xs); padding:8px 10px; border-radius:12px; border:1px solid rgba(255,255,255,.22); background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), repeating-linear-gradient(45deg, rgba(255,0,120,.18) 0 12px, rgba(0,240,255,.18) 12px 24px, rgba(255,255,255,.10) 24px 36px); box-shadow:0 6px 24px rgba(0,0,0,.45), inset 0 0 28px rgba(255,255,255,.06)}
+
+  .panel{background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.16); border-radius:16px; overflow:hidden}
+  .panel h3{margin:0; padding:12px; font-size:var(--fz-l); font-weight:900; letter-spacing:.4px; border-bottom:1px dashed rgba(255,255,255,.18); display:flex; align-items:center; justify-content:space-between; gap:8px}
+  .caret{font-size:1.2em; user-select:none}
+  .panel .box{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:var(--fz-s); line-height:1.55; white-space:pre-wrap; word-break:break-word; padding:12px}
+  .actions{display:flex; gap:8px; padding:0 12px 12px}
+  .action{flex:1; padding:10px; font-weight:800; font-size:var(--fz-s); border-radius:10px; border:1px solid rgba(255,255,255,.18); background:linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.08)); color:#001218; text-align:center; user-select:none}
+  .action.secondary{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); color:var(--prime)}
+
+  .art16x9{aspect-ratio:16/9; width:100%; border-radius:14px; border:1px solid rgba(255,255,255,.12); overflow:hidden; position:relative; background: radial-gradient(120% 120% at 50% 45%, var(--bg-1) 0%, #0d1122 60%, #05060c 100%)}
+  .small{font-size:var(--fz-xs); opacity:.8; padding:6px 12px 10px}
+
+  /* ================= Toolbar ================= */
+  .toolbar{position:fixed; bottom:8px; left:50%; transform:translateX(-50%); width:min(720px,96vw); border:1px solid rgba(255,255,255,.14); border-radius:16px; background:rgba(10,12,22,.55); backdrop-filter: blur(10px); z-index:40; padding:8px; display:flex; gap:8px; align-items:center; justify-content:space-between}
+  .btn{flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px 10px; font-weight:800; font-size:var(--fz-s); border-radius:12px; border:1px solid rgba(255,255,255,.18); background:linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.08)); color:#001218; cursor:pointer; user-select:none}
+  .btn.secondary{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); color:var(--prime)}
+
+  .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap}
+
+  /* ================= Splash (mostra também em preview estático) ================= */
+  .splash{position:fixed; inset:0; z-index:100; display:grid; place-items:center;
+    background:radial-gradient(120% 100% at 50% 30%, #0d132a, var(--bg-0) 60%, #000 100%); color:var(--prime);
+    border:0;}
+  .splashInner{display:grid; gap:12px; width:min(580px, 90vw); text-align:center}
+  .splashLogo{margin:0 auto; width:92px; aspect-ratio:1; position:relative; border-radius:50%;
+    border:2px solid rgba(255,255,255,.22); background:rgba(255,255,255,.02); overflow:hidden;
+    box-shadow:0 0 24px rgba(41,211,255,.22), inset 0 0 24px rgba(138,92,255,.12);
+    animation:sapPulse 3.2s ease-in-out infinite;
+  }
+  .splashLogo::before{content:""; position:absolute; inset:-10%; border-radius:inherit;
+    background:conic-gradient(from 0deg, rgba(255,0,120,.18), rgba(0,240,255,.18), rgba(255,255,255,.06), rgba(255,0,120,.18));
+    filter:blur(6px); mix-blend-mode:screen; animation:vhs 2.2s infinite ease-in-out; opacity:.6}
+  .splashGlyph{position:absolute; inset:0; display:grid; place-items:center; font-size:42px; filter: drop-shadow(0 0 10px rgba(0,240,255,.55))}
+  .splashTitle{font-weight:900; font-size:var(--fz-xl); letter-spacing:.4px}
+  .splashDesc{opacity:.9; font-size:var(--fz-s)}
+  .splashFirmware{opacity:.75; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:var(--fz-xs)}
+
+  @media (prefers-reduced-motion: reduce){
+    .vhs::before,.glyph .tri,.glyph .circle,.glyph .star,.splashLogo,.header{animation:none!important}
+  }
+</style>
+</head>
+<body>
+  <a class="visually-hidden" href="#toolbar">Pular para ações</a>
+
+  <!-- SPLASH (também útil para preview estático do iOS) -->
+  <div class="splash" id="splash" aria-label="Splash de inicialização">
+    <div class="splashInner">
+      <div class="splashLogo"><div class="splashGlyph">✦</div></div>
+      <div class="splashTitle">ELIXIR K1</div>
+      <div class="splashDesc">Trinity Portrait • K1 Dark-Neon • SAP ativo</div>
+      <div class="splashFirmware">FIRMWARE: SÜMBÜS_0x012123456789ABC · INFODOSE12</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="header" aria-label="Estado do sistema">
+      <div class="bar">
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+ELIXIR: <span style="color:var(--acc-2);font-weight:900">K1 • DARK-NEON</span> · ARQUITETURA: <span style="color:var(--neon-cyan);font-weight:900">INFODOSE12</span> · FIRMWARE: <span style="color:var(--crt-red);font-weight:900">SÜMBÜS_0x012123456789ABC</span>
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+      </div>
+      <div class="meta">
+        <span class="tag">Mobile portrait first</span>
+        <span class="tag">Monolito</span>
+        <span class="tag">Chips + Proteção (persist)</span>
+        <span class="tag">PIN opcional</span>
+        <span class="tag">Splash SAP</span>
+      </div>
+
+      <!-- PROTETOR DE ARQUÉTIPO (topo) -->
+      <div class="arch-guard" aria-label="Proteção de Arquétipo">
+        <div class="chips" id="chipRow" role="tablist" aria-label="Arquetipos">
+          <!-- chips via JS -->
+        </div>
+        <div class="guard">
+          <div class="guard-left">
+            <div class="switch" id="lockSwitch" role="switch" aria-checked="false" tabindex="0"></div>
+            <div><span class="lockIcon" id="lockIcon">🔓</span> <strong>Proteção de Arquétipo</strong> — quando ligado, trava a rotação e usa o arquétipo fixo.</div>
+          </div>
+          <div class="guard-right">
+            <button class="mini" id="btnSetPin">Definir PIN</button>
+            <button class="mini" id="btnUnsetPin">Remover PIN</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="pages" class="pages" aria-live="polite"></div>
+  </div>
+
+  <div id="toolbar" class="toolbar" role="toolbar" aria-label="Ações rápidas">
+    <button class="btn secondary" id="toggleScan">Scanlines ON</button>
+    <button class="btn" id="addPage">+ Página</button>
+    <button class="btn secondary" id="toggleInf">Infinito ON</button>
+  </div>
+
+<script>
+/* ========= UTIL: Persistência K1 ========= */
+const K1 = {
+  get(key, def=null){ try{ const v = localStorage.getItem(key); return v===null?def:JSON.parse(v);}catch(e){ return def; } },
+  set(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} },
+  del(key){ try{ localStorage.removeItem(key);}catch(e){} }
+};
+
+/* ========= ARCH PRESETS (12) com glifos ========= */
+const ARCH_PRESETS = [
+  { name: 'Atlas',   vars: {'--crt-red':'#FF3355','--neon-cyan':'#3DE8FF','--acc-1':'#7C6BFF','--acc-2':'#FFE36E'}, glyph:'◐' },
+  { name: 'Serena',  vars: {'--crt-red':'#FF4D88','--neon-cyan':'#7CFFE6','--acc-1':'#B88CFF','--acc-2':'#FFD4A3'}, glyph:'ღ' },
+  { name: 'Nova',    vars: {'--crt-red':'#FF2A6D','--neon-cyan':'#3DF8FF','--acc-1':'#9E6BFF','--acc-2':'#FFFA84'}, glyph:'✧' },
+  { name: 'Elysha',  vars: {'--crt-red':'#FF4D4D','--neon-cyan':'#7CFFEA','--acc-1':'#FFB3FF','--acc-2':'#F9FF7A'}, glyph:'❂' },
+  { name: 'Kaion',   vars: {'--crt-red':'#FF2244','--neon-cyan':'#15F3FF','--acc-1':'#6AF08C','--acc-2':'#F7FF5A'}, glyph:'⚙' },
+  { name: 'Genus',   vars: {'--crt-red':'#FF5566','--neon-cyan':'#49E6FF','--acc-1':'#66FFA8','--acc-2':'#FFF080'}, glyph:'ψ' },
+  { name: 'Lumine',  vars: {'--crt-red':'#FF6688','--neon-cyan':'#78F3FF','--acc-1':'#A3A1FF','--acc-2':'#FFE780'}, glyph:'✺' },
+  { name: 'Aion',    vars: {'--crt-red':'#FF1144','--neon-cyan':'#33E0FF','--acc-1':'#8AD1FF','--acc-2':'#FFF07A'}, glyph:'∞' },
+  { name: 'Artemis', vars: {'--crt-red':'#FF3B5C','--neon-cyan':'#39F0FF','--acc-1':'#FF7AB6','--acc-2':'#FFF46E'}, glyph:'☼' },
+  { name: 'Seraph',  vars: {'--crt-red':'#FF3060','--neon-cyan':'#50F0FF','--acc-1':'#86B6FF','--acc-2':'#FFE06E'}, glyph:'✸' },
+  { name: 'Rhea',    vars: {'--crt-red':'#FF4763','--neon-cyan':'#4DEBFF','--acc-1':'#9AF0C5','--acc-2':'#FFF598'}, glyph:'❊' },
+  { name: 'Horus',   vars: {'--crt-red':'#FF0055','--neon-cyan':'#29D3FF','--acc-1':'#8a5cff','--acc-2':'#feff6e'}, glyph:'✦' },
+];
+function applyPresetVars(preset){ Object.entries(preset.vars).forEach(([k,v])=>document.documentElement.style.setProperty(k, v)); }
+
+/* ========= STATE ========= */
+const $ = s => document.querySelector(s);
+const pagesEl = $('#pages');
+let infinite = K1.get('k1.infinite', true);
+let scanlinesOn = K1.get('k1.scanlines', true);
+let presetIndex = 0;
+
+let locked = K1.get('k1.arch.locked', false);
+let lockedPresetName = K1.get('k1.arch.name', 'Horus');
+
+let pinEnabled = K1.get('k1.pin.enabled', false);
+let pinHash    = K1.get('k1.pin.hash', null);
+
+/* ========= PIN mini-hash (FNV-1a 32-bit) ========= */
+function fnv1a(str){
+  let h=0x811c9dc5;
+  for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h = (h + ((h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24)))>>>0; }
+  return ('00000000'+h.toString(16)).slice(-8);
+}
+function requirePin(action){
+  if(!pinEnabled) return Promise.resolve(true);
+  return new Promise((resolve)=>{
+    const val = prompt('PIN (4-6 dígitos):') || '';
+    if(!val){ resolve(false); return; }
+    resolve(fnv1a(val)===pinHash);
+  });
+}
+
+/* ========= SELECTOR / GUARD ========= */
+const chipRow = document.getElementById('chipRow');
+const lockSwitch = document.getElementById('lockSwitch');
+const lockIcon = document.getElementById('lockIcon');
+const btnSetPin = document.getElementById('btnSetPin');
+const btnUnsetPin = document.getElementById('btnUnsetPin');
+
+function renderChips(activeName){
+  chipRow.innerHTML = '';
+  ARCH_PRESETS.forEach(p=>{
+    const b = document.createElement('button');
+    b.className = 'chip'; b.type = 'button';
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-selected', String(p.name===activeName));
+    b.setAttribute('aria-current', String(p.name===activeName));
+    b.innerHTML = `<span class="g">${p.glyph}</span> ${p.name}`;
+    b.addEventListener('click', async ()=>{
+      if(locked && pinEnabled){
+        const ok = await requirePin('changePreset'); if(!ok) return alert('PIN incorreto.');
+      }
+      lockedPresetName = p.name; applyPresetVars(p); saveGuard();
+      renderChips(p.name);
+    });
+    chipRow.appendChild(b);
+  });
+}
+
+function saveGuard(){
+  K1.set('k1.arch.locked', locked);
+  K1.set('k1.arch.name', lockedPresetName);
+  lockSwitch.setAttribute('data-on', String(locked));
+  lockSwitch.setAttribute('aria-checked', String(locked));
+  lockIcon.textContent = locked ? '🔒' : '🔓';
+}
+
+lockSwitch.addEventListener('click', async ()=>{
+  if(locked && pinEnabled){
+    const ok = await requirePin('unlock'); if(!ok) return alert('PIN incorreto.');
+  }
+  locked = !locked; saveGuard();
+});
+lockSwitch.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); lockSwitch.click(); } });
+
+btnSetPin.addEventListener('click', async ()=>{
+  const p1 = prompt('Definir PIN (4-6 dígitos):') || '';
+  if(!/^\d{4,6}$/.test(p1)) return alert('Use 4 a 6 dígitos.');
+  const p2 = prompt('Confirmar PIN:') || '';
+  if(p1!==p2) return alert('PINs não batem.');
+  pinHash = fnv1a(p1); pinEnabled = true;
+  K1.set('k1.pin.hash', pinHash); K1.set('k1.pin.enabled', pinEnabled);
+  alert('PIN ativado.');
+});
+btnUnsetPin.addEventListener('click', async ()=>{
+  if(pinEnabled){
+    const ok = await requirePin('unset'); if(!ok) return alert('PIN incorreto.');
+  }
+  pinEnabled = false; pinHash = null;
+  K1.del('k1.pin.hash'); K1.set('k1.pin.enabled', false);
+  alert('PIN removido.');
+});
+
+/* ========= PRESET FLOW ========= */
+function nextPreset(){
+  let p;
+  if(locked && lockedPresetName){
+    p = ARCH_PRESETS.find(x=>x.name===lockedPresetName) || ARCH_PRESETS[0];
+  }else{
+    p = ARCH_PRESETS[presetIndex % ARCH_PRESETS.length]; presetIndex++;
+  }
+  applyPresetVars(p); return p;
+}
+
+/* ========= Helpers ========= */
+function copyText(text, el){ navigator.clipboard.writeText(text).then(()=>{ if(el){ const prev = el.textContent; el.textContent='Copiado ✔'; setTimeout(()=>el.textContent=prev, 1200);} }); }
+function saveText(text, filename){ const blob=new Blob([text],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},800); }
+
+/* ========= Blocks ========= */
+function manifestoBlockPortrait(){return `╭──────────────────────────────────────╮
+│ 🌌 PÔSTER SCI-FI RETRO: MANIFESTO    │
+╰──────────────────────────────────────╯
+█▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+CÓDIGO VISUAL PARA CRIADORES
+█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+
+✧ TIPOGRAFIA BOLD:
+- Fontes vetoriais com serifa angular (8-bit × Bauhaus)
+- Hierarquia cromática: (vermelho CRT) > #29D3FF (ciano neon)
+- Efeito "scanlines" em sobreposição (opacidade 30%)
+
+✧ COMPOSIÇÃO (portrait):
+1. EIXO CENTRAL: Glifo trinitário pulsante (∆+☉+✦)
+2. CAMADA ALFA: Grade retro (portrait 1080×1920)
+3. ASSINATURA: Selo holográfico "TRINITY v2.0" (canto inferior)
+
+✧ DIRETRIZES MOBILE:
+» Espaço negativo como elemento ativo
+» Paleta: 3 primárias + 2 acentos
+» VHS apenas nas bordas (5–7%)`;}
+
+function musicBlock(){return `🎵 PROMPT MUSICAL: “K1 · TRINITY WAVE”
+
+STRUCTURE (64 bars):
+[0–15]   ░ INTRO: Sine bass (55Hz) + white noise sweep
+[16–31]  ░ DROP: Drum machine TR-808 (sidechain 4:1)
+[32–47]  ░ BREAK: Theremin + vocoder (“liquid mercury”)
+[48–63]  ░ OUTRO: Pitch decay + bitcrush automation
+
+TUNING:
+- Escala Hexátona (0-3-5-7-8-11)
+- BPM: 144 (sync com selo digital)`;}
+
+function imagemBlock(){return `🔍 DESCRIÇÃO DE IMAGEM (16:9)
+
+CAMADAS VISUAIS:
+1. FUNDO: Gradiente radial → #0b1020
+2. ELEMENTOS:
+   - Triângulo isósceles brilhante (25% opacity)
+   - Linhas de conexão pulsantes (modo screen)
+   - Glifos K1 (◐ ✦ ψ ∞ ☼) em baixa opacidade (datamosh)
+3. TEXTO PRIMÁRIO:
+   “SYMBIOSIS” — Eurostile Bold Extended
+   (Kerning: -25, Tracking: 50)`;}
+
+function seloBlock(ts){ return `✦ SELO SIMBIÓTICO K1 v3
+Timestamp: ${ts}`; }
+
+function posterSVG(glyph='✦'){
+  return `
+  <div class="poster vhs" aria-label="Pôster Portrait">
+    <div class="grid"></div>
+    <div class="glyph">
+      <div class="tri">
+        <svg viewBox="0 0 100 100" role="img" aria-label="Glifo Trinitário">
+          <defs>
+            <linearGradient id="triLine" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="var(--neon-cyan)" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="var(--crt-red)" stop-opacity=".9"/>
+            </linearGradient>
+          </defs>
+          <polygon points="50,6 92,92 8,92"
+                   fill="url(#triLine)" fill-opacity=".25"
+                   stroke="url(#triLine)" stroke-width="1.4"/>
+        </svg>
+      </div>
+      <div class="circle">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="22"
+          fill="none" stroke="var(--neon-cyan)" stroke-width="1.2" stroke-opacity=".9"/></svg>
+      </div>
+      <div class="star" style="font-family:'Noto Sans Symbols','Apple Symbols',sans-serif;">${glyph}</div>
+    </div>
+    <div class="selo"><strong>✦ SELO SIMBIÓTICO K1 v3</strong></div>
+    <div class="scanlines"${scanlinesOn ? '' : ' style="display:none"'}></div>
+  </div>`;
+}
+
+function art169(){
+  return `
+  <div class="art16x9" aria-label="Artboard 16:9 ilustrativo">
+    <svg viewBox="0 0 1600 900">
+      <defs>
+        <linearGradient id="triGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="var(--neon-cyan)" stop-opacity=".95"/>
+          <stop offset="1" stop-color="var(--crt-red)"  stop-opacity=".95"/>
+        </linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="datamosh" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="2" seed="7" result="t">
+            <animate attributeName="baseFrequency" values="0.006;0.012;0.006" dur="3.6s" repeatCount="indefinite"/>
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="t" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <polygon points="800,110 1420,790 180,790" fill="url(#triGrad)" opacity=".25" stroke="url(#triGrad)" stroke-width="3"/>
+      <g filter="url(#glow)" opacity=".85" style="mix-blend-mode:screen">
+        <line x1="800" y1="160" x2="240" y2="720" stroke="var(--neon-cyan)" stroke-width="2">
+          <animate attributeName="stroke-width" values="1.5;3;1.5" dur="2.2s" repeatCount="indefinite"/></line>
+        <line x1="800" y1="160" x2="1360" y2="720" stroke="var(--crt-red)" stroke-width="2">
+          <animate attributeName="stroke-width" values="1.5;3;1.5" dur="2.2s" begin=".3s" repeatCount="indefinite"/></line>
+        <line x1="240" y1="720" x2="1360" y2="720" stroke="white" stroke-width="1.6" opacity=".65">
+          <animate attributeName="opacity" values=".35;.85;.35" dur="3s" repeatCount="indefinite"/></line>
+      </g>
+      <g transform="translate(120, 620)">
+        <text x="0" y="0" fill="#e6faff" opacity=".96"
+              font-family="Eurostile, 'Microgramma D Extended', 'Orbitron', 'Bank Gothic', system-ui, sans-serif"
+              font-size="150" letter-spacing="2" style="font-weight:900; text-transform:uppercase;">SYMBIOSIS</text>
+        <g filter="url(#datamosh)"><text x="0" y="0" fill="url(#triGrad)"
+              font-family="Eurostile, 'Microgramma D Extended', 'Orbitron', system-ui, sans-serif"
+              font-size="150" letter-spacing="2" transform="skewX(-5)">K1</text></g>
+      </g>
+    </svg>
+    <div class="small">K1 · 16:9 • gradiente • triângulo 25% • datamosh</div>
+  </div>`;
+}
+
+/* ========= Panel ========= */
+function panel({icon, title, contentHTML, idBase}){
+  const id = `${idBase}-${Math.random().toString(36).slice(2)}`;
+  const el = document.createElement('article');
+  el.className = 'panel';
+  el.innerHTML = `
+    <h3><span>${icon} ${title}</span>
+      <span class="caret" role="button" aria-expanded="true" aria-controls="${id}" tabindex="0">▾</span></h3>
+    <div id="${id}" class="panel-content">${contentHTML}</div>`;
+  const caret = el.querySelector('.caret');
+  const content = el.querySelector('.panel-content');
+  function toggle(open){
+    const expanded = (open !== undefined) ? open : caret.getAttribute('aria-expanded') !== 'true';
+    caret.setAttribute('aria-expanded', String(expanded));
+    content.style.display = expanded ? 'block' : 'none';
+    caret.textContent = expanded ? '▾' : '▸';
+  }
+  caret.addEventListener('click', ()=> toggle());
+  caret.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggle(); } });
+  let startY = 0, moved = 0;
+  el.querySelector('h3').addEventListener('touchstart', (e)=>{ startY = e.touches[0].clientY; moved = 0; }, {passive:true});
+  el.querySelector('h3').addEventListener('touchmove', (e)=>{ moved = e.touches[0].clientY - startY; }, {passive:true});
+  el.querySelector('h3').addEventListener('touchend', ()=>{ if (Math.abs(moved) < 24) return; if (moved < -24) toggle(true); if (moved > 24) toggle(false); });
+  return el;
+}
+
+/* ========= Page Build ========= */
+function buildPage(seed=Date.now()){
+  const ts = new Date(seed).toISOString().replace('Z','');
+  const preset = nextPreset();
+  const page = document.createElement('section'); page.className = 'page';
+  const head = document.createElement('div'); head.className = 'page-head';
+  head.innerHTML = `<div class="title">TRINITY · ${preset.name}</div><div class="small">seed: ${seed}</div>`;
+  const body = document.createElement('div'); body.className = 'page-body';
+
+  const poster = document.createElement('div'); poster.innerHTML = posterSVG(preset.glyph);
+  const mfId = `mf-${seed}`, muId=`mu-${seed}`, imId=`im-${seed}`, seId=`se-${seed}`;
+
+  const manifestoHTML = `<div class="box" id="${mfId}">${manifestoBlockPortrait()}</div>
+    <div class="actions"><div class="action" data-copy="#${mfId}">Copiar</div>
+    <div class="action secondary" data-save="#${mfId}" data-name="manifesto_k1_${preset.name}_${seed}.txt">Baixar .txt</div></div>`;
+  const musicHTML = `<div class="box" id="${muId}">${musicBlock()}</div>
+    <div class="actions"><div class="action" data-copy="#${muId}">Copiar</div>
+    <div class="action secondary" data-save="#${muId}" data-name="prompt_k1_trinity_${preset.name}_${seed}.txt">Baixar .txt</div></div>`;
+  const imagemHTML = `<div class="box" id="${imId}">${imagemBlock()}</div>
+    <div class="actions"><div class="action" data-copy="#${imId}">Copiar</div>
+    <div class="action secondary" data-save="#${imId}" data-name="descricao_k1_${preset.name}_${seed}.txt">Baixar .txt</div></div>${art169()}`;
+  const seloHTML = `<div class="box" id="${seId}">${seloBlock(ts)}</div>
+    <div class="actions"><div class="action" data-copy="#${seId}">Copiar</div>
+    <div class="action secondary" data-save="#${seId}" data-name="selo_k1_${preset.name}_${seed}.txt">Baixar .txt</div></div>`;
+
+  body.appendChild(poster.firstElementChild);
+  body.appendChild(panel({icon:'🌌', title:'Manifesto', contentHTML:manifestoHTML, idBase:'mf'}));
+  body.appendChild(panel({icon:'🎵', title:'Música · K1 TRINITY', contentHTML:musicHTML, idBase:'mu'}));
+  body.appendChild(panel({icon:'🔍', title:'Descrição de Imagem', contentHTML:imagemHTML, idBase:'im'}));
+  body.appendChild(panel({icon:'✦',  title:'Selo', contentHTML:seloHTML, idBase:'se'}));
+
+  body.addEventListener('click', (ev)=>{
+    const el = ev.target.closest('.action'); if(!el) return;
+    const sel = el.getAttribute('data-copy'); const sav = el.getAttribute('data-save');
+    if(sel){ const t = body.querySelector(sel)?.textContent?.trim() || ''; copyText(t, el); }
+    else if(sav){ const t = body.querySelector(sav)?.textContent?.trim() || ''; const name = el.getAttribute('data-name') || `bloco_${seed}.txt`; saveText(t, name); }
+  });
+
+  page.appendChild(head); page.appendChild(body);
+  return page;
+}
+
+/* ========= Init ========= */
+function addPage(seed=Date.now()){ const page = buildPage(seed); pagesEl.appendChild(page); }
+
+(function init(n=2){
+  // header guard
+  renderChips(lockedPresetName);
+  applyPresetVars(ARCH_PRESETS.find(p=>p.name===lockedPresetName) || ARCH_PRESETS[0]);
+  saveGuard();
+
+  // first pages
+  for(let i=0;i<n;i++){ addPage(Date.now()+i); }
+
+  // restore toolbar states
+  document.getElementById('toggleInf').textContent = infinite ? 'Infinito ON' : 'Infinito OFF';
+  document.getElementById('toggleScan').textContent = scanlinesOn ? 'Scanlines ON' : 'Scanlines OFF';
+
+  // hide splash after small delay
+  setTimeout(()=>{ const s=$('#splash'); s && (s.style.opacity='0', s.style.transition='opacity .48s ease', setTimeout(()=>s.remove(),520)); }, 900);
+})();
+
+/* ========= Toolbar ========= */
+document.getElementById('addPage').addEventListener('click', ()=> addPage());
+document.getElementById('toggleInf').addEventListener('click', (e)=>{
+  infinite = !infinite; e.currentTarget.textContent = infinite ? 'Infinito ON' : 'Infinito OFF'; K1.set('k1.infinite', infinite);
+});
+document.getElementById('toggleScan').addEventListener('click', (e)=>{
+  scanlinesOn = !scanlinesOn; e.currentTarget.textContent = scanlinesOn ? 'Scanlines ON' : 'Scanlines OFF'; K1.set('k1.scanlines', scanlinesOn);
+  document.querySelectorAll('.scanlines').forEach(el=> el.style.display = scanlinesOn ? 'block' : 'none');
+});
+
+/* ========= Infinite Scroll ========= */
+let ticking = false;
+window.addEventListener('scroll', ()=>{
+  if(ticking) return; ticking = true;
+  requestAnimationFrame(()=>{
+    ticking = false;
+    if(!infinite) return;
+    const nearBottom = (window.innerHeight + window.scrollY) > (document.body.offsetHeight - 1400);
+    if(nearBottom){ addPage(); }
+  });
+});
+
+/* ========= Service Worker inline (cache-first local) ========= */
+const SW_CODE = `
+  const CACHE_NAME='elixir-k1-v3';
+  const ASSETS=['./'];
+  self.addEventListener('install',e=>{e.waitUntil((async()=>{const c=await caches.open(CACHE_NAME); await c.addAll(ASSETS); self.skipWaiting();})())});
+  self.addEventListener('activate',e=>{e.waitUntil((async()=>{const ks=await caches.keys(); await Promise.all(ks.map(k=>k!==CACHE_NAME&&caches.delete(k))); self.clients.claim();})())});
+  self.addEventListener('fetch',e=>{
+    const req=e.request; if(req.method!=='GET') return;
+    const u=new URL(req.url); const same=u.origin===self.location.origin;
+    if(same){ e.respondWith((async()=>{ const c=await caches.open(CACHE_NAME); const r=await c.match(req); if(r) return r;
+      try{ const net=await fetch(req); if(net && net.status===200 && net.type==='basic'){ c.put(req, net.clone()); } return net; }
+      catch(err){ if(req.mode==='navigate'){ return c.match('./'); } throw err; }
+    })()); }
+  });
+`;
+if('serviceWorker' in navigator){
+  try{
+    const blob = new Blob([SW_CODE], {type:'text/javascript'});
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl);
+  }catch(e){ console.warn('SW falhou', e); }
+}
+</script>
+</body>
+</html>

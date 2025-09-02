@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>KOBLLUX · Dual.Infodose — ULTRA · Mobile Portrait</title>
+<meta name="theme-color" content="#0b0f0b"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<style>
+/* ====== THEME (KOBLLUX DNA) ====== */
+:root{
+  --bg:#0b0f0b; --panel:#0e120e; --panel-2:#0a0e0a;
+  --text:#e9ffe7; --muted:#b2d3ad; --line:rgba(61,255,18,.28);
+  --accent:#3dff12; --accent-soft:rgba(61,255,18,.10);
+  --warn:#f7d663; --danger:#ff6767; --ok:#32d875;
+  --radius:16px;
+  --font: ui-sans-serif, system-ui, -apple-system, "SF Pro Text", Segoe UI, Roboto, Inter, Arial, "Noto Color Emoji";
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--text); font-family:var(--font);
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(61,255,18,.08), transparent 60%),
+    radial-gradient(900px 400px at -20% 0%, rgba(61,255,18,.05), transparent 60%),
+    var(--bg);
+  overflow:auto; overscroll-behavior-y: contain; touch-action: manipulation;
+}
+a{color:var(--accent); text-decoration:none}
+h1,h2,h3{margin:0 0 8px 0}
+small,code,kbd{font-family:var(--mono)}
+kbd.key{padding:2px 6px; border:1px solid var(--line); border-radius:6px; font-size:12px}
+
+/* ====== LAYOUT ====== */
+.container{max-width:880px; margin:0 auto; padding:0 12px}
+header.app{
+  position:sticky; top:0; z-index:100;
+  backdrop-filter:saturate(1.2) blur(10px);
+  background:linear-gradient(180deg, rgba(11,15,11,.85), rgba(11,15,11,.55) 70%, transparent);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{display:flex; align-items:center; gap:10px; padding:12px 6px}
+.logo{
+  display:grid; place-items:center; width:38px; height:38px; border-radius:12px;
+  background:radial-gradient(120% 120% at 20% 20%, #1aff66 0%, #0b0f0b 62%);
+  box-shadow: inset 0 0 24px rgba(61,255,18,.45);
+  color:#041404; font-weight:900;
+}
+.brand{display:flex; flex-direction:column; line-height:1.05}
+.brand b{letter-spacing:.2px}
+.brand small{opacity:.7; font-size:12px}
+
+.actions{margin-left:auto; display:flex; gap:8px}
+.btn, .mini, .ghost, .pill{
+  border-radius:999px; border:1px solid var(--line); background:var(--panel);
+  color:var(--text);
+}
+.btn{padding:10px 14px; font-weight:700}
+.mini{padding:7px 10px; font-size:12px}
+.ghost{background:transparent}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:8px 12px; font-size:12px; background:var(--accent-soft)}
+
+/* ====== CARDS / GRID ====== */
+main{display:grid; gap:12px; padding:8px 0 92px}
+.card{
+  background:linear-gradient(180deg, var(--panel), var(--panel-2));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:12px; position:relative;
+  box-shadow: 0 6px 28px rgba(0,0,0,.25);
+}
+.row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.grid{display:grid; gap:8px}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.grid-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+
+/* ====== TABS ====== */
+.tabs{ position:sticky; top:calc(env(safe-area-inset-top) + 54px); z-index:10; display:flex; gap:8px; background:transparent; padding:4px 0}
+.tab{flex:1; text-align:center; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background:var(--panel-2); font-weight:700}
+.tab[aria-current="page"]{outline:2px solid var(--accent); background:rgba(61,255,18,.08)}
+.tabpanels > [hidden]{display:none}
+
+/* ====== OUTPUTS ====== */
+#out, #history, #toolsOut{
+  max-height:58vh; overflow:auto; border:1px dashed var(--line); border-radius:12px; padding:10px; background:#050705;
+  -webkit-overflow-scrolling:touch; scroll-behavior:smooth;
+}
+.out-item{padding:10px; border-bottom:1px dashed rgba(255,255,255,.06)}
+.out-item:last-child{border-bottom:0}
+
+/* ====== SNIPPET (MODAL + SHADOW) ====== */
+.snip-fab{
+  position:fixed; right:12px; bottom:calc(env(safe-area-inset-bottom) + 14px);
+  z-index:9998; border-radius:999px; padding:12px 14px; font-weight:900;
+  box-shadow: 0 6px 24px rgba(0,0,0,.45); border:1px solid var(--line); background:var(--panel);
+}
+.snip-modal-backdrop{
+  position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,.55); backdrop-filter: blur(6px);
+  display:none; align-items:center; justify-content:center; padding:20px;
+}
+.snip-modal{
+  width:100%; max-width:820px; border-radius:16px;
+  background:var(--panel); color:var(--text);
+  border:1px solid var(--line);
+  box-shadow: 0 10px 40px rgba(0,0,0,.5);
+  display:grid; grid-template-rows:auto auto auto 1fr auto; gap:10px; padding:12px;
+}
+.snip-modal h3{ margin:0; font-size:16px }
+.snip-row{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center; }
+.snip-ta{
+  width:100%; min-height:160px; resize:vertical;
+  border-radius:12px; background:#000; color:#baffb0;
+  border:1px solid var(--line); padding:10px; font-family:var(--mono);
+  white-space:pre; overflow:auto; line-height:1.25;
+}
+.snip-actions{ display:flex; gap:8px; justify-content:flex-end; }
+.snip-pill{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--line); background:var(--accent-soft); font-size:12px }
+.help{opacity:.75; font-size:12px}
+
+/* ====== BOTTOM SHEET (preset) ====== */
+.sheet{
+  position:fixed; left:0; right:0; bottom:0; background:var(--panel);
+  border-top:1px solid var(--line); border-radius:16px 16px 0 0; padding:12px;
+  box-shadow: 0 -12px 34px rgba(0,0,0,.4);
+}
+
+/* ====== LISTA ULTRA (gestos + undo + compacto) ====== */
+.list{display:grid; gap:8px}
+.item{
+  background:#0a0e0a; border:1px solid var(--line); border-radius:12px; padding:10px;
+  display:flex; align-items:center; gap:8px; touch-action: pan-y;
+  transform: translateX(0); transition: transform .2s ease;
+}
+.item.compacto{padding:6px 8px; font-size:14px}
+.item .name{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.item .ext{opacity:.7; font-size:12px}
+.item .del{border:1px solid var(--line); background:#150b0b; color:#ff9e9e; border-radius:999px; padding:6px 10px}
+.compact-toggle{display:flex; gap:8px; align-items:center}
+
+/* Snackbar (undo) */
+.snackbar{
+  position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom) + 18px); transform:translateX(-50%);
+  background:#000; border:1px solid var(--line); border-radius:12px; padding:10px 12px;
+  display:flex; gap:12px; align-items:center; z-index:10000;
+}
+
+/* ====== VALID STATES ====== */
+.bad{outline:2px solid var(--danger)}
+.good{outline:2px solid var(--ok)}
+</style>
+</head>
+<body>
+<header class="app">
+  <div class="container header-inner">
+    <div class="logo">⚡</div>
+    <div class="brand">
+      <b>KOBLLUX · Dual.Infodose · ULTRA</b>
+      <small>Sempre único, sempre seu</small>
+    </div>
+    <div class="actions">
+      <button class="mini ghost" id="exportPngBtn">PNG</button>
+      <button class="mini ghost" id="downloadHtmlBtn">Baixar HTML</button>
+      <button class="mini" id="mockBtn">Offline: LIGADO</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <main>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab" data-tab="saida" aria-current="page">Saída</button>
+      <button class="tab" data-tab="historico">Histórico</button>
+      <button class="tab" data-tab="ferramentas">Ferramentas</button>
+      <button class="tab" data-tab="lista">Lista+</button>
+    </div>
+
+    <section class="tabpanels">
+      <!-- Saída -->
+      <div id="panel-saida">
+        <div class="card grid">
+          <div class="row">
+            <h3>Saída</h3>
+            <span class="pill">DOM → PNG | Copy | Share</span>
+            <div class="actions" style="margin-left:auto">
+              <button class="mini ghost" id="addOut">+ item</button>
+              <button class="mini" id="copyOut">Copiar</button>
+              <button class="mini ghost" id="shareOut">Compartilhar</button>
+            </div>
+          </div>
+          <div id="out" class="grid" aria-live="polite">
+            <div class="out-item">ULTRA pronto. Toque <kbd class="key">➕ Snippet</kbd> ou use os presets no Patch.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div id="panel-historico" hidden>
+        <div class="card grid">
+          <div class="row">
+            <h3>Histórico</h3>
+            <button class="mini ghost" id="clearHist">Limpar</button>
+            <label class="mini ghost" style="padding:8px 10px; border-radius:10px; cursor:pointer;">
+              ⤒ importar JSON <input id="histImport" type="file" accept="application/json" style="display:none">
+            </label>
+            <button class="mini ghost" id="copyHistMD">Copiar (MD)</button>
+          </div>
+          <div id="history"></div>
+        </div>
+      </div>
+
+      <!-- Ferramentas -->
+      <div id="panel-ferramentas" hidden>
+        <div class="card grid">
+          <h3>Ativações</h3>
+          <div class="grid-2">
+            <label class="row"><input type="checkbox" id="nodeUNO" checked/> ⊙ UNO · Frame</label>
+            <label class="row"><input type="checkbox" id="nodeDUAL" checked/> ⇄ DUAL · Transform</label>
+            <label class="row"><input type="checkbox" id="nodeTRI" checked/> △ TRINITY · Prism</label>
+            <label class="row"><input type="checkbox" id="nodeSTAR" checked/> ☆彡 Aesthetic · Frame</label>
+            <label class="row"><input type="checkbox" id="nodeQA" checked/> § QA · Safe-check</label>
+            <label class="row"><input type="checkbox" id="nodeRESET"/> ∞ Reset</label>
+          </div>
+          <div class="grid-3">
+            <label class="row">Wrap <input type="number" id="wrap" value="64" min="24" max="120" style="max-width:120px"></label>
+            <label class="row">Usuário <input id="user" value="iphoneUser"></label>
+            <label class="row">Cor
+              <select id="theme">
+                <option value="matrix">Matrix Green</option>
+                <option value="mono">Monocromático</option>
+                <option value="tupac">All Eyez on Smig</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <input id="endpoint" placeholder="Webhook (opcional): http://localhost:5678/ascii/uno — deixe vazio para offline" style="flex:1"/>
+            <button class="mini ghost" id="saveEp">Salvar</button>
+            <select id="runs" style="width:88px">
+              <option value="1">1x</option><option value="2">2x</option><option value="3">3x</option><option value="5">5x</option>
+            </select>
+            <div class="pill"><input type="checkbox" id="toggleMD"/> copiar como MD</div>
+          </div>
+        </div>
+
+        <!-- PATCH SLOT -->
+        <div id="patch-slot" class="card">
+          <div class="row">
+            <h3>Snippet Modal / Patches</h3>
+            <span class="pill">Shadow DOM sandbox</span>
+            <div class="actions" style="margin-left:auto">
+              <button class="mini ghost" onclick="openSnippetModal()">Abrir Snnipetmodal</button>
+            </div>
+          </div>
+          <div id="patch-host" style="margin-top:8px; border:1px dashed var(--line); border-radius:12px; padding:10px;">
+            <em style="opacity:.7">Sem snippet carregado (ainda).</em>
+          </div>
+          <div class="grid" style="margin-top:10px">
+            <div class="row" style="gap:6px; flex-wrap:wrap">
+              <span class="help">Presets:</span>
+              <button class="mini" onclick="prefillPreset('modal')">Modal Demo</button>
+              <button class="mini" onclick="prefillPreset('sheet')">Bottom Sheet</button>
+              <button class="mini" onclick="prefillPreset('pay')">Pay PNG</button>
+              <button class="mini ghost" onclick="openSnippetModal('')">Vazio</button>
+              <label class="mini ghost" style="padding:8px 10px; border-radius:10px; cursor:pointer;">
+                ⤒ importar .html <input id="importSnippetFile" type="file" accept=".html,text/html" style="display:none">
+              </label>
+            </div>
+            <small class="help">Arquivos aceitos: <b>.html</b>. Outros tipos serão rejeitados.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA+ (com gestos, undo, compacto) -->
+      <div id="panel-lista" hidden>
+        <div class="card grid">
+          <div class="row">
+            <h3>Lista ULTRA</h3>
+            <div class="compact-toggle" style="margin-left:auto">
+              <label class="row"><input type="checkbox" id="compactMode"/> modo compacto</label>
+              <button class="mini" id="addItemBtn">+ adicionar</button>
+            </div>
+          </div>
+          <div class="list" id="list"></div>
+          <div class="help">• Deslize item para a esquerda → confirmar remoção • <b>Desfazer</b> aparece no snackbar • Validação: nomes devem terminar com <code>.html</code></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- FAB global -->
+<button class="snip-fab" onclick="openSnippetModal()">➕ Snippet</button>
+
+<!-- SNIPPET MODAL -->
+<div class="snip-modal-backdrop" id="snipBackdrop" role="dialog" aria-modal="true" aria-label="Snnipetmodal">
+  <div class="snip-modal">
+    <div class="snip-row">
+      <h3>Snnipetmodal — cole seu HTML/CSS/JS</h3>
+      <span class="snip-pill">Shadow DOM (isolado)</span>
+    </div>
+    <label class="row">
+      <span>Salvar snippet e recarregar junto com o app</span>
+      <input type="checkbox" id="snipPersist"/>
+    </label>
+    <div class="row">
+      <select id="snippetAction">
+        <option value="shadow">Injetar no Patch (Shadow)</option>
+        <option value="append-out">Anexar à Saída</option>
+        <option value="inject-section">Injetar em seletor…</option>
+      </select>
+      <input id="snippetSelector" placeholder="#id ou .classe" style="width:180px; display:none"/>
+    </div>
+    <textarea id="snipArea" class="snip-ta" placeholder="Cole aqui o seu snippet..."></textarea>
+    <div class="snip-actions">
+      <button class="mini ghost" id="snipClose">Cancelar</button>
+      <button id="snipRun">Injetar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===========================================================
+   ESTADO + UTIL
+   =========================================================== */
+const UI_LS_KEY='kobllux_ui_ultra_v1';
+const PATCH_LS_KEY='kobllux_patch_ultra_v1';
+
+function pulse(msg){
+  const n = document.createElement('div');
+  n.className='snackbar'; n.innerHTML = msg;
+  document.body.appendChild(n); setTimeout(()=>n.remove(),1600);
+}
+function saveUI(part){ try{
+  const cur = JSON.parse(localStorage.getItem(UI_LS_KEY) || '{}');
+  const next = {...cur, ...part};
+  localStorage.setItem(UI_LS_KEY, JSON.stringify(next));
+}catch{}}
+function loadUI(){ try{ return JSON.parse(localStorage.getItem(UI_LS_KEY) || '{}') }catch{ return {} } }
+
+/* ===========================================================
+   TABS + SAÍDA + HISTÓRICO
+   =========================================================== */
+const el = {
+  tabs: document.querySelectorAll('.tab'),
+  panels:{
+    saida: document.getElementById('panel-saida'),
+    historico: document.getElementById('panel-historico'),
+    ferramentas: document.getElementById('panel-ferramentas'),
+    lista: document.getElementById('panel-lista'),
+  },
+  out: document.getElementById('out'),
+  history: document.getElementById('history'),
+  addOut: document.getElementById('addOut'),
+  copyOut: document.getElementById('copyOut'),
+  shareOut: document.getElementById('shareOut'),
+  clearHist: document.getElementById('clearHist'),
+  exportPngBtn: document.getElementById('exportPngBtn'),
+  downloadHtmlBtn: document.getElementById('downloadHtmlBtn'),
+  mockBtn: document.getElementById('mockBtn'),
+  histImport: document.getElementById('histImport'),
+  copyHistMD: document.getElementById('copyHistMD'),
+  // Ferramentas
+  endpoint: document.getElementById('endpoint'),
+  saveEp: document.getElementById('saveEp'),
+  runs: document.getElementById('runs'),
+  user: document.getElementById('user'),
+  wrap: document.getElementById('wrap'),
+  theme: document.getElementById('theme'),
+  tglMD: document.getElementById('toggleMD'),
+  // Patch
+  patchHost: document.getElementById('patch-host'),
+  // Lista+
+  list: document.getElementById('list'),
+  addItemBtn: document.getElementById('addItemBtn'),
+  compactMode: document.getElementById('compactMode'),
+};
+
+let historyArr = [];
+let offlineMock = true;
+
+/* Tabs */
+function setTab(name){
+  for(const t of el.tabs){ t.setAttribute('aria-current', t.dataset.tab===name?'page':'false'); }
+  el.panels.saida.hidden = name!=='saida';
+  el.panels.historico.hidden = name!=='historico';
+  el.panels.ferramentas.hidden = name!=='ferramentas';
+  el.panels.lista.hidden = name!=='lista';
+  saveUI({activeTab:name});
+}
+el.tabs.forEach(t=>t.addEventListener('click', ()=> setTab(t.dataset.tab)));
+
+/* Saída */
+el.addOut.addEventListener('click', ()=>{
+  const i = document.createElement('div');
+  i.className='out-item';
+  i.textContent = 'Item '+(el.out.children.length+1)+' · '+new Date().toLocaleTimeString();
+  el.out.appendChild(i);
+  el.out.scrollTop = el.out.scrollHeight;
+  pushHistory({portal:'⊙', user: el.user?.value||'iphoneUser', text: 'addOut'}, {aesthetic:i.textContent});
+});
+el.copyOut.addEventListener('click', async ()=>{
+  const txt = [...el.out.querySelectorAll('.out-item')].map(n=>n.textContent).join('\\n');
+  try{ await navigator.clipboard.writeText(el.tglMD?.checked ? '```\\n'+txt+'\\n```' : txt); pulse('Copiado'); }catch{ pulse('Falhou copiar'); }
+});
+el.shareOut.addEventListener('click', async ()=>{
+  const txt = [...el.out.querySelectorAll('.out-item')].map(n=>n.textContent).join('\\n');
+  try{
+    if (navigator.share) { await navigator.share({title:'KOBLLUX Ultra', text:txt}); pulse('Compartilhado'); }
+    else { await navigator.clipboard.writeText(txt); pulse('Copiado'); }
+  }catch{}
+});
+
+/* Histórico */
+function pushHistory(req,res){
+  const item = {t:Date.now(), req, res};
+  historyArr.unshift(item); if (historyArr.length>220) historyArr.pop();
+  const lines = historyArr.map(it=>{
+    const dt = new Date(it.t).toLocaleString();
+    return `${dt}\\n> ${it.req.portal} | ${it.req.user}\\n${(it.req.text||'').slice(0,160)}\\n—\\n${(it.res.aesthetic||'').slice(0,220)}\\n`;
+  }).join('\\n');
+  el.history.textContent = lines || '(vazio)';
+}
+el.clearHist.addEventListener('click', ()=>{ historyArr=[]; el.history.textContent=''; pulse('Histórico limpo'); });
+el.copyHistMD.addEventListener('click', ()=>{
+  const md = historyArr.map(h=>`### ${new Date(h.t).toLocaleString()}\\n\\n**${h.req.portal} | ${h.req.user}**\\n\\n${(h.req.text||'').replace(/\\n/g,'  \\n')}\\n\\n\\\n\\\n${'```'}\\n${(h.res.aesthetic||'').replace(/\\n/g,'\\n')}\\n${'```'}\\n`).join('\\n');
+  navigator.clipboard.writeText(md);
+  pulse('Histórico (MD) copiado');
+});
+el.histImport.addEventListener('change', (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{ try{ const s = JSON.parse(reader.result); if(Array.isArray(s)){ historyArr=s; pushHistory({portal:'⊙',user:'import',text:'(state import)'},{aesthetic:'(ok)'}); pulse('Importado'); } }catch{ pulse('Falha import'); } };
+  reader.readAsText(file);
+});
+
+/* Export PNG do OUT */
+el.exportPngBtn.addEventListener('click', ()=> exportElementToPNG(el.out, 'kobllux_ultra_saida.png'));
+async function exportElementToPNG(node, fileName='dual.png'){
+  const rect = node.getBoundingClientRect();
+  const w = Math.max(600, Math.ceil(rect.width));
+  const h = Math.max(400, Math.ceil(rect.height));
+  const serializer = new XMLSerializer();
+  const clone = node.cloneNode(true);
+  clone.style.background = '#050705';
+  clone.style.color = getComputedStyle(node).color;
+  const html = serializer.serializeToString(clone);
+  const svg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;height:${h}px;overflow:auto">${html}</div>
+  </foreignObject>
+</svg>`;
+  const svgBlob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+  const url = URL.createObjectURL(svgBlob);
+  const img = new Image();
+  img.onload = ()=>{
+    const canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0); URL.revokeObjectURL(url);
+    canvas.toBlob((blob)=>{
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click(); URL.revokeObjectURL(a.href);
+      pulse('PNG exportado');
+    }, 'image/png');
+  };
+  img.src = url;
+}
+
+/* Baixar HTML (com estado) */
+el.downloadHtmlBtn.addEventListener('click', ()=>{
+  const state = {
+    endpoint: el.endpoint.value, theme: el.theme.value, user: el.user.value, wrap: el.wrap.value,
+    offlineMock, copyAsMarkdown: el.tglMD.checked, historyArr
+  };
+  const html = '<!-- KOBLLUX ULTRA STATE ' + encodeURIComponent(JSON.stringify(state)) + ' -->\\n' + document.documentElement.outerHTML;
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'KOBLLUX_ULTRA.html'; a.click(); URL.revokeObjectURL(a.href);
+  pulse('HTML baixado');
+});
+
+/* ===========================================================
+   FERRAMENTAS (workflow local) — baseado nas suas versões
+   =========================================================== */
+function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+function wrapText(s, width){
+  width = clamp(width||64, 24, 120);
+  const words = (s||'').split(/\\s+/); const lines=[]; let line='';
+  for (const w of words){
+    if ((line + ' ' + w).trim().length > width){ lines.push(line.trim()); line = w; }
+    else line += ' ' + w;
+  }
+  if (line.trim()) lines.push(line.trim());
+  return lines.join('\\n');
+}
+function nodeUNO(t, prev){
+  const frame = '╔' + '═'.repeat(13) + '╗\\n' + '║   ⊙ UNO     ║\\n' + '║   raiz      ║\\n' + '╚' + '═'.repeat(13) + '╝\\n' + `UNO aberto: raiz ativada para ${t.user} em ${t.now}`;
+  return prev ? (frame + '\\n' + prev) : frame;
+}
+function nodeDUAL(t, prev){
+  const base = t.text || 'solta o verbo';
+  let r = base.trim(); if (!r) r = base;
+  if (r.length < 60) r = r + ' · tamo junto';
+  r = r.replace(/smig(dr(i|ix)k?s?)?/ig,'Smigdrix').replace(/mano/ig,'mano 🫱🏽‍🫲🏾');
+  if (r.split(' ').length > 8) r = r.replace(/\\s/g, (m,i)=> i%7===0 ? ' | ' : ' ');
+  const s = `⇄ DUAL ATIVO ⇄\\n${wrapText('IA(local): ' + r, t.wrap)}`;
+  return prev ? (prev + '\\n' + s) : s;
+}
+function nodeTRI(t, prev){
+  const prism = `   △
+  / \\ 
+ /   \\ 
+/_____\\`;
+  const s = prism + `\\nseed: ${wrapText(t.text||'smig seed', t.wrap)}`;
+  return prev ? (prev + '\\n' + s) : s;
+}
+function nodeSTAR(t, prev){
+  const inside = (prev || t.text || 'fluxo OK').replace(/\\n/g,' ');
+  const content = inside.slice(0, t.wrap);
+  const line = '─'.repeat(Math.max(12, Math.min(t.wrap, content.length+2)));
+  return ['☆' + line + '☆彡', `│ ${content} │`, '☆' + line + '☆彡'].join('\\n');
+}
+function nodeQA(t, prev){ const ok = prev && prev.length >= 8; return ok ? prev + `\\n§───✔───§ fluxo seguro` : `§ QA falhou: estética vazia/curta`; }
+function nodeRESET(t, prev){ const s = `∞───reset───∞`; return prev ? (prev + '\\n' + s) : s; }
+
+async function executeFlow(payload){
+  const hasBackend = el.endpoint.value.trim().length > 0 && !offlineMock;
+  if (hasBackend) return callBackend(payload);
+  const ctx = { ...payload, now: new Date().toISOString(), wrap: clamp(parseInt(el.wrap.value||'64',10), 24, 120) };
+  let buf='';
+  if (document.getElementById('nodeUNO').checked) buf = nodeUNO(ctx, buf);
+  if (document.getElementById('nodeDUAL').checked) buf = nodeDUAL(ctx, buf);
+  if (document.getElementById('nodeTRI').checked) buf = nodeTRI(ctx, buf);
+  if (document.getElementById('nodeSTAR').checked) buf = nodeSTAR(ctx, buf);
+  if (document.getElementById('nodeQA').checked) buf = nodeQA(ctx, buf);
+  if (document.getElementById('nodeRESET').checked) buf = nodeRESET(ctx, buf);
+  return { portal: ctx.portal, aesthetic: buf || ctx.text || '(vazio)', text: ctx.text, user: ctx.user };
+}
+async function callBackend(payload){
+  const res = await fetch(el.endpoint.value.trim(), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  if (!res.ok) throw new Error('HTTP '+res.status);
+  return await res.json();
+}
+
+/* ===========================================================
+   PATCH: Shadow DOM + Modal + Import .html (validação)
+   =========================================================== */
+let __patchShadow;
+(function initPatchShadow(){
+  if(!el.patchHost) return;
+  __patchShadow = el.patchHost.attachShadow({mode:'open'});
+  const base = document.createElement('style');
+  base.textContent = `
+    :host, * { box-sizing: border-box; }
+    html, body { margin:0; padding:0 }
+    body { font-family: var(--mono, ui-monospace); color: #e9ffe7; background: transparent; }
+    a { color: #3dff12 }
+    .patch-wrap { display:block; width:100%; overflow:auto; }
+    button{border:1px solid rgba(61,255,18,.28); background:#0a0e0a; color:#e9ffe7; border-radius:10px; padding:8px 10px}
+  `;
+  const wrap = document.createElement('div'); wrap.className='patch-wrap';
+  __patchShadow.appendChild(base); __patchShadow.appendChild(wrap);
+  const saved = localStorage.getItem(PATCH_LS_KEY); if(saved){ injectSnippet(saved); }
+})();
+function injectSnippet(code){
+  if(!__patchShadow) return;
+  const container = __patchShadow.querySelector('.patch-wrap');
+  container.innerHTML='';
+  const root = document.createElement('div'); root.innerHTML = code;
+  container.appendChild(root);
+  const scripts = root.querySelectorAll('script');
+  scripts.forEach(old=>{ const s = document.createElement('script'); if(old.src) s.src = old.src; else s.textContent = old.textContent; __patchShadow.appendChild(s); old.remove(); });
+  pulse('Snippet injetado');
+}
+
+/* Modal */
+const backdrop = document.getElementById('snipBackdrop');
+const snipArea = document.getElementById('snipArea');
+const snipPersist = document.getElementById('snipPersist');
+const snipAction = document.getElementById('snippetAction');
+const snipSel = document.getElementById('snippetSelector');
+document.getElementById('snipRun').addEventListener('click', ()=>{
+  const code = snipArea.value || '';
+  const action = snipAction.value;
+  if(action==='shadow'){ injectSnippet(code); if(snipPersist.checked) localStorage.setItem(PATCH_LS_KEY, code); closeSnippetModal(); return; }
+  if(action==='append-out'){ const d = document.createElement('div'); d.className='out-item'; d.textContent = code; el.out.appendChild(d); closeSnippetModal(); return; }
+  if(action==='inject-section'){ const sel = (snipSel.value||'').trim(); if(!sel){ pulse('Informe um seletor'); return; } const node = document.querySelector(sel); if(node){ node.insertAdjacentHTML('beforeend', code); closeSnippetModal(); } else pulse('Seletor não encontrado'); return; }
+});
+document.getElementById('snipClose').addEventListener('click', closeSnippetModal);
+snipAction.addEventListener('change', ()=>{ snipSel.style.display = snipAction.value==='inject-section' ? 'inline-block' : 'none'; });
+function openSnippetModal(prefill=''){ snipArea.value = prefill || localStorage.getItem(PATCH_LS_KEY) || ''; snipPersist.checked = !!localStorage.getItem(PATCH_LS_KEY); backdrop.style.display='flex'; }
+function closeSnippetModal(){ backdrop.style.display='none' }
+
+/* Presets */
+function prefillPreset(name){
+  let code='';
+  if(name==='modal'){
+    code = `
+<style>
+.kx-modal{position:fixed; inset:0; display:grid; place-items:center; background:rgba(0,0,0,.55)}
+.kx-box{background:#0b0f0b; border:1px solid rgba(61,255,18,.28); color:#e9ffe7; padding:16px; border-radius:12px; width:min(92vw,480px)}
+</style>
+<div class="kx-modal" id="kxM">
+  <div class="kx-box">
+    <b>Modal Demo (KOBLLUX)</b><br/>Shadow DOM isolado 😎<br/><br/>
+    <button onclick="document.getElementById('kxM').remove()">Fechar</button>
+  </div>
+</div>`;
+  } else if(name==='sheet'){
+    code = `
+<style>.sheet{left:0; right:0; bottom:0}</style>
+<div class="sheet">
+  <div style="display:flex;align-items:center;gap:8px">
+    <b>Bottom Sheet</b><span style="opacity:.7">overlay</span>
+    <div style="margin-left:auto"><button onclick="this.closest('.sheet').remove()">Fechar</button></div>
+  </div>
+  <div style="margin-top:8px">Conteúdo do sheet… listas, botões, formulário etc.</div>
+</div>`;
+  } else if(name==='pay'){
+    code = `
+<style>
+.pay{display:grid; gap:10px; border:1px solid rgba(61,255,18,.28); border-radius:12px; padding:12px; background:#0a0e0a}
+.row{display:flex; gap:8px; align-items:center}
+.input{flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(61,255,18,.28); background:#000; color:#baffb0}
+</style>
+<div class="pay">
+  <b>Comprar PNG (Mock)</b>
+  <div class="row">
+    <input class="input" placeholder="Seu e-mail"/>
+    <button onclick="alert('PIX gerado: R$ 9,90')">PIX</button>
+    <button onclick="alert('Stripe (teste)')">Cartão</button>
+  </div>
+  <small style="opacity:.7">Exemplo de checkout como patch (sem tocar no core).</small>
+</div>`;
+  }
+  openSnippetModal(code);
+}
+
+/* Import de snippet via arquivo .html (validação) */
+document.getElementById('importSnippetFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0]; if(!file) return;
+  const ok = file.name.toLowerCase().endsWith('.html');
+  if(!ok){ pulse('Apenas .html'); return; }
+  const reader = new FileReader();
+  reader.onload = ()=>{ const text = String(reader.result||''); if(!text.trim()){ pulse('Arquivo vazio'); return; } injectSnippet(text); localStorage.setItem(PATCH_LS_KEY, text); pulse('Snippet importado'); };
+  reader.readAsText(file);
+});
+
+/* ===========================================================
+   LISTA ULTRA (gesto → confirmar → undo) + compacto
+   =========================================================== */
+let items = [];
+function renderList(){
+  el.list.innerHTML='';
+  items.forEach(it=>{
+    const d = document.createElement('div');
+    d.className='item' + (el.compactMode.checked?' compacto':'');
+    d.dataset.id = it.id;
+    d.innerHTML = `<span class="name">${it.name}</span><span class="ext">${it.valid? 'ok' : 'exige .html'}</span><button class="del">Excluir</button>`;
+    if(!it.valid) d.classList.add('bad'); else d.classList.remove('bad');
+    // Gestos
+    let startX=0, dx=0, swiped=false;
+    d.addEventListener('touchstart', (ev)=>{ startX = ev.touches[0].clientX; dx=0; swiped=false; }, {passive:true});
+    d.addEventListener('touchmove', (ev)=>{
+      dx = ev.touches[0].clientX - startX;
+      if(dx < 0){ d.style.transform = `translateX(${dx}px)`; if(Math.abs(dx)>60) swiped=true; }
+    }, {passive:true});
+    d.addEventListener('touchend', ()=>{
+      if(swiped){ confirmRemove(it.id); } d.style.transform = 'translateX(0)';
+    });
+    d.querySelector('.del').addEventListener('click', ()=> confirmRemove(it.id));
+    el.list.appendChild(d);
+  });
+  saveUI({ultraList:items, compact: el.compactMode.checked});
+}
+function confirmRemove(id){
+  const it = items.find(x=>x.id===id); if(!it) return;
+  const idx = items.findIndex(x=>x.id===id);
+  const removed = items.splice(idx,1)[0]; renderList();
+  const bar = document.createElement('div');
+  bar.className='snackbar';
+  bar.innerHTML = `Removido <b>${removed.name}</b> <button class="mini" id="undoBtn">Desfazer</button>`;
+  document.body.appendChild(bar);
+  const t = setTimeout(()=> bar.remove(), 3000);
+  bar.querySelector('#undoBtn').addEventListener('click', ()=>{
+    clearTimeout(t); items.splice(idx,0,removed); renderList(); bar.remove();
+  });
+}
+el.addItemBtn.addEventListener('click', ()=>{
+  const name = prompt('Nome do arquivo (.html obrigatório):','novo_arquivo.html')||'';
+  const valid = name.toLowerCase().endsWith('.html');
+  items.push({id:crypto.randomUUID(), name, valid});
+  renderList();
+});
+el.compactMode.addEventListener('change', ()=> renderList());
+
+/* ===========================================================
+   BOOTSTRAP (restaura UI / lista / toggles / tema / offline)
+   =========================================================== */
+(function init(){
+  // Tabs
+  const s = loadUI();
+  setTab(s.activeTab || 'saida');
+  // Offline btn
+  el.mockBtn.textContent = 'Offline: ' + (offlineMock?'LIGADO':'DESLIGADO');
+  el.mockBtn.addEventListener('click', ()=>{
+    offlineMock = !offlineMock;
+    el.mockBtn.textContent = 'Offline: ' + (offlineMock?'LIGADO':'DESLIGADO');
+    saveUI({offlineMock});
+  });
+  // Prefs básicas
+  el.endpoint.value = s.endpoint || '';
+  el.user.value = s.user || 'iphoneUser';
+  el.wrap.value = s.wrap || 64;
+  el.theme.value = s.theme || 'matrix';
+  el.tglMD.checked = s.copyAsMarkdown || false;
+  // Lista
+  if (Array.isArray(s.ultraList)) items = s.ultraList; else items = [
+    {id:crypto.randomUUID(), name:'index.html', valid:true},
+    {id:crypto.randomUUID(), name:'readme.txt', valid:false},
+  ];
+  el.compactMode.checked = !!s.compact;
+  renderList();
+})();
+
+/* ===========================================================
+   SHARE / THEME HELPERS (opcional expandir depois)
+   =========================================================== */
+</script>
+
+<script>
+// Safety bindings: portals, theme, mock/offline
+(function(){
+  try {
+    // portal grid
+    var grid = document.querySelector('#sec-input .grid-btns');
+    if (grid && !grid.dataset.bound) {
+      grid.dataset.bound = '1';
+      grid.addEventListener('click', function(e){
+        var b = e.target.closest('button'); if(!b) return;
+        var t = (b.textContent || '').trim();
+        var syms = ['⊙','⇄','△','☆彡','§','∞'];
+        var sym = syms.find(function(s){ return t.indexOf(s) !== -1; });
+        if (sym) {
+          if (typeof window.runPortal === 'function') window.runPortal(sym);
+          else if (typeof window.handlePortal === 'function') window.handlePortal(sym);
+          else console.log('[safety] portal click:', sym);
+        }
+      });
+    }
+    // theme select
+    var select = document.getElementById('themeSelect');
+    if (select && !select.dataset.bound) {
+      select.dataset.bound = '1';
+      select.addEventListener('change', function(){
+        var val = select.value;
+        if (typeof window.applyTheme === 'function') window.applyTheme(val);
+        else document.documentElement.setAttribute('data-theme', val);
+      });
+    }
+    // mock/offline
+    var mockBtn = document.getElementById('mockBtn');
+    if (mockBtn && !mockBtn.dataset.bound) {
+      mockBtn.dataset.bound = '1';
+      mockBtn.addEventListener('click', function(){
+        if (typeof window.toggleMock === 'function') return window.toggleMock();
+        if (typeof window.toggleOffline === 'function') return window.toggleOffline();
+        alert('Modo offline (mock) não disponível neste preset.');
+      });
+    }
+  } catch(err){ console.warn('[safety] erro ao ligar botões:', err); }
+})();
+</script>
+</body>
+</html>

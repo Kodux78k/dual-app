@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>Manual Prático TICOs — NR10/NR35</title>
+<meta name="theme-color" content="#FF7A00"/>
+<style>
+:root{
+  --bg:#0e0f12;
+  --fg:#e9eef6;
+  --muted:#a8b0c3;
+  --card:#161821;
+  --accent:#FF7A00; /* laranja obra */
+  --warn:#FFD60A;   /* amarelo */
+  --info:#2E59FF;   /* azul */
+  --ok:#22c55e;
+  --bad:#ef4444;
+  --lux:#111111;    /* preto luxara */
+  --gold:#D4AF37;   /* dourado luxara */
+  --shadow: 0 10px 25px rgba(0,0,0,.35);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+  background: radial-gradient(1200px 800px at 50% -10%, rgba(46,89,255,.12), transparent 60%),
+              linear-gradient(180deg, #0b0c10 0%, #0e0f12 40%, #0a0b0f 100%);
+  color:var(--fg);
+}
+h1,h2,h3{margin:0 0 .5rem}
+h1{font-size:1.4rem}
+h2{font-size:1.15rem;color:#fff}
+h3{font-size:1rem;color:var(--muted)}
+p{margin:.35rem 0;color:#dfe6f6}
+small{color:var(--muted)}
+
+.container{padding:16px 14px 90px;max-width:760px;margin:0 auto}
+.row{display:grid;gap:12px}
+.card{
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--radius);
+  padding:14px;
+  box-shadow:var(--shadow);
+}
+.card.lux{
+  background:linear-gradient(180deg, #0a0a0a, #0d0d0d);
+  border:1px solid rgba(212,175,55,.35);
+}
+.kicker{font-size:.75rem;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+
+.header{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter: blur(10px);
+  background:rgba(14,15,18,.65);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.header-inner{max-width:760px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.logo{
+  width:40px;height:40px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, #fff6, transparent 60%), conic-gradient(from 0deg, var(--accent), var(--warn), var(--info), var(--accent));
+  position:relative;box-shadow:0 0 0 3px #0008, inset 0 0 20px #000;
+  animation:pulse 2.4s infinite ease-in-out;
+}
+.logo:after{
+  content:"⚡";position:absolute;inset:0;display:grid;place-items:center;
+  font-size:20px;text-shadow:0 0 12px rgba(255,122,0,.8);
+}
+@keyframes pulse{
+  0%,100%{transform:scale(1); box-shadow:0 0 0 0 rgba(255,122,0,.25)}
+  50%{transform:scale(1.06); box-shadow:0 0 0 12px rgba(255,122,0,.06)}
+}
+
+.header-title{flex:1}
+.header-title h1{display:flex;align-items:center;gap:8px}
+.badge{
+  font-size:.72rem;padding:.15rem .5rem;border-radius:999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.1);
+}
+.btn{
+  appearance:none;border:none;cursor:pointer;
+  background:linear-gradient(180deg, #202330, #171925);
+  border:1px solid rgba(255,255,255,.08);
+  color:#fff;padding:.7rem 1rem;border-radius:12px;font-weight:600;
+  display:inline-flex;align-items:center;gap:.6rem;justify-content:center
+}
+.btn:active{transform:translateY(1px)}
+.btn.full{width:100%}
+.btn.warn{background:linear-gradient(180deg, #2a2000, #1f1800);border-color:#b38900}
+.btn.accent{background:linear-gradient(180deg, #2b1a10, #1b100a);border-color:#934216}
+.btn.ok{background:linear-gradient(180deg, #15331d, #0f2516);border-color:#225a34}
+.btn.ghost{
+  background:transparent;border:1px dashed rgba(255,255,255,.18);color:var(--muted);
+}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media (max-width:420px){ .grid2{grid-template-columns:1fr} .grid3{grid-template-columns:1fr 1fr} }
+
+.section{display:none}
+.section.active{display:block}
+
+.lux-quote{color:var(--gold);font-weight:600}
+.hr{height:1px;background:linear-gradient(90deg, transparent, rgba(255,255,255,.15), transparent);margin:.7rem 0}
+
+.tip{
+  background:linear-gradient(180deg, rgba(255,122,0,.1), rgba(255,122,0,.05));
+  border:1px solid rgba(255,122,0,.25);border-radius:14px;padding:10px;font-size:.95rem
+}
+
+.list{display:grid;gap:8px}
+.item{
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:12px;padding:10px;display:flex;align-items:flex-start;gap:10px
+}
+.item .icon{font-size:1.25rem;line-height:1}
+.item strong{display:block}
+.kv{display:flex;gap:8px;flex-wrap:wrap}
+.kv .pill{
+  font-size:.75rem;padding:.2rem .5rem;border-radius:999px;background:#fff1;border:1px solid #fff2;color:#cfe2ff
+}
+
+.checkrow{display:grid;gap:10px}
+.check{
+  background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px
+}
+.check label{display:block;font-weight:700;margin-bottom:6px}
+.choice{display:flex;gap:10px}
+.choice .opt{
+  flex:1;background:#0000;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px;text-align:center;cursor:pointer
+}
+.choice input{display:none}
+.choice input:checked + .opt.ok{outline:2px solid var(--ok); background:rgba(34,197,94,.1)}
+.choice input:checked + .opt.bad{outline:2px solid var(--bad); background:rgba(239,68,68,.1)}
+
+.bottom-nav{
+  position:fixed;z-index:99;bottom:0;left:0;right:0;
+  backdrop-filter: blur(8px);
+  background:rgba(10,11,15,.7);
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.bottom-inner{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px}
+.tab{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 4px;border-radius:10px;color:#c7d0e8;text-decoration:none;font-size:.75rem
+}
+.tab.active{background:linear-gradient(180deg, rgba(46,89,255,.15), rgba(46,89,255,.05)); color:#fff; border:1px solid rgba(46,89,255,.35)}
+
+.input, textarea{
+  width:100%;padding:.8rem;border-radius:12px;
+  background:#0f1117;color:#fff;border:1px solid rgba(255,255,255,.12)
+}
+label{font-size:.9rem;color:#e7edff}
+
+.gallery{display:flex;gap:8px;overflow:auto}
+.gallery img{height:82px;border-radius:10px;border:1px solid rgba(255,255,255,.12)}
+
+.modal{
+  position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,.6);z-index:120
+}
+.modal.show{display:flex}
+.sheet{
+  width:100%;max-width:760px;background:#0f1116;border-top-left-radius:16px;border-top-right-radius:16px;
+  border:1px solid rgba(255,255,255,.08);box-shadow:0 -20px 40px rgba(0,0,0,.5);padding:14px
+}
+.sheet .handle{width:60px;height:6px;background:#ffffff22;border-radius:999px;margin:4px auto 10px}
+.sheet .title{font-weight:800;font-size:1.05rem}
+
+.actionbar{display:flex;gap:8px;flex-wrap:wrap}
+.hidden{display:none !important}
+
+.small{font-size:.85rem;color:#cbd5f1}
+
+a.link{color:#9bb4ff}
+hr.soft{border:none;height:1px;background:linear-gradient(90deg, transparent, #ffffff22, transparent);margin:8px 0}
+
+footer{
+  margin-top:16px;
+  color:#94a3b8;font-size:.78rem;text-align:center
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div class="logo" id="btnInsight" title="Tocar para frase de segurança"></div>
+    <div class="header-title">
+      <h1>Manual Prático TICOs <span class="badge">NR10 · NR35</span></h1>
+      <small class="kicker">“Sem falar em horas — só prática que salva.”</small>
+    </div>
+    <button class="btn" id="btnSpeak" title="Ler tela em voz alta">🔊 Ler</button>
+  </div>
+</header>
+
+<main class="container">
+  <!-- HOME -->
+  <section id="home" class="section active">
+    <div class="row">
+      <div class="card tip" id="tipOfDay">
+        <strong>⚡ Dica do Dia</strong>
+        <p id="tipText">Teste o detector de tensão em um ponto conhecido antes de confiar nele.</p>
+        <div class="actionbar">
+          <button class="btn ghost" id="btnNewTip">🎲 Outra dica</button>
+          <button class="btn ghost" id="btnSaveTip">🔖 Salvar nos favoritos</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="kicker">Atalhos Rápidos</div>
+        <div class="grid3">
+          <button class="btn" data-go="nr10">⚡ NR10</button>
+          <button class="btn" data-go="nr35">🧗 NR35</button>
+          <button class="btn" data-go="check">✅ Checklist</button>
+        </div>
+        <div class="grid3" style="margin-top:8px">
+          <button class="btn warn" data-go="risk">📸 Relatar Risco</button>
+          <button class="btn" data-go="gloss">📚 Glossário</button>
+          <button class="btn" data-go="config">⚙️ Config</button>
+        </div>
+      </div>
+
+      <div class="card lux">
+        <div class="kicker" style="color:var(--gold)">Insight Luxara</div>
+        <p class="lux-quote">“Sua vida é o maior projeto entregue hoje. Pulso seguro, missão cumprida.”</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NR10 -->
+  <section id="nr10" class="section">
+    <div class="row">
+      <div class="card">
+        <h2>⚡ NR10 — Eletricidade na Prática</h2>
+        <div class="hr"></div>
+        <div class="list">
+          <div class="item">
+            <div class="icon">👀</div>
+            <div><strong>Olho vivo no painel</strong><small class="small"><br/>Cheiro de ozônio, manchas de queimado e pó = alerta de risco.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🧪</div>
+            <div><strong>Teste de ausência de tensão</strong><small class="small"><br/>Detector calibrado antes de encostar. Teste em ponto conhecido → meça → reteste.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">✋</div>
+            <div><strong>Técnica da “uma mão só”</strong><small class="small"><br/>Mantenha uma mão atrás do corpo ao medir; reduz corrente pelo tórax.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🧰</div>
+            <div><strong>Checklist mental</strong><small class="small"><br/>Desliga → Bloqueia → Testa → Trabalha.</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3×6×9 — Chave de Curiosidade</h3>
+        <div class="hr"></div>
+        <div class="list">
+          <div class="item">
+            <div class="icon">❓</div>
+            <div><strong>Por quê?</strong><small class="small"><br/>Painéis “desligados” podem estar vivos por retorno, falha de disjuntor ou erro humano.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🛠️</div>
+            <div><strong>Como aplicar</strong><small class="small"><br/>Sempre valide o detector no mesmo ambiente e imediatamente antes do toque.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🚀</div>
+            <div><strong>Antecipação</strong><small class="small"><br/>Clique no ⚡ (topo) para receber micro‑insights elétricos ao longo do dia.</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NR35 -->
+  <section id="nr35" class="section">
+    <div class="row">
+      <div class="card">
+        <h2>🧗 NR35 — Altura na Prática</h2>
+        <div class="hr"></div>
+        <div class="list">
+          <div class="item">
+            <div class="icon">🔺</div>
+            <div><strong>3 pontos de apoio</strong><small class="small"><br/>Subir/descer com 2 pés + 1 mão (ou 2 mãos + 1 pé). Sem pressa.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🧵</div>
+            <div><strong>Talabarte testado</strong><small class="small"><br/>Puxe como se aguentasse seu peso antes de subir.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🧯</div>
+            <div><strong>Onde não prender</strong><small class="small"><br/>Nunca em escada solta, tubo fino, guarda‑corpo improvisado.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🪢</div>
+            <div><strong>Nó rápido (emergência)</strong><small class="small"><br/>Tenha um talabarte extra para travar se algo falhar.</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3×6×9 — Chave de Curiosidade</h3>
+        <div class="hr"></div>
+        <div class="list">
+          <div class="item">
+            <div class="icon">⏱️</div>
+            <div><strong>Por quê?</strong><small class="small"><br/>1 segundo de queda ≈ 4 m. Não há tempo para pensar; só para já estar preso.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🧩</div>
+            <div><strong>Como aplicar</strong><small class="small"><br/>Revise âncora, linha de vida e plano de resgate antes de subir.</small></div>
+          </div>
+          <div class="item">
+            <div class="icon">🎯</div>
+            <div><strong>Antecipação</strong><small class="small"><br/>Ative o “Desafio do Dia”: combine a palavra STOP com a dupla.</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section id="check" class="section">
+    <div class="row">
+      <div class="card">
+        <h2>✅ Checklist — Elétrica em Altura</h2>
+        <div class="hr"></div>
+
+        <div class="checkrow" id="checkForm">
+          <div class="check">
+            <label>Ferramenta isolada conferida</label>
+            <div class="choice">
+              <label style="flex:1"><input type="radio" name="c1" value="ok"><div class="opt ok">OK</div></label>
+              <label style="flex:1"><input type="radio" name="c1" value="bad"><div class="opt bad">Não OK</div></label>
+            </div>
+            <small class="small">Sem fissuras, luvas sem furo, cabo sem descascado.</small>
+          </div>
+
+          <div class="check">
+            <label>Detector de tensão testado</label>
+            <div class="choice">
+              <label style="flex:1"><input type="radio" name="c2" value="ok"><div class="opt ok">OK</div></label>
+              <label style="flex:1"><input type="radio" name="c2" value="bad"><div class="opt bad">Não OK</div></label>
+            </div>
+            <small class="small">Teste no ponto conhecido ➝ meça ➝ reteste.</small>
+          </div>
+
+          <div class="check">
+            <label>Linha de vida em ponto confiável</label>
+            <div class="choice">
+              <label style="flex:1"><input type="radio" name="c3" value="ok"><div class="opt ok">OK</div></label>
+              <label style="flex:1"><input type="radio" name="c3" value="bad"><div class="opt bad">Não OK</div></label>
+            </div>
+            <small class="small">Evite escada solta, tubos finos e guarda‑corpos frágeis.</small>
+          </div>
+
+          <div class="check">
+            <label>Palavra de parada (STOP) combinada</label>
+            <div class="choice">
+              <label style="flex:1"><input type="radio" name="c4" value="ok"><div class="opt ok">OK</div></label>
+              <label style="flex:1"><input type="radio" name="c4" value="bad"><div class="opt bad">Não OK</div></label>
+            </div>
+            <small class="small">Sem acordo de STOP, sem trabalho em altura.</small>
+          </div>
+
+          <div class="check">
+            <label>Plano de resgate revisado</label>
+            <div class="choice">
+              <label style="flex:1"><input type="radio" name="c5" value="ok"><div class="opt ok">OK</div></label>
+              <label style="flex:1"><input type="radio" name="c5" value="bad"><div class="opt bad">Não OK</div></label>
+            </div>
+            <small class="small">Quem aciona, como aciona, tempo de resposta.</small>
+          </div>
+        </div>
+
+        <div class="actionbar" style="margin-top:8px">
+          <button class="btn accent" id="btnConcluir">🚀 Concluir</button>
+          <button class="btn" id="btnSalvarSessao">💾 Salvar Sessão</button>
+          <button class="btn ghost" id="btnLimparSessao">🧹 Limpar</button>
+        </div>
+      </div>
+
+      <div class="card lux">
+        <div class="kicker" style="color:var(--gold)">Ritual</div>
+        <p class="lux-quote">“Você subiu com coragem; desceu com sabedoria. Continue mestre da obra.”</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GLOSSÁRIO -->
+  <section id="gloss" class="section">
+    <div class="row">
+      <div class="card">
+        <h2>📚 Glossário Vivo</h2>
+        <div class="hr"></div>
+        <div class="list" id="glossList"></div>
+      </div>
+      <div class="card">
+        <h3>Adicionar termo</h3>
+        <label for="gTermo">Termo</label>
+        <input class="input" id="gTermo" placeholder="Ex.: Talabarte, Painel suspeito…"/>
+        <label for="gDef">Definição</label>
+        <textarea class="input" id="gDef" rows="3" placeholder="Explique do jeito do canteiro"></textarea>
+        <div class="actionbar" style="margin-top:8px">
+          <button class="btn" id="btnAddGloss">➕ Adicionar</button>
+          <button class="btn ghost" id="btnExportGloss">⬇️ Exportar JSON</button>
+          <label class="btn ghost" for="importGlossInput">⬆️ Importar</label>
+          <input id="importGlossInput" type="file" accept=".json" class="hidden"/>
+        </div>
+        <small class="small">Dica: grave áudios curtos do próprio time explicando termos e anexe como link na definição.</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- REPORT RISCO -->
+  <section id="risk" class="section">
+    <div class="row">
+      <div class="card">
+        <h2>📸 Reportar Risco (offline)</h2>
+        <div class="hr"></div>
+        <label>Foto</label>
+        <input class="input" id="rFoto" type="file" accept="image/*" capture="environment"/>
+        <label>Nota</label>
+        <textarea class="input" id="rNota" rows="3" placeholder="Descreva o risco observado"></textarea>
+        <div class="grid2" style="margin-top:8px">
+          <button class="btn warn" id="btnSalvarRisco">💾 Salvar</button>
+          <button class="btn ghost" id="btnLoc">📍 Pegar localização</button>
+        </div>
+        <small class="small">As evidências ficam salvas neste aparelho (localStorage). Você pode exportar depois.</small>
+      </div>
+
+      <div class="card">
+        <h3>Relatos salvos</h3>
+        <div id="rLista" class="list"></div>
+        <div class="actionbar" style="margin-top:8px">
+          <button class="btn" id="btnExportReports">⬇️ Exportar JSON</button>
+          <button class="btn ghost" id="btnClearReports">🗑️ Limpar todos</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIG -->
+  <section id="config" class="section">
+    <div class="row">
+      <div class="card">
+        <h2>⚙️ Configurações</h2>
+        <div class="hr"></div>
+        <div class="list">
+          <div class="item">
+            <div class="icon">🔊</div>
+            <div>
+              <strong>Ler tela em voz alta</strong>
+              <div class="hr"></div>
+              <div class="kv">
+                <label class="pill"><input type="checkbox" id="toggleTTS"/> habilitar</label>
+                <span class="pill">voz: sistema</span>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="icon">🧠</div>
+            <div>
+              <strong>Dados locais</strong>
+              <div class="hr"></div>
+              <div class="actionbar">
+                <button class="btn" id="btnExportAll">⬇️ Exportar tudo</button>
+                <button class="btn ghost" id="btnWipeAll">🧯 Apagar tudo</button>
+              </div>
+              <small class="small">Chaves usadas: <code>tico.settings</code>, <code>tico.tips</code>, <code>tico.glossary</code>, <code>tico.reports</code>, <code>tico.check.sessions</code>.</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer>Manual Prático TICOs · “Segurança é coragem com consciência.” · Luxara ⚫︎💛</footer>
+    </div>
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <div class="bottom-inner">
+    <a class="tab active" data-go="home">🏠<span>Início</span></a>
+    <a class="tab" data-go="nr10">⚡<span>NR10</span></a>
+    <a class="tab" data-go="nr35">🧗<span>NR35</span></a>
+    <a class="tab" data-go="check">✅<span>Checklist</span></a>
+    <a class="tab" data-go="risk">📸<span>Risco</span></a>
+  </div>
+</nav>
+
+<!-- SHEET: Dicas quando Não OK -->
+<div class="modal" id="modalDica">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="title">Dica rápida</div>
+    <div class="hr"></div>
+    <div id="modalDicaText" class="small"></div>
+    <div class="actionbar" style="margin-top:8px">
+      <button class="btn ok" id="btnFecharDica">Entendi</button>
+    </div>
+  </div>
+</div>
+
+<!-- SHEET: Ritual de Encerramento -->
+<div class="modal" id="modalRitual">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="title">⚡ Missão Concluída</div>
+    <div class="hr"></div>
+    <p class="lux-quote">“Sua vida foi o maior projeto entregue hoje.”</p>
+    <p class="small">Checklist salvo. Continue mestre da obra.</p>
+    <div class="actionbar" style="margin-top:8px">
+      <button class="btn ok" id="btnFecharRitual">Fechar</button>
+      <button class="btn ghost" data-go="home">Ir ao Início</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============== STATE & UTILS ===============
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => [...root.querySelectorAll(sel)];
+
+const KEYS = {
+  settings: 'tico.settings',
+  tips: 'tico.tips',          // saved tip indices
+  glossary: 'tico.glossary',  // array of {term, def}
+  reports: 'tico.reports',    // array of {id, ts, note, photo, loc}
+  sessions: 'tico.check.sessions' // array of {ts, values:{}}
+};
+
+function load(key, fallback){
+  try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }catch(e){ return fallback; }
+}
+function save(key, value){
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function toast(msg){
+  // simple replacement using alert for portability
+  console.log(msg);
+}
+
+// =============== NAVIGATION ===============
+function go(id){
+  $$('.section').forEach(s => s.classList.toggle('active', s.id === id));
+  $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.go === id));
+  if (id === 'home') updateTipOfDay();
+}
+$$('[data-go]').forEach(el => el.addEventListener('click', e => {
+  const id = e.currentTarget.dataset.go;
+  if (id) go(id);
+}));
+
+// =============== TIPS & INSIGHTS ===============
+const TIPS = [
+  "Teste o detector em ponto conhecido antes e depois da medição.",
+  "Medição com uma mão reduz o caminho da corrente pelo tórax.",
+  "Sem acordo de STOP, sem trabalho em altura.",
+  "Ancora apenas em ponto fixo e confiável (nada de escada).",
+  "Talabarte deve suportar seu peso. Teste puxando antes de subir.",
+  "Painel com cheiro de ozônio = risco. Pare e investigue.",
+  "Plano de resgate claro: quem aciona, como aciona, tempo.",
+  "Ferramenta isolada: sem fissura, sem descascado.",
+  "Rádio carregado e canal combinado antes de subir.",
+  "Luvas isolantes certas no par certo (nada trocado).",
+  "Dupla: você sobe, eu vigio. Sem exceção.",
+  "Detector sem bateria = detector que mente. Confira carga."
+];
+const INSIGHTS = [
+  "⚡ Segurança é coragem com consciência.",
+  "◐ Subir é coragem. Descer com segurança é sabedoria.",
+  "ψ Comunicação é o EPI invisível da equipe.",
+  "⚡ Sem pressa: a pressa só adianta o erro.",
+  "◐ Cada checklist é uma escada invisível.",
+  "ψ Pare na dúvida. Dúvida é risco pedindo atenção."
+];
+
+function updateTipOfDay(){
+  let saved = load(KEYS.tips, []);
+  const idx = Math.floor(Math.random() * TIPS.length);
+  $('#tipText').textContent = TIPS[idx];
+  $('#btnSaveTip').onclick = () => {
+    if(!saved.includes(idx)){ saved.push(idx); save(KEYS.tips, saved); }
+    alert('Dica salva nos seus favoritos (dados locais).');
+  };
+}
+
+$('#btnNewTip').addEventListener('click', updateTipOfDay);
+$('#btnInsight').addEventListener('click', () => {
+  const s = INSIGHTS[Math.floor(Math.random()*INSIGHTS.length)];
+  alert(s);
+});
+
+// =============== TTS (Speech) ===============
+const settings = load(KEYS.settings, { tts: false });
+$('#toggleTTS').checked = settings.tts;
+
+function speak(text){
+  if(!('speechSynthesis' in window)){ alert('Leitor de voz não suportado neste dispositivo.'); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'pt-BR';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+$('#toggleTTS').addEventListener('change', e => {
+  settings.tts = e.target.checked; save(KEYS.settings, settings);
+});
+$('#btnSpeak').addEventListener('click', () => {
+  const active = $('.section.active');
+  if(!active){ return; }
+  const text = active.innerText.replace(/\s+/g,' ').trim();
+  speak(text.slice(0, 8000)); // safety limit
+});
+
+// =============== CHECKLIST LOGIC ===============
+const BAD_TIPS = {
+  c1: "Ferramenta isolada não ok: troque a peça, verifique luvas e cabos. Sem ferramenta segura não há trabalho.",
+  c2: "Detector sem teste é risco oculto. Valide em ponto conhecido, meça e reteste.",
+  c3: "Âncora insegura derruba herói. Use ponto fixo e homologado. Evite escada/tubo fino.",
+  c4: "Sem palavra STOP combinada, a equipe vira ruído. Combine agora antes de subir.",
+  c5: "Sem plano de resgate, cada minuto conta contra você. Defina responsável e caminho."
+};
+
+function openSheet(id){ $(id).classList.add('show'); }
+function closeSheet(id){ $(id).classList.remove('show'); }
+
+$('#btnFecharDica').addEventListener('click', () => closeSheet('#modalDica'));
+$('#btnFecharRitual').addEventListener('click', () => closeSheet('#modalRitual'));
+
+$('#btnConcluir').addEventListener('click', () => {
+  const fields = ['c1','c2','c3','c4','c5'];
+  let anyBad = false;
+  for(const f of fields){
+    const val = $(`input[name="${f}"]:checked`)?.value;
+    if(val === 'bad'){
+      anyBad = true;
+      $('#modalDicaText').textContent = BAD_TIPS[f] || "Ajuste este item antes de prosseguir.";
+      openSheet('#modalDica');
+      break;
+    }
+  }
+  if(!anyBad){
+    // Ritual
+    saveSession();
+    openSheet('#modalRitual');
+  }
+});
+
+function saveSession(){
+  const values = {};
+  ['c1','c2','c3','c4','c5'].forEach(f => {
+    values[f] = $(`input[name="${f}"]:checked`)?.value || null;
+  });
+  const sess = load(KEYS.sessions, []);
+  sess.push({ ts: Date.now(), values });
+  save(KEYS.sessions, sess);
+}
+
+$('#btnSalvarSessao').addEventListener('click', () => { saveSession(); alert('Sessão salva localmente.'); });
+$('#btnLimparSessao').addEventListener('click', () => {
+  $$('input[type="radio"]').forEach(i => i.checked = false);
+});
+
+// =============== GLOSSÁRIO ===============
+function renderGloss(){
+  const list = load(KEYS.glossary, []);
+  const root = $('#glossList'); root.innerHTML = '';
+  if(!list.length){ root.innerHTML = '<small class="small">Sem termos ainda. Adicione o primeiro.</small>'; return; }
+  list.forEach((g, i) => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    div.innerHTML = `<div class="icon">🔤</div>
+      <div style="flex:1">
+        <strong>${g.term}</strong>
+        <div class="hr"></div>
+        <p class="small">${g.def || ''}</p>
+        <div class="actionbar">
+          <button class="btn ghost" data-edit="${i}">✏️ Editar</button>
+          <button class="btn ghost" data-del="${i}">🗑️ Remover</button>
+        </div>
+      </div>`;
+    root.appendChild(div);
+  });
+  // handlers
+  $$('#glossList [data-edit]').forEach(b=> b.onclick = () => {
+    const list = load(KEYS.glossary, []);
+    const g = list[+b.dataset.edit];
+    const nt = prompt('Termo:', g.term) ?? g.term;
+    const nd = prompt('Definição:', g.def) ?? g.def;
+    list[+b.dataset.edit] = {term: nt, def: nd};
+    save(KEYS.glossary, list); renderGloss();
+  });
+  $$('#glossList [data-del]').forEach(b=> b.onclick = () => {
+    const list = load(KEYS.glossary, []);
+    list.splice(+b.dataset.del,1);
+    save(KEYS.glossary, list); renderGloss();
+  });
+}
+$('#btnAddGloss').addEventListener('click', () => {
+  const term = $('#gTermo').value.trim();
+  const def = $('#gDef').value.trim();
+  if(!term){ alert('Informe um termo.'); return; }
+  const list = load(KEYS.glossary, []);
+  list.push({term, def});
+  save(KEYS.glossary, list);
+  $('#gTermo').value=''; $('#gDef').value='';
+  renderGloss();
+});
+$('#btnExportGloss').addEventListener('click', () => exportJSON(KEYS.glossary, load(KEYS.glossary, []), 'glossario_tico.json'));
+$('#importGlossInput').addEventListener('change', (e)=> importJSON(e, KEYS.glossary, renderGloss));
+
+// =============== REPORT RISCO (OFFLINE) ===============
+async function fileToDataURL(file){
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = reject;
+    fr.readAsDataURL(file);
+  });
+}
+
+$('#btnLoc').addEventListener('click', () => {
+  if(!('geolocation' in navigator)){ alert('Geolocalização indisponível.'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    $('#btnLoc').textContent = `📍 ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+    $('#btnLoc').dataset.loc = JSON.stringify({lat:pos.coords.latitude, lon:pos.coords.longitude});
+  }, err => alert('Não foi possível obter localização.'));
+});
+
+$('#btnSalvarRisco').addEventListener('click', async () => {
+  const note = $('#rNota').value.trim();
+  if(!note && !$('#rFoto').files[0]){ alert('Inclua uma nota ou uma foto.'); return; }
+  let photo = null;
+  if($('#rFoto').files[0]){
+    photo = await fileToDataURL($('#rFoto').files[0]);
+  }
+  const loc = $('#btnLoc').dataset.loc ? JSON.parse($('#btnLoc').dataset.loc) : null;
+  const arr = load(KEYS.reports, []);
+  arr.push({ id: crypto.randomUUID?.() || String(Date.now()), ts: Date.now(), note, photo, loc });
+  save(KEYS.reports, arr);
+  $('#rNota').value=''; $('#rFoto').value=''; $('#btnLoc').textContent='📍 Pegar localização'; delete $('#btnLoc').dataset.loc;
+  renderReports();
+  alert('Relato salvo localmente.');
+});
+
+function renderReports(){
+  const arr = load(KEYS.reports, []);
+  const root = $('#rLista'); root.innerHTML='';
+  if(!arr.length){ root.innerHTML = '<small class="small">Sem relatos ainda.</small>'; return; }
+  arr.slice().reverse().forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'item';
+    const when = new Date(r.ts).toLocaleString();
+    const loc = r.loc ? `${r.loc.lat.toFixed?.(5)}, ${r.loc.lon.toFixed?.(5)}` : '—';
+    div.innerHTML = `<div class="icon">⚠️</div>
+      <div style="flex:1">
+        <strong>${when}</strong>
+        <p class="small">${r.note || '(sem texto)'}</p>
+        <div class="kv">
+          <span class="pill">loc: ${loc}</span>
+        </div>
+        ${r.photo ? `<div class="gallery" style="margin-top:6px"><img src="${r.photo}" alt="foto do risco"/></div>`:''}
+        <div class="actionbar" style="margin-top:6px">
+          <button class="btn ghost" data-del="${r.id}">Remover</button>
+        </div>
+      </div>`;
+    root.appendChild(div);
+  });
+  $$('#rLista [data-del]').forEach(b => b.onclick = () => {
+    let arr = load(KEYS.reports, []);
+    arr = arr.filter(x => x.id !== b.dataset.del);
+    save(KEYS.reports, arr); renderReports();
+  });
+}
+$('#btnExportReports').addEventListener('click', () => exportJSON(KEYS.reports, load(KEYS.reports, []), 'relatos_tico.json'));
+$('#btnClearReports').addEventListener('click', () => { if(confirm('Limpar todos os relatos?')){ save(KEYS.reports, []); renderReports(); }});
+
+// =============== EXPORT/IMPORT ALL ===============
+function exportJSON(key, data, filename){
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+  setTimeout(()=> URL.revokeObjectURL(url), 1000);
+}
+function importJSON(ev, key, onDone){
+  const f = ev.target.files[0]; if(!f) return;
+  const fr = new FileReader();
+  fr.onload = () => { try { const data = JSON.parse(fr.result); save(key, data); onDone && onDone(); } catch(e){ alert('Arquivo inválido.'); } };
+  fr.readAsText(f);
+}
+$('#btnExportAll').addEventListener('click', () => {
+  const bundle = {
+    [KEYS.settings]: load(KEYS.settings, {}),
+    [KEYS.tips]: load(KEYS.tips, []),
+    [KEYS.glossary]: load(KEYS.glossary, []),
+    [KEYS.reports]: load(KEYS.reports, []),
+    [KEYS.sessions]: load(KEYS.sessions, []),
+  };
+  exportJSON('tico.bundle', bundle, 'tico_bundle.json');
+});
+$('#btnWipeAll').addEventListener('click', () => {
+  if(confirm('Apagar TODOS os dados locais?')){
+    Object.values(KEYS).forEach(k => localStorage.removeItem(k));
+    renderGloss(); renderReports();
+    alert('Dados apagados deste aparelho.');
+  }
+});
+
+// =============== INIT ===============
+function init(){
+  updateTipOfDay();
+  renderGloss();
+  renderReports();
+}
+init();
+</script>
+</body>
+</html>

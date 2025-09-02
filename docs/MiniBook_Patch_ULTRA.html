@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dual.Infodose · Mini‑Book Masterclass (Patch)</title>
+  <style>
+    /* =====================================================
+       Mini‑Book Patch · Smigdrix/ULTRA (Shadow‑safe CSS)
+       Namespace prefix: mbx-
+       ===================================================== */
+    :root {
+      --mbx-bg: #0b0b10;
+      --mbx-fg: #e9e9ee;
+      --mbx-muted: #a9a9b8;
+      --mbx-accent: #8a5cff;
+      --mbx-accent-2: #29d3ff;
+      --mbx-card: #13131a;
+      --mbx-border: #1e1e28;
+      --mbx-ok: #31d0aa;
+      --mbx-warn: #ffd166;
+      --mbx-danger: #ff5c93;
+      --mbx-shadow: 0 10px 30px rgba(0,0,0,.25);
+      --mbx-radius: 16px;
+      --mbx-font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      --mbx-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+    /* Themes */
+    [data-theme="light"] {
+      --mbx-bg: #f6f7fb;
+      --mbx-fg: #16161d;
+      --mbx-muted: #4b4b5a;
+      --mbx-card: #ffffff;
+      --mbx-border: #e7e7f0;
+      --mbx-shadow: 0 10px 30px rgba(2,2,12,.08);
+    }
+    [data-theme="dracula"] {
+      --mbx-bg: #1e1f29;
+      --mbx-fg: #f8f8f2;
+      --mbx-muted: #b6b6c2;
+      --mbx-accent: #bd93f9;
+      --mbx-accent-2: #8be9fd;
+      --mbx-card: #282a36;
+      --mbx-border: #3b3e4a;
+    }
+    [data-theme="matrix"] {
+      --mbx-bg: #000a00;
+      --mbx-fg: #defcd0;
+      --mbx-muted: #86b38e;
+      --mbx-accent: #00ff9c;
+      --mbx-accent-2: #00ff41;
+      --mbx-card: #001400;
+      --mbx-border: #003100;
+    }
+    [data-theme="mono"] {
+      --mbx-bg: #0d0d0d;
+      --mbx-fg: #f2f2f2;
+      --mbx-muted: #9c9c9c;
+      --mbx-accent: #f2f2f2;
+      --mbx-accent-2: #bdbdbd;
+      --mbx-card: #151515;
+      --mbx-border: #252525;
+    }
+    [data-theme="tupac"] {
+      --mbx-bg: #0b0b10;
+      --mbx-fg: #f6f6f6;
+      --mbx-muted: #c8b6ff;
+      --mbx-accent: #ffd700;   /* gold */
+      --mbx-accent-2: #a020f0; /* royal purple */
+      --mbx-card: #111116;
+      --mbx-border: #2a223b;
+    }
+
+    html, body {
+      height: 100%;
+    }
+    body.mbx-root {
+      margin: 0;
+      padding: 24px;
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(138,92,255,.12), transparent 60%),
+                  radial-gradient(900px 600px at -20% 0%, rgba(41,211,255,.10), transparent 60%),
+                  var(--mbx-bg);
+      color: var(--mbx-fg);
+      font-family: var(--mbx-font);
+      line-height: 1.45;
+      letter-spacing: 0.1px;
+    }
+
+    .mbx-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+    .mbx-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .mbx-logo {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      background: conic-gradient(from 0deg, var(--mbx-accent), var(--mbx-accent-2), var(--mbx-accent));
+      box-shadow: inset 0 0 0 6px rgba(0,0,0,.25), var(--mbx-shadow);
+      animation: mbx-spin 9s linear infinite;
+    }
+    @keyframes mbx-spin {
+      to { transform: rotate(360deg); }
+    }
+    .mbx-h1 {
+      font-size: clamp(20px, 3.2vw, 30px);
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+    .mbx-sub {
+      color: var(--mbx-muted);
+      font-size: 14px;
+    }
+    .mbx-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .mbx-btn {
+      appearance: none;
+      border: 1px solid var(--mbx-border);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(0,0,0,.08));
+      color: var(--mbx-fg);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: var(--mbx-shadow);
+      transition: transform .05s ease, background .2s ease, border-color .2s ease;
+    }
+    .mbx-btn:hover { transform: translateY(-1px); }
+    .mbx-btn:active { transform: translateY(0); }
+    .mbx-btn.primary {
+      border-color: transparent;
+      background: linear-gradient(180deg, var(--mbx-accent), var(--mbx-accent-2));
+      color: #0c0c10;
+    }
+    .mbx-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 820px) {
+      .mbx-row { grid-template-columns: 2fr 1fr; }
+    }
+
+    .mbx-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(0,0,0,.08));
+      border: 1px solid var(--mbx-border);
+      border-radius: var(--mbx-radius);
+      box-shadow: var(--mbx-shadow);
+      padding: 18px;
+    }
+    .mbx-card h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .mbx-card p { margin: 6px 0; color: var(--mbx-muted); }
+    .mbx-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      border: 1px solid var(--mbx-border);
+      background: rgba(255,255,255,.03);
+    }
+    .mbx-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    @media (min-width: 680px) {
+      .mbx-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    details.mbx-d {
+      border: 1px solid var(--mbx-border);
+      border-radius: 14px;
+      background: var(--mbx-card);
+      box-shadow: var(--mbx-shadow);
+      padding: 14px 16px;
+    }
+    details.mbx-d + details.mbx-d { margin-top: 10px; }
+    details.mbx-d > summary {
+      list-style: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    details.mbx-d > summary::before {
+      content: "▸";
+      transition: transform .2s ease;
+      color: var(--mbx-accent);
+    }
+    details.mbx-d[open] > summary::before { transform: rotate(90deg); }
+    details.mbx-d .mbx-d-content {
+      margin-top: 10px;
+      color: var(--mbx-fg);
+      font-size: 14px;
+    }
+    .mbx-code {
+      background: #0e0e15;
+      border: 1px dashed var(--mbx-border);
+      padding: 10px 12px; border-radius: 10px;
+      font-family: var(--mbx-mono);
+      font-size: 12.5px;
+      white-space: pre-wrap;
+      color: #d7e1ff;
+      overflow: auto;
+    }
+    .mbx-kv {
+      display: grid; gap: 10px; margin-top: 8px;
+    }
+    .mbx-kv label { font-size: 12px; color: var(--mbx-muted); }
+    .mbx-input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--mbx-border);
+      background: rgba(0,0,0,.15);
+      color: var(--mbx-fg);
+      outline: none;
+      font-family: var(--mbx-mono);
+    }
+    .mbx-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap; margin-top: 10px;
+      color: var(--mbx-muted); font-size: 12px;
+    }
+    .mbx-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 10px; border-radius: 999px;
+      border: 1px solid var(--mbx-border); background: rgba(255,255,255,.03);
+      font-size: 12px;
+    }
+    .mbx-hr { height: 1px; background: var(--mbx-border); margin: 10px 0; border: 0; }
+    .mbx-notice { border-left: 4px solid var(--mbx-accent); padding: 10px 12px; background: rgba(138,92,255,.09); border-radius: 8px; }
+    .mbx-success { border-left-color: var(--mbx-ok); background: rgba(49,208,170,.09); }
+    .mbx-warn    { border-left-color: var(--mbx-warn); background: rgba(255,209,102,.09); }
+    .mbx-danger  { border-left-color: var(--mbx-danger); background: rgba(255,92,147,.1); }
+  </style>
+</head>
+<body class="mbx-root" data-theme="tupac">
+  <div class="mbx-wrap">
+    <div class="mbx-title">
+      <div class="mbx-logo" aria-hidden="true"></div>
+      <div>
+        <div class="mbx-h1">📖 Mini‑Book Masterclass · Dual.Infodose</div>
+        <div class="mbx-sub">Patch de Ajuda interativo — pronto para o Snippet Modal (Shadow/Append/Inject)</div>
+        <div class="mbx-actions">
+          <button class="mbx-btn primary" id="btnCopyMD">Copiar Mini‑Book (Markdown)</button>
+          <button class="mbx-btn" id="btnExportMD">Exportar Eventos + Mini‑Book (MD)</button>
+          <button class="mbx-btn" id="btnExportJSON">Exportar Estado (JSON)</button>
+          <button class="mbx-btn" id="btnEmitTests">Emitir Eventos‑Teste ⚡</button>
+          <select class="mbx-btn" id="selTheme" title="Tema">
+            <option value="tupac">Tupac (All Eyez)</option>
+            <option value="dracula">Drácula</option>
+            <option value="matrix">Matrix Green</option>
+            <option value="mono">Monocromático</option>
+            <option value="light">Claro</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="mbx-row">
+      <div class="mbx-grid">
+        <details class="mbx-d" open>
+          <summary>Capítulo 1 · Fundamentos</summary>
+          <div class="mbx-d-content">
+            <ul>
+              <li>O app roda <b>100% no navegador</b> (PWA offline‑first).</li>
+              <li>Cada tela organizada em <b>cards</b>, <b>tabs</b> e <b>dock flutuante</b>.</li>
+              <li>Áreas: <b>Entrada</b> (prompts), <b>Saída</b> (render), <b>Histórico</b> (memória local), <b>Ferramentas</b> (patches, presets, exportações).</li>
+            </ul>
+          </div>
+        </details>
+        <details class="mbx-d" open>
+          <summary>Capítulo 2 · Portais e Símbolos</summary>
+          <div class="mbx-d-content">
+            <p>Portais acionáveis pelo texto:</p>
+            <div class="mbx-kv">
+              <div class="mbx-chip">⊙ UNO</div>
+              <div class="mbx-chip">⇄ DUAL</div>
+              <div class="mbx-chip">△ TRINITY</div>
+              <div class="mbx-chip">☆彡 Estético</div>
+              <div class="mbx-chip">§ Safe</div>
+              <div class="mbx-chip">∞ Reset</div>
+            </div>
+            <p>O motor detecta símbolos e aplica o fluxo. <code class="mbx-chip">SmigAll()</code> roda todos em sequência.</p>
+          </div>
+        </details>
+
+        <details class="mbx-d" open>
+          <summary>Capítulo 3 · Snippet Modal & Patches</summary>
+          <div class="mbx-d-content">
+            <p><b>Snippet Modal</b> é o coração: cole HTML/CSS/JS e rode ao vivo.</p>
+            <ol>
+              <li><b>Shadow DOM</b> — isolado/sandbox.</li>
+              <li><b>Append‑out</b> — anexa saída.</li>
+              <li><b>Inject Section</b> — cola em seletor do layout.</li>
+            </ol>
+            <div class="mbx-notice">Dica: use este patch em Shadow para estilo isolado — mas ele funciona nos três modos.</div>
+          </div>
+        </details>
+
+        <details class="mbx-d" open>
+          <summary>Capítulo 4 · Eventos KOBLLUX</summary>
+          <div class="mbx-d-content">
+            <p>CustomEvents globais para integração:</p>
+            <ul>
+              <li><code>kobllux:pix:paid</code> — pagamento marcado</li>
+              <li><code>kobllux:debug:log</code> — logs interceptados</li>
+              <li><code>kobllux:settings:changed</code> — configs/API</li>
+              <li><code>kobllux:lock:armed</code> | <code>kobllux:lock:unlocked</code> — trava</li>
+            </ul>
+            <p>O <b>Event Tray</b> do ULTRA captura em tempo real e exporta JSON/Markdown.</p>
+          </div>
+        </details>
+
+        <details class="mbx-d" open>
+          <summary>Capítulo 5 · PIX, Debug & Lock</summary>
+          <div class="mbx-d-content">
+            <ul>
+              <li><b>PIX</b> — gera BR Code + CRC16, copia e QR (depende do patch PIX).</li>
+              <li><b>Debug</b> — intercepta console/fetch e exporta.</li>
+              <li><b>Lock</b> — PIN ≥6 dígitos; hash SHA‑256 guardado em <code>localStorage.kobllux.lock.hash</code>.</li>
+            </ul>
+            <div class="mbx-kv">
+              <label>Definir PIN (≥6):</label>
+              <input id="pinSet" class="mbx-input" placeholder="Defina seu PIN..." inputmode="numeric" minlength="6" />
+              <button class="mbx-btn" id="btnSetPIN">Salvar PIN (SHA‑256)</button>
+            </div>
+            <div class="mbx-kv" style="margin-top:8px">
+              <label>Destravar:</label>
+              <input id="pinUnlock" class="mbx-input" placeholder="Digite seu PIN..." inputmode="numeric" />
+              <button class="mbx-btn" id="btnUnlock">Destravar App</button>
+            </div>
+            <p class="mbx-sub">Hash salvo em <code>kobllux.lock.hash</code>. Eventos são emitidos ao travar/destravar.</p>
+          </div>
+        </details>
+
+        <details class="mbx-d">
+          <summary>Capítulo 6 · Histórico e Persistência</summary>
+          <div class="mbx-d-content">
+            <ul>
+              <li><code>kobllux.lock.hash</code> — PIN</li>
+              <li><code>kobllux_events_v1</code> — histórico de eventos</li>
+              <li><code>smig_patch_log</code> — patches aplicados</li>
+            </ul>
+            <div class="mbx-notice">Exportar/Importar: use botões no topo (MD/JSON) ou a ferramenta nativa do ULTRA.</div>
+          </div>
+        </details>
+
+        <details class="mbx-d">
+          <summary>Capítulo 7 · Estética & Modos</summary>
+          <div class="mbx-d-content">
+            <p>Temas prontos: <b>Matrix Green</b>, <b>Monocromático</b>, <b>Tupac</b>, <b>Drácula</b>, <b>Claro</b>.</p>
+            <p>Estética altera vibração, UX e humor. Troque acima em <b>Tema</b>.</p>
+          </div>
+        </details>
+
+        <details class="mbx-d">
+          <summary>Capítulo 8 · Produção Criativa</summary>
+          <div class="mbx-d-content">
+            <ul>
+              <li>Exportar DOM &rarr; PNG.</li>
+              <li>Copiar saída em Markdown &rarr; GitHub/Notion.</li>
+              <li>Compartilhar estado via query string.</li>
+              <li>Usar patches para modais/sheets/checkouts (sem tocar no core).</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="mbx-d">
+          <summary>Capítulo 9 · Lista+ e Undo</summary>
+          <div class="mbx-d-content">
+            <ul>
+              <li>Gerenciador de snippets com <b>gestos mobile</b> (swipe &rarr; excluir, <i>snackbar</i> &rarr; desfazer).</li>
+              <li>Validação de nomes <code>.html</code>.</li>
+              <li>Modo compacto para caber mais.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="mbx-d">
+          <summary>Capítulo 10 · Mastery</summary>
+          <div class="mbx-d-content">
+            <ul>
+              <li>Combine portais (ex.: <b>UNO + TRINITY</b>) para narrativas complexas.</li>
+              <li>Injete patches de <b>música</b> (Boom‑Bap, Tupac Beat).</li>
+              <li>Modo offline &rarr; 100% local.</li>
+              <li>API: cole a chave no <b>Patch Merger</b> e salve.</li>
+            </ul>
+            <div class="mbx-kv">
+              <label>Chave de API (opcional):</label>
+              <input id="apiKey" class="mbx-input" placeholder="cole aqui e Salvar" />
+              <div style="display:flex; gap:8px; flex-wrap:wrap">
+                <button class="mbx-btn" id="btnSaveKey">Salvar em localStorage</button>
+                <button class="mbx-btn" id="btnUseMDKey">Usar CHAVE (MD) do exemplo</button>
+              </div>
+              <p class="mbx-sub">Armazenada em <code>localStorage.dual.apiKey</code>.</p>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="mbx-card">
+        <h3>🚀 Missão Final (Prática)</h3>
+        <ol>
+          <li>Abrir o <b>ULTRA</b>.</li>
+          <li>Injetar <code>preset_shadow.html</code>.</li>
+          <li>Gerar PIX teste e marcar como pago.</li>
+          <li>Abrir tray ⚡Eventos e exportar <b>Markdown</b>.</li>
+          <li>Destravar com seu <b>PIN</b>.</li>
+          <li>Tema <b>Tupac</b> + portal <b>☆彡</b>.</li>
+        </ol>
+        <hr class="mbx-hr">
+        <div class="mbx-notice mbx-success">Fluxo Mestre: <b>Entrada → Patch → Evento → Persistência → Estética → Exportação</b></div>
+        <div class="mbx-foot">
+          <span class="mbx-pill">Status: <b id="statusTag">OK</b></span>
+          <span class="mbx-pill">Eventos capturados: <b id="evCount">0</b></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mbx-card">
+      <h3>ℹ️ Como usar este Patch</h3>
+      <p>Abra o <b>Snippet Modal</b> no ULTRA/Smigdrix e cole este HTML. Ele é <b>standalone</b>, funciona em Shadow, Append ou Inject.</p>
+      <p>Este patch <i>ouve</i> eventos KOBLLUX e também <i>emite</i> eventos de teste para o Event Tray.</p>
+      <div class="mbx-notice mbx-warn">Se você estiver fora do ULTRA, tudo continua funcionando localmente (localStorage/descargas).</div>
+    </div>
+  </div>
+
+  <!-- Mini‑book em Markdown para copiar/exportar -->
+  <script type="text/markdown" id="miniBookMD">
+# 📖 Mini-Book Masterclass · Dual.Infodose App
+
+## Capítulo 1 · Fundamentos
+- O app roda **100% no navegador** (PWA offline-first).
+- Cada tela é organizada em **cards**, **tabs** e **dock flutuante**.
+- Áreas: **Entrada** (prompts), **Saída** (render), **Histórico** (memória local), **Ferramentas** (patches/presets/exportações).
+
+## Capítulo 2 · Portais e Símbolos
+- Portais: ⊙ UNO · ⇄ DUAL · △ TRINITY · ☆彡 Estético · § Safe · ∞ Reset
+- O motor detecta símbolos no texto e aplica o fluxo correspondente.
+- `SmigAll()` roda todos os portais em sequência.
+
+## Capítulo 3 · Snippet Modal & Patches
+- **Coração do app**: colar HTML/CSS/JS e rodar ao vivo.
+- Modos: Shadow DOM · Append-out · Inject Section.
+
+## Capítulo 4 · Eventos KOBLLUX
+- `kobllux:pix:paid` · `kobllux:debug:log` · `kobllux:settings:changed` · `kobllux:lock:armed/unlocked`
+- Event Tray captura em tempo real e exporta JSON/Markdown.
+
+## Capítulo 5 · PIX, Debug & Lock
+- PIX: BR Code + CRC16, QR opcional.
+- Debug: intercepta console/fetch.
+- Lock: PIN ≥6 dígitos → hash SHA-256 salvo em `kobllux.lock.hash`.
+
+## Capítulo 6 · Histórico e Persistência
+- `kobllux.lock.hash` · `kobllux_events_v1` · `smig_patch_log`.
+- Exportar/Importar JSON ou HTML com estado embutido.
+
+## Capítulo 7 · Estética & Modos
+- Temas: Matrix Green · Monocromático · Tupac (All Eyez) · Dracula · Light.
+
+## Capítulo 8 · Produção Criativa
+- Exportar DOM→PNG; copiar saída em Markdown; compartilhar estado por query; criar modais/sheets via patches.
+
+## Capítulo 9 · Lista+ e Undo
+- Gerenciador interno: swipe→excluir, snackbar→desfazer; validação `.html`; modo compacto.
+
+## Capítulo 10 · Mastery
+- Combine portais (UNO + TRINITY); patches de música; offline 100%; API via Patch Merger.
+
+### 🚀 Missão Final
+1) ULTRA → `preset_shadow.html` → PIX pago → exportar eventos (MD) → destravar com PIN → tema Tupac + ☆彡.
+  </script>
+
+  <script>
+    (function () {
+      const $ = (sel) => document.querySelector(sel);
+      const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+      const state = {
+        events: [],
+        maxEvents: 500,
+        mdText: '',
+        theme: localStorage.getItem('miniBook.theme') || 'tupac',
+        mdKey: 'ARCHASK-78K-QUANTA-9Z3F-5V1A-ULT'
+      };
+
+      // Apply theme
+      document.body.dataset.theme = state.theme;
+      $('#selTheme').value = state.theme;
+      $('#selTheme').addEventListener('change', (e) => {
+        state.theme = e.target.value;
+        document.body.dataset.theme = state.theme;
+        localStorage.setItem('miniBook.theme', state.theme);
+        tag('Tema', state.theme);
+      });
+
+      // Helpers
+      function download(name, content, mime = 'text/plain') {
+        const blob = new Blob([content], { type: mime });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      }
+      function nowISO() { return new Date().toISOString(); }
+      function tag(k, v) {
+        const t = $('#statusTag');
+        t.textContent = `${k}: ${v}`;
+        setTimeout(() => (t.textContent = 'OK'), 3000);
+      }
+      function hashHex(buf) {
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      async function sha256(str) {
+        const enc = new TextEncoder();
+        const buf = enc.encode(str);
+        const digest = await crypto.subtle.digest('SHA-256', buf);
+        return hashHex(digest);
+      }
+
+      // Event capture (listen + persist mirror)
+      const KOB_EVENTS = [
+        'kobllux:pix:paid',
+        'kobllux:debug:log',
+        'kobllux:settings:changed',
+        'kobllux:lock:armed',
+        'kobllux:lock:unlocked'
+      ];
+      KOB_EVENTS.forEach(ev => {
+        window.addEventListener(ev, (e) => {
+          const rec = {
+            name: ev,
+            ts: nowISO(),
+            detail: (e && e.detail) ? e.detail : null
+          };
+          state.events.push(rec);
+          if (state.events.length > state.maxEvents) state.events.shift();
+          $('#evCount').textContent = String(state.events.length);
+
+          try {
+            const key = 'kobllux_events_v1';
+            const prev = JSON.parse(localStorage.getItem(key) || '[]');
+            prev.push(rec);
+            if (prev.length > 2000) prev.shift();
+            localStorage.setItem(key, JSON.stringify(prev));
+          } catch {}
+        });
+      });
+
+      function emit(name, detail) {
+        const ev = new CustomEvent(name, { detail });
+        window.dispatchEvent(ev);
+      }
+
+      // Buttons
+      $('#btnEmitTests').addEventListener('click', () => {
+        emit('kobllux:settings:changed', { key: 'dual.apiKey', at: nowISO() });
+        emit('kobllux:debug:log', { level: 'info', msg: 'Mini‑Book patch conectado.' });
+        emit('kobllux:pix:paid', { amount: (Math.random()*10+1).toFixed(2), currency: 'BRL', at: nowISO() });
+        emit('kobllux:lock:armed', { reason: 'manual' });
+        tag('Eventos', 'emitidos');
+      });
+
+      // PIN save/unlock
+      $('#btnSetPIN').addEventListener('click', async () => {
+        const pin = $('#pinSet').value.trim();
+        if (!pin || pin.length < 6) { tag('PIN', 'mínimo 6'); return; }
+        const hx = await sha256(pin);
+        localStorage.setItem('kobllux.lock.hash', hx);
+        emit('kobllux:lock:armed', { ts: nowISO(), set: true });
+        tag('PIN', 'salvo');
+      });
+      $('#btnUnlock').addEventListener('click', async () => {
+        const pin = $('#pinUnlock').value.trim();
+        const hx = await sha256(pin);
+        const saved = localStorage.getItem('kobllux.lock.hash');
+        if (saved && saved === hx) {
+          emit('kobllux:lock:unlocked', { ts: nowISO() });
+          tag('Lock', 'destravado');
+        } else {
+          emit('kobllux:lock:armed', { ts: nowISO(), failed: true });
+          tag('Lock', 'falhou');
+        }
+      });
+
+      // API Key
+      $('#btnSaveKey').addEventListener('click', () => {
+        const v = $('#apiKey').value.trim();
+        if (!v) { tag('API', 'vazio'); return; }
+        localStorage.setItem('dual.apiKey', v);
+        emit('kobllux:settings:changed', { key: 'dual.apiKey', value: '***' });
+        tag('API', 'salva');
+      });
+      $('#btnUseMDKey').addEventListener('click', () => {
+        $('#apiKey').value = state.mdKey;
+        tag('API', 'exemplo colado');
+      });
+
+      // Markdown
+      state.mdText = ($('#miniBookMD')?.textContent || '').trim();
+      $('#btnCopyMD').addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(state.mdText);
+          tag('Markdown', 'copiado');
+        } catch {
+          tag('Clipboard', 'bloqueado');
+        }
+      });
+
+      $('#btnExportMD').addEventListener('click', () => {
+        const evs = state.events.map(e => `- ${e.ts} · **${e.name}** ${e.detail ? '`' + JSON.stringify(e.detail) + '`' : ''}`).join('\n');
+        const md = `# Eventos KOBLLUX (amostra)\n\n${evs || '_Sem eventos capturados nesta sessão._'}\n\n---\n` + state.mdText;
+        download('MiniBook_DualInfodose_+_Eventos.md', md, 'text/markdown');
+      });
+
+      $('#btnExportJSON').addEventListener('click', () => {
+        const payload = {
+          ts: nowISO(),
+          theme: state.theme,
+          apiKey: localStorage.getItem('dual.apiKey') || null,
+          lockHash: localStorage.getItem('kobllux.lock.hash') || null,
+          events: state.events
+        };
+        download('MiniBook_State.json', JSON.stringify(payload, null, 2), 'application/json');
+      });
+
+      // Warm welcome
+      setTimeout(() => {
+        emit('kobllux:debug:log', { hello: 'Mini‑Book Ready', at: nowISO() });
+      }, 300);
+    })();
+  </script>
+</body>
+</html>

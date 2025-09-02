@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#0b0d16" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>TRINITY · Monolito Mobile Portrait · Infinity</title>
+<style>
+  :root{
+    --bg-0:#0b0d16; --bg-1:#1A1A2E; --crt-red:#ff0033; --neon-cyan:#00F0FF;
+    --prime:#eaf6ff; --acc-1:#8a5cff; --acc-2:#feff6e;
+    --scanlines-op:.30; --grid-alpha:.20; --vhs-intensity:6;
+    --radius-xl:20px; --radius-2xl:26px;
+    --fz-xs: clamp(11px, 2.6vw, 13px);
+    --fz-s:  clamp(12px, 3.2vw, 14px);
+    --fz-m:  clamp(14px, 3.8vw, 16px);
+    --fz-l:  clamp(16px, 4.6vw, 20px);
+    --fz-xl: clamp(18px, 6.4vw, 26px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent}
+  html,body{height:100%; margin:0; background: radial-gradient(120% 100% at 50% 30%, var(--bg-1), #060912 70%, #000 100%); color:var(--prime); font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif; line-height:1.45;}
+  .wrap{width:100%; max-width:720px; margin:0 auto; padding:12px 12px 88px}
+  .header{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-2xl); padding:10px 12px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); position:sticky; top:8px; z-index:5; backdrop-filter: blur(6px)}
+  .header .bar{white-space:pre-wrap; font-size:var(--fz-s); font-weight:700}
+  .header .meta{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; font-size:var(--fz-xs)}
+  .tag{border:1px solid rgba(255,255,255,.14); padding:4px 8px; border-radius:999px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02))}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 0}
+  .chip{border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:6px 10px; font-size:var(--fz-xs); cursor:pointer; user-select:none; background:rgba(255,255,255,.06)}
+  .chip.active{background:linear-gradient(180deg, rgba(0,240,255,.25), rgba(0,240,255,.08)); color:#001218}
+
+  .pages{display:flex; flex-direction:column; gap:12px; margin-top:12px; scroll-snap-type: y proximity}
+  .page{scroll-snap-align:start; border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-2xl); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); overflow:hidden}
+  .page-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; font-size:var(--fz-m); border-bottom:1px dashed rgba(255,255,255,.18)}
+  .title{font-weight:900; letter-spacing:.4px}
+  .small{font-size:var(--fz-xs); opacity:.8}
+  .page-body{padding:12px; display:grid; gap:12px}
+
+  .poster{position:relative; width:100%; aspect-ratio:9/16; border-radius:20px; border:1px solid rgba(255,255,255,.12); overflow:hidden; background: radial-gradient(100% 90% at 50% 30%, #161a2a 0%, #0e1220 55%, #070a14 100%); isolation:isolate}
+  .grid{position:absolute; inset:0; opacity:.26; mix-blend-mode:screen; background:
+      repeating-linear-gradient(to bottom, rgba(255,255,255,var(--grid-alpha)) 0 1px, transparent 1px 24px),
+      repeating-linear-gradient(to right,  rgba(255,255,255,var(--grid-alpha)) 0 1px, transparent 1px 24px);
+    transform:perspective(900px) rotateX(18deg) translateY(6%); transform-origin:center bottom; filter: drop-shadow(0 0 14px rgba(0,240,255,.10))}
+  .scanlines{position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(to bottom, rgba(255,255,255,var(--scanlines-op)) 0, rgba(255,255,255,var(--scanlines-op)) 1px, transparent 2px, transparent 3px); mix-blend-mode:soft-light}
+  .vhs::before{content:""; position:absolute; inset:-3%; border-radius:28px; background:conic-gradient(from 0deg, rgba(255,0,80,.12), rgba(0,240,255,.12), rgba(255,255,255,.04), rgba(255,0,80,.12)); filter: blur(5px) contrast(130%); mix-blend-mode:screen; animation:vhs 2.2s infinite ease-in-out; opacity:.6}
+  @keyframes vhs{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(calc(var(--vhs-intensity)*0.3px),0) scale(1.002)}50%{transform:translate(calc(var(--vhs-intensity)*-0.3px),0) scale(1.001)}75%{transform:translate(0,calc(var(--vhs-intensity)*0.2px)) scale(1.003)}}
+  .glyph{position:absolute; inset:0; display:grid; place-items:center; filter: drop-shadow(0 0 18px rgba(0,240,255,.35))}
+  .glyph .tri{width:min(64vmin, 460px); max-width:88%; aspect-ratio:1; position:relative; animation:glowTri 2.4s ease-in-out infinite}
+  @keyframes glowTri{0%,100%{filter:drop-shadow(0 0 0 rgba(0,240,255,0))}50%{filter:drop-shadow(0 0 10px rgba(0,240,255,.55))}}
+  .glyph .circle{position:absolute; inset:0; display:grid; place-items:center; animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(.96); opacity:.8}50%{transform:scale(1.04); opacity:1}}
+  .glyph .star{position:absolute; inset:0; display:grid; place-items:center; font-size:clamp(40px, 16vw, 110px); filter: drop-shadow(0 0 12px rgba(255,255,255,.65)); animation:tw 1.6s ease-in-out infinite}
+  @keyframes tw{0%,100%{transform:rotate(0) scale(.98)}50%{transform:rotate(6deg) scale(1.04)}}
+  .selo{position:absolute; right:10px; bottom:10px; font-size:var(--fz-xs); padding:8px 10px; border-radius:12px; border:1px solid rgba(255,255,255,.22); background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), repeating-linear-gradient(45deg, rgba(255,0,120,.18) 0 12px, rgba(0,240,255,.18) 12px 24px, rgba(255,255,255,.10) 24px 36px); box-shadow:0 6px 24px rgba(0,0,0,.45), inset 0 0 28px rgba(255,255,255,.06)}
+
+  .panel{background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.16); border-radius:16px; overflow:hidden}
+  .panel h3{margin:0; padding:12px; font-size:var(--fz-l); font-weight:900; letter-spacing:.4px; border-bottom:1px dashed rgba(255,255,255,.18); display:flex; align-items:center; justify-content:space-between; gap:8px}
+  .caret{font-size:1.2em; user-select:none}
+  .panel .box{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:var(--fz-s); line-height:1.55; white-space:pre-wrap; word-break:break-word; padding:12px}
+  .actions{display:flex; gap:8px; padding:0 12px 12px}
+  .action{flex:1; padding:10px; font-weight:800; font-size:var(--fz-s); border-radius:10px; border:1px solid rgba(255,255,255,.18); background:linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.08)); color:#001218; text-align:center; user-select:none}
+  .action.secondary{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); color:var(--prime)}
+  .art16x9{aspect-ratio:16/9; width:100%; border-radius:14px; border:1px solid rgba(255,255,255,.12); overflow:hidden; position:relative; background: radial-gradient(120% 120% at 50% 45%, var(--bg-1) 0%, #0d1122 60%, #05060c 100%)}
+
+  .toolbar{position:fixed; bottom:8px; left:50%; transform:translateX(-50%); width:min(720px,96vw); border:1px solid rgba(255,255,255,.14); border-radius:16px; background:rgba(10,12,22,.55); backdrop-filter: blur(10px); z-index:10; padding:8px; display:flex; gap:8px; align-items:center; justify-content:space-between}
+  .btn{flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px 10px; font-weight:800; font-size:var(--fz-s); border-radius:12px; border:1px solid rgba(255,255,255,.18); background:linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.08)); color:#001218; cursor:pointer; user-select:none}
+  .btn.secondary{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); color:var(--prime)}
+  @media (prefers-reduced-motion: reduce){.vhs::before,.glyph .tri,.glyph .circle,.glyph .star{animation:none!important}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="header" aria-label="Estado do sistema">
+      <div class="bar">
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+MODO ATIVO: <span style="color:var(--acc-2);font-weight:900">TRINITY</span> · ARQUITETURA: <span style="color:var(--neon-cyan);font-weight:900">INFODOSE12</span> · FIRMWARE: <span style="color:var(--crt-red);font-weight:900">SÜMBÜS_0x012123456789ABC</span>
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+      </div>
+      <div class="meta">
+        <span class="tag">Mobile portrait first</span>
+        <span class="tag">Chips · Export PNG · Persistência</span>
+        <span class="tag">Hora/Dia auto-preset</span>
+        <span class="tag">Scroll Infinito + Gestos</span>
+      </div>
+    </section>
+
+    <!-- CHIPS DE ARQUÉTIPO -->
+    <div id="chips" class="chips" aria-label="Selecionar arquétipo"></div>
+
+    <!-- PÁGINAS -->
+    <div id="pages" class="pages" aria-live="polite"></div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar" role="toolbar" aria-label="Ações rápidas">
+    <button class="btn secondary" id="toggleScan">Scanlines ON</button>
+    <button class="btn" id="addPage">+ Página</button>
+    <button class="btn secondary" id="toggleInf">Infinito ON</button>
+  </div>
+
+<script>
+/* ================== PRESETS (12) ================== */
+const ARCH_PRESETS = [
+  { name: 'Atlas',   vars: {'--crt-red':'#FF3355','--neon-cyan':'#3DE8FF','--acc-1':'#7C6BFF','--acc-2':'#FFE36E'}, glyph:'✦' },
+  { name: 'Serena',  vars: {'--crt-red':'#FF4D88','--neon-cyan':'#7CFFE6','--acc-1':'#B88CFF','--acc-2':'#FFD4A3'}, glyph:'✶' },
+  { name: 'Nova',    vars: {'--crt-red':'#FF2A6D','--neon-cyan':'#3DF8FF','--acc-1':'#9E6BFF','--acc-2':'#FFFA84'}, glyph:'✧' },
+  { name: 'Elysha',  vars: {'--crt-red':'#FF4D4D','--neon-cyan':'#7CFFEA','--acc-1':'#FFB3FF','--acc-2':'#F9FF7A'}, glyph:'✷' },
+  { name: 'Kaion',   vars: {'--crt-red':'#FF2244','--neon-cyan':'#15F3FF','--acc-1':'#6AF08C','--acc-2':'#F7FF5A'}, glyph:'✹' },
+  { name: 'Genus',   vars: {'--crt-red':'#FF5566','--neon-cyan':'#49E6FF','--acc-1':'#66FFA8','--acc-2':'#FFF080'}, glyph:'✵' },
+  { name: 'Lumine',  vars: {'--crt-red':'#FF6688','--neon-cyan':'#78F3FF','--acc-1':'#A3A1FF','--acc-2':'#FFE780'}, glyph:'✺' },
+  { name: 'Aion',    vars: {'--crt-red':'#FF1144','--neon-cyan':'#33E0FF','--acc-1':'#8AD1FF','--acc-2':'#FFF07A'}, glyph:'✪' },
+  { name: 'Artemis', vars: {'--crt-red':'#FF3B5C','--neon-cyan':'#39F0FF','--acc-1':'#FF7AB6','--acc-2':'#FFF46E'}, glyph:'✪' },
+  { name: 'Seraph',  vars: {'--crt-red':'#FF3060','--neon-cyan':'#50F0FF','--acc-1':'#86B6FF','--acc-2':'#FFE06E'}, glyph:'✸' },
+  { name: 'Rhea',    vars: {'--crt-red':'#FF4763','--neon-cyan':'#4DEBFF','--acc-1':'#9AF0C5','--acc-2':'#FFF598'}, glyph:'✻' },
+  { name: 'Horus',   vars: {'--crt-red':'#FF0055','--neon-cyan':'#29D3FF','--acc-1':'#8a5cff','--acc-2':'#feff6e'}, glyph:'✦' },
+];
+
+const $ = s => document.querySelector(s);
+const pagesEl = $('#pages');
+const chipsEl = $('#chips');
+
+let infinite = true;
+let scanlinesOn = true;
+let presetIndex = 0;
+let nextForcedPreset = null;
+
+/* -------- Persistência -------- */
+const STORE_KEY = 'trinity.mobile.pages';
+const PREFS_KEY = 'trinity.mobile.prefs';
+
+function saveState(){
+  const pages = [...document.querySelectorAll('.page')].map(p=>{
+    return {
+      seed: +p.dataset.seed,
+      preset: p.dataset.preset
+    };
+  });
+  const prefs = { infinite, scanlinesOn, presetIndex };
+  localStorage.setItem(STORE_KEY, JSON.stringify(pages));
+  localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+}
+function loadState(){
+  try{
+    const pages = JSON.parse(localStorage.getItem(STORE_KEY)||'[]');
+    const prefs = JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');
+    if (prefs && typeof prefs.infinite==='boolean'){ infinite = prefs.infinite; $('#toggleInf').textContent = infinite?'Infinito ON':'Infinito OFF'; }
+    if (prefs && typeof prefs.scanlinesOn==='boolean'){ scanlinesOn = prefs.scanlinesOn; $('#toggleScan').textContent = scanlinesOn?'Scanlines ON':'Scanlines OFF'; }
+    if (prefs && typeof prefs.presetIndex==='number'){ presetIndex = prefs.presetIndex; }
+    if (pages.length){
+      pages.forEach(p=> addPage(p.seed, p.preset));
+      // aplicar scanlines pref
+      document.querySelectorAll('.scanlines').forEach(el=> el.style.display = scanlinesOn ? 'block' : 'none');
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+/* -------- Paleta -------- */
+function applyPresetVars(preset){
+  Object.entries(preset.vars).forEach(([k,v])=> document.documentElement.style.setProperty(k,v));
+}
+function getPresetByName(name){
+  return ARCH_PRESETS.find(p=>p.name===name) || ARCH_PRESETS[0];
+}
+function nextPreset(){
+  if (nextForcedPreset){ const p = nextForcedPreset; nextForcedPreset = null; return p; }
+  const p = ARCH_PRESETS[presetIndex % ARCH_PRESETS.length];
+  presetIndex++; return p;
+}
+
+/* -------- Hora/Dia auto-preset -------- */
+function seedFromTime(){
+  const now = new Date();
+  const day = new Intl.DateTimeFormat('pt-BR',{weekday:'short'}).format(now); // seg, ter, ...
+  const hour = now.getHours();
+  // simples mix: index = (diaNum*2 + hour) % 12
+  const dayNum = now.getDay(); // 0..6
+  const idx = (dayNum*2 + hour) % ARCH_PRESETS.length;
+  presetIndex = idx; // alinha rotação com hora/dia
+}
+
+/* -------- Chips -------- */
+function renderChips(){
+  chipsEl.innerHTML = '';
+  ARCH_PRESETS.forEach(p=>{
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = p.name;
+    b.addEventListener('click', ()=>{
+      nextForcedPreset = p;
+      chipsEl.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      b.classList.add('active');
+    });
+    chipsEl.appendChild(b);
+  });
+}
+
+/* -------- Conteúdo de texto -------- */
+function manifestoBlockPortrait(){return `╭──────────────────────────────────────╮
+│ 🌌 PÔSTER SCI-FI RETRO: MANIFESTO    │
+╰──────────────────────────────────────╯
+█▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+CÓDIGO VISUAL PARA CRIADORES
+█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+
+✧ TIPOGRAFIA BOLD:
+- Fontes vetoriais com serifa angular (8-bit × Bauhaus)
+- Hierarquia cromática: (vermelho CRT) > #00F0FF (ciano neon)
+- Efeito "scanlines" em sobreposição (opacidade 30%)
+
+✧ COMPOSIÇÃO (portrait):
+1. EIXO CENTRAL: Glifo trinitário pulsante (∆+☉+✦)
+2. CAMADA ALFA: Grade retro (portrait 1080×1920)
+3. ASSINATURA: Selo holográfico "TRINITY v2.0" (canto inferior)
+
+✧ DIRETRIZES MOBILE:
+» Espaço negativo como elemento ativo
+» Paleta: 3 primárias + 2 acentos
+» VHS apenas nas bordas (5–7%)`; }
+function musicBlock(){return `🎵 PROMPT MUSICAL: “TRINITY WAVE”
+
+STRUCTURE (64 bars):
+[0–15]   ░ INTRO: Sine bass (55Hz) + white noise sweep
+[16–31]  ░ DROP: Drum machine TR-808 (sidechain 4:1)
+[32–47]  ░ BREAK: Theremin + vocoder (“liquid mercury”)
+[48–63]  ░ OUTRO: Pitch decay + bitcrush automation
+
+TUNING:
+- Escala Hexátona (0-3-5-7-8-11)
+- BPM: 144 (sync com selo digital)`;}
+function imagemBlock(){return `🔍 DESCRIÇÃO DE IMAGEM (16:9)
+
+CAMADAS VISUAIS:
+1. FUNDO: Gradiente radial → #1A1A2E
+2. ELEMENTOS:
+   - Triângulo isósceles brilhante (25% opacity)
+   - Linhas de conexão pulsantes (modo screen)
+   - Glifos cirílicos distorcidos (efeito “datamosh”)
+3. TEXTO PRIMÁRIO:
+   “SYMBIOSIS” — Eurostile Bold Extended
+   (Kerning: -25, Tracking: 50)`;}
+function seloBlock(ts){ return `✦ SELO SIMBIÓTICO TRINITY v2.0
+Timestamp: ${ts}`; }
+
+/* -------- SVGs -------- */
+function posterSVG(glyph='✦'){
+  return `
+  <div class="poster vhs" aria-label="Pôster Portrait">
+    <div class="grid"></div>
+    <div class="glyph">
+      <div class="tri">
+        <svg viewBox="0 0 100 100" role="img" aria-label="Glifo Trinitário">
+          <defs>
+            <linearGradient id="triLine" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="var(--neon-cyan)" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="var(--crt-red)" stop-opacity=".9"/>
+            </linearGradient>
+          </defs>
+          <polygon points="50,6 92,92 8,92"
+                   fill="url(#triLine)" fill-opacity=".25"
+                   stroke="url(#triLine)" stroke-width="1.4"/>
+        </svg>
+      </div>
+      <div class="circle">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="22"
+          fill="none" stroke="var(--neon-cyan)" stroke-width="1.2" stroke-opacity=".9"/></svg>
+      </div>
+      <div class="star" style="font-family:'Noto Sans Symbols','Apple Symbols',sans-serif;">${glyph}</div>
+    </div>
+    <div class="selo"><strong>✦ SELO SIMBIÓTICO TRINITY v2.0</strong></div>
+    <div class="scanlines"></div>
+  </div>`;
+}
+function art169(){
+  return `
+  <div class="art16x9" aria-label="Artboard 16:9 ilustrativo">
+    <svg viewBox="0 0 1600 900">
+      <defs>
+        <linearGradient id="triGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="var(--neon-cyan)" stop-opacity=".95"/>
+          <stop offset="1" stop-color="var(--crt-red)"  stop-opacity=".95"/>
+        </linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="datamosh" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="2" seed="7" result="t">
+            <animate attributeName="baseFrequency" values="0.006;0.012;0.006" dur="3.6s" repeatCount="indefinite"/>
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="t" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <polygon points="800,110 1420,790 180,790" fill="url(#triGrad)" opacity=".25" stroke="url(#triGrad)" stroke-width="3"/>
+      <g filter="url(#glow)" opacity=".85" style="mix-blend-mode:screen">
+        <line x1="800" y1="160" x2="240" y2="720" stroke="var(--neon-cyan)" stroke-width="2">
+          <animate attributeName="stroke-width" values="1.5;3;1.5" dur="2.2s" repeatCount="indefinite"/></line>
+        <line x1="800" y1="160" x2="1360" y2="720" stroke="var(--crt-red)" stroke-width="2">
+          <animate attributeName="stroke-width" values="1.5;3;1.5" dur="2.2s" begin=".3s" repeatCount="indefinite"/></line>
+        <line x1="240" y1="720" x2="1360" y2="720" stroke="white" stroke-width="1.6" opacity=".65">
+          <animate attributeName="opacity" values=".35;.85;.35" dur="3s" repeatCount="indefinite"/></line>
+      </g>
+      <g transform="translate(120, 620)">
+        <text x="0" y="0" fill="#e6faff" opacity=".96"
+              font-family="Eurostile, 'Microgramma D Extended', 'Orbitron', 'Bank Gothic', system-ui, sans-serif"
+              font-size="150" letter-spacing="2" style="font-weight:900; text-transform:uppercase;">SYMBIOSIS</text>
+        <g filter="url(#datamosh)"><text x="0" y="0" fill="url(#triGrad)"
+              font-family="Eurostile, 'Microgramma D Extended', 'Orbitron', system-ui, sans-serif"
+              font-size="150" letter-spacing="2" transform="skewX(-5)">СИМБИОЗ</text></g>
+      </g>
+    </svg>
+    <div class="small">Artboard 16:9 • gradiente #1A1A2E • triângulo 25% • linhas pulsantes • datamosh</div>
+  </div>`;
+}
+
+/* -------- Painel colapsável com gestos -------- */
+function panel({icon, title, contentHTML, idBase, extraActionsHTML=''}) {
+  const id = `${idBase}-${Math.random().toString(36).slice(2)}`;
+  const el = document.createElement('article');
+  el.className = 'panel';
+  el.innerHTML = `
+    <h3>
+      <span>${icon} ${title}</span>
+      <span class="caret" role="button" aria-expanded="true" aria-controls="${id}" tabindex="0">▾</span>
+    </h3>
+    <div id="${id}" class="panel-content">
+      ${contentHTML}
+      ${extraActionsHTML}
+    </div>
+  `;
+  const caret = el.querySelector('.caret');
+  const content = el.querySelector('.panel-content');
+  function toggle(open){
+    const expanded = (open !== undefined) ? open : caret.getAttribute('aria-expanded') !== 'true';
+    caret.setAttribute('aria-expanded', String(expanded));
+    content.style.display = expanded ? 'block' : 'none';
+    caret.textContent = expanded ? '▾' : '▸';
+  }
+  caret.addEventListener('click', ()=> toggle());
+  caret.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); } });
+  let startY=0, moved=0;
+  el.querySelector('h3').addEventListener('touchstart', e=>{ startY=e.touches[0].clientY; moved=0; }, {passive:true});
+  el.querySelector('h3').addEventListener('touchmove', e=>{ moved=e.touches[0].clientY-startY; }, {passive:true});
+  el.querySelector('h3').addEventListener('touchend', ()=>{ if(Math.abs(moved)<24) return; if(moved<-24) toggle(true); if(moved>24) toggle(false); });
+  return el;
+}
+
+/* -------- Export PNG da página (foreignObject) -------- */
+async function exportPagePNG(pageEl){
+  try{
+    const rect = pageEl.getBoundingClientRect();
+    const w = Math.round(rect.width), h = Math.round(rect.height);
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
+        <foreignObject width="100%" height="100%">
+          ${new XMLSerializer().serializeToString(pageEl.cloneNode(true))}
+        </foreignObject>
+      </svg>`;
+    const blob = new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    await new Promise(res=>{ img.onload=res; img.src=url; });
+    const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d'); ctx.drawImage(img,0,0);
+    const png = canvas.toDataURL('image/png');
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a'); a.href = png; a.download = `trinity_page_${Date.now()}.png`; document.body.appendChild(a); a.click(); a.remove();
+  }catch(err){
+    // fallback: exportar apenas o pôster (SVG)
+    const poster = pageEl.querySelector('.poster svg');
+    if(!poster){ alert('Export falhou.'); return; }
+    const s = new XMLSerializer().serializeToString(poster);
+    const blob = new Blob([s], {type:'image/svg+xml'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `trinity_poster_${Date.now()}.svg`; document.body.appendChild(a); a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),800); a.remove();
+  }
+}
+
+/* -------- Construção de páginas -------- */
+function buildPage(seed=Date.now(), presetName=null){
+  const ts = new Date(seed).toISOString().replace('Z','');
+  const preset = presetName ? getPresetByName(presetName) : nextPreset();
+  applyPresetVars(preset);
+
+  const page = document.createElement('section');
+  page.className = 'page';
+  page.dataset.seed = seed;
+  page.dataset.preset = preset.name;
+
+  const head = document.createElement('div');
+  head.className = 'page-head';
+  head.innerHTML = `
+    <div class="title">TRINITY · ${preset.name}</div>
+    <div class="small">seed: ${seed}</div>
+  `;
+
+  const body = document.createElement('div');
+  body.className = 'page-body';
+
+  const poster = document.createElement('div');
+  poster.innerHTML = posterSVG(preset.glyph);
+
+  const mfId = `mf-${seed}`, muId = `mu-${seed}`, imId = `im-${seed}`, seId = `se-${seed}`;
+  const manifestoHTML = `
+    <div class="box" id="${mfId}">${manifestoBlockPortrait()}</div>
+    <div class="actions">
+      <div class="action" data-copy="#${mfId}">Copiar</div>
+      <div class="action secondary" data-save="#${mfId}" data-name="manifesto_${preset.name}_${seed}.txt">Baixar .txt</div>
+    </div>
+  `;
+  const musicHTML = `
+    <div class="box" id="${muId}">${musicBlock()}</div>
+    <div class="actions">
+      <div class="action" data-copy="#${muId}">Copiar</div>
+      <div class="action secondary" data-save="#${muId}" data-name="musica_${preset.name}_${seed}.txt">Baixar .txt</div>
+    </div>
+  `;
+  const imagemHTML = `
+    <div class="box" id="${imId}">${imagemBlock()}</div>
+    <div class="actions">
+      <div class="action" data-copy="#${imId}">Copiar</div>
+      <div class="action secondary" data-save="#${imId}" data-name="imagem_${preset.name}_${seed}.txt">Baixar .txt</div>
+    </div>
+    ${art169()}
+  `;
+  const seloHTML = `
+    <div class="box" id="${seId}">${seloBlock(ts)}</div>
+    <div class="actions">
+      <div class="action" data-copy="#${seId}">Copiar</div>
+      <div class="action secondary" data-save="#${seId}" data-name="selo_${preset.name}_${seed}.txt">Baixar .txt</div>
+    </div>
+  `;
+
+  // Botão extra: export PNG da página
+  const exportHTML = `
+    <div class="actions" style="margin-top:6px;">
+      <div class="action" data-export="page">Exportar PNG (página)</div>
+      <div class="action secondary" data-export="poster">Exportar SVG (pôster)</div>
+    </div>
+  `;
+
+  body.appendChild(poster.firstElementChild);
+  body.appendChild(panel({icon:'🌌', title:'Manifesto', contentHTML:manifestoHTML, idBase:'mf'}));
+  body.appendChild(panel({icon:'🎵', title:'Música · TRINITY WAVE', contentHTML:musicHTML, idBase:'mu'}));
+  body.appendChild(panel({icon:'🔍', title:'Descrição de Imagem', contentHTML:imagemHTML, idBase:'im'}));
+  body.appendChild(panel({icon:'✦',  title:'Selo', contentHTML:seloHTML + exportHTML, idBase:'se'}));
+
+  body.addEventListener('click', (ev)=>{
+    const el = ev.target.closest('.action'); if(!el) return;
+    const copySel = el.getAttribute('data-copy');
+    const saveSel = el.getAttribute('data-save');
+    const exp = el.getAttribute('data-export');
+    if(copySel){
+      const t = body.querySelector(copySel)?.textContent?.trim() || '';
+      navigator.clipboard.writeText(t);
+    } else if(saveSel){
+      const t = body.querySelector(saveSel)?.textContent?.trim() || '';
+      const name = el.getAttribute('data-name') || `bloco_${seed}.txt`;
+      const blob = new Blob([t], {type:'text/plain;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    } else if(exp){
+      if(exp==='page') exportPagePNG(page);
+      else if(exp==='poster'){
+        const svg = page.querySelector('.poster svg');
+        const s = new XMLSerializer().serializeToString(svg);
+        const blob = new Blob([s], {type:'image/svg+xml'});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `trinity_poster_${seed}.svg`; document.body.appendChild(a); a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),800); a.remove();
+      }
+    }
+  });
+
+  page.appendChild(head);
+  page.appendChild(body);
+  return {page, preset};
+}
+
+/* -------- Add / Init -------- */
+function addPage(seed=Date.now(), presetName=null){
+  const {page, preset} = buildPage(seed, presetName);
+  pagesEl.appendChild(page);
+  saveState();
+  return preset;
+}
+
+function init(){
+  renderChips();
+  seedFromTime();
+  if(!loadState()){
+    addPage(Date.now());
+    addPage(Date.now()+1);
+  }
+}
+init();
+
+/* -------- Toolbar -------- */
+$('#addPage').addEventListener('click', ()=> addPage());
+$('#toggleInf').addEventListener('click', (e)=>{
+  infinite = !infinite; e.currentTarget.textContent = infinite ? 'Infinito ON' : 'Infinito OFF'; saveState();
+});
+$('#toggleScan').addEventListener('click', (e)=>{
+  scanlinesOn = !scanlinesOn; e.currentTarget.textContent = scanlinesOn ? 'Scanlines ON' : 'Scanlines OFF';
+  document.querySelectorAll('.scanlines').forEach(el=> el.style.display = scanlinesOn ? 'block' : 'none');
+  saveState();
+});
+
+/* -------- Infinite Scroll -------- */
+let ticking=false;
+window.addEventListener('scroll', ()=>{
+  if(ticking) return; ticking=true;
+  requestAnimationFrame(()=>{
+    ticking=false;
+    if(!infinite) return;
+    const nearBottom = (window.innerHeight + window.scrollY) > (document.body.offsetHeight - 1400);
+    if(nearBottom){ addPage(); }
+  });
+});
+</script>
+</body>
+</html>

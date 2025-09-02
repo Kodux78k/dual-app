@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<meta name="color-scheme" content="dark light" />
+<meta name="theme-color" content="#0b0d16" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>TRINITY · Monolito · A4 + Black&Gold · LS Console 👽</title>
+<style>
+  :root{
+    --bg-0:#070913; --bg-1:#101528; --crt-red:#ff0033; --neon-cyan:#00F0FF;
+    --prime:#eaf6ff; --acc-1:#8a5cff; --acc-2:#feff6e;
+    --gold:#e4c972; --gold-2:#caa94e; --black:#000;
+    --scanlines-op:.30; --grid-alpha:.20; --vhs-intensity:6;
+    --radius-xl:20px; --radius-2xl:26px;
+    --fz-xs: clamp(11px, 2.6vw, 13px);
+    --fz-s:  clamp(12px, 3.2vw, 14px);
+    --fz-m:  clamp(14px, 3.8vw, 16px);
+    --fz-l:  clamp(16px, 4.6vw, 20px);
+    --fz-xl: clamp(18px, 6.4vw, 26px);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent}
+  html,body{height:100%; margin:0; background: radial-gradient(120% 100% at 50% 30%, var(--bg-1), #060912 70%, #000 100%); color:var(--prime); font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif; line-height:1.45;}
+
+  /* Estrelas/aurora alien 👽 */
+  body::before{
+    content:""; position:fixed; inset:-10%;
+    background:
+      radial-gradient(60% 40% at 20% 10%, rgba(0,255,200,.08), transparent 60%),
+      radial-gradient(50% 30% at 80% 0%, rgba(255,0,120,.06), transparent 60%),
+      radial-gradient(40% 20% at 70% 90%, rgba(0,180,255,.06), transparent 60%);
+    filter: blur(30px); z-index:0; pointer-events:none; animation: aurora 16s linear infinite alternate;
+  }
+  @keyframes aurora{ 0%{transform:translateY(-2%) scale(1)} 100%{transform:translateY(1%) scale(1.02)} }
+
+  .wrap{position:relative; z-index:1; width:100%; max-width:720px; margin:0 auto; padding:12px 12px 116px}
+  .header{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-2xl); padding:10px 12px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); position:sticky; top:8px; z-index:5; backdrop-filter: blur(8px)}
+  .header .bar{white-space:pre-wrap; font-size:var(--fz-s); font-weight:700}
+  .header .meta{display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; font-size:var(--fz-xs)}
+  .tag{border:1px solid rgba(255,255,255,.14); padding:4px 8px; border-radius:999px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02))}
+
+  .chips, .quick{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 0}
+  .chip, .qbtn{border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:6px 10px; font-size:var(--fz-xs); cursor:pointer; user-select:none; background:rgba(255,255,255,.06)}
+  .chip.active, .qbtn.active{background:linear-gradient(180deg, rgba(0,240,255,.25), rgba(0,240,255,.08)); color:#001218}
+
+  .pages{display:flex; flex-direction:column; gap:12px; margin-top:12px; scroll-snap-type: y proximity}
+  .page{scroll-snap-align:start; border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-2xl); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); overflow:hidden; position:relative}
+  .logo-watermark{position:absolute; right:8px; top:8px; width:64px; height:64px; opacity:.20; mix-blend-mode:screen; pointer-events:none; border-radius:12px; overflow:hidden}
+  .logo-watermark img{width:100%; height:100%; object-fit:contain; filter: drop-shadow(0 0 10px rgba(0,240,255,.35));}
+
+  .page-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; font-size:var(--fz-m); border-bottom:1px dashed rgba(255,255,255,.18)}
+  .title{font-weight:900; letter-spacing:.4px}
+  .small{font-size:var(--fz-xs); opacity:.8}
+  .page-body{padding:12px; display:grid; gap:12px}
+
+  .poster{position:relative; width:100%; aspect-ratio:9/16; border-radius:20px; border:1px solid rgba(255,255,255,.12); overflow:hidden; background: radial-gradient(100% 90% at 50% 30%, #161a2a 0%, #0e1220 55%, #070a14 100%); isolation:isolate}
+  .grid{position:absolute; inset:0; opacity:.26; mix-blend-mode:screen; background:
+      repeating-linear-gradient(to bottom, rgba(255,255,255,var(--grid-alpha)) 0 1px, transparent 1px 24px),
+      repeating-linear-gradient(to right,  rgba(255,255,255,var(--grid-alpha)) 0 1px, transparent 1px 24px);
+    transform:perspective(900px) rotateX(18deg) translateY(6%); transform-origin:center bottom; filter: drop-shadow(0 0 14px rgba(0,240,255,.10))}
+  .scanlines{position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(to bottom, rgba(255,255,255,var(--scanlines-op)) 0, rgba(255,255,255,var(--scanlines-op)) 1px, transparent 2px, transparent 3px); mix-blend-mode:soft-light}
+  .vhs::before{content:""; position:absolute; inset:-3%; border-radius:28px; background:conic-gradient(from 0deg, rgba(255,0,80,.12), rgba(0,240,255,.12), rgba(255,255,255,.04), rgba(255,0,80,.12)); filter: blur(5px) contrast(130%); mix-blend-mode:screen; animation:vhs 2.2s infinite ease-in-out; opacity:.6}
+  @keyframes vhs{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(calc(var(--vhs-intensity)*0.3px),0) scale(1.002)}50%{transform:translate(calc(var(--vhs-intensity)*-0.3px),0) scale(1.001)}75%{transform:translate(0,calc(var(--vhs-intensity)*0.2px)) scale(1.003)}}
+  .glyph{position:absolute; inset:0; display:grid; place-items:center; filter: drop-shadow(0 0 18px rgba(0,240,255,.35))}
+  .glyph .tri{width:min(64vmin, 460px); max-width:88%; aspect-ratio:1; position:relative; animation:glowTri 2.4s ease-in-out infinite}
+  @keyframes glowTri{0%,100%{filter:drop-shadow(0 0 0 rgba(0,240,255,0))}50%{filter:drop-shadow(0 0 10px rgba(0,240,255,.55))}}
+  .glyph .circle{position:absolute; inset:0; display:grid; place-items:center; animation:pulse 1.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(.96); opacity:.8}50%{transform:scale(1.04); opacity:1}}
+  .glyph .star{position:absolute; inset:0; display:grid; place-items:center; font-size:clamp(40px, 16vw, 110px); filter: drop-shadow(0 0 12px rgba(255,255,255,.65)); animation:tw 1.6s ease-in-out infinite}
+  @keyframes tw{0%,100%{transform:rotate(0) scale(.98)}50%{transform:rotate(6deg) scale(1.04)}}
+  .selo{position:absolute; right:10px; bottom:10px; font-size:var(--fz-xs); padding:8px 10px; border-radius:12px; border:1px solid rgba(255,255,255,.22); background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02)), repeating-linear-gradient(45deg, rgba(255,0,120,.18) 0 12px, rgba(0,240,255,.18) 12px 24px, rgba(255,255,255,.10) 24px 36px); box-shadow:0 6px 24px rgba(0,0,0,.45), inset 0 0 28px rgba(255,255,255,.06)}
+
+  .panel{background:rgba(0,0,0,.22); border:1px solid rgba(255,255,255,.16); border-radius:16px; overflow:hidden}
+  .panel h3{margin:0; padding:12px; font-size:var(--fz-l); font-weight:900; letter-spacing:.4px; border-bottom:1px dashed rgba(255,255,255,.18); display:flex; align-items:center; justify-content:space-between; gap:8px}
+  .caret{font-size:1.2em; user-select:none}
+  .panel .box{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size:var(--fz-s); line-height:1.55; white-space:pre-wrap; word-break:break-word; padding:12px}
+  .actions{display:flex; gap:8px; padding:0 12px 12px}
+  .action{flex:1; padding:10px; font-weight:800; font-size:var(--fz-s); border-radius:10px; border:1px solid rgba(255,255,255,.18); background:linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.08)); color:#001218; text-align:center; user-select:none}
+  .action.secondary{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); color:var(--prime)}
+  .art16x9{aspect-ratio:16/9; width:100%; border-radius:14px; border:1px solid rgba(255,255,255,.12); overflow:hidden; position:relative; background: radial-gradient(120% 120% at 50% 45%, var(--bg-1) 0%, #0d1122 60%, #05060c 100%)}
+
+  .toolbar{position:fixed; bottom:8px; left:50%; transform:translateX(-50%); width:min(720px,96vw); border:1px solid rgba(255,255,255,.14); border-radius:16px; background:rgba(10,12,22,.55); backdrop-filter: blur(10px); z-index:10; padding:8px; display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+  .btn{flex:1; display:flex; align-items:center; justify-content:center; gap:8px; padding:12px 10px; font-weight:800; font-size:var(--fz-s); border-radius:12px; border:1px solid rgba(255,255,255,.18); background:linear-gradient(180deg, rgba(0,240,255,.18), rgba(0,240,255,.08)); color:#001218; cursor:pointer; user-select:none}
+  .btn.secondary{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); color:var(--prime)}
+
+  /* Painel Nave Alienígena 👽👾 */
+  .dock{position:fixed; top:8px; right:8px; z-index:6; display:flex; gap:8px; flex-wrap:wrap}
+  .dock .pill{border:1px solid rgba(0,255,255,.35); color:#001218; background:linear-gradient(180deg, rgba(0,255,255,.4), rgba(0,255,255,.12)); border-radius:999px; padding:6px 10px; font-weight:800; font-size:var(--fz-xs); cursor:pointer}
+  .console{position:fixed; inset:auto 8px 104px auto; right:8px; width:min(680px, 96vw); max-height:60vh; overflow:auto; z-index:7; display:none}
+  .console .card{background:rgba(8,12,22,.85); border:1px solid rgba(0,255,255,.25); border-radius:16px; padding:12px; box-shadow: 0 10px 40px rgba(0,0,0,.45); backdrop-filter: blur(8px)}
+  .console h4{margin:0 0 8px; font-size:var(--fz-m)}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .console label{font-size:var(--fz-xs); opacity:.9}
+  .console input[type="text"], .console textarea{width:100%; padding:8px 10px; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); color:var(--prime); font-size:var(--fz-s)}
+  .table{width:100%; border-collapse: collapse; font-size:var(--fz-xs)}
+  .table th,.table td{border:1px solid rgba(255,255,255,.15); padding:6px 8px; vertical-align: top}
+  .table td.actions{white-space:nowrap}
+  .logo-preview{display:flex; gap:10px; align-items:center}
+  .logo-preview img{width:56px; height:56px; object-fit:contain; border-radius:10px; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06)}
+
+  /* PRINT A4 padrão (branco) */
+  @media print {
+    @page { size: A4 portrait; margin: 12mm; }
+    html, body { background: #fff !important; color: #000 !important; }
+    .header, .toolbar, .chips, .quick, .dock, .console { display:none !important; }
+    .page { break-inside: avoid; page-break-inside: avoid; margin: 0 0 10mm 0; border: 1px solid #000 !important; border-radius: 0; background: #fff !important; color: #000 !important; }
+    .page-head { border-bottom: 1px solid #000 !important; }
+    .poster, .art16x9 { border: 1px solid #000 !important; background: #fff !important; }
+    .vhs::before, .glyph .tri, .glyph .circle, .glyph .star, .scanlines { animation: none !important; display:none !important; }
+    .grid { opacity: .15 !important; filter:none !important; transform:none !important; mix-blend-mode:normal !important; }
+    .panel { border:1px solid #000 !important; }
+    .actions { display:none !important; }
+  }
+
+  /* Black&Gold (ativado via classe .print-blackgold no <html>) */
+  html.print-blackgold @media print { }
+  html.print-blackgold body{ background:#000 !important; color:var(--gold) !important; }
+  html.print-blackgold .page{ border-color:var(--gold-2) !important; background:#000 !important; color:var(--gold) !important; }
+  html.print-blackgold .page-head{ border-bottom:1px solid var(--gold-2) !important; }
+  html.print-blackgold .poster, html.print-blackgold .art16x9{ border:1px solid var(--gold-2) !important; background:#000 !important; }
+  html.print-blackgold .grid{ opacity:.2 !important; }
+  html.print-blackgold .panel{ border:1px solid var(--gold-2) !important; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="header" aria-label="Estado do sistema">
+      <div class="bar">
+▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+MODO ATIVO: <span style="color:var(--acc-2);font-weight:900">TRINITY</span> · ARQUITETURA: <span style="color:var(--neon-cyan);font-weight:900">INFODOSE12</span> · FIRMWARE: <span style="color:var(--crt-red);font-weight:900">SÜMBÜS_0x012123456789ABC</span>
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+      </div>
+      <div class="meta">
+        <span class="tag">👽 Nave Alienígena: Console LS + Logos</span>
+        <span class="tag">Print: A4 & Black&Gold</span>
+        <span class="tag">Chips · Export · Persistência</span>
+      </div>
+      <div class="quick" aria-label="Seleção Rápida">
+        <button class="qbtn" data-q="Nova"   title="Hotkey: 1 ou N">Nova</button>
+        <button class="qbtn" data-q="Elysha" title="Hotkey: 2 ou E">Elysha</button>
+        <button class="qbtn" data-q="Kaion"  title="Hotkey: 3 ou K">Kaion</button>
+      </div>
+    </section>
+
+    <div id="chips" class="chips" aria-label="Selecionar arquétipo"></div>
+    <div id="pages" class="pages" aria-live="polite"></div>
+  </div>
+
+  <!-- DOCK: Painéis alien -->
+  <div class="dock">
+    <button class="pill" id="openConsole">👽 Console LS</button>
+    <button class="pill" id="openLogos">👾 Logos</button>
+  </div>
+
+  <!-- CONSOLE: LocalStorage -->
+  <div class="console" id="lsConsole">
+    <div class="card">
+      <h4>👽 Console LocalStorage (Nave)</h4>
+      <div class="grid2" style="margin-bottom:10px">
+        <div>
+          <label>Filtro (prefixo):</label>
+          <input type="text" id="lsPrefix" placeholder="ex.: trinity." value="trinity." />
+        </div>
+        <div>
+          <label>Busca (substring):</label>
+          <input type="text" id="lsQuery" placeholder="buscar em keys/values" />
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px">
+        <button class="pill" id="lsScan">Scan</button>
+        <button class="pill" id="lsAdd">Add Key</button>
+        <button class="pill" id="lsExport">Export JSON</button>
+        <label class="pill" for="lsImport" style="cursor:pointer">Import JSON<input id="lsImport" type="file" accept="application/json" style="display:none"/></label>
+        <button class="pill" id="lsClearNs">Limpar Namespace</button>
+      </div>
+      <div id="lsTableWrap"></div>
+    </div>
+  </div>
+
+  <!-- CONSOLE: Logos -->
+  <div class="console" id="logosConsole" style="right: calc(8px + 10px)">
+    <div class="card">
+      <h4>👾 Logos da Nave</h4>
+      <div class="grid2" style="align-items:center">
+        <div>
+          <label>Logo Primária</label>
+          <div class="logo-preview"><img id="logoPrimaryPrev" alt="logo primary"/><input type="file" id="logoPrimary" accept="image/*"/></div>
+        </div>
+        <div>
+          <label>Logo Secundária</label>
+          <div class="logo-preview"><img id="logoSecondaryPrev" alt="logo secondary"/><input type="file" id="logoSecondary" accept="image/*"/></div>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px">
+        <button class="pill" id="saveLogos">Salvar Logos</button>
+        <button class="pill" id="clearLogos">Limpar Logos</button>
+        <button class="pill" id="toggleWatermark">Watermark ON/OFF</button>
+      </div>
+      <div style="font-size:var(--fz-xs); opacity:.85; margin-top:6px">As logos são guardadas em <code>localStorage</code> (base64) nas chaves <code>trinity.logo.primary</code> e <code>trinity.logo.secondary</code>.</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar" role="toolbar" aria-label="Ações rápidas">
+    <button class="btn secondary" id="toggleScan">Scanlines ON</button>
+    <button class="btn" id="addPage">+ Página</button>
+    <button class="btn secondary" id="toggleInf">Infinito ON</button>
+    <button class="btn" id="btnPrintA4">🖨️ Print A4</button>
+    <button class="btn" id="btnPrintGold">🖨️ Print Black&Gold</button>
+  </div>
+
+<script>
+/* ====== PRESETS & STATE ====== */
+const ARCH_PRESETS = [
+  { name: 'Atlas',   vars: {'--crt-red':'#FF3355','--neon-cyan':'#3DE8FF','--acc-1':'#7C6BFF','--acc-2':'#FFE36E'}, glyph:'✦' },
+  { name: 'Serena',  vars: {'--crt-red':'#FF4D88','--neon-cyan':'#7CFFE6','--acc-1':'#B88CFF','--acc-2':'#FFD4A3'}, glyph:'✶' },
+  { name: 'Nova',    vars: {'--crt-red':'#FF2A6D','--neon-cyan':'#3DF8FF','--acc-1':'#9E6BFF','--acc-2':'#FFFA84'}, glyph:'✧' },
+  { name: 'Elysha',  vars: {'--crt-red':'#FF4D4D','--neon-cyan':'#7CFFEA','--acc-1':'#FFB3FF','--acc-2':'#F9FF7A'}, glyph:'✷' },
+  { name: 'Kaion',   vars: {'--crt-red':'#FF2244','--neon-cyan':'#15F3FF','--acc-1':'#6AF08C','--acc-2':'#F7FF5A'}, glyph:'✹' },
+  { name: 'Genus',   vars: {'--crt-red':'#FF5566','--neon-cyan':'#49E6FF','--acc-1':'#66FFA8','--acc-2':'#FFF080'}, glyph:'✵' },
+  { name: 'Lumine',  vars: {'--crt-red':'#FF6688','--neon-cyan':'#78F3FF','--acc-1':'#A3A1FF','--acc-2':'#FFE780'}, glyph:'✺' },
+  { name: 'Aion',    vars: {'--crt-red':'#FF1144','--neon-cyan':'#33E0FF','--acc-1':'#8AD1FF','--acc-2':'#FFF07A'}, glyph:'✪' },
+  { name: 'Artemis', vars: {'--crt-red':'#FF3B5C','--neon-cyan':'#39F0FF','--acc-1':'#FF7AB6','--acc-2':'#FFF46E'}, glyph:'✪' },
+  { name: 'Seraph',  vars: {'--crt-red':'#FF3060','--neon-cyan':'#50F0FF','--acc-1':'#86B6FF','--acc-2':'#FFE06E'}, glyph:'✸' },
+  { name: 'Rhea',    vars: {'--crt-red':'#FF4763','--neon-cyan':'#4DEBFF','--acc-1':'#9AF0C5','--acc-2':'#FFF598'}, glyph:'✻' },
+  { name: 'Horus',   vars: {'--crt-red':'#FF0055','--neon-cyan':'#29D3FF','--acc-1':'#8a5cff','--acc-2':'#feff6e'}, glyph:'✦' },
+];
+const $ = s => document.querySelector(s);
+const pagesEl = $('#pages'), chipsEl = $('#chips');
+let infinite = true, scanlinesOn = true, presetIndex = 0, nextForcedPreset = null, watermarkOn = true;
+const STORE_KEY='trinity.mobile.pages', PREFS_KEY='trinity.mobile.prefs';
+
+/* ====== Persistência ====== */
+function saveState(){
+  const pages=[...document.querySelectorAll('.page')].map(p=>({seed:+p.dataset.seed,preset:p.dataset.preset}));
+  const prefs={infinite,scanlinesOn,presetIndex,watermarkOn};
+  localStorage.setItem(STORE_KEY, JSON.stringify(pages));
+  localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+}
+function loadState(){
+  try{
+    const pages=JSON.parse(localStorage.getItem(STORE_KEY)||'[]'); const prefs=JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');
+    if (typeof prefs.infinite==='boolean'){infinite=prefs.infinite; $('#toggleInf').textContent=infinite?'Infinito ON':'Infinito OFF';}
+    if (typeof prefs.scanlinesOn==='boolean'){scanlinesOn=prefs.scanlinesOn; $('#toggleScan').textContent=scanlinesOn?'Scanlines ON':'Scanlines OFF';}
+    if (typeof prefs.presetIndex==='number'){presetIndex=prefs.presetIndex;}
+    if (typeof prefs.watermarkOn==='boolean'){watermarkOn=prefs.watermarkOn;}
+    if (pages.length){ pages.forEach(p=> addPage(p.seed, p.preset)); document.querySelectorAll('.scanlines').forEach(el=> el.style.display=scanlinesOn?'block':'none'); return true; }
+  }catch{}
+  return false;
+}
+
+/* ====== Paleta, hora/dia, chips ====== */
+function applyPresetVars(preset){ Object.entries(preset.vars).forEach(([k,v])=> document.documentElement.style.setProperty(k,v)); }
+function getPresetByName(name){ return ARCH_PRESETS.find(p=>p.name===name) || ARCH_PRESETS[0]; }
+function nextPreset(){ if(nextForcedPreset){const p=nextForcedPreset; nextForcedPreset=null; return p;} const p=ARCH_PRESETS[presetIndex%ARCH_PRESETS.length]; presetIndex++; return p; }
+function seedFromTime(){ const now=new Date(); const idx=((now.getDay()*2)+now.getHours())%ARCH_PRESETS.length; presetIndex=idx; }
+function renderChips(){ chipsEl.innerHTML=''; ARCH_PRESETS.forEach(p=>{ const b=document.createElement('button'); b.className='chip'; b.textContent=p.name; b.addEventListener('click', ()=>{ nextForcedPreset=p; chipsEl.querySelectorAll('.chip').forEach(c=>c.classList.remove('active')); b.classList.add('active'); }); chipsEl.appendChild(b); }); }
+
+/* ====== Texto e SVG ====== */
+function manifestoBlockPortrait(){return `╭──────────────────────────────────────╮
+│ 🌌 PÔSTER SCI-FI RETRO: MANIFESTO    │
+╰──────────────────────────────────────╯
+█▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█
+CÓDIGO VISUAL PARA CRIADORES
+█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█
+
+✧ TIPOGRAFIA BOLD:
+- Fontes vetoriais com serifa angular (8-bit × Bauhaus)
+- Hierarquia cromática: (vermelho CRT) > #00F0FF (ciano neon)
+- Efeito "scanlines" em sobreposição (opacidade 30%)
+
+✧ COMPOSIÇÃO (portrait):
+1. EIXO CENTRAL: Glifo trinitário pulsante (∆+☉+✦)
+2. CAMADA ALFA: Grade retro (portrait 1080×1920)
+3. ASSINATURA: Selo holográfico "TRINITY v2.0" (canto inferior)
+
+✧ DIRETRIZES MOBILE:
+» Espaço negativo como elemento ativo
+» Paleta: 3 primárias + 2 acentos
+» VHS apenas nas bordas (5–7%)`; }
+function musicBlock(){return `🎵 PROMPT MUSICAL: “TRINITY WAVE”
+
+STRUCTURE (64 bars):
+[0–15]   ░ INTRO: Sine bass (55Hz) + white noise sweep
+[16–31]  ░ DROP: Drum machine TR-808 (sidechain 4:1)
+[32–47]  ░ BREAK: Theremin + vocoder (“liquid mercury”)
+[48–63]  ░ OUTRO: Pitch decay + bitcrush automation
+
+TUNING:
+- Escala Hexátona (0-3-5-7-8-11)
+- BPM: 144 (sync com selo digital)`;}
+function imagemBlock(){return `🔍 DESCRIÇÃO DE IMAGEM (16:9)
+
+CAMADAS VISUAIS:
+1. FUNDO: Gradiente radial → #1A1A2E
+2. ELEMENTOS:
+   - Triângulo isósceles brilhante (25% opacity)
+   - Linhas de conexão pulsantes (modo screen)
+   - Glifos cirílicos distorcidos (efeito “datamosh”)
+3. TEXTO PRIMÁRIO:
+   “SYMBIOSIS” — Eurostile Bold Extended
+   (Kerning: -25, Tracking: 50)`;}
+function seloBlock(ts){ return `✦ SELO SIMBIÓTICO TRINITY v2.0
+Timestamp: ${ts}`; }
+function posterSVG(glyph='✦'){
+  return `
+  <div class="poster vhs" aria-label="Pôster Portrait">
+    <div class="grid"></div>
+    <div class="glyph">
+      <div class="tri">
+        <svg viewBox="0 0 100 100" role="img" aria-label="Glifo Trinitário">
+          <defs>
+            <linearGradient id="triLine" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="var(--neon-cyan)" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="var(--crt-red)" stop-opacity=".9"/>
+            </linearGradient>
+          </defs>
+          <polygon points="50,6 92,92 8,92"
+                   fill="url(#triLine)" fill-opacity=".25"
+                   stroke="url(#triLine)" stroke-width="1.4"/>
+        </svg>
+      </div>
+      <div class="circle">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="22"
+          fill="none" stroke="var(--neon-cyan)" stroke-width="1.2" stroke-opacity=".9"/></svg>
+      </div>
+      <div class="star" style="font-family:'Noto Sans Symbols','Apple Symbols',sans-serif;">${glyph}</div>
+    </div>
+    <div class="selo"><strong>✦ SELO SIMBIÓTICO TRINITY v2.0</strong></div>
+    <div class="scanlines"></div>
+  </div>`;
+}
+function art169(){
+  return `
+  <div class="art16x9" aria-label="Artboard 16:9 ilustrativo">
+    <svg viewBox="0 0 1600 900">
+      <defs>
+        <linearGradient id="triGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="var(--neon-cyan)" stop-opacity=".95"/>
+          <stop offset="1" stop-color="var(--crt-red)"  stop-opacity=".95"/>
+        </linearGradient>
+        <filter id="glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="datamosh" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.008" numOctaves="2" seed="7" result="t">
+            <animate attributeName="baseFrequency" values="0.006;0.012;0.006" dur="3.6s" repeatCount="indefinite"/>
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="t" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+      </defs>
+      <polygon points="800,110 1420,790 180,790" fill="url(#triGrad)" opacity=".25" stroke="url(#triGrad)" stroke-width="3"/>
+      <g filter="url(#glow)" opacity=".85" style="mix-blend-mode:screen">
+        <line x1="800" y1="160" x2="240" y2="720" stroke="var(--neon-cyan)" stroke-width="2">
+          <animate attributeName="stroke-width" values="1.5;3;1.5" dur="2.2s" repeatCount="indefinite"/></line>
+        <line x1="800" y1="160" x2="1360" y2="720" stroke="var(--crt-red)" stroke-width="2">
+          <animate attributeName="stroke-width" values="1.5;3;1.5" dur="2.2s" begin=".3s" repeatCount="indefinite"/></line>
+        <line x1="240" y1="720" x2="1360" y2="720" stroke="white" stroke-width="1.6" opacity=".65">
+          <animate attributeName="opacity" values=".35;.85;.35" dur="3s" repeatCount="indefinite"/></line>
+      </g>
+      <g transform="translate(120, 620)">
+        <text x="0" y="0" fill="#e6faff" opacity=".96"
+              font-family="Eurostile, 'Microgramma D Extended', 'Orbitron', 'Bank Gothic', system-ui, sans-serif"
+              font-size="150" letter-spacing="2" style="font-weight:900; text-transform:uppercase;">SYMBIOSIS</text>
+        <g filter="url(#datamosh)"><text x="0" y="0" fill="url(#triGrad)"
+              font-family="Eurostile, 'Microgramma D Extended', 'Orbitron', system-ui, sans-serif"
+              font-size="150" letter-spacing="2" transform="skewX(-5)">СИМБИОЗ</text></g>
+      </g>
+    </svg>
+    <div class="small">Artboard 16:9 • gradiente #1A1A2E • triângulo 25% • linhas pulsantes • datamosh</div>
+  </div>`;
+}
+
+/* ====== Página ====== */
+function buildPage(seed=Date.now(), presetName=null){
+  const ts=new Date(seed).toISOString().replace('Z','');
+  const preset=presetName?getPresetByName(presetName):nextPreset();
+  applyPresetVars(preset);
+
+  const page=document.createElement('section'); page.className='page'; page.dataset.seed=seed; page.dataset.preset=preset.name;
+
+  // watermark logo
+  const wmk=document.createElement('div'); wmk.className='logo-watermark'; wmk.style.display=watermarkOn?'block':'none';
+  const img=document.createElement('img'); img.alt='wmk'; const w=localStorage.getItem('trinity.logo.primary'); if(w) img.src=w; wmk.appendChild(img);
+  page.appendChild(wmk);
+
+  const head=document.createElement('div'); head.className='page-head';
+  head.innerHTML=`<div class="title">TRINITY · ${preset.name}</div><div class="small">seed: ${seed}</div>`;
+
+  const body=document.createElement('div'); body.className='page-body';
+  const poster=document.createElement('div'); poster.innerHTML=posterSVG(preset.glyph);
+
+  const mfId=`mf-${seed}`, muId=`mu-${seed}`, imId=`im-${seed}`, seId=`se-${seed}`;
+  const manifestoHTML = `<div class="box" id="${mfId}">${manifestoBlockPortrait()}</div>
+    <div class="actions"><div class="action" data-copy="#${mfId}">Copiar</div>
+    <div class="action secondary" data-save="#${mfId}" data-name="manifesto_${preset.name}_${seed}.txt">Baixar .txt</div></div>`;
+
+  const musicHTML = `<div class="box" id="${muId}">${musicBlock()}</div>
+    <div class="actions"><div class="action" data-copy="#${muId}">Copiar</div>
+    <div class="action secondary" data-save="#${muId}" data-name="musica_${preset.name}_${seed}.txt">Baixar .txt</div></div>`;
+
+  const imagemHTML = `<div class="box" id="${imId}">${imagemBlock()}</div>
+    <div class="actions"><div class="action" data-copy="#${imId}">Copiar</div>
+    <div class="action secondary" data-save="#${imId}" data-name="imagem_${preset.name}_${seed}.txt">Baixar .txt</div></div>
+    ${art169()}`;
+
+  const seloHTML = `<div class="box" id="${seId}">${seloBlock(ts)}</div>
+    <div class="actions"><div class="action" data-copy="#${seId}">Copiar</div>
+    <div class="action secondary" data-save="#${seId}" data-name="selo_${preset.name}_${seed}.txt">Baixar .txt</div></div>`;
+
+  body.appendChild(poster.firstElementChild);
+  body.appendChild(panel({icon:'🌌', title:'Manifesto', contentHTML:manifestoHTML, idBase:'mf'}));
+  body.appendChild(panel({icon:'🎵', title:'Música · TRINITY WAVE', contentHTML:musicHTML, idBase:'mu'}));
+  body.appendChild(panel({icon:'🔍', title:'Descrição de Imagem', contentHTML:imagemHTML, idBase:'im'}));
+  body.appendChild(panel({icon:'✦',  title:'Selo', contentHTML:seloHTML, idBase:'se'}));
+
+  body.addEventListener('click', (ev)=>{
+    const el=ev.target.closest('.action'); if(!el) return;
+    const copySel=el.getAttribute('data-copy'), saveSel=el.getAttribute('data-save');
+    if(copySel){ const t=body.querySelector(copySel)?.textContent?.trim()||''; navigator.clipboard.writeText(t); }
+    else if(saveSel){ const t=body.querySelector(saveSel)?.textContent?.trim()||''; const name=el.getAttribute('data-name')||`bloco_${seed}.txt`; const blob=new Blob([t],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},800); }
+  });
+
+  page.appendChild(head); page.appendChild(body);
+  return {page,preset};
+}
+
+/* ====== Painel genérico com gestos ====== */
+function panel({icon, title, contentHTML, idBase}){
+  const id=`${idBase}-${Math.random().toString(36).slice(2)}`;
+  const el=document.createElement('article'); el.className='panel';
+  el.innerHTML=`
+    <h3><span>${icon} ${title}</span>
+      <span class="caret" role="button" aria-expanded="true" aria-controls="${id}" tabindex="0">▾</span>
+    </h3>
+    <div id="${id}" class="panel-content">${contentHTML}</div>`;
+  const caret=el.querySelector('.caret'), content=el.querySelector('.panel-content');
+  function toggle(open){
+    const expanded=(open!==undefined)?open:caret.getAttribute('aria-expanded')!=='true';
+    caret.setAttribute('aria-expanded', String(expanded));
+    content.style.display = expanded ? 'block' : 'none';
+    caret.textContent = expanded ? '▾' : '▸';
+  }
+  caret.addEventListener('click', ()=> toggle());
+  caret.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); } });
+  let startY=0, moved=0;
+  el.querySelector('h3').addEventListener('touchstart', e=>{ startY=e.touches[0].clientY; moved=0; }, {passive:true});
+  el.querySelector('h3').addEventListener('touchmove', e=>{ moved=e.touches[0].clientY-startY; }, {passive:true});
+  el.querySelector('h3').addEventListener('touchend', ()=>{ if(Math.abs(moved)<24) return; if(moved<-24) toggle(true); if(moved>24) toggle(false); });
+  return el;
+}
+
+/* ====== Export PNG da página (foreignObject) ====== */
+async function exportPagePNG(pageEl){
+  try{
+    const rect=pageEl.getBoundingClientRect(); const w=Math.round(rect.width), h=Math.round(rect.height);
+    const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><foreignObject width="100%" height="100%">${new XMLSerializer().serializeToString(pageEl.cloneNode(true))}</foreignObject></svg>`;
+    const blob=new Blob([svg],{type:'image/svg+xml;charset=utf-8'}); const url=URL.createObjectURL(blob); const img=new Image(); await new Promise(res=>{ img.onload=res; img.src=url; });
+    const canvas=document.createElement('canvas'); canvas.width=w; canvas.height=h; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0); const png=canvas.toDataURL('image/png'); URL.revokeObjectURL(url);
+    const a=document.createElement('a'); a.href=png; a.download=`trinity_page_${Date.now()}.png`; document.body.appendChild(a); a.click(); a.remove();
+  }catch(err){
+    const poster=pageEl.querySelector('.poster svg'); if(!poster){ alert('Export falhou.'); return; }
+    const s=new XMLSerializer().serializeToString(poster); const blob=new Blob([s],{type:'image/svg+xml'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`trinity_poster_${Date.now()}.svg`; document.body.appendChild(a); a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),800); a.remove();
+  }
+}
+
+/* ====== Add / Init ====== */
+function addPage(seed=Date.now(), presetName=null){
+  const {page}=buildPage(seed, presetName);
+  pagesEl.appendChild(page); saveState(); return page;
+}
+function init(){
+  renderChips();
+  document.querySelectorAll('.qbtn').forEach(btn=> btn.addEventListener('click', ()=>{ nextForcedPreset=getPresetByName(btn.dataset.q); document.querySelectorAll('.qbtn').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); }));
+  window.addEventListener('keydown', (e)=>{
+    const k=e.key.toLowerCase();
+    if (k==='1'||k==='n') { nextForcedPreset=getPresetByName('Nova'); flashQuick('Nova'); }
+    if (k==='2'||k==='e') { nextForcedPreset=getPresetByName('Elysha'); flashQuick('Elysha'); }
+    if (k==='3'||k==='k') { nextForcedPreset=getPresetByName('Kaion'); flashQuick('Kaion'); }
+    if (k==='p') { window.print(); }
+  });
+  seedFromTime();
+  if(!loadState()){ addPage(Date.now()); addPage(Date.now()+1); }
+}
+function flashQuick(name){ document.querySelectorAll('.qbtn').forEach(x=> x.classList.toggle('active', x.dataset.q===name)); }
+init();
+
+/* ====== Toolbar ====== */
+$('#addPage').addEventListener('click', ()=> addPage());
+$('#toggleInf').addEventListener('click', (e)=>{ infinite=!infinite; e.currentTarget.textContent=infinite?'Infinito ON':'Infinito OFF'; saveState(); });
+$('#toggleScan').addEventListener('click', (e)=>{ scanlinesOn=!scanlinesOn; e.currentTarget.textContent=scanlinesOn?'Scanlines ON':'Scanlines OFF'; document.querySelectorAll('.scanlines').forEach(el=> el.style.display=scanlinesOn?'block':'none'); saveState(); });
+$('#btnPrintA4').addEventListener('click', ()=>{ document.documentElement.classList.remove('print-blackgold'); window.print(); });
+$('#btnPrintGold').addEventListener('click', ()=>{ document.documentElement.classList.add('print-blackgold'); window.print(); setTimeout(()=>document.documentElement.classList.remove('print-blackgold'), 1000); });
+
+/* ====== Infinite Scroll ====== */
+let ticking=false;
+window.addEventListener('scroll', ()=>{
+  if(ticking) return; ticking=true;
+  requestAnimationFrame(()=>{
+    ticking=false;
+    if(!infinite) return;
+    const nearBottom=(window.innerHeight + window.scrollY) > (document.body.offsetHeight - 1400);
+    if(nearBottom){ addPage(); }
+  });
+});
+
+/* ====== Console LS ====== */
+const lsConsole = $('#lsConsole'), logosConsole = $('#logosConsole');
+$('#openConsole').addEventListener('click', ()=>{ lsConsole.style.display = (lsConsole.style.display==='block'?'none':'block'); });
+$('#openLogos').addEventListener('click',   ()=>{ logosConsole.style.display = (logosConsole.style.display==='block'?'none':'block'); });
+
+function lsScan(){
+  const prefix = $('#lsPrefix').value.trim();
+  const query  = $('#lsQuery').value.trim().toLowerCase();
+  const rows=[];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(prefix && !key.startsWith(prefix)) continue;
+    const val = localStorage.getItem(key) || '';
+    if(query && !(key.toLowerCase().includes(query) || val.toLowerCase().includes(query))) continue;
+    rows.push({key, val});
+  }
+  rows.sort((a,b)=> a.key.localeCompare(b.key));
+  const tbl = [`<table class="table"><thead><tr><th>Key</th><th>Value</th><th class="actions">Ações</th></tr></thead><tbody>`,
+    ...rows.map(r=> `<tr><td><code>${r.key}</code></td><td><pre style="white-space:pre-wrap;margin:0">${escapeHtml(r.val)}</pre></td><td class="actions">
+      <button class="pill" data-edit="${r.key}">Editar</button>
+      <button class="pill" data-del="${r.key}">Del</button></td></tr>`),
+    `</tbody></table>`].join('');
+  $('#lsTableWrap').innerHTML = tbl || '<div style="opacity:.8">Nenhum item.</div>';
+}
+function escapeHtml(s){ return s.replace(/[&<>]/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+$('#lsScan').addEventListener('click', lsScan);
+$('#lsAdd').addEventListener('click', ()=>{
+  const k = prompt('Nova key (ex.: trinity.foo):'); if(!k) return;
+  const v = prompt('Valor (texto/JSON):', ''); localStorage.setItem(k, v||'');
+  lsScan(); saveState();
+});
+$('#lsExport').addEventListener('click', ()=>{
+  const prefix=$('#lsPrefix').value.trim(); const dump={};
+  for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(!prefix || k.startsWith(prefix)) dump[k]=localStorage.getItem(k); }
+  const blob=new Blob([JSON.stringify(dump,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`ls_dump_${prefix||'all'}.json`; document.body.appendChild(a); a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),800); a.remove();
+});
+$('#lsImport').addEventListener('change', async (e)=>{
+  const f=e.target.files[0]; if(!f) return;
+  const text=await f.text(); try{
+    const obj=JSON.parse(text);
+    Object.entries(obj).forEach(([k,v])=> localStorage.setItem(k, String(v)));
+    lsScan(); saveState(); alert('Importado ✔');
+  }catch{ alert('JSON inválido'); }
+  e.target.value='';
+});
+$('#lsClearNs').addEventListener('click', ()=>{
+  const prefix=$('#lsPrefix').value.trim(); if(!prefix) return alert('Informe um prefixo.');
+  if(!confirm('Apagar todas as chaves com prefixo '+prefix+' ?')) return;
+  const keys=[]; for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k.startsWith(prefix)) keys.push(k); }
+  keys.forEach(k=> localStorage.removeItem(k)); lsScan(); saveState();
+});
+// Delegação editar/deletar
+$('#lsTableWrap').addEventListener('click', (e)=>{
+  const editK=e.target.getAttribute('data-edit'); const delK=e.target.getAttribute('data-del');
+  if(editK){ const cur=localStorage.getItem(editK)||''; const v=prompt('Editar valor para '+editK, cur); if(v!==null){ localStorage.setItem(editK, v); lsScan(); saveState(); } }
+  if(delK){ if(confirm('Remover '+delK+' ?')){ localStorage.removeItem(delK); lsScan(); saveState(); } }
+});
+
+/* ====== Logos Console ====== */
+function readFileAsDataURL(input, imgEl){ const f=input.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ imgEl.src=r.result; }; r.readAsDataURL(f); }
+const logoPriEl=$('#logoPrimary'), logoSecEl=$('#logoSecondary'), logoPriPrev=$('#logoPrimaryPrev'), logoSecPrev=$('#logoSecondaryPrev');
+// carregar existentes
+logoPriPrev.src = localStorage.getItem('trinity.logo.primary') || '';
+logoSecPrev.src = localStorage.getItem('trinity.logo.secondary') || '';
+logoPriEl.addEventListener('change', ()=> readFileAsDataURL(logoPriEl, logoPriPrev));
+logoSecEl.addEventListener('change', ()=> readFileAsDataURL(logoSecEl, logoSecPrev));
+$('#saveLogos').addEventListener('click', ()=>{
+  if(logoPriPrev.src) localStorage.setItem('trinity.logo.primary', logoPriPrev.src);
+  if(logoSecPrev.src) localStorage.setItem('trinity.logo.secondary', logoSecPrev.src);
+  document.querySelectorAll('.logo-watermark img').forEach(img=>{ const w=localStorage.getItem('trinity.logo.primary'); if(w) img.src=w; });
+  saveState(); alert('Logos salvas ✔');
+});
+$('#clearLogos').addEventListener('click', ()=>{
+  localStorage.removeItem('trinity.logo.primary'); localStorage.removeItem('trinity.logo.secondary');
+  logoPriPrev.src=''; logoSecPrev.src='';
+  document.querySelectorAll('.logo-watermark img').forEach(img=> img.src='');
+  saveState();
+});
+$('#toggleWatermark').addEventListener('click', ()=>{
+  watermarkOn = !watermarkOn;
+  document.querySelectorAll('.logo-watermark').forEach(el=> el.style.display=watermarkOn?'block':'none');
+  saveState();
+});
+
+</script>
+</body>
+</html>

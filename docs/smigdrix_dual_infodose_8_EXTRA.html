@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Smigdrix · Dual Infodose — Mobile Portrait</title>
+  <style>
+    :root {
+      --bg: #070a07; --panel: #0e120e; --accent: #3dff12; --accent-soft: rgba(61,255,18,.14);
+      --muted: #a4ff9a; --text: #e9ffe7; --line: rgba(61,255,18,.25); --line-soft: rgba(61,255,18,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 12px) 0;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(61,255,18,.07), transparent 60%),
+        radial-gradient(900px 500px at 120% 10%, rgba(61,255,18,.05), transparent 60%),
+        var(--bg);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      display: flex; flex-direction: column; min-height: 100dvh;
+    }
+    header {
+      position: sticky; top: 0; z-index: 30;
+      background: linear-gradient(180deg, rgba(0,0,0,.75), rgba(0,0,0,.25));
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+    }
+    .title { display:flex; align-items:center; gap:8px; font-weight:800; letter-spacing:.4px; }
+    .dot { width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent); }
+    .tag { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:var(--accent-soft); border:1px solid var(--line); font-size:12px; }
+
+    main { flex: 1; display:flex; flex-direction: column; gap:12px; padding: 10px 12px; }
+    .section { display:flex; flex-direction: column; gap:8px; }
+
+    input, textarea, select { width:100%; background:var(--panel); color:var(--text); border: 1px solid var(--line); border-radius: 12px; padding:10px 12px; font-size:16px; outline:none; }
+    textarea { min-height: 110px; resize: vertical; }
+
+    .row { display:flex; gap:8px; align-items:center; flex-wrap: wrap; }
+    .stack { display:flex; flex-direction: column; gap:8px; }
+
+    .card { background:#000; border: 1px solid var(--line-soft); border-radius:14px; padding:12px; box-shadow: inset 0 0 0 1px rgba(61,255,18,.08); }
+    .card h3 { margin:0 0 8px; font-size:14px; opacity:.9; }
+
+    button { -webkit-tap-highlight-color: transparent; cursor:pointer; background: var(--accent); color:#041604; border:none; border-radius:14px; font-weight:900; font-size:15px; padding:10px 12px; box-shadow:0 2px 0 #0a0, inset 0 -2px 0 rgba(0,0,0,.25); }
+    button:active { transform: translateY(1px) scale(.99); }
+    .ghost { background:#141714; color:var(--muted); border:1px dashed var(--line); box-shadow:none; }
+    .mini { font-size:12px; padding:8px 10px; border-radius:10px; }
+
+    .grid-btns { display:grid; gap:8px; grid-template-columns: repeat(3,1fr); }
+    @media (min-width: 480px){ .grid-btns { grid-template-columns: repeat(6,1fr); } }
+
+    .out { white-space: pre-wrap; word-break: break-word; overflow:auto; line-height:1.25; min-height:200px; }
+
+    footer { padding: 0 12px 12px; font-size:12px; opacity:.85; }
+    .pill { display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:var(--accent-soft); border:1px solid var(--line); font-size:12px; }
+
+    /* Tabs simples (empilhadas no mobile) */
+    .tabs { display:flex; gap:8px; position: sticky; top: calc(44px + env(safe-area-inset-top)); z-index: 20; padding-bottom: 4px; }
+    .tab { padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:var(--panel); cursor:pointer; font-weight:700; }
+    .tab.active { background: var(--accent-soft); }
+
+    /* Tema Tupac */
+    body.tupac { --bg:#0a0707; --panel:#140e0e; --accent:#ffd166; --accent-soft:rgba(255,209,102,.14); --muted:#ffe1a8; --text:#fff7e6; --line:rgba(255,209,102,.28); --line-soft:rgba(255,209,102,.12); background: radial-gradient(1200px 600px at 50% -10%, rgba(255,209,102,.08), transparent 60%), radial-gradient(900px 500px at -20% 10%, rgba(255,102,102,.06), transparent 60%), var(--bg); }
+
+    /* Modal de Snippet */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index: 50; }
+    .modal { width:min(680px, 92vw); background:#000; border:1px solid var(--line); border-radius:14px; padding:12px; box-shadow: 0 10px 40px rgba(0,0,0,.6), inset 0 0 0 1px rgba(61,255,18,.08); }
+    .modal .row { justify-content: space-between; }
+    .modal textarea { min-height: 180px; }
+
+    /* Log de Patches */
+    .log { font-size:12px; background:#010; border:1px solid var(--line-soft); border-radius:10px; padding:8px; max-height:180px; overflow:auto; }
+  </style>
+</head>
+<body>
+  <header class="section">
+    <div class="title"><span class="dot"></span> Smigdrix · Dual Infodose <span class="tag">Portrait 📱</span></div>
+    <!-- Endpoint and snippet controls -->
+    <div class="row">
+      <input id="endpoint" placeholder="URL do webhook (ex.: http://localhost:5678/ascii/uno) — pode deixar vazio pra offline" />
+      <button class="ghost mini" id="saveEp">Salvar</button>
+      <button class="ghost mini" id="openSnippet">✂️ Snippet</button>
+    </div>
+    <div class="row" style="margin-top:6px">
+      <button class="ghost mini" onclick="pasteIntoMsg()">📥 Colar no campo de mensagem</button>
+      <button class="ghost mini" onclick="pasteIntoSnippet()">📥 Colar no Snippet</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="section card" id="sec-input">
+      <h3>Entrada</h3>
+      <textarea id="msg" class="ansi-green" placeholder="Fala que eu te escuto… (detecta portal no texto: ⊙ ⇄ △ ☆彡 § ∞)"></textarea>
+      <div class="grid-btns">
+        <button onclick="runPortalSafe('⊙')">UNO ⊙</button>
+        <button onclick="runPortalSafe('⇄')">DUAL ⇄</button>
+        <button onclick="runPortalSafe('△')">TRINITY △</button>
+        <button onclick="runPortalSafe('☆彡')">ESTÉTICO ☆彡</button>
+        <button onclick="runPortalSafe('§')">SAFE §</button>
+        <button onclick="runPortalSafe('∞')">RESET ∞</button>
+      </div>
+      <div class="row">
+        <button class="ghost mini" onclick="preset('rima')">Rima</button>
+        <button class="ghost mini" onclick="preset('haiku')">Haiku</button>
+        <button class="ghost mini" onclick="preset('ascii')">ASCII</button>
+        <button class="ghost mini" onclick="preset('zen')">Zen</button>
+        <button class="ghost mini" onclick="preset('reset')">Reset</button>
+        <button class="ghost mini" onclick="smigAll()">ALL ▶︎</button>
+      </div>
+    </div>
+
+    <div class="section card" id="sec-workflow">
+      <h3>Workflow Local</h3>
+      <div class="row">
+        <label class="row"><input type="checkbox" id="nodeUNO" checked> ⊙ UNO · Frame</label>
+        <label class="row"><input type="checkbox" id="nodeDUAL" checked> ⇄ DUAL · Transform</label>
+        <label class="row"><input type="checkbox" id="nodeTRI" checked> △ TRINITY · Prism</label>
+      </div>
+      <div class="row">
+        <label class="row"><input type="checkbox" id="nodeSTAR" checked> ☆彡 Aesthetic · Frame</label>
+        <label class="row"><input type="checkbox" id="nodeQA" checked> § QA · Safe-check</label>
+        <label class="row"><input type="checkbox" id="nodeRESET"> ∞ Reset</label>
+      </div>
+      <div class="row">
+        <label class="row">Wrap <input type="number" id="wrap" value="64" min="24" max="120" style="width:96px"></label>
+        <label class="row">Usuário <input id="user" value="iphoneUser" style="width:140px"></label>
+        <label class="row">Cor
+          <select id="theme">
+            <option value="matrix">Matrix Green</option>
+            <option value="mono">Monocromático</option>
+            <option value="tupac">All Eyez on Smig</option>
+          </select>
+        </label>
+        <label class="row" title="Se ligado, o botão 'copiar' usa Markdown"><input type="checkbox" id="toggleMD"> Copiar como MD</label>
+        <label class="row"><input type="checkbox" id="toggleAutosave" checked> Auto‑salvar</label>
+        <label class="row"><input type="checkbox" id="toggleAutoscroll" checked> Auto-scroll</label>
+        <label class="row"><input type="checkbox" id="toggleAutoscript"> Auto-script</label>
+        <button class="ghost mini" id="editAutoscript">✍️ Editar Auto-script</button>
+        <button class="ghost mini" id="mockBtn">🔌 offline: LIGADO</button>
+        <select id="runs" style="width:80px">
+          <option value="1">1x</option><option value="2">2x</option><option value="3">3x</option><option value="5">5x</option>
+        </select>
+      </div> <!-- end of workflow row -->
+      <!-- Tabs container -->
+      <div class="tabs">
+        <div class="tab active" data-tab="out">Saída</div>
+        <div class="tab" data-tab="hist">Histórico</div>
+        <div class="tab" data-tab="tools">Ferramentas</div>
+      </div>
+    </div>
+
+    <section class="section card" id="tab-out">
+      <h3>Saída</h3>
+      <div class="out ansi-green" id="out">Pronto pra rodar ASCII…</div>
+      <div class="row">
+        <button class="mini ghost" onclick="copiar()">📋 copiar</button>
+        <button class="mini ghost" onclick="copyMarkdown()">📑 copiar MD</button>
+        <button class="mini ghost" onclick="compartilhar()">↗ compartilhar</button>
+        <button class="mini ghost" onclick="downloadState()">💾 exportar estado</button>
+        <button class="mini ghost" onclick="exportPNG()">🖼 PNG</button>
+        <button class="mini ghost" onclick="downloadHTML()">⬇️ baixar HTML</button>
+      </div>
+      <div class="row">
+        <label class="row"><input type="checkbox" id="toggleAutoscroll2"> Auto-scroll (Saída)</label>
+      </div>
+    </section>
+
+    <section class="section card" id="tab-hist" style="display:none;">
+      <h3>Histórico</h3>
+      <div id="history" class="out" style="min-height:140px;"></div>
+      <div class="row">
+        <button class="mini ghost" onclick="clearHistory()">🧹 limpar histórico</button>
+        <label class="mini ghost" style="padding:8px 10px; border-radius:10px; cursor:pointer;">
+          ⤒ importar <input type="file" accept="application/json" style="display:none" onchange="importState(event)">
+        </label>
+        <button class="mini ghost" onclick="copyHistoryMD()">📚 copiar histórico (MD)</button>
+      </div>
+    </section>
+
+    <section class="section card" id="tab-tools" style="display:none;">
+      <h3>Ferramentas</h3>
+      <div class="row" style="flex-wrap:wrap">
+        <button class="ghost" onclick="asciiFace()">Gerar ASCII Face</button>
+        <button class="ghost" onclick="boomBap()">Boom-Bap (metronome)</button>
+        <button class="ghost" onclick="tupacBeat()">Tupac Beat ▶</button>
+        <button class="ghost" onclick="urlShare()">Link com estado</button>
+        <button class="ghost" onclick="showPatchLog()">📝 ver log de patches</button>
+        <button class="ghost" onclick="undoPatch()">⎌ desfazer último patch</button>
+        <button class="ghost" onclick="clearPatchLog()">🗑 limpar log</button>
+        <button class="ghost" onclick="saveSnippetAsAutoscript()">💾 salvar snippet como Auto-script</button>
+      </div>
+      <div id="patchLog" class="log" aria-live="polite"></div>
+      <pre id="toolsOut" class="out ansi-green" style="min-height:80px"></pre>
+    </section>
+  </main>
+
+  <footer class="section">
+    <div>Sem API? Mantenha <span class="pill">🔌 offline</span>. Se quiser n8n depois: <span class="pill">https://n8n.io</span>.</div>
+  </footer>
+
+  <!-- Modal de Snippet para patches/injeções -->
+  <div class="modal-backdrop" id="snippetModal">
+    <div class="modal">
+      <div class="row">
+        <strong>Snippet Modal</strong>
+        <div class="row">
+          <select id="snippetAction">
+            <option value="append-out">Anexar à Saída</option>
+            <option value="replace-style">Trocar &lt;style&gt; (CSS)</option>
+            <option value="inject-section">Injetar em seletor…</option>
+            <option value="replace-script">Trocar funções (JS)</option>
+          </select>
+          <input id="snippetSelector" placeholder="#id ou .classe (para injetar)" style="width:180px; display:none" />
+          <button class="ghost mini" onclick="closeSnippet()">Fechar</button>
+        </div>
+      </div>
+      <textarea id="snippetText" placeholder="Cole aqui seu snippet (texto, CSS, HTML ou JS)"></textarea>
+      <div class="row" style="justify-content:flex-end;">
+        <button class="ghost mini" onclick="previewSnippet()">Pré‑visualizar</button>
+        <button class="mini" onclick="applySnippet()">Aplicar</button>
+      </div>
+      <div class="out" id="snippetPreview" style="min-height:60px"></div>
+    </div>
+  </div>
+
+  <script>
+    const OUT = document.getElementById('out');
+    const EP = document.getElementById('endpoint');
+    const SAVE = document.getElementById('saveEp');
+    const MSG = document.getElementById('msg');
+    const RUNS = document.getElementById('runs');
+    const MOCKBTN = document.getElementById('mockBtn');
+    const USER = document.getElementById('user');
+    const WRAP = document.getElementById('wrap');
+    const THEME = document.getElementById('theme');
+    const TABS = document.querySelectorAll('.tab');
+    const TAB_OUT = document.getElementById('tab-out');
+    const TAB_HIST = document.getElementById('tab-hist');
+    const TAB_TOOLS = document.getElementById('tab-tools');
+    const HISTORY = document.getElementById('history');
+    const TOOLSOUT = document.getElementById('toolsOut');
+    const TGL_MD = document.getElementById('toggleMD');
+    const TGL_AUTOSAVE = document.getElementById('toggleAutosave');
+    const TGL_AUTOSCROLL = document.getElementById('toggleAutoscroll');
+    const TGL_AUTOSCROLL2 = document.getElementById('toggleAutoscroll2');
+    const TGL_AUTOSCRIPT = document.getElementById('toggleAutoscript');
+    const BTN_EDIT_AUTOSCRIPT = document.getElementById('editAutoscript');
+    const PATCHLOG = document.getElementById('patchLog');
+
+    // Modal
+    const SNIP_MODAL = document.getElementById('snippetModal');
+    const SNIP_TEXT = document.getElementById('snippetText');
+    const SNIP_PREV = document.getElementById('snippetPreview');
+    // colar helpers
+    async function pasteIntoMsg(){ try{ const t = await navigator.clipboard.readText(); if (t){ MSG.value = t; } } catch(e){ alert('Não consegui ler do clipboard neste navegador.'); } }
+    async function pasteIntoSnippet(){ try{ const t = await navigator.clipboard.readText(); if (t){ SNIP_TEXT.value = t; previewSnippet(); } } catch(e){ alert('Não consegui ler do clipboard neste navegador.'); } }
+    const SNIP_ACTION = document.getElementById('snippetAction');
+    const SNIP_SEL = document.getElementById('snippetSelector');
+    document.getElementById('openSnippet').addEventListener('click', ()=>{ SNIP_MODAL.style.display='flex'; });
+    function closeSnippet(){ SNIP_MODAL.style.display='none'; }
+    SNIP_ACTION.addEventListener('change', ()=>{ SNIP_SEL.style.display = SNIP_ACTION.value==='inject-section' ? 'inline-block' : 'none'; });
+
+    // Auto-script store keys
+    const AS_ENABLED_KEY = 'smig_autoscript_enabled';
+    const AS_CODE_KEY = 'smig_autoscript_code';
+
+    const SYMBOLS = ['⊙','⇄','△','☆彡','§','∞'];
+    let offlineMock = true; // mobile-first: offline inicialmente
+    let history = [];
+    let copyAsMarkdown = false;
+
+    // Patch history & undo
+    let patchHistory = [];   // {time, action, selector, content, backup, backupHTML}
+    function logPatch(entry){ patchHistory.push(entry); localStorage.setItem('smig_patch_log', JSON.stringify(patchHistory)); renderPatchLog(); }
+    function renderPatchLog(){ if (!patchHistory.length){ PATCHLOG.textContent = '(sem patches)'; return; } PATCHLOG.innerHTML = patchHistory.map((p, i) => { const dt = new Date(p.time).toLocaleString(); return `[${i+1}] ${dt} • ${p.action}${p.selector?` • ${p.selector}`:''}\n${(p.content||'').slice(0,160)}…`; }).join('\n'); }
+    function showPatchLog(){ renderPatchLog(); }
+    function undoPatch(){ if (!patchHistory.length){ PATCHLOG.textContent = '(nada pra desfazer)'; return; } const last = patchHistory.pop(); try { if (last.action === 'replace-style' && last.backup){ const style = document.querySelector('head style'); if (style) style.textContent = last.backup; } else if (last.action === 'inject-section' && last.selector){ const node = document.querySelector(last.selector); if (node && last.backupHTML !== undefined){ node.innerHTML = last.backupHTML; } } else if (last.action === 'append-out'){ if (last.content){ const txt = OUT.textContent; const cut = txt.endsWith(last.content + '\n') ? txt.slice(0, - (last.content.length + 1)) : txt.replace(last.content, ''); OUT.textContent = cut; } } else if (last.action === 'replace-script'){ alert('Undo de script não é suportado (JS já executado).'); } } catch(e){ console.warn('undo erro', e); } localStorage.setItem('smig_patch_log', JSON.stringify(patchHistory)); renderPatchLog(); }
+    function clearPatchLog(){ patchHistory = []; localStorage.removeItem('smig_patch_log'); renderPatchLog(); }
+
+    // —— bootstrap ——
+    (function init(){
+      EP.value = localStorage.getItem('smig_endpoint') || '';
+      USER.value = localStorage.getItem('smig_user') || 'iphoneUser';
+      WRAP.value = localStorage.getItem('smig_wrap') || '64';
+      THEME.value = localStorage.getItem('smig_theme') || 'matrix';
+      copyAsMarkdown = (localStorage.getItem('smig_copy_md')||'0') === '1';
+      TGL_MD.checked = copyAsMarkdown;
+      const auto = localStorage.getItem('smig_autosave');
+      TGL_AUTOSAVE.checked = auto === null ? true : auto==='1';
+      const asc = localStorage.getItem('smig_autoscroll');
+      const ascOn = asc === null ? true : asc==='1';
+      TGL_AUTOSCROLL.checked = ascOn;
+      TGL_AUTOSCROLL2.checked = ascOn;
+
+      // autoscript
+      const asEnabled = (localStorage.getItem(AS_ENABLED_KEY)||'0') === '1';
+      TGL_AUTOSCRIPT.checked = asEnabled;
+      const asCode = localStorage.getItem(AS_CODE_KEY)||'';
+
+      // restaura patch log
+      try { patchHistory = JSON.parse(localStorage.getItem('smig_patch_log')||'[]') || []; } catch { patchHistory = []; }
+      renderPatchLog();
+
+      SAVE.addEventListener('click', ()=>{ localStorage.setItem('smig_endpoint', EP.value.trim()); pulse('Endpoint salvo'); });
+      MSG.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) runPortal(detectPortal(MSG.value)); });
+      TABS.forEach(tab => tab.addEventListener('click', switchTab));
+      THEME.addEventListener('change', applyTheme);
+      TGL_MD.addEventListener('change', ()=>{ copyAsMarkdown = TGL_MD.checked; localStorage.setItem('smig_copy_md', copyAsMarkdown?'1':'0'); pulse(copyAsMarkdown?'MD ON':'texto'); });
+      TGL_AUTOSAVE.addEventListener('change', ()=>{ localStorage.setItem('smig_autosave', TGL_AUTOSAVE.checked?'1':'0'); pulse(TGL_AUTOSAVE.checked?'autosave ON':'autosave OFF'); });
+      TGL_AUTOSCROLL.addEventListener('change', syncAutoscroll);
+      TGL_AUTOSCROLL2.addEventListener('change', syncAutoscroll);
+      TGL_AUTOSCRIPT.addEventListener('change', ()=>{ localStorage.setItem(AS_ENABLED_KEY, TGL_AUTOSCRIPT.checked?'1':'0'); pulse(TGL_AUTOSCRIPT.checked?'autoscript ON':'autoscript OFF'); });
+      BTN_EDIT_AUTOSCRIPT.addEventListener('click', ()=>{
+        SNIP_MODAL.style.display='flex';
+        SNIP_ACTION.value = 'replace-script';
+        SNIP_SEL.style.display = 'none';
+        SNIP_TEXT.value = localStorage.getItem(AS_CODE_KEY)||'';
+        previewSnippet();
+      });
+
+      applyTheme();
+
+      // roda autoscript se habilitado
+      if (asEnabled && asCode){
+        try {
+          eval(asCode);
+          logPatch({ time: Date.now(), action: 'autoscript-run', selector: '<startup>', content: asCode });
+        } catch(e){
+          TOOLSOUT.textContent = 'Auto-script erro: '+e.message;
+        }
+      }
+
+      try { const url = new URL(window.location); const m = url.searchParams.get('m'); if (m) MSG.value = decodeURIComponent(m); const p = url.searchParams.get('p'); if (p) runPortal(p); } catch {}
+    })();
+
+    function syncAutoscroll(){
+      const on = (this === TGL_AUTOSCROLL2) ? TGL_AUTOSCROLL2.checked : TGL_AUTOSCROLL.checked;
+      TGL_AUTOSCROLL.checked = on; TGL_AUTOSCROLL2.checked = on;
+      localStorage.setItem('smig_autoscroll', on?'1':'0');
+    }
+
+    function switchTab(e){ TABS.forEach(t => t.classList.remove('active')); e.target.classList.add('active'); TAB_OUT.style.display = e.target.dataset.tab==='out' ? '' : 'none'; TAB_HIST.style.display = e.target.dataset.tab==='hist' ? '' : 'none'; TAB_TOOLS.style.display = e.target.dataset.tab==='tools' ? '' : 'none'; }
+    function pulse(t){ if (navigator.vibrate) navigator.vibrate([8,40,16]); console.log(t); }
+    function detectarSimbolo(text){ return SYMBOLS.find(s => text.includes(s)); }
+    function detectPortal(text){ return detectarSimbolo(text) || '⊙'; }
+    function preset(kind){ const map = { rima: 'manda uma rima 🔥 ⇄', haiku: 'faça um haiku sobre café ☕ ☆彡', ascii: 'desenha um rosto ASCII feliz ^_^ ☆彡', zen: 'uma frase zen minimalista §', reset: 'reset geral ∞' }; MSG.value = map[kind] || 'oi dual ⊙'; pulse('preset'); }
+
+    async function runPortal(portal){ const text = MSG.value.trim(); const autoPortal = detectarSimbolo(text) || portal || '⊙'; const payload = { portal: autoPortal, user: USER.value || 'iphoneUser', text }; const runs = parseInt(RUNS.value, 10) || 1; OUT.textContent = ''; for (let i=0;i<runs;i++){ try { const data = await executeFlow(payload); render(data); pushHistory(payload, data); autoSave(); } catch (err){ const data = await localMock(payload); render(data); pushHistory(payload, data); autoSave(); } } }
+    async function smigAll(){ const text = MSG.value.trim() || 'Smig ALL test'; OUT.textContent = ''; for (const p of SYMBOLS){ const payload = { portal: p, user: USER.value || 'iphoneUser', text }; try { const data = await executeFlow(payload); render(data); pushHistory(payload, data); await wait(120); autoSave(); } catch (e){ const data = await localMock(payload); render(data); pushHistory(payload, data); autoSave(); } } }
+
+    async function executeFlow(payload){ const hasBackend = EP.value.trim().length > 0 && !offlineMock; if (hasBackend) return callBackend(payload); const ctx = { ...payload, now: new Date().toISOString(), wrap: clamp(parseInt(WRAP.value||'64',10), 24, 120) }; let buf = ''; if (document.getElementById('nodeUNO').checked) buf = nodeUNO(ctx, buf); if (document.getElementById('nodeDUAL').checked) buf = nodeDUAL(ctx, buf); if (document.getElementById('nodeTRI').checked) buf = nodeTRI(ctx, buf); if (document.getElementById('nodeSTAR').checked) buf = nodeSTAR(ctx, buf); if (document.getElementById('nodeQA').checked) buf = nodeQA(ctx, buf); if (document.getElementById('nodeRESET').checked) buf = nodeRESET(ctx, buf); return { portal: ctx.portal, aesthetic: buf || ctx.text || '(vazio)', text: ctx.text, user: ctx.user }; }
+
+    // —— Nodes ——
+    function nodeUNO(t, prev){ const frame = '╔' + '═'.repeat(13) + '╗\n' + '║   ⊙ UNO     ║\n' + '║   raiz      ║\n' + '╚' + '═'.repeat(13) + '╝\n' + `UNO aberto: raiz ativada para ${t.user} em ${t.now}`; return prev ? (frame + '\n' + prev) : frame; }
+    function nodeDUAL(t, prev){ const base = t.text || 'solta o verbo'; const stylized = stylize(base); const s = `⇄ DUAL ATIVO ⇄\n${wrapText('IA(local) diz: ' + stylized, t.wrap)}`; return prev ? (prev + '\n' + s) : s; }
+    function nodeTRI(t, prev){ const prism = `   △\n  / \\ \n /   \\ \n/_____\\`; const s = prism + `\nseed: ${wrapText(t.text||'smig seed', t.wrap)}`; return prev ? (prev + '\n' + s) : s; }
+    function nodeSTAR(t, prev){ const inside = (prev || t.text || 'fluxo OK').replace(/\n/g,' '); const content = inside.slice(0, t.wrap); const line = '─'.repeat(Math.max(12, Math.min(t.wrap, content.length+2))); return ['☆' + line + '☆彡', `│ ${content} │`, '☆' + line + '☆彡'].join('\n'); }
+    function nodeQA(t, prev){ const ok = prev && prev.length >= 8; return ok ? prev + `\n§───✔───§ fluxo seguro` : `§ QA falhou: estética vazia/curta`; }
+    function nodeRESET(t, prev){ const s = `∞───reset───∞`; return prev ? (prev + '\n' + s) : s; }
+
+    // —— Helpers ——
+    function stylize(text){ let r = text.trim(); if (!r) return r; if (r.length < 60) r = r + ' · tamo junto'; r = r.replace(/smig(dr(i|ix)k?s?)?/ig, 'Smigdrix').replace(/mano/ig,'mano 🫱🏽‍🫲🏾'); if (r.split(' ').length > 8) r = r.replace(/\s/g, (m,i)=> i%7===0 ? ' | ' : ' '); return r; }
+    function wrapText(s, width){ width = clamp(width||64, 24, 120); const words = (s||'').split(/\s+/); const lines=[]; let line=''; for (const w of words){ if ((line + ' ' + w).trim().length > width){ lines.push(line.trim()); line = w; } else line += ' ' + w; } if (line.trim()) lines.push(line.trim()); return lines.join('\n'); }
+    function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+    async function callBackend(payload){ const res = await fetch(EP.value.trim(), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) }); if (!res.ok) throw new Error('HTTP '+res.status); return await res.json(); }
+    async function localMock(t){ const now = new Date().toISOString(); const frames = { '⊙': `╔═════════════╗\n║   ⊙ UNO     ║\n║   raiz      ║\n╚═════════════╝\nUNO aberto: raiz ativada para ${t.user} em ${now}`, '⇄': `⇄ DUAL ATIVO ⇄\nIA diz: ${t.text ? 'eco: '+t.text : 'manda algo que eu ecoo'}`, '△': `   △\n  / \\ \n /   \\ \n/_____\\\nseed: ${(t.text||'smig seed')}`, '☆彡': `☆────────────☆彡\n│ ${(t.text||'fluxo OK').substring(0,180).replace(/\n/g,' ')} │\n☆────────────☆彡`, '§': `§───✔───§ fluxo seguro`, '∞': `∞───reset───∞` }; return { portal: t.portal, aesthetic: frames[t.portal] || ('eco: '+t.text), text: t.text }; }
+
+    function render(data){ const tag = data.portal || '?'; const chunk = `[ ${tag} ]\n${data.aesthetic || data.text || data.ai || JSON.stringify(data, null, 2)}\n\n`; OUT.textContent += chunk; ensureScroll(); }
+    function ensureScroll(){ const on = TGL_AUTOSCROLL.checked || TGL_AUTOSCROLL2.checked; if (!on) return; OUT.scrollTop = OUT.scrollHeight; }
+    function pushHistory(req, res){ const item = { t: Date.now(), req, res }; history.unshift(item); if (history.length > 200) history.pop(); const lines = history.map(it => { const dt = new Date(it.t).toLocaleString(); return `${dt}\n> ${it.req.portal} | ${it.req.user}\n${(it.req.text||'').slice(0,160)}\n—\n${(it.res.aesthetic||'').slice(0,220)}\n`; }).join('\n'); HISTORY.textContent = lines || '(vazio)'; }
+    function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
+    function toggleMock(){ offlineMock = !offlineMock; MOCKBTN.textContent = offlineMock ? '🔌 offline: LIGADO' : '🔌 offline: DESLIGADO'; }
+
+    // copiar
+    async function copiar(){ const text = OUT.textContent.trim() || ''; if (!text) return; const payload = (TGL_MD.checked) ? '```\n' + text + '\n```' : text; try { await navigator.clipboard.writeText(payload); } catch {} }
+    async function copyMarkdown(){ const text = OUT.textContent.trim() || ''; if (!text) return; const md = '```\n' + text + '\n```'; try { await navigator.clipboard.writeText(md); } catch {} }
+    function copyHistoryMD(){ const md = history.map(h=>`### ${new Date(h.t).toLocaleString()}\n\n**${h.req.portal} | ${h.req.user}**\n\n${(h.req.text||'').replace(/\n/g,'  \n')}\n\n\` + '``' + `\n${(h.res.aesthetic||'')}\n\` + '``' + `\n`).join('\n'); navigator.clipboard.writeText(md); }
+
+    function clearHistory(){ history = []; HISTORY.textContent = ''; }
+    function autoSave(){ if (!TGL_AUTOSAVE.checked) return; localStorage.setItem('smig_endpoint', EP.value.trim()); localStorage.setItem('smig_user', USER.value); localStorage.setItem('smig_wrap', WRAP.value); localStorage.setItem('smig_theme', THEME.value); localStorage.setItem('smig_copy_md', TGL_MD.checked ? '1':'0'); localStorage.setItem('smig_autoscroll', (TGL_AUTOSCROLL.checked||TGL_AUTOSCROLL2.checked) ? '1':'0'); }
+    function downloadState(){ const state = { endpoint: EP.value, history, theme: THEME.value, user: USER.value, wrap: WRAP.value, copyAsMarkdown: TGL_MD.checked, autoscroll: (TGL_AUTOSCROLL.checked||TGL_AUTOSCROLL2.checked), autoscriptEnabled: TGL_AUTOSCRIPT.checked, autoscriptCode: localStorage.getItem(AS_CODE_KEY)||'' }; const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'smigdrix_state.json'; a.click(); URL.revokeObjectURL(a.href); }
+    function importState(e){ const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { try { const s = JSON.parse(reader.result); if (s.endpoint) EP.value = s.endpoint; if (Array.isArray(s.history)) { history = s.history; pushHistory({portal:'⊙',user:'import',text:'(state import)'},{aesthetic:'(state import)'}); } if (s.theme) { THEME.value = s.theme; applyTheme(); } if (s.user) USER.value = s.user; if (s.wrap) WRAP.value = s.wrap; if (typeof s.copyAsMarkdown==='boolean'){ TGL_MD.checked = s.copyAsMarkdown; localStorage.setItem('smig_copy_md', s.copyAsMarkdown?'1':'0'); } if (typeof s.autoscroll==='boolean'){ TGL_AUTOSCROLL.checked = s.autoscroll; TGL_AUTOSCROLL2.checked = s.autoscroll; localStorage.setItem('smig_autoscroll', s.autoscroll?'1':'0'); } if (typeof s.autoscriptEnabled==='boolean'){ TGL_AUTOSCRIPT.checked = s.autoscriptEnabled; localStorage.setItem(AS_ENABLED_KEY, s.autoscriptEnabled?'1':'0'); } if (typeof s.autoscriptCode==='string'){ localStorage.setItem(AS_CODE_KEY, s.autoscriptCode); } } catch {} }; reader.readAsText(file); }
+
+    function urlShare(){ const url = new URL(window.location); url.searchParams.set('m', encodeURIComponent(MSG.value||'')); url.searchParams.set('p', detectPortal(MSG.value||'')); TOOLSOUT.textContent = url.toString(); if (navigator.clipboard) navigator.clipboard.writeText(url.toString()); }
+    function asciiFace(){ const faces = [ `  .-.\n (o o)\n | O \\ \n  \'-\'/\n   '-'`, `  ^_^\n ( •_•)\n /)  )\\\n/  \\/  \\`, ` (≖‿≖ )\n /(   )\\\n/  |_|  \\` ]; TOOLSOUT.textContent = faces[Math.floor(Math.random()*faces.length)]; }
+    function boomBap(){ const ctx = new (window.AudioContext||window.webkitAudioContext)(); let t = ctx.currentTime; const tempo = 92; const beat = 60/tempo; for (let bar=0; bar<2; bar++){ for (let step=0; step<4; step++){ const osc = ctx.createOscillator(); const gain = ctx.createGain(); const isKick = step===0 || step===2; const f = isKick? 80: 1100; const dur = isKick? .08: .03; osc.frequency.value = f; gain.gain.value = .0001; gain.gain.setValueAtTime(.4, t); gain.gain.exponentialRampToValueAtTime(.0001, t+dur); osc.connect(gain).connect(ctx.destination); osc.start(t); osc.stop(t+dur); t += beat; } } }
+    function tupacBeat(){ const ctx = new (window.AudioContext||window.webkitAudioContext)(); let t = ctx.currentTime; const tempo = 94; const beat = 60/tempo; for (let bar=0; bar<4; bar++){ for (let step=0; step<8; step++){ if (step===0 || step===3 || (bar%2===1 && step===6)) tone(ctx, 70, .1, t); if (step===2 || step===6) tone(ctx, 1800, .05, t); noise(ctx, 0.02, t+0.01); t += beat/2; } } }
+    function tone(ctx, f, d, s){ const o = ctx.createOscillator(); const g = ctx.createGain(); o.type='sine'; o.frequency.value=f; g.gain.value=.0001; g.gain.setValueAtTime(.5, s); g.gain.exponentialRampToValueAtTime(.0001, s+d); o.connect(g).connect(ctx.destination); o.start(s); o.stop(s+d); }
+    function noise(ctx, d, s){ const n = ctx.createBuffer(1, ctx.sampleRate*d, ctx.sampleRate); const ch = n.getChannelData(0); for (let i=0;i<ch.length;i++) ch[i] = Math.random()*2-1; const src = ctx.createBufferSource(); src.buffer = n; const g = ctx.createGain(); g.gain.value=.12; src.connect(g).connect(ctx.destination); src.start(s); src.stop(s+d); }
+    function applyTheme(){ const v = THEME.value; document.body.classList.toggle('tupac', v==='tupac'); document.body.style.filter = v==='mono' ? 'grayscale(1) contrast(1.1)' : 'none'; }
+
+    // Exportar PNG
+    async function exportPNG(){ const text = OUT.textContent.trim() || 'Smigdrix vazio'; const theme = THEME.value; const dpi = Math.max(2, Math.min(4, Math.floor(window.devicePixelRatio || 2))); const pad = 24; const lineHeight = 20; const fontPx = 16; const ff = "SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace"; const can = document.createElement('canvas'); const ctx = can.getContext('2d'); ctx.font = `${fontPx}px ${ff}`; const lines = text.split(/\n/); const maxW = lines.reduce((m, line)=> Math.max(m, ctx.measureText(line).width), 0); const w = Math.ceil(maxW) + pad*2; const h = Math.ceil(lines.length * lineHeight) + pad*2 + 2; can.width = w * dpi; can.height = h * dpi; ctx.scale(dpi, dpi); const bg = (theme==='tupac') ? '#0a0707' : '#000000'; const fg = (theme==='tupac') ? '#ffd166' : (theme==='mono' ? '#e8e8e8' : '#baffb0'); const stroke = (theme==='tupac') ? 'rgba(255,209,102,0.35)' : 'rgba(61,255,18,0.35)'; ctx.fillStyle = bg; ctx.fillRect(0,0,w,h); ctx.strokeStyle = stroke; ctx.lineWidth = 1; ctx.strokeRect(0.5,0.5,w-1,h-1); ctx.font = `${fontPx}px ${ff}`; ctx.fillStyle = fg; let y = pad + fontPx; for (const line of lines){ ctx.fillText(line, pad, y); y += lineHeight; } can.toBlob(async (blob)=>{ if (!blob) return; const url = URL.createObjectURL(blob); try { const file = new File([blob], 'smigdrix.png', { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'Smigdrix · Dual Infodose', text: 'ASCII render' }); URL.revokeObjectURL(url); return; } } catch {} const a = document.createElement('a'); a.href = url; a.download = 'smigdrix.png'; a.click(); setTimeout(()=> URL.revokeObjectURL(url), 3000); }, 'image/png'); }
+
+    // Baixar o próprio HTML (com o estado atual injetado)
+    function downloadHTML(){ const state = { endpoint: EP.value, theme: THEME.value, user: USER.value, wrap: WRAP.value, offlineMock, copyAsMarkdown: TGL_MD.checked, autoscroll: (TGL_AUTOSCROLL.checked||TGL_AUTOSCROLL2.checked), autoscriptEnabled: TGL_AUTOSCRIPT.checked, autoscriptCode: localStorage.getItem(AS_CODE_KEY)||'' }; const html = '<!-- Smigdrix state ' + encodeURIComponent(JSON.stringify(state)) + ' -->\n' + document.documentElement.outerHTML; const blob = new Blob([html], {type:'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'smigdrix_dual_infodose.html'; a.click(); URL.revokeObjectURL(a.href); }
+
+    // —— Snippet engine ——
+    function previewSnippet(){ const v = SNIP_TEXT.value; SNIP_PREV.textContent = v || '(vazio)'; }
+    function applySnippet(){ const action = SNIP_ACTION.value; const content = SNIP_TEXT.value || ''; if (!content && action!=='append-out') return; if (action==='append-out'){ OUT.textContent += (content + '\n'); logPatch({ time: Date.now(), action, selector: null, content }); closeSnippet(); ensureScroll(); return; } if (action==='replace-style'){ const style = document.querySelector('head style'); if (style){ const backup = style.textContent; style.textContent = content; logPatch({ time: Date.now(), action, selector: 'head style', content, backup }); closeSnippet(); return; } } if (action==='inject-section'){ const sel = (SNIP_SEL.value||'').trim(); if (!sel) { SNIP_PREV.textContent = 'Faltou seletor (#id ou .classe)'; return; } const node = document.querySelector(sel); if (node){ const backupHTML = node.innerHTML; node.insertAdjacentHTML('beforeend', content); logPatch({ time: Date.now(), action, selector: sel, content, backupHTML }); closeSnippet(); return; } else { SNIP_PREV.textContent = 'Seletor não encontrado.'; } } if (action==='replace-script'){ try { eval(content); logPatch({ time: Date.now(), action, selector: '<script>', content }); closeSnippet(); } catch(e){ SNIP_PREV.textContent = 'Erro JS: '+e.message; } } }
+    function saveSnippetAsAutoscript(){ const code = SNIP_TEXT.value||''; localStorage.setItem(AS_CODE_KEY, code); localStorage.setItem(AS_ENABLED_KEY, '1'); TGL_AUTOSCRIPT.checked = true; logPatch({ time: Date.now(), action: 'autoscript-save', selector: '<startup>', content: code }); }
+  </script>
+  <!-- Rescue Kit: ensures essential DOM nodes and rebinds tabs if needed -->
+  <script>
+    (function(){
+      try{
+        // Ensure key output nodes exist
+        if (!document.getElementById('out')) {
+          const outDiv = document.createElement('div');
+          outDiv.id = 'out';
+          outDiv.className = 'out ansi-green';
+          outDiv.textContent = '(vazio)';
+          document.body.appendChild(outDiv);
+        }
+        if (!document.getElementById('history')) {
+          const histDiv = document.createElement('div');
+          histDiv.id = 'history';
+          histDiv.className = 'out';
+          document.body.appendChild(histDiv);
+        }
+        if (!document.getElementById('toolsOut')) {
+          const toolsPre = document.createElement('pre');
+          toolsPre.id = 'toolsOut';
+          toolsPre.className = 'out ansi-green';
+          document.body.appendChild(toolsPre);
+        }
+        // Rebind tab clicks to toggle visibility
+        const tabs = document.querySelectorAll('.tab');
+        const tabOut = document.getElementById('tab-out');
+        const tabHist = document.getElementById('tab-hist');
+        const tabTools = document.getElementById('tab-tools');
+        tabs.forEach(tab => {
+          tab.addEventListener('click', function(e){
+            tabs.forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            if (tabOut) tabOut.style.display = e.target.dataset.tab === 'out' ? '' : 'none';
+            if (tabHist) tabHist.style.display = e.target.dataset.tab === 'hist' ? '' : 'none';
+            if (tabTools) tabTools.style.display = e.target.dataset.tab === 'tools' ? '' : 'none';
+          });
+        });
+        // Guarantee snippet preview element variable
+        if (!window.SNIP_PREV) {
+          window.SNIP_PREV = document.getElementById('snippetPreview');
+        }
+        // Guard overlay/backdrop pointer-events so UI remains clickable
+        const overlays = document.querySelectorAll('[style*="position: fixed"]');
+        overlays.forEach(el => {
+          const style = window.getComputedStyle(el);
+          if (style && parseFloat(style.zIndex) > 40 && style.display !== 'none') {
+            el.style.pointerEvents = 'none';
+          }
+        });
+      }catch(e){ console.warn('Rescue kit error', e); }
+    })();
+  </script>
+
+  <!-- Override script: provide safer runPortal and tool helpers for offline mode -->
+  <script>
+    (function(){
+      try {
+        // Override runPortalSafe to be more fault-tolerant and always render output
+        window.runPortalSafe = async function(portal){
+          const text = MSG.value ? MSG.value.trim() : '';
+          const autoPortal = detectarSimbolo(text) || portal || '⊙';
+          const payload = { portal: autoPortal, user: USER && USER.value ? USER.value : 'iphoneUser', text };
+          const runs = RUNS && RUNS.value ? (parseInt(RUNS.value, 10) || 1) : 1;
+          if (OUT) OUT.textContent = '';
+          for (let i = 0; i < runs; i++){
+            let data;
+            try {
+              // Prefer executeFlow but catch any errors
+              data = await executeFlow(payload);
+            } catch (err) {
+              try {
+                data = await localMock(payload);
+              } catch (inner) {
+                data = { portal: autoPortal, aesthetic: '(erro) ' + (inner && inner.message ? inner.message : '') };
+              }
+            }
+            try { render(data); } catch {}
+            try { pushHistory(payload, data); } catch {}
+            try { autoSave(); } catch {}
+          }
+        };
+        // Also point original runPortal to the safe version so other calls still work
+        window.runPortal = window.runPortalSafe;
+        // Override asciiFace helper to always write into toolsOut if present
+        window.asciiFace = function(){
+          const faces = [
+            `  .-.\n (o o)\n | O \\ \n  '-'`,
+            `  ^_^\n ( •_•)\n /)  )\\\n/  \\/  \\`,
+            ` (≖‿≖ )\n /(   )\\\n/  |_|  \\`
+          ];
+          if (typeof TOOLSOUT !== 'undefined' && TOOLSOUT){
+            TOOLSOUT.textContent = faces[Math.floor(Math.random() * faces.length)];
+          }
+        };
+      } catch (e){
+        console.warn('Override init error', e);
+      }
+    })();
+  </script>
+</body>
+</html>

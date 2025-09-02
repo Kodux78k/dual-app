@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#070a07"/>
+<title>Smigdrix · Dual Infodose — UNIFIED</title>
+<style id="themeStyle">
+:root{
+  --bg:#070a07; --panel:#0e120e; --panel-2:#0a0e0a;
+  --text:#e9ffe7; --muted:#a4ff9a; --line:rgba(61,255,18,.25); --line-soft:rgba(61,255,18,.12);
+  --accent:#3dff12; --accent-soft:rgba(61,255,18,.14); --danger:#ff7272; --ok:#32d875;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; color:var(--text); background:var(--bg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  display:flex; flex-direction:column; min-height:100dvh;
+}
+header{position:sticky; top:0; z-index:30; padding:10px 12px; border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(0,0,0,.75),rgba(0,0,0,.25)); backdrop-filter:blur(6px)}
+.title{display:flex; align-items:center; gap:8px; font-weight:800; letter-spacing:.2px}
+.dot{width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow:0 0 12px var(--accent)}
+main{flex:1; display:flex; flex-direction:column; gap:12px; padding:10px 12px}
+.section{display:flex; flex-direction:column; gap:8px}
+.card{background:#000; border:1px solid var(--line-soft); border-radius:14px; padding:12px;
+  box-shadow: inset 0 0 0 1px rgba(61,255,18,.08)}
+.row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.grid-2{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.grid-btns{display:grid; gap:8px; grid-template-columns:repeat(3,1fr)}
+@media(min-width:560px){.grid-btns{grid-template-columns:repeat(6,1fr)}}
+input,textarea,select{width:100%; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:12px; padding:10px 12px; font-size:15px; outline:none}
+textarea{min-height:110px; resize:vertical}
+button{-webkit-tap-highlight-color:transparent; cursor:pointer; background:var(--accent); color:#041604; border:none; border-radius:14px;
+  font-weight:900; font-size:14px; padding:10px 12px; box-shadow:0 2px 0 #0a0, inset 0 -2px 0 rgba(0,0,0,.25)}
+button.ghost{background:#141714; color:var(--muted); border:1px dashed var(--line); box-shadow:none}
+button.mini{font-size:12px; padding:8px 10px; border-radius:10px}
+button:active{transform:translateY(1px) scale(.99)}
+.out{white-space:pre-wrap; word-break:break-word; overflow:auto; line-height:1.25; min-height:200px; border:1px solid var(--line); border-radius:12px; padding:10px}
+.tabs{display:flex; gap:8px; position:sticky; top:calc(44px + env(safe-area-inset-top)); z-index:20}
+.tab{padding:8px 12px; border-radius:999px; border:1px solid var(--line); background:var(--panel); cursor:pointer; font-weight:700}
+.tab.active{background:var(--accent-soft)}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:var(--accent-soft); border:1px solid var(--line)}
+.hr{height:1px; background:var(--line-soft); margin:8px 0}
+.kv{display:grid; grid-template-columns:140px 1fr; gap:6px; align-items:center}
+footer{padding:0 12px 12px; font-size:12px; opacity:.85}
+.badge{display:inline-flex; align-items:center; gap:6px; font-size:12px; padding:4px 8px; border:1px solid var(--line); border-radius:10px; background:rgba(0,0,0,.35)}
+/* Tema claro/Drácula é aplicado por JS alterando este style */
+</style>
+</head>
+<body>
+<header class="section">
+  <div class="title"><span class="dot"></span> Smigdrix · Dual Infodose <span class="pill">UNIFIED</span></div>
+  <div class="row">
+    <input id="endpoint" placeholder="Webhook (ex.: http://localhost:5678/ascii/uno) — deixe vazio para offline"/>
+    <button class="ghost mini" id="saveEp">Salvar</button>
+    <button class="ghost mini" id="openSnippet">✂️ Snippet Modal</button>
+    <button class="ghost mini" onclick="applyDraculaTheme()">🌑 Drácula</button>
+    <button class="ghost mini" onclick="applyLightTheme()">🌞 Claro</button>
+    <button class="ghost mini" onclick="applySystemTheme()">🌓 Sistema</button>
+  </div>
+  <div class="row">
+    <button class="ghost mini" onclick="pasteIntoMsg()">📥 Colar no campo</button>
+    <button class="ghost mini" onclick="pasteIntoSnippet()">📥 Colar no Snippet</button>
+  </div>
+</header>
+
+<main>
+  <!-- Entrada + Portais + Presets -->
+  <section class="section card" id="sec-input">
+    <h3>Entrada</h3>
+    <textarea id="msg" placeholder="Fala que eu te escuto… (⊙ ⇄ △ ☆彡 § ∞)"></textarea>
+    <div class="grid-btns" id="portalGrid">
+      <button>UNO ⊙</button>
+      <button>DUAL ⇄</button>
+      <button>TRINITY △</button>
+      <button>ESTÉTICO ☆彡</button>
+      <button>SAFE §</button>
+      <button>RESET ∞</button>
+    </div>
+    <div class="row">
+      <button class="ghost mini" onclick="preset('rima')">Rima</button>
+      <button class="ghost mini" onclick="preset('haiku')">Haiku</button>
+      <button class="ghost mini" onclick="preset('ascii')">ASCII</button>
+      <button class="ghost mini" onclick="preset('zen')">Zen</button>
+      <button class="ghost mini" onclick="preset('reset')">Reset</button>
+      <button class="ghost mini" onclick="smigAll()">ALL ▶︎</button>
+    </div>
+  </section>
+
+  <!-- Workflow local -->
+  <section class="section card" id="sec-workflow">
+    <h3>Workflow Local</h3>
+    <div class="row">
+      <label class="row"><input type="checkbox" id="nodeUNO" checked> ⊙ UNO · Frame</label>
+      <label class="row"><input type="checkbox" id="nodeDUAL" checked> ⇄ DUAL · Transform</label>
+      <label class="row"><input type="checkbox" id="nodeTRI" checked> △ TRINITY · Prism</label>
+    </div>
+    <div class="row">
+      <label class="row"><input type="checkbox" id="nodeSTAR" checked> ☆彡 Aesthetic · Frame</label>
+      <label class="row"><input type="checkbox" id="nodeQA" checked> § QA · Safe-check</label>
+      <label class="row"><input type="checkbox" id="nodeRESET"> ∞ Reset</label>
+    </div>
+    <div class="row">
+      <label class="row">Wrap <input type="number" id="wrap" value="64" min="24" max="120" style="width:96px"></label>
+      <label class="row">Usuário <input id="user" value="iphoneUser" style="width:160px"></label>
+      <label class="row">Tema
+        <select id="themeSelect" style="width:180px">
+          <option value="system">Seguir sistema</option>
+          <option value="dracula">Drácula</option>
+          <option value="light">Claro</option>
+        </select>
+      </label>
+      <label class="row"><input type="checkbox" id="toggleMD"> Copiar como MD</label>
+      <label class="row"><input type="checkbox" id="toggleAutosave" checked> Auto-salvar</label>
+      <label class="row"><input type="checkbox" id="toggleAutoscroll" checked> Auto-scroll</label>
+      <button class="ghost mini" id="mockBtn">🔌 offline: LIGADO</button>
+      <select id="runs" style="width:80px"><option>1x</option><option>2x</option><option>3x</option><option>5x</option></select>
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" data-tab="out">Saída</div>
+    <div class="tab" data-tab="hist">Histórico</div>
+    <div class="tab" data-tab="tools">Ferramentas</div>
+  </div>
+
+  <!-- Saída -->
+  <section class="section card" id="tab-out">
+    <h3>Saída</h3>
+    <div class="out" id="out">Pronto pra rodar ASCII…</div>
+    <div class="row">
+      <button class="mini ghost" onclick="copiar()">📋 copiar</button>
+      <button class="mini ghost" onclick="copyMarkdown()">📑 copiar MD</button>
+      <button class="mini ghost" onclick="compartilhar()">↗ compartilhar</button>
+      <button class="mini ghost" onclick="downloadState()">💾 exportar estado</button>
+      <button class="mini ghost" onclick="exportPNG()">🖼 PNG</button>
+      <button class="mini ghost" onclick="downloadHTML()">⬇️ baixar HTML</button>
+    </div>
+    <div class="row"><label class="row"><input type="checkbox" id="toggleAutoscroll2"> Auto-scroll (Saída)</label></div>
+  </section>
+
+  <!-- Histórico -->
+  <section class="section card" id="tab-hist" style="display:none">
+    <h3>Histórico</h3>
+    <div id="history" class="out" style="min-height:140px"></div>
+    <div class="row">
+      <button class="mini ghost" onclick="clearHistory()">🧹 limpar histórico</button>
+      <label class="mini ghost" style="padding:8px 10px; border-radius:10px; cursor:pointer">⤒ importar
+        <input id="histImport" type="file" accept="application/json" style="display:none" onchange="importState(event)"></label>
+      <button class="mini ghost" onclick="copyHistoryMD()">📚 copiar histórico (MD)</button>
+    </div>
+  </section>
+
+  <!-- Ferramentas -->
+  <section class="section card" id="tab-tools" style="display:none">
+    <h3>Ferramentas</h3>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="ghost" onclick="asciiFace()">Gerar ASCII Face</button>
+      <button class="ghost" onclick="boomBap()">Boom-Bap</button>
+      <button class="ghost" onclick="tupacBeat()">Tupac Beat ▶</button>
+      <button class="ghost" onclick="urlShare()">Link com estado</button>
+      <button class="ghost" onclick="showPatchLog()">📝 ver log de patches</button>
+      <button class="ghost" onclick="undoPatch()">⎌ desfazer último patch</button>
+      <button class="ghost" onclick="clearPatchLog()">🗑 limpar log</button>
+      <span class="badge">Exemplos rápidos:</span>
+      <button class="mini ghost" onclick="prefillPreset('modal')">Preset Modal</button>
+      <button class="mini ghost" onclick="prefillPreset('sheet')">Preset Sheet</button>
+      <button class="mini ghost" onclick="prefillPreset('pay')">Preset Pay</button>
+    </div>
+    <div id="patchLog" class="out" aria-live="polite" style="min-height:100px"></div>
+    <pre id="toolsOut" class="out" style="min-height:80px"></pre>
+  </section>
+
+  <!-- Patch Host (Shadow) -->
+  <section class="section card">
+    <h3>Patch Host (Shadow DOM)</h3>
+    <div id="patch-host" class="out" style="min-height:70px; background:#050705">Instale snippets no shadow aqui via “Snippet Modal” → Ação: <b>shadow</b></div>
+  </section>
+</main>
+
+<footer>
+  <div>Sem API? Mantenha <span class="pill">🔌 offline</span>. Se quiser n8n depois: <span class="pill">https://n8n.io</span>.</div>
+</footer>
+
+<!-- Snippet Modal -->
+<div class="modal-backdrop" id="snippetModal" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:50; background:rgba(0,0,0,.55)">
+  <div class="card" style="width:min(820px,92vw); max-height:92vh; overflow:auto">
+    <div class="row">
+      <strong>Snippet Modal</strong>
+      <span class="badge">persistir</span><input id="snipPersist" type="checkbox" />
+      <span class="badge">ação</span>
+      <select id="snippetAction">
+        <option value="append-out">Anexar à Saída</option>
+        <option value="replace-style">Trocar &lt;style&gt;</option>
+        <option value="inject-section">Injetar em seletor…</option>
+        <option value="replace-script">Trocar funções (JS)</option>
+        <option value="shadow">Shadow (Patch Host)</option>
+      </select>
+      <input id="snippetSelector" placeholder="#id ou .classe (para injetar)" style="width:220px; display:none"/>
+      <button class="ghost mini" onclick="closeSnippet()">Fechar</button>
+    </div>
+    <textarea id="snippetText" placeholder="Cole snippet (texto/CSS/HTML/JS)"></textarea>
+    <div class="row" style="justify-content:flex-end">
+      <button class="ghost mini" onclick="previewSnippet()">Pré-visualizar</button>
+      <button class="mini" onclick="applySnippet()">Aplicar</button>
+    </div>
+    <div class="out" id="snippetPreview" style="min-height:60px"></div>
+  </div>
+</div>
+
+<script>
+/* ========== Tema ========== */
+function setTheme(mode){
+  const s=document.getElementById('themeStyle');
+  if(mode==='system'){
+    const mql=window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    const apply=()=> setTheme(mql && mql.matches ? 'dracula' : 'light');
+    if(mql){ mql.onchange=apply; apply(); }
+    try{ localStorage.setItem('smig_theme_mode','system'); }catch{}
+    return;
+  }
+  if(mode==='dracula'){
+    s.textContent = `:root{--bg:#282a36;--panel:#1e1f29;--panel-2:#1b1c24;--accent:#bd93f9;--accent-soft:rgba(189,147,249,.18);--muted:#8be9fd;--text:#f8f8f2;--line:rgba(189,147,249,.28);--line-soft:rgba(189,147,249,.12)} body{background:var(--bg);color:var(--text)} .out{border-color:var(--accent)}`;
+  }else if(mode==='light'){
+    s.textContent = `:root{--bg:#ffffff;--panel:#f5f7fa;--panel-2:#eef2f5;--accent:#0f9d58;--accent-soft:rgba(15,157,88,.12);--muted:#2f6f3e;--text:#111;--line:rgba(15,157,88,.28);--line-soft:rgba(15,157,88,.12)} body{background:linear-gradient(180deg,#fff,#f5f7fa);color:var(--text)} .out{border-color:var(--accent); background:#fff}`;
+  }
+  try{ localStorage.setItem('smig_theme_mode',mode); }catch{}
+  const sel=document.getElementById('themeSelect'); if(sel) sel.value=mode;
+}
+function applyDraculaTheme(){ setTheme('dracula'); OUT.textContent+='\\nTema Drácula ON'; }
+function applyLightTheme(){ setTheme('light'); OUT.textContent+='\\nTema Claro ON'; }
+function applySystemTheme(){ setTheme('system'); OUT.textContent+='\\nSeguindo sistema 🌓'; }
+
+/* ========== Core refs & estado ========== */
+const OUT = document.getElementById('out');
+const HISTORY = document.getElementById('history');
+const EP = document.getElementById('endpoint');
+const SAVE = document.getElementById('saveEp');
+const MSG = document.getElementById('msg');
+const RUNS = document.getElementById('runs');
+const MOCKBTN = document.getElementById('mockBtn');
+const WRAP = document.getElementById('wrap');
+const USER = document.getElementById('user');
+const TGL_MD = document.getElementById('toggleMD');
+
+let offlineMock = true;
+let historyArr = [];
+let patchHistory = [];
+
+/* ========== Tabs ========== */
+const TABS = [...document.querySelectorAll('.tab')];
+const TAB_OUT = document.getElementById('tab-out');
+const TAB_HIST = document.getElementById('tab-hist');
+const TAB_TOOLS = document.getElementById('tab-tools');
+function switchTab(e){
+  const t=e.target.dataset.tab;
+  TABS.forEach(x=>x.classList.remove('active'));
+  e.target.classList.add('active');
+  TAB_OUT.style.display = t==='out'?'':'none';
+  TAB_HIST.style.display = t==='hist'?'':'none';
+  TAB_TOOLS.style.display = t==='tools'?'':'none';
+}
+TABS.forEach(t=>t.addEventListener('click', switchTab));
+
+/* ========== Boot ========== */
+(function init(){
+  try{
+    EP.value = localStorage.getItem('smig_endpoint') || '';
+    USER.value = localStorage.getItem('smig_user') || 'iphoneUser';
+    WRAP.value = localStorage.getItem('smig_wrap') || 64;
+    const md = localStorage.getItem('smig_copy_md'); TGL_MD.checked = md === '1';
+    const asc = localStorage.getItem('smig_autoscroll'); const on = asc===null?true:asc==='1';
+    document.getElementById('toggleAutoscroll').checked = on;
+    document.getElementById('toggleAutoscroll2').checked = on;
+    const mode = localStorage.getItem('smig_theme_mode') || 'system'; setTheme(mode);
+  }catch{}
+  SAVE.addEventListener('click', ()=>{ localStorage.setItem('smig_endpoint', EP.value.trim()); toast('Endpoint salvo'); });
+  MSG.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && (e.metaKey||e.ctrlKey)) runPortal(); });
+  MOCKBTN.textContent = '🔌 offline: LIGADO';
+  safeBindAll(); // segura tudo
+})();
+
+/* ========== Util ========== */
+const SYMBOLS = ['⊙','⇄','△','☆彡','§','∞'];
+const getWrap = ()=> Math.max(24, Math.min(120, parseInt(WRAP.value||'64',10)));
+function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+function wait(ms){ return new Promise(r=>setTimeout(r,ms)); }
+function toast(msg){
+  const n=document.createElement('div'); n.className='badge'; n.style.position='fixed';
+  n.style.left='50%'; n.style.bottom='18px'; n.style.transform='translateX(-50%)';
+  n.style.background='#000'; n.style.zIndex='9999'; n.textContent=msg; document.body.appendChild(n);
+  setTimeout(()=>n.remove(),1400);
+}
+
+/* ========== Portais ========== */
+function detectarSimbolo(text){ return SYMBOLS.find(s => (text||'').includes(s)); }
+function detectPortal(text){ return detectarSimbolo(text) || '⊙'; }
+
+async function runPortal(forceSym){
+  const text = MSG.value.trim();
+  const sym = forceSym || detectPortal(text);
+  const payload = { portal: sym, user: USER.value || 'iphoneUser', text };
+  const runs = parseInt((RUNS.value||'1'),10) || 1;
+  OUT.textContent = '';
+  for(let i=0;i<runs;i++){
+    try{
+      const data = await executeFlow(payload);
+      render(data); pushHistory(payload, data);
+    }catch(e){
+      const data = await localMock(payload);
+      render(data); pushHistory(payload, data);
+    }
+  }
+}
+
+/* ========== Pipeline local / remoto ========== */
+async function executeFlow(payload){
+  const hasBackend = EP.value.trim().length > 0 && !offlineMock;
+  if(hasBackend) return callBackend(payload);
+  const ctx = { ...payload, now:new Date().toISOString(), wrap:getWrap() };
+  let buf='';
+  if (document.getElementById('nodeUNO').checked) buf = nodeUNO(ctx, buf);
+  if (document.getElementById('nodeDUAL').checked) buf = nodeDUAL(ctx, buf);
+  if (document.getElementById('nodeTRI').checked)  buf = nodeTRI(ctx, buf);
+  if (document.getElementById('nodeSTAR').checked) buf = nodeSTAR(ctx, buf);
+  if (document.getElementById('nodeQA').checked)   buf = nodeQA(ctx, buf);
+  if (document.getElementById('nodeRESET').checked)buf = nodeRESET(ctx, buf);
+  return { portal: ctx.portal, aesthetic: buf || ctx.text || '(vazio)', text: ctx.text, user: ctx.user };
+}
+async function callBackend(payload){
+  const res = await fetch(EP.value.trim(), { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+  if(!res.ok) throw new Error('HTTP '+res.status); return await res.json();
+}
+
+/* ===== Nodes ===== */
+function wrapText(s, width){
+  width = clamp(width||64, 24, 120);
+  const words = (s||'').split(/\s+/); const lines=[]; let line='';
+  for(const w of words){ if((line + ' ' + w).trim().length > width){ lines.push(line.trim()); line = w; } else line += ' ' + w; }
+  if(line.trim()) lines.push(line.trim()); return lines.join('\\n');
+}
+function nodeUNO(t, prev){
+  const frame = '╔' + '═'.repeat(13) + '╗\\n' + '║   ⊙ UNO     ║\\n' + '║   raiz      ║\\n' + '╚' + '═'.repeat(13) + '╝\\n' + `UNO aberto: raiz ativada para ${t.user} em ${t.now}`;
+  return prev ? (frame + '\\n' + prev) : frame;
+}
+function nodeDUAL(t, prev){
+  const base = t.text || 'solta o verbo'; const s = `⇄ DUAL ATIVO ⇄\\n${wrapText('IA(local) diz: ' + base, t.wrap)}`;
+  return prev ? (prev + '\\n' + s) : s;
+}
+function nodeTRI(t, prev){
+  const prism = `   △\\n  / \\\\ \\n /   \\\\ \\n/_____\\\\`; const s = prism + `\\nseed: ${wrapText(t.text||'smig seed', t.wrap)}`;
+  return prev ? (prev + '\\n' + s) : s;
+}
+function nodeSTAR(t, prev){
+  const inside=(prev||t.text||'fluxo OK').replace(/\\n/g,' '); const content=inside.slice(0,t.wrap);
+  const line='─'.repeat(Math.max(12, Math.min(t.wrap, content.length+2)));
+  return (prev? prev+'\\n':'' ) + ['☆'+line+'☆彡', `│ ${content} │`, '☆'+line+'☆彡'].join('\\n');
+}
+function nodeQA(t, prev){ const ok = prev && prev.length>=8; return ok ? prev + `\\n§───✔───§ fluxo seguro` : '§ QA falhou: estética vazia/curta'; }
+function nodeRESET(t, prev){ const s='∞───reset───∞'; return prev ? (prev+'\\n'+s) : s; }
+
+/* ===== Fallback localMock ===== */
+async function localMock(t){
+  const now=new Date().toISOString();
+  const frames={
+    '⊙': `╔═════════════╗\\n║   ⊙ UNO     ║\\n║   raiz      ║\\n╚═════════════╝\\nUNO aberto: raiz ativada para ${t.user} em ${now}`,
+    '⇄': `⇄ DUAL ATIVO ⇄\\nIA diz: ${t.text? 'eco: '+t.text:'manda algo que eu ecoo'}`,
+    '△': `   △\\n  / \\\\ \\n /   \\\\ \\n/_____\\\\\\nseed: ${(t.text||'smig seed')}`,
+    '☆彡': `☆────────────☆彡\\n│ ${(t.text||'fluxo OK').substring(0,180).replace(/\\n/g,' ')} │\\n☆────────────☆彡`,
+    '§': `§───✔───§ fluxo seguro`,
+    '∞': `∞───reset───∞`
+  };
+  return { portal:t.portal||detectPortal(t.text), aesthetic: frames[t.portal] || ('eco: '+t.text), text:t.text, user:t.user };
+}
+
+/* ===== Render + histórico ===== */
+function ensureScroll(){
+  const on = document.getElementById('toggleAutoscroll').checked || document.getElementById('toggleAutoscroll2').checked;
+  if(on){ OUT.scrollTop = OUT.scrollHeight; }
+}
+function render(data){
+  const tag=data.portal||'?';
+  const chunk = `[ ${tag} ]\\n${data.aesthetic || data.text || data.ai || JSON.stringify(data,null,2)}\\n\\n`;
+  OUT.textContent += chunk; ensureScroll();
+}
+function pushHistory(req,res){
+  const item={t:Date.now(), req, res}; historyArr.unshift(item); if(historyArr.length>220) historyArr.pop();
+  const lines = historyArr.map(h=>`${new Date(h.t).toLocaleString()}\\n> ${h.req.portal} | ${h.req.user}\\n${(h.req.text||'').slice(0,160)}\\n—\\n${(h.res.aesthetic||'').slice(0,220)}\\n`).join('\\n');
+  HISTORY.textContent = lines || '(vazio)';
+}
+
+/* ===== Clipboard / share / estado ===== */
+async function copiar(){ try{ await navigator.clipboard.writeText(OUT.textContent||''); toast('copiado'); }catch{ toast('falha ao copiar'); } }
+async function copyMarkdown(){ const text=OUT.textContent.trim(); if(!text) return; const md = '```\\n'+text+'\\n```'; try{ await navigator.clipboard.writeText(md);}catch{} }
+function copyHistoryMD(){
+  const md = historyArr.map(h=>`### ${new Date(h.t).toLocaleString()}\\n\\n**${h.req.portal} | ${h.req.user}**\\n\\n${(h.req.text||'').replace(/\\n/g,'  \\n')}\\n\\n\\\n\\\n${'```'}\\n${(h.res.aesthetic||'').replace(/\\n/g,'\\n')}\\n${'```'}\\n`).join('\\n');
+  navigator.clipboard.writeText(md); toast('Histórico (MD) copiado');
+}
+async function compartilhar(){
+  const text = OUT.textContent.slice(0,6000);
+  try{
+    if(navigator.share){ await navigator.share({title:'Smigdrix UNIFIED', text}); toast('compartilhado'); }
+    else{ await navigator.clipboard.writeText(text); toast('copiado'); }
+  }catch{}
+}
+function downloadState(){
+  const state={ endpoint:EP.value, history:historyArr, user:USER.value, wrap:WRAP.value,
+    copyAsMarkdown:TGL_MD.checked, autoscroll:(document.getElementById('toggleAutoscroll').checked||document.getElementById('toggleAutoscroll2').checked),
+    themeMode: localStorage.getItem('smig_theme_mode')||'system' };
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='smigdrix_state.json'; a.click(); URL.revokeObjectURL(a.href);
+}
+function importState(e){
+  const file=e.target.files[0]; if(!file) return; const r=new FileReader();
+  r.onload=()=>{ try{
+    const s=JSON.parse(r.result);
+    if(s.endpoint) EP.value=s.endpoint; if(Array.isArray(s.history)){ historyArr=s.history; pushHistory({portal:'⊙',user:'import',text:'(state import)'},{aesthetic:'(ok)'}); }
+    if(s.user) USER.value=s.user; if(s.wrap) WRAP.value=s.wrap;
+    if(typeof s.copyAsMarkdown==='boolean'){ TGL_MD.checked=s.copyAsMarkdown; localStorage.setItem('smig_copy_md', s.copyAsMarkdown?'1':'0'); }
+    if(typeof s.autoscroll==='boolean'){
+      document.getElementById('toggleAutoscroll').checked=s.autoscroll;
+      document.getElementById('toggleAutoscroll2').checked=s.autoscroll;
+      localStorage.setItem('smig_autoscroll', s.autoscroll?'1':'0');
+    }
+    if(s.themeMode){ localStorage.setItem('smig_theme_mode', s.themeMode); setTheme(s.themeMode); }
+    toast('estado importado');
+  }catch{ toast('falha ao importar'); } };
+  r.readAsText(file);
+}
+function downloadHTML(){
+  const state = { endpoint:EP.value, theme: localStorage.getItem('smig_theme_mode')||'system', user:USER.value, wrap:WRAP.value, offlineMock, copyAsMarkdown:TGL_MD.checked };
+  const html = '<!-- Smigdrix UNIFIED state ' + encodeURIComponent(JSON.stringify(state)) + ' -->\\n' + document.documentElement.outerHTML;
+  const blob=new Blob([html],{type:'text/html'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='Smigdrix_UNIFIED.html'; a.click(); URL.revokeObjectURL(a.href); toast('HTML baixado');
+}
+
+/* ===== PNG da saída ===== */
+async function exportPNG(){
+  const text=OUT.textContent.trim()||'Smigdrix vazio';
+  const mode=localStorage.getItem('smig_theme_mode')||'system';
+  const dpi=Math.max(2,Math.min(4,Math.floor(window.devicePixelRatio||2)));
+  const pad=24, lineH=20, fontPx=16, ff="SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
+  const can=document.createElement('canvas'); const ctx=can.getContext('2d'); ctx.font=`${fontPx}px ${ff}`;
+  const lines=text.split(/\\n/); const maxW=lines.reduce((m,l)=>Math.max(m,ctx.measureText(l).width),0);
+  const w=Math.ceil(maxW)+pad*2, h=Math.ceil(lines.length*lineH)+pad*2+2; can.width=w*dpi; can.height=h*dpi; ctx.scale(dpi,dpi);
+  const isDark = mode==='dracula' || (mode==='system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const bg=isDark?'#0a0707':'#ffffff', fg=isDark?'#ffd166':'#0f9d58', stroke=isDark?'rgba(255,209,102,0.35)':'rgba(15,157,88,0.35)';
+  ctx.fillStyle=bg; ctx.fillRect(0,0,w,h); ctx.strokeStyle=stroke; ctx.strokeRect(.5,.5,w-1,h-1);
+  ctx.font=`${fontPx}px ${ff}`; ctx.fillStyle=fg; let y=pad+fontPx; for(const line of lines){ ctx.fillText(line,pad,y); y+=lineH; }
+  can.toBlob(async (blob)=>{ if(!blob) return toast('falha PNG');
+    const url=URL.createObjectURL(blob);
+    try{
+      const f=new File([blob],'smigdrix.png',{type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f], title:'Smigdrix UNIFIED', text:'ASCII render'}); URL.revokeObjectURL(url); return; }
+    }catch{}
+    const a=document.createElement('a'); a.href=url; a.download='smigdrix.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),3000);
+    toast('PNG baixado');
+  }, 'image/png');
+}
+
+/* ===== Presets & helpers ===== */
+function preset(kind){
+  const map={
+    rima:'manda uma rima 🔥 ⇄', haiku:'faça um haiku sobre café ☕ ☆彡',
+    ascii:'desenha um rosto ASCII feliz ^_^ ☆彡', zen:'uma frase zen minimalista §', reset:'reset geral ∞'
+  }; MSG.value = map[kind] || 'oi dual ⊙'; toast('preset carregado');
+}
+async function smigAll(){
+  const text=MSG.value.trim()||'Smig ALL test'; OUT.textContent='';
+  for(const p of SYMBOLS){ const payload={portal:p, user:USER.value||'iphoneUser', text}; const data=await executeFlow(payload).catch(()=>localMock(payload)); render(data); pushHistory(payload,data); await wait(120); }
+}
+
+/* ===== Patch Host (Shadow) ===== */
+let __patchShadow;
+(function initPatchShadow(){
+  const host=document.getElementById('patch-host'); if(!host) return;
+  __patchShadow = host.attachShadow({mode:'open'});
+  const base=document.createElement('style'); base.textContent=`
+    :host,*{box-sizing:border-box} body{font-family: ui-monospace, SFMono-Regular; color:#e9ffe7; background:transparent}
+    .wrap{display:block; width:100%; overflow:auto} button{border:1px solid rgba(61,255,18,.28); background:#0a0e0a; color:#e9ffe7; border-radius:10px; padding:8px 10px}
+  `;
+  const wrap=document.createElement('div'); wrap.className='wrap'; __patchShadow.appendChild(base); __patchShadow.appendChild(wrap);
+  try{ window.__smigPatchRoot = __patchShadow; }catch{}
+})();
+function injectSnippet(code){
+  if(!__patchShadow) return toast('shadow não disponível');
+  const cont=__patchShadow.querySelector('.wrap'); cont.innerHTML='';
+  const root=document.createElement('div'); root.innerHTML=code; cont.appendChild(root);
+  const scripts=root.querySelectorAll('script');
+  scripts.forEach(old=>{ const s=document.createElement('script'); if(old.src) s.src=old.src; else s.textContent=old.textContent; __patchShadow.appendChild(s); old.remove(); });
+  toast('Snippet injetado (shadow)');
+}
+
+/* ===== Snippet Modal ===== */
+const SNIP = {
+  modalEl: document.getElementById('snippetModal'),
+  ta: document.getElementById('snippetText'),
+  prev: document.getElementById('snippetPreview'),
+  action: document.getElementById('snippetAction'),
+  sel: document.getElementById('snippetSelector'),
+  persist: document.getElementById('snipPersist')
+};
+document.getElementById('openSnippet').addEventListener('click', ()=>{ openSnippetModal(''); });
+function openSnippetModal(prefill=''){
+  SNIP.ta.value = prefill || localStorage.getItem('smig_snippet_saved') || '';
+  SNIP.persist.checked = !!localStorage.getItem('smig_snippet_saved');
+  SNIP.modalEl.style.display='flex';
+}
+function closeSnippet(){ SNIP.modalEl.style.display='none'; }
+SNIP.action.addEventListener('change', ()=>{ SNIP.sel.style.display = SNIP.action.value==='inject-section' ? 'inline-block' : 'none'; });
+function previewSnippet(){ SNIP.prev.textContent = SNIP.ta.value || '(vazio)'; }
+function applySnippet(){
+  const action=SNIP.action.value; const content=SNIP.ta.value||''; if(!content && action!=='append-out') return;
+  if(action==='append-out'){ OUT.textContent += (content+'\\n'); logPatch({time:Date.now(), action, selector:null, content}); closeSnippet(); ensureScroll(); return; }
+  if(action==='replace-style'){ const st=document.getElementById('themeStyle'); if(st){ const backup=st.textContent; st.textContent=content; logPatch({time:Date.now(), action, selector:'#themeStyle', content, backup}); closeSnippet(); return; } }
+  if(action==='inject-section'){ const sel=(SNIP.sel.value||'').trim(); if(!sel){ SNIP.prev.textContent='Faltou seletor'; return; } const n=document.querySelector(sel); if(n){ const backupHTML=n.innerHTML; n.insertAdjacentHTML('beforeend', content); logPatch({time:Date.now(), action, selector:sel, content, backupHTML}); closeSnippet(); return; } SNIP.prev.textContent='Seletor não encontrado.'; return; }
+  if(action==='replace-script'){ try{ eval(content); logPatch({time:Date.now(), action, selector:'<script>', content}); closeSnippet(); }catch(e){ SNIP.prev.textContent='Erro JS: '+e.message; } return; }
+  if(action==='shadow'){ injectSnippet(content); if(SNIP.persist.checked) localStorage.setItem('smig_snippet_saved', content); closeSnippet(); return; }
+}
+
+/* ===== Patch log ===== */
+function logPatch(p){ patchHistory.push(p); }
+function showPatchLog(){
+  const box=document.getElementById('patchLog'); if(!box) return;
+  if(!patchHistory.length){ box.textContent='(sem patches)'; return; }
+  box.textContent = patchHistory.map((p,i)=>`[${i+1}] ${new Date(p.time).toLocaleString()} • ${p.action}${p.selector?` • ${p.selector}`:''}\\n${(p.content||'').slice(0,160)}…`).join('\\n');
+}
+function undoPatch(){ const p=patchHistory.pop(); showPatchLog(); toast('undo'); }
+function clearPatchLog(){ patchHistory=[]; showPatchLog(); }
+
+/* ===== Exemplos de Snippet ===== */
+function prefillPreset(name){
+  let code='';
+  if(name==='modal'){
+    code=`<style>
+.kx-modal{position:fixed; inset:0; display:grid; place-items:center; background:rgba(0,0,0,.55)}
+.kx-box{background:#0b0f0b; border:1px solid rgba(61,255,18,.28); color:#e9ffe7; padding:16px; border-radius:12px; width:min(92vw,480px)}
+.kx-btn{border:1px solid rgba(61,255,18,.28); background:#0a0e0a; color:#e9ffe7; border-radius:10px; padding:8px 10px}
+</style>
+<div class="kx-modal" id="kxM"><div class="kx-box">
+  <b>Modal Demo</b><br/>Shadow DOM isolado 😎<br/><br/>
+  <button class="kx-btn" id="kClose">Fechar</button>
+</div></div>
+<script>(function(){const root=document.currentScript.getRootNode(); root.getElementById('kClose')?.addEventListener('click',()=>root.getElementById('kxM')?.remove());})();</script>`;
+  }else if(name==='sheet'){
+    code=`<style>.sheet{position:fixed;left:0;right:0;bottom:0;border-top:1px solid rgba(61,255,18,.28);border-radius:16px 16px 0 0;background:#0b0f0b;color:#e9ffe7;padding:12px;box-shadow:0 -12px 34px rgba(0,0,0,.4)}</style>
+<div class="sheet" id="kxSheet"><div style="display:flex;align-items:center;gap:8px">
+  <b>Bottom Sheet</b><span style="opacity:.7">overlay</span><div style="margin-left:auto"><button id="closeSheet">Fechar</button></div>
+</div><div style="margin-top:8px">Conteúdo do sheet…</div></div>
+<script>(function(){const root=document.currentScript.getRootNode(); root.getElementById('closeSheet')?.addEventListener('click',()=>root.getElementById('kxSheet')?.remove());})();</script>`;
+  }else if(name==='pay'){
+    code=`<style>
+.pay{display:grid; gap:10px; border:1px solid rgba(61,255,18,.28); border-radius:12px; padding:12px; background:#0a0e0a}
+.row{display:flex; gap:8px; align-items:center}
+.input{flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(61,255,18,.28); background:#000; color:#baffb0}
+</style>
+<div class="pay" id="kxPay"><b>Comprar PNG (Mock)</b>
+  <div class="row"><input class="input" placeholder="Seu e-mail"/>
+  <button id="payPix">PIX</button><button id="payCc">Cartão</button></div>
+  <small style="opacity:.7">Checkout como patch (shadow-safe).</small>
+</div>
+<script>(function(){const root=document.currentScript.getRootNode();
+  root.getElementById('payPix')?.addEventListener('click',()=>alert('PIX gerado: R$ 9,90'));
+  root.getElementById('payCc')?.addEventListener('click',()=>alert('Stripe (teste)'));})();</script>`;
+  }
+  openSnippetModal(code);
+}
+
+/* ===== Ferramentas extras ===== */
+function asciiFace(){
+  const faces=[`  .-.\\n (o o)\\n | O \\\\ \\n  '-'\\/\\n   '-'`,
+               `  ^_^\\n ( •_•)\\n /)  )\\\\\\n/  \\\\/  \\\\`,
+               ` (≖‿≖ )\\n /(   )\\\\\\n/  |_|  \\\\`];
+  document.getElementById('toolsOut').textContent=faces[Math.floor(Math.random()*faces.length)];
+}
+function boomBap(){
+  const ctx=new (window.AudioContext||window.webkitAudioContext)(); let t=ctx.currentTime; const tempo=92; const beat=60/tempo;
+  for(let bar=0;bar<2;bar++){ for(let step=0;step<4;step++){ const o=ctx.createOscillator(), g=ctx.createGain();
+    const kick=step===0||step===2; o.frequency.value=kick?80:1100; const d=kick?.08:.03;
+    g.gain.value=.0001; g.gain.setValueAtTime(.4,t); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g).connect(ctx.destination); o.start(t); o.stop(t+d); t+=beat; } }
+  toast('boom-bap ✅');
+}
+function tupacBeat(){
+  const ctx=new (window.AudioContext||window.webkitAudioContext)(); let t=ctx.currentTime; const tempo=94; const beat=60/tempo;
+  for(let bar=0;bar<4;bar++){ for(let step=0;step<8;step++){
+    if(step===0||step===3||(bar%2===1&&step===6)) tone(ctx,70,.1,t);
+    if(step===2||step===6) tone(ctx,1800,.05,t); noise(ctx,.02,t+0.01); t+=beat/2; } }
+  toast('All Eyez beat ✅');
+}
+function tone(ctx,f,d,s){ const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f;
+  g.gain.value=.0001; g.gain.setValueAtTime(.5,s); g.gain.exponentialRampToValueAtTime(.0001,s+d);
+  o.connect(g).connect(ctx.destination); o.start(s); o.stop(s+d); }
+function noise(ctx,d,s){ const n=ctx.createBuffer(1, ctx.sampleRate*d, ctx.sampleRate);
+  const ch=n.getChannelData(0); for(let i=0;i<ch.length;i++) ch[i]=Math.random()*2-1;
+  const src=ctx.createBufferSource(); src.buffer=n; const g=ctx.createGain(); g.gain.value=.12; src.connect(g).connect(ctx.destination);
+  src.start(s); src.stop(s+d); }
+
+/* ===== Paste helpers ===== */
+async function pasteIntoMsg(){ try{ const t=await navigator.clipboard.readText(); if(t) MSG.value=t; }catch{ alert('Clipboard indisponível'); } }
+async function pasteIntoSnippet(){ try{ const t=await navigator.clipboard.readText(); if(t){ SNIP.ta.value=t; previewSnippet(); } }catch{ alert('Clipboard indisponível'); } }
+
+/* ===== Safe bindings (idempotente) ===== */
+function safeBindAll(){
+  // grade de portais
+  const grid=document.getElementById('portalGrid');
+  if(grid && !grid.dataset.bound){
+    grid.dataset.bound='1';
+    grid.addEventListener('click', (e)=>{
+      const b=e.target.closest('button'); if(!b) return;
+      const txt=b.textContent||''; const sym = SYMBOLS.find(s=>txt.includes(s));
+      if(!sym) return;
+      try{ runPortal(sym); }catch(e){ localMock({portal:sym, user:USER.value||'user', text:MSG.value||''}).then(render); }
+    });
+  }
+  // tema select
+  const sel=document.getElementById('themeSelect');
+  if(sel && !sel.dataset.bound){ sel.dataset.bound='1'; sel.addEventListener('change', ()=>setTheme(sel.value)); }
+  // mock
+  if(MOCKBTN && !MOCKBTN.dataset.bound){
+    MOCKBTN.dataset.bound='1';
+    MOCKBTN.addEventListener('click', ()=>{
+      offlineMock = !offlineMock;
+      MOCKBTN.textContent = offlineMock ? '🔌 offline: LIGADO' : '🔌 offline: DESLIGADO';
+      toast(offlineMock?'modo offline':'modo online');
+    });
+  }
+  // fallback runPortal caso removido
+  if(typeof window.runPortal!=='function'){
+    window.runPortal = (sym)=> localMock({portal:sym||detectPortal(MSG.value||''), user:USER.value||'user', text:MSG.value||''}).then(render);
+  }
+}
+</script>
+</body>
+</html>
